@@ -25,9 +25,11 @@ from __future__ import annotations
 import csv
 import io
 import re
+import gabarits as _gabarits
 import operations
 
-# Mots-clés -> type de gabarit. Ordre = priorité (premier match gagne).
+# Mots-clés -> type de gabarit, pour les DÉCAISSEMENTS.
+# Ordre = priorité (premier match gagne).
 REGLES = [
     (("loyer", "rent"),                         "loyer"),
     (("pno", "assurance", "gmf", "maif", "matmut", "emprunteur"), "assurance"),
@@ -41,9 +43,57 @@ REGLES = [
     (("ikea", "electromenager", "darty", "boulanger", "mobilier"), "petit_equipement"),
 ]
 
+# Mots-clés -> type, pour les ENCAISSEMENTS.
+#
+# Un encaissement n'était pas catégorisé du tout : `if montant > 0: return
+# "loyer"` faisait de TOUT crédit un loyer imposable. Un dépôt de garantie,
+# un apport, une indemnité d'assurance et une allocation logement — quatre
+# natures, trois comptes — ressortaient identiques, et la recette annuelle
+# était surévaluée de sommes qui, pour deux d'entre elles, ne sont pas des
+# produits du tout (constat E-01).
+REGLES_ENCAISSEMENT = [
+    (("depot de garantie", "depot garantie", "caution", "dg locataire"),
+     "depot_garantie_recu"),
+    (("deblocage", "mise a disposition pret", "pret debloque"), "emprunt_recu"),
+    (("sinistre", "indemnite", "indemnisation", "remboursement sinistre"),
+     "indemnite_assurance"),
+    (("regularisation charges", "regul charges"), "regularisation_charges"),
+    (("provision charges", "charges locatives", "forfait charges"),
+     "charges_locatives"),
+    # CAF / APL versées en tiers payant : complément de loyer, imposable.
+    (("loyer", "rent", "caf", "apl", "als", "msa"), "loyer"),
+]
+
+# Une mensualité de prêt MÊLE capital (non déductible) et intérêts
+# (déductibles) : aucune proposition automatique ne peut être juste, elle
+# demande une ventilation. On ne propose donc RIEN et la ligne part en
+# attente, où elle bloque la liasse tant qu'elle n'est pas traitée.
+VENTILATION_REQUISE = ("pret", "prets", "emprunt", "echeance", "mensualite",
+                       "credit immo", "credit immobilier", "amortissement pret")
+
+# Destination des lignes non identifiées, par sens du flux.
+ATTENTE = {"produit": "attente_encaissement", "charge": "attente_decaissement"}
+
 
 def _norm(s: str) -> str:
     return (s or "").strip().lower()
+
+
+def _contient(lib: str, cle: str) -> bool:
+    """Vrai si `cle` apparaît au DÉBUT D'UN MOT de `lib`.
+
+    `any(k in lib for k in cles)` cherchait une sous-chaîne, sans aucune
+    frontière : « mobilier » matchait dans « IMMOBILIER », donc la mensualité
+    d'un prêt immobilier devenait du petit équipement — 10 680 € de capital
+    passés en charge sur l'année, le redressement le plus classique en LMNP
+    au réel. « rent » matchait de même dans « PARENTS » (constat E-04).
+
+    L'ancrage porte sur le DÉBUT du mot seulement, pas sur sa fin : les
+    libellés bancaires fléchissent et tronquent les terminaisons — « comptab »
+    doit continuer de reconnaître « COMPTABLE », « reparation » de reconnaître
+    « REPARATIONS ». Un `\\b` des deux côtés les aurait tous fait tomber.
+    """
+    return re.search(rf"\b{re.escape(cle)}", lib) is not None
 
 
 def _date_iso(s: str) -> str:
@@ -54,28 +104,70 @@ def _date_iso(s: str) -> str:
     return s                            # déjà AAAA-MM-JJ
 
 
+def _nature_attendue(montant: float) -> str:
+    """'produit' pour un encaissement, 'charge' pour un décaissement."""
+    return "produit" if montant > 0 else "charge"
+
+
+def _coherent(type_op: str, montant: float, conn=None) -> bool:
+    """Le type retenu va-t-il dans le sens du montant ?
+
+    Rien en aval ne peut plus le vérifier : `proposer` enregistre
+    `round(abs(montant), 2)` et le guichet impose des montants strictement
+    positifs — l'information de signe est détruite. Un encaissement classé
+    « assurance » devenait donc une charge déductible de 800 €, alors qu'il
+    s'agissait d'une recette : 1 600 € d'écart sur le résultat pour 800 €
+    encaissés (constat E-05).
+    """
+    g = _gabarits.tous(conn) if conn is not None else _gabarits.GABARITS
+    fiche = g.get(type_op)
+    if fiche is None:
+        return False
+    return fiche["nature"] == _nature_attendue(montant)
+
+
 def categoriser(libelle: str, montant: float, conn=None) -> str:
     """Renvoie le type de gabarit proposé pour une ligne de relevé.
+
     Priorité 1 : l'HISTORIQUE des saisies validées (un libellé déjà rencontré
     reprend son type — vos propres saisies sont le meilleur référentiel).
-    Priorité 2 : les mots-clés génériques. Sinon : autres_charges (signalé)."""
+    Priorité 2 : les mots-clés, distincts selon le SENS du flux.
+    Sinon : le compte d'attente 472000, qui BLOQUE la liasse tant que la
+    ligne n'a pas été reclassée.
+
+    Le type retenu est confronté au sens du montant avant d'être rendu : une
+    nature de charge sur un encaissement (ou l'inverse) part en attente
+    plutôt que d'être acceptée.
+    """
+    attente = ATTENTE[_nature_attendue(montant)]
+    lib = _norm(libelle)
+
     if conn is not None:
         t = suggerer_depuis_historique(conn, libelle)
         if t:
-            return t
-    if montant > 0:
-        return "loyer"                 # encaissement : loyer par défaut
-    lib = _norm(libelle)
-    for cles, type_op in REGLES:
-        if any(k in lib for k in cles):
-            return type_op
-    return "autres_charges"            # décaissement non reconnu -> à requalifier
+            return t if _coherent(t, montant, conn) else attente
+
+    # Une mensualité de prêt se ventile à la main : ne rien proposer.
+    if any(_contient(lib, k) for k in VENTILATION_REQUISE):
+        return attente
+
+    regles = REGLES_ENCAISSEMENT if montant > 0 else REGLES
+    for cles, type_op in regles:
+        if any(_contient(lib, k) for k in cles):
+            return type_op if _coherent(type_op, montant, conn) else attente
+    return attente
 
 
 def suggerer_depuis_historique(conn, libelle: str) -> str | None:
     """Type le plus fréquemment associé à ce libellé (normalisé) dans les
     opérations déjà saisies, tous exercices confondus. None si inconnu ou
-    si l'historique ne pointe que vers un fourre-tout."""
+    si l'historique ne pointe que vers un fourre-tout.
+
+    « Fourre-tout » se lit sur le drapeau `requalifier` du gabarit, et non
+    sur un nom de type écrit en dur : depuis la passe E, `autres_charges`
+    n'est plus le seul — les deux comptes d'attente le portent aussi, et
+    resuggérer une attente reconduirait indéfiniment le doute.
+    """
     lib = _norm(libelle)
     if len(lib) < 4:
         return None
@@ -83,9 +175,10 @@ def suggerer_depuis_historique(conn, libelle: str) -> str | None:
         "SELECT type, COUNT(*) AS n FROM operation "
         "WHERE LOWER(TRIM(COALESCE(libelle,''))) = ? AND source='saisie' "
         "GROUP BY type ORDER BY n DESC LIMIT 1", (lib,)).fetchone()
-    if row and row[0] != "autres_charges":
-        return row[0]
-    return None
+    if not row:
+        return None
+    fiche = _gabarits.tous(conn).get(row[0], {})
+    return None if fiche.get("requalifier") else row[0]
 
 
 # Séparateurs de milliers (espace ordinaire, insécable, fine insécable) et

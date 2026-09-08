@@ -167,7 +167,7 @@ def test_aucune_anomalie_si_propre(conn):
     ("ORANGE INTERNET", -29, "telecom"),
     ("DGFIP TAXE FONCIERE", -1162, "impot_local"),
     ("FACTURE CABINET COMPTABLE", -225, "honoraires"),
-    ("ACHAT TRUC INCONNU", -42, "autres_charges"),
+    ("ACHAT TRUC INCONNU", -42, "attente_decaissement"),  # E-06
 ])
 def test_categoriser(libelle, montant, attendu):
     assert imp.categoriser(libelle, montant) == attendu

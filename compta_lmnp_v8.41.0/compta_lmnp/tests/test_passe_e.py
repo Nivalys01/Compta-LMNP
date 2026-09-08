@@ -362,3 +362,133 @@ def test_e10_gabarits_pointent_vers_des_comptes_existants(base):
     orphelins = {cle: g["compte"] for cle, g in gabarits.GABARITS.items()
                  if g["compte"] not in plan}
     assert not orphelins, f"gabarits sans compte au plan : {orphelins}"
+
+
+# ═══ E-01 / E-04 / E-05 / E-06 — la catégorisation ══════════════════════
+
+def test_e01_encaissements_ne_sont_plus_tous_des_loyers():
+    """Le tableau du rapport : quatre encaissements, quatre natures, trois
+    comptes. `if montant > 0: return "loyer"` en faisait 6 820 € de recettes,
+    dont 5 700 € qui ne sont pas des produits du tout."""
+    attendus = {
+        "VIREMENT DEPOT DE GARANTIE LOCATAIRE": "depot_garantie_recu",
+        "VIR M DUPONT APPORT":           "attente_encaissement",
+        "REMB SINISTRE GMF DEGAT DES EAUX":     "indemnite_assurance",
+        "VIR CAF ALLOCATION LOGEMENT":          "loyer",
+    }
+    for libelle, attendu in attendus.items():
+        assert import_bancaire.categoriser(libelle, 700.0) == attendu, libelle
+
+
+def test_e01_un_encaissement_inconnu_va_en_attente_pas_en_loyer():
+    """Le défaut de fond : l'inconnu ne doit plus créer d'impôt."""
+    t = import_bancaire.categoriser("VIR RECU ORIGINE INDETERMINEE", 1500.0)
+    assert t == "attente_encaissement"
+    assert gabarits.GABARITS[t]["compte"] == "472000"
+
+
+@pytest.mark.parametrize("libelle,montant", [
+    ("ECHEANCE PRET IMMOBILIER 001234",       -890.0),
+    ("AGENCE IMMOBILIERE HONORAIRES GESTION",  -65.0),
+    ("VIR RECU PARENTS AIDE",                 -300.0),
+])
+def test_e04_plus_de_match_en_sous_chaine(libelle, montant):
+    """« mobilier » ⊂ « IMMOBILIER » et « rent » ⊂ « PARENTS » : le filtrage
+    par sous-chaîne faisait passer 10 680 €/an de capital en petit
+    équipement, et un décaissement en loyer."""
+    t = import_bancaire.categoriser(libelle, montant)
+    assert t not in ("petit_equipement", "loyer")
+    assert t == "attente_decaissement"
+
+
+@pytest.mark.parametrize("libelle,attendu", [
+    ("FACTURE CABINET COMPTABLE", "honoraires"),     # comptab ⊂ COMPTABLE
+    ("DEVIS REPARATIONS TOITURE", "maintenance"),    # reparation ⊂ REPARATIONS
+    ("PRLV ASSURANCES GMF",       "assurance"),      # assurance ⊂ ASSURANCES
+])
+def test_e04_les_terminaisons_flechies_matchent_toujours(libelle, attendu):
+    """L'ancrage porte sur le DÉBUT du mot, pas sur sa fin : un `\\b` des deux
+    côtés aurait fait tomber toutes les formes fléchies des libellés
+    bancaires."""
+    assert import_bancaire.categoriser(libelle, -100.0) == attendu
+
+
+def test_e05_une_nature_de_charge_ne_prend_pas_un_encaissement(base):
+    """Le scénario du rapport : l'historique dit « assurance » pour ce
+    libellé, l'assureur rembourse un sinistre sous le même libellé. Sans
+    contrôle du sens, 800 € encaissés devenaient 800 € de charge déductible
+    — 1 600 € d'écart sur le résultat."""
+    operations.saisir(base, type="assurance", montant=138.49,
+                      date_operation="2026-01-15", bien_id=1,
+                      libelle="PRLV GMF PNO", source="saisie")
+    assert import_bancaire.categoriser("PRLV GMF PNO", -138.49, base) == "assurance"
+    assert import_bancaire.categoriser("PRLV GMF PNO", 800.0, base) == "attente_encaissement"
+
+
+def test_e05_une_nature_de_produit_ne_prend_pas_un_decaissement(base):
+    """Le cas symétrique, celui qu'E-04 produisait : un décaissement
+    libellé « loyer » ne peut pas être un produit."""
+    assert import_bancaire.categoriser("VIR LOYER MARS", 795.0) == "loyer"
+    assert import_bancaire.categoriser("REMB TROP PERCU LOYER", -795.0) \
+        == "attente_decaissement"
+
+
+def test_e06_le_fourre_tout_bloque_au_lieu_de_deduire(base):
+    """628800 est une charge IMMÉDIATEMENT DÉDUCTIBLE : « signalé » n'empêche
+    rien. 472000 déclenche le contrôle bloquant. C'est toute la différence
+    entre un contrôle qui informe et un contrôle qui protège."""
+    import controles
+    t = import_bancaire.categoriser("PRLV FOURNISSEUR INCONNU", -95.0)
+    assert t == "attente_decaissement"
+    assert gabarits.GABARITS[t]["compte"] == "472000"
+
+    operations.saisir(base, type=t, montant=95.0,
+                      date_operation="2026-01-05", bien_id=1)
+    codes = {a.code for a in controles.controler(base, 2026)
+             if a.niveau == controles.BLOQUANT}
+    assert "COMPTE_ATTENTE" in codes
+
+
+def test_e06_une_ligne_en_attente_reste_hors_du_resultat(base):
+    """Une charge non identifiée ne doit plus se déduire toute seule."""
+    avant = _resultat(base)
+    operations.saisir(base, type="attente_decaissement", montant=890.0,
+                      date_operation="2026-01-05", bien_id=1)
+    assert _resultat(base) == avant
+
+
+def test_e06_historique_ne_resuggere_pas_une_attente(base):
+    """Resuggérer un fourre-tout reconduirait le doute indéfiniment. Le test
+    porte sur le DRAPEAU `requalifier`, pas sur le nom du type : depuis la
+    passe E, `autres_charges` n'est plus le seul concerné."""
+    operations.saisir(base, type="attente_decaissement", montant=33.0,
+                      date_operation="2026-01-05", bien_id=1,
+                      libelle="PRLV MYSTERE", source="saisie")
+    assert import_bancaire.suggerer_depuis_historique(base, "PRLV MYSTERE") is None
+
+
+def test_e04_mensualite_de_pret_ne_propose_rien(base):
+    """Une mensualité mêle capital (non déductible) et intérêts
+    (déductibles) : aucune proposition automatique ne peut être juste."""
+    for libelle in ("ECHEANCE PRET 001234", "REMBOURSEMENT EMPRUNT N.12345",
+                    "MENSUALITE CREDIT IMMOBILIER"):
+        assert import_bancaire.categoriser(libelle, -890.0) \
+            == "attente_decaissement", libelle
+
+
+def test_e01_import_complet_ne_cree_plus_de_recette_fictive(base, tmp_path):
+    """Bout en bout : le relevé d'E-01 importé et validé ne doit ajouter au
+    résultat que ce qui est réellement imposable — l'allocation logement."""
+    p = tmp_path / "releve.csv"
+    p.write_text("date;libelle;montant\n"
+                 "05/01/2026;VIREMENT DEPOT DE GARANTIE LOCATAIRE;700,00\n"
+                 "06/01/2026;VIR M DUPONT APPORT;5000,00\n"
+                 "07/01/2026;REMB SINISTRE GMF DEGAT DES EAUX;800,00\n"
+                 "08/01/2026;VIR CAF ALLOCATION LOGEMENT;320,00\n",
+                 encoding="utf-8")
+    avant = _resultat(base)
+    import_bancaire.importer(base, str(p), valider=True)
+    apres = _resultat(base)
+    # 320 € d'APL (loyer) + 800 € d'indemnité (produit courant) = 1 120 €.
+    # Le dépôt de garantie (dette) et l'apport (attente) restent dehors.
+    assert round(apres - avant, 2) == 1120.00

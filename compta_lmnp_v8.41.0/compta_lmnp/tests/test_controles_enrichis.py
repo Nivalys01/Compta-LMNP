@@ -233,8 +233,10 @@ def test_import_suggere_le_type_de_l_historique(conn):
         operations.saisir(conn, type="energie", montant=45.0,
                           date_operation=f"{ANNEE}-{m}-10", periode=f"{ANNEE}-{m}",
                           libelle="PRLV SEPA ENGIE")
-    # Sans historique, aucun mot-clé ne matche → autres_charges.
-    assert import_bancaire.categoriser("PRLV SEPA ENGIE", -45.0) == "autres_charges"
+    # Sans historique, aucun mot-clé ne matche → compte d'ATTENTE depuis la
+    # passe E (E-06) : le fourre-tout 628800 était une charge déductible, il
+    # « signalait » sans rien empêcher. 472000 bloque la liasse.
+    assert import_bancaire.categoriser("PRLV SEPA ENGIE", -45.0) == "attente_decaissement"
     # Avec l'historique, la suggestion suit les saisies validées.
     assert import_bancaire.categoriser("PRLV SEPA ENGIE", -45.0, conn) == "energie"
     assert import_bancaire.categoriser("prlv sepa engie ", -45.0, conn) == "energie"
@@ -248,4 +250,4 @@ def test_import_historique_ignore_les_fourre_tout(conn):
                       date_operation=f"{ANNEE}-03-10", periode=f"{ANNEE}-03",
                       libelle="PRLV MYSTERE")
     assert import_bancaire.suggerer_depuis_historique(conn, "PRLV MYSTERE") is None
-    assert import_bancaire.categoriser("PRLV MYSTERE", -33.0, conn) == "autres_charges"
+    assert import_bancaire.categoriser("PRLV MYSTERE", -33.0, conn) == "attente_decaissement"

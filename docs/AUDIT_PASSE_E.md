@@ -22,7 +22,7 @@ lectures. Ce qui n'a pas pu être vérifié faute de fichier est isolé en §5.
 | Libellé | Montant | Type proposé |
 |---|---|---|
 | `VIREMENT DEPOT DE GARANTIE LOCATAIRE` | +700,00 | `loyer` |
-| `VIR ***DONNEE-RETIREE*** APPORT` | +5 000,00 | `loyer` |
+| `VIR M DUPONT APPORT` | +5 000,00 | `loyer` |
 | `REMB SINISTRE GMF DEGAT DES EAUX` | +800,00 | `loyer` |
 | `VIR CAF ALLOCATION LOGEMENT` | +320,00 | `loyer` |
 
@@ -635,6 +635,68 @@ gabarits de résultat (classes 6 et 7), ce qui était le comportement de fait
 avant la passe E.
 
 Non-régression : 15 tests supplémentaires dans `tests/test_passe_e.py`.
+
+### Lot 3 — E-01, E-04, E-05, E-06 (traité)
+
+`import_bancaire.categoriser` est réécrit autour de trois idées.
+
+**Le sens du flux gouverne le jeu de règles.** `REGLES_ENCAISSEMENT` traite
+les crédits (dépôt de garantie, déblocage de prêt, indemnité, régularisation
+de charges, loyer — CAF/APL comprises), `REGLES` les débits. `if montant > 0:
+return "loyer"` disparaît : un encaissement inconnu ne crée plus d'impôt.
+
+**Les mots-clés sont ancrés en DÉBUT DE MOT.** `_contient()` remplace
+`any(k in lib …)`. « mobilier » ne matche plus dans « IMMOBILIER », « rent »
+plus dans « PARENTS ». L'ancrage ne porte volontairement **que sur le début**
+du mot : les libellés bancaires fléchissent les terminaisons, et un `\b` des
+deux côtés aurait fait tomber « comptab » → COMPTABLE, « reparation » →
+RÉPARATIONS, « assurance » → ASSURANCES. Les six règles historiques passent
+toujours.
+
+**Le type retenu est confronté au signe.** `_coherent()` compare la `nature`
+du gabarit au sens du montant ; en cas de désaccord, la ligne part en attente.
+Ce contrôle s'applique aussi au chemin de l'historique, qui était précisément
+le scénario d'E-05.
+
+**Le fourre-tout devient un compte d'attente.** `autres_charges` (628800,
+charge déductible) cesse d'être la destination par défaut au profit de
+`attente_encaissement` / `attente_decaissement` (472000). `autres_charges`
+reste au catalogue pour la saisie manuelle.
+
+**Une mensualité de prêt ne propose rien.** `VENTILATION_REQUISE` capte
+pret / emprunt / echeance / mensualite / credit immobilier et bascule en
+attente : la mensualité mêle capital non déductible et intérêts déductibles,
+aucune proposition automatique ne peut être juste.
+
+`suggerer_depuis_historique` ne resuggère plus un fourre-tout — le test porte
+désormais sur le drapeau `requalifier` du gabarit et non sur un nom de type
+écrit en dur, puisque `autres_charges` n'est plus le seul concerné.
+
+Bout en bout, le relevé d'E-01 (4 encaissements, 6 820 €) n'ajoute plus que
+**1 120 €** au résultat : l'allocation logement et l'indemnité d'assurance.
+Le dépôt de garantie devient une dette, l'apport part en attente.
+
+Non-régression : 15 tests supplémentaires. Trois tests existants mis à jour,
+tous sur le changement de fourre-tout (`autres_charges` → `attente_*`).
+
+### Incident — nom réel recopié dans un test, attrapé par le contrôle du projet
+
+En écrivant les tests d'E-01 j'ai recopié tel quel le libellé
+« VIR M \<nom\> APPORT » du tableau du rapport : il porte le nom réel de
+l'exploitant. `tests/test_audit_production.py`, qui exécute le contrôle de
+publication, a échoué en BLOQUANT et l'a signalé. Le libellé est anonymisé
+(« VIR M DUPONT APPORT »), dans le test **et dans ce rapport**.
+
+Deux enseignements :
+
+1. Le garde-fou fonctionne, et il a fonctionné dans la seule direction qui
+   compte — il a bloqué avant publication, pas après.
+2. **`verifier_depot.py` ne couvre pas `docs/`.** Il inspecte ce que le
+   paquet publierait, c'est-à-dire l'arborescence `compta_lmnp/`. Le rapport
+   d'audit, à la racine du dépôt, portait le même nom réel sans qu'aucun
+   contrôle ne le voie. Un dépôt public expose `docs/` comme le reste : le
+   contrôle devrait porter sur les fichiers **suivis par git**, pas seulement
+   sur le contenu du paquet. **À traiter.**
 
 ### Réserve — la conséquence annoncée pour les cases 218/232 n'existe pas
 
