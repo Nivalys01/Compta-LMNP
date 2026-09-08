@@ -10,12 +10,21 @@ l'essentiel de la frappe. Chaque ligne est rapprochée d'un type d'opération ;
 ce qui n'est pas reconnu tombe en 'autres_charges' (donc signalé à requalifier
 par les contrôles — comportement prudent, pas silencieux).
 
-Format CSV attendu (séparateur ; ou ,) : date(JJ/MM/AAAA ou AAAA-MM-JJ);libelle;montant
-Montant signé : positif = encaissement, négatif = décaissement.
+Format CSV attendu (séparateur ;, tabulation ou ,) :
+    date(JJ/MM/AAAA ou AAAA-MM-JJ);libelle;montant
+EXACTEMENT trois colonnes. Montant signé : positif = encaissement, négatif
+= décaissement ; les formes -120,50 / 120,50- / (120,50) / -120,50 EUR /
+-1 234,50 € sont toutes acceptées.
+
+Un export à colonnes débit et crédit séparées est REFUSÉ, pas deviné : il
+était lu comme un montant positif et transformait toutes les charges en
+recettes. Toute ligne dont le montant reste illisible est comptée et
+restituée par analyser() — jamais ignorée en silence.
 """
 from __future__ import annotations
 import csv
 import io
+import re
 import operations
 
 # Mots-clés -> type de gabarit. Ordre = priorité (premier match gagne).
@@ -79,20 +88,83 @@ def suggerer_depuis_historique(conn, libelle: str) -> str | None:
     return None
 
 
-def proposer(csv_path: str, conn=None) -> list[dict]:
-    """Lit le relevé et renvoie des propositions d'opérations (non insérées).
+# Séparateurs de milliers (espace ordinaire, insécable, fine insécable) et
+# marques de devise que les exports bancaires accolent au montant.
+_PARASITES_MONTANT = (" ", "\xa0", " ", "€")
+
+
+def _montant(brut: str) -> float:
+    """Convertit un montant d'export bancaire en flottant SIGNÉ.
+
+    Les banques françaises écrivent le même débit d'au moins cinq façons :
+    -120,50 ; 120,50- (signe suffixe, hérité des mainframes) ; (120,50)
+    (convention comptable anglo-saxonne) ; -120,50 EUR ; -1 234,50 €.
+    Seule la première était lue ; les autres disparaissaient de l'import
+    sans un mot, et l'utilisateur concluait que son relevé était vide.
+
+    Lève ValueError si la chaîne reste illisible — à charge de l'appelant
+    de COMPTER le rejet et de le restituer, jamais de l'avaler.
+    """
+    s = (brut or "").strip()
+    for p in _PARASITES_MONTANT:
+        s = s.replace(p, "")
+    s = re.sub(r"(?i)eur", "", s).strip()   # « EUR » ne peut pas être un chiffre
+    negatif = False
+    if s.startswith("(") and s.endswith(")"):      # (120,50) = -120,50
+        negatif, s = True, s[1:-1].strip()
+    if s.endswith("-"):                            # 120,50-  = -120,50
+        negatif, s = True, s[:-1].strip()
+    if not s:
+        raise ValueError("montant vide")
+    valeur = float(s.replace(",", "."))
+    return -abs(valeur) if negatif else valeur
+
+
+def _delimiteur(texte: str) -> str:
+    """Devine le séparateur de colonnes sur le début du fichier.
+
+    Le point-virgule l'emporte à égalité : dans un export français la
+    virgule est d'abord un séparateur DÉCIMAL (120,50), donc fréquente
+    sans être le délimiteur. La tabulation est reconnue depuis la passe E
+    — un export tabulé était auparavant lu comme une colonne unique, donc
+    intégralement rejeté (constat E-03).
+    """
+    debut = texte[:2048]
+    comptes = {c: debut.count(c) for c in (";", "\t", ",")}
+    meilleur = max(comptes.values())
+    if meilleur == 0:
+        return ";"
+    for c in (";", "\t", ","):             # ordre = priorité à égalité
+        if comptes[c] == meilleur:
+            return c
+    return ";"
+
+
+def analyser(csv_path: str, conn=None) -> dict:
+    """Lit le relevé et rend compte de TOUT : ce qui est proposé, et ce qui
+    ne l'est pas.
+
+    Renvoie {"propositions": [...], "rejets": [...]}, chaque rejet portant
+    son numéro de ligne, son contenu et la raison. Un import partiel qui se
+    présente comme complet est le pire des résultats : le déclarant ne peut
+    pas savoir que des charges manquent à l'appel.
 
     Robustesse (les exports bancaires réels sont sales) :
     - encodage : UTF-8 (avec ou sans BOM) puis repli cp1252 — les banques
       françaises exportent souvent en encodage Windows ;
     - un fichier binaire (PDF renommé…) est refusé avec un message clair ;
-    - montants : tous les séparateurs de milliers Unicode sont nettoyés
-      (espace, insécable \xa0, fine insécable \u202f) — sinon la ligne
-      serait ignorée EN SILENCE, une perte de données invisible ;
+    - séparateur : point-virgule, tabulation ou virgule ;
+    - montants : voir _montant() ;
     - libellés : tabulations et sauts de ligne remplacés par des espaces
       (interdits au guichet — un relevé bancaire peut en contenir).
+
+    Refuse le FICHIER (et non la ligne) dès qu'une ligne de données ne porte
+    pas exactement trois colonnes : un export « Date;Libellé;Débit;Crédit »
+    se lisait auparavant sans erreur, la colonne débit étant prise pour un
+    montant signé — toutes les charges devenaient des recettes (E-02).
     """
-    brut = open(csv_path, "rb").read()
+    with open(csv_path, "rb") as f:
+        brut = f.read()
     texte = None
     for enc in ("utf-8-sig", "cp1252"):
         try:
@@ -105,19 +177,28 @@ def proposer(csv_path: str, conn=None) -> list[dict]:
                          "(fichier binaire ? mauvais fichier ?). Exportez le "
                          "relevé au format CSV depuis votre banque.")
 
-    delim = ";" if texte[:2048].count(";") >= texte[:2048].count(",") else ","
-    propositions = []
-    for r in csv.reader(io.StringIO(texte), delimiter=delim):
-        if len(r) < 3:
-            continue
+    delim = _delimiteur(texte)
+    propositions: list[dict] = []
+    rejets: list[dict] = []
+    for n, r in enumerate(csv.reader(io.StringIO(texte), delimiter=delim), 1):
+        if not r or all(not c.strip() for c in r):
+            continue                          # ligne vide
         if _norm(r[0]) in ("date", "date operation"):
-            continue               # en-tête
-        montant_brut = r[2].strip()
-        for sep in (" ", "\xa0", "\u202f"):
-            montant_brut = montant_brut.replace(sep, "")
+            continue                          # en-tête
+        if len(r) != 3:
+            raise ValueError(
+                f"Ligne {n} : {len(r)} colonnes au lieu de 3. Ce module lit "
+                "un relevé « date;libelle;montant », le montant étant signé "
+                "(négatif pour un décaissement). Il ne sait pas lire un "
+                "export à colonnes débit et crédit séparées : il prendrait "
+                "chaque débit pour une recette, et toutes vos charges "
+                "deviendraient des loyers. Réexportez le relevé en trois "
+                "colonnes, ou supprimez les colonnes en trop avant l'import.")
         try:
-            montant = float(montant_brut.replace(",", "."))
+            montant = _montant(r[2])
         except ValueError:
+            rejets.append({"ligne": n, "contenu": delim.join(r).strip(),
+                           "raison": f"montant illisible ({r[2].strip()!r})"})
             continue
         date = _date_iso(r[0])
         libelle = " ".join(r[1].split())       # tabs/newlines → espace simple
@@ -130,7 +211,16 @@ def proposer(csv_path: str, conn=None) -> list[dict]:
             "type": type_op,
             "periode": date[:7] if mensuel else None,
         })
-    return propositions
+    return {"propositions": propositions, "rejets": rejets}
+
+
+def proposer(csv_path: str, conn=None) -> list[dict]:
+    """Propositions d'opérations (non insérées) issues du relevé.
+
+    Ne dit RIEN des lignes rejetées : passer par analyser() partout où
+    l'utilisateur doit les voir.
+    """
+    return analyser(csv_path, conn)["propositions"]
 
 
 def importer(conn, csv_path: str, valider: bool = False) -> list[dict]:

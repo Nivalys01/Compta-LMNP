@@ -95,8 +95,16 @@ def cmd_saisir(a):
 
 def cmd_importer(a):
     conn = _conn()
+    rejets = import_bancaire.analyser(a.csv, conn)["rejets"]
     props = import_bancaire.importer(conn, a.csv, valider=a.valider)
     conn.close()
+    if rejets:
+        # Rendre compte AVANT la liste : une ligne non lue est une charge
+        # non déduite ou une recette non déclarée, pas un détail.
+        print(f"ATTENTION — {len(rejets)} ligne(s) non lue(s) :")
+        for r in rejets:
+            print(f"  ligne {r['ligne']:>4} : {r['raison']}  |  {r['contenu']}")
+        print()
     print(f"{len(props)} ligne(s) {'importée(s)' if a.valider else 'proposée(s)'} :")
     for p in props:
         per = p["periode"] or "-"

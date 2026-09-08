@@ -1727,11 +1727,20 @@ def import_proposer():
         jeton = uuid.uuid4().hex
         chemin = os.path.join(_dossier_imports(), jeton + ".csv")
         f.save(chemin)
-        props = import_bancaire.proposer(chemin, conn)
+        analyse = import_bancaire.analyser(chemin, conn)
+        props, rejets = analyse["propositions"], analyse["rejets"]
         if not props:
             os.remove(chemin)
+            detail = ""
+            if rejets:
+                # Un relevé entièrement dans un format de montant non lu
+                # produisait « aucune ligne exploitable » : l'utilisateur
+                # croyait son fichier vide. Il doit voir la vraie raison.
+                ex = rejets[0]
+                detail = (f" {len(rejets)} ligne(s) rejetée(s), la première "
+                          f"en ligne {ex['ligne']} : {ex['raison']}.")
             return redirect(url_for("saisie", err="Aucune ligne exploitable "
-                                                  "dans ce relevé."))
+                                                  "dans ce relevé." + detail))
         annee = _annee_param(conn)
         annees = _annees(conn)
         biens = conn.execute("SELECT id, libelle FROM bien ORDER BY id").fetchall()
@@ -1745,9 +1754,13 @@ def import_proposer():
             perio_json=json.dumps(perio),
         ) + render_template_string(PAGE_IMPORT_SECTION,
             propositions=props, jeton=jeton)
+        avertissement = ("" if not rejets else
+                         f" {len(rejets)} ligne(s) du relevé n'ont PAS pu "
+                         f"être lues (première : ligne {rejets[0]['ligne']}, "
+                         f"{rejets[0]['raison']}) — vérifiez-les à la main.")
         return _base(body, active="saisie", annee=annee, annees=annees,
                      flash_ok=f"{len(props)} proposition(s) — cochez et "
-                              "validez ci-dessous.")
+                              "validez ci-dessous." + avertissement)
     except ValueError as exc:
         return redirect(url_for("saisie", err=str(exc)))
     finally:
