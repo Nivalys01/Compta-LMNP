@@ -568,3 +568,116 @@ def test_verifier_depot_couvre_bien_la_racine_du_depot_reel():
         pytest.skip("pas de dépôt git ici")
     assert any(f.startswith("docs/") for f in fichiers), \
         "le contrôle ne voit pas docs/ — le trou est revenu"
+
+
+# ═══ E-07 / E-08 / E-09 — les majeurs restants ══════════════════════════
+
+@pytest.mark.parametrize("accentue,sans_accent,attendu", [
+    ("PRELEVEMENT TAXE FONCIÈRE 2026",  "PRELEVEMENT TAXE FONCIERE 2026",  "impot_local"),
+    ("ENTRETIEN CHAUDIÈRE ANNUEL",      "ENTRETIEN CHAUDIERE ANNUEL",      "maintenance"),
+    ("APPEL COPROPRIÉTÉ T1",            "APPEL COPROPRIETE T1",            "charge_copro"),
+    ("DEVIS RÉPARATION TOITURE",        "DEVIS REPARATION TOITURE",        "maintenance"),
+])
+def test_e07_accents_indifferents(accentue, sans_accent, attendu):
+    """Les clés de REGLES sont écrites sans accent, les libellés SEPA des
+    banques en ligne les conservent. Taxe foncière, entretien de chaudière
+    et appels de copropriété sont l'essentiel des charges d'un dossier
+    LMNP : c'est le volume qui fait la gravité de ce défaut."""
+    assert import_bancaire.categoriser(accentue, -1420.0) == attendu
+    assert import_bancaire.categoriser(sans_accent, -1420.0) == attendu
+
+
+def test_e07_la_cle_de_l_historique_nest_pas_repliee():
+    """E-07 replie les accents pour la recherche PAR MOTS-CLÉS uniquement.
+
+    La clé de l'historique reste non repliée, et c'est délibéré : la
+    comparaison se fait côté SQL (`LOWER(TRIM(libelle))`). Replier en Python
+    seulement creuserait un écart de plus entre les deux côtés.
+    """
+    assert import_bancaire._norm("TAXE FONCIÈRE") == "taxe fonciere"
+    assert import_bancaire._cle_libelle("TAXE FONCIÈRE") == "taxe foncière"
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "LOWER() de SQLite est ASCII : « CHAUDIÈRE » y reste « CHAUDIèRE » alors "
+    "que Python rend « chaudière ». L'historique ne retrouve donc AUCUN "
+    "libellé accentué. Cause supplémentaire d'E-12, non relevée par le "
+    "rapport, à traiter avec ce constat — pas une régression d'E-07, le "
+    "défaut préexiste."))
+def test_e12_historique_sur_libelle_accentue_connu_pour_echouer(base):
+    operations.saisir(base, type="maintenance", montant=210.0,
+                      date_operation="2026-03-01", bien_id=1,
+                      libelle="ENTRETIEN CHAUDIÈRE ANNUEL", source="saisie")
+    assert import_bancaire.suggerer_depuis_historique(
+        base, "ENTRETIEN CHAUDIÈRE ANNUEL") == "maintenance"
+
+
+@pytest.mark.parametrize("libelle", [
+    "DGFIP COTISATION FONCIERE DES ENTREPRISES",
+    "TRESOR PUBLIC CFE 2026",
+    "CFE 2026 DGFIP",
+])
+def test_e08_la_cfe_nest_plus_captee_par_les_impots_locaux(libelle):
+    """Les trois libellés réalistes d'un avis de CFE contiennent « dgfip »
+    ou « tresor public » : la règle `cfe`, placée après, était inatteignable
+    en pratique. Le plan distingue pourtant 635110 de 635130, et la liasse
+    imprime une ligne « dont CFE » qui restait à zéro."""
+    assert import_bancaire.categoriser(libelle, -310.0) == "cfe"
+
+
+def test_e08_la_taxe_fonciere_reste_un_impot_local():
+    """Contrepartie du réordonnancement : ne pas tout capter en CFE."""
+    for libelle in ("DGFIP TAXE FONCIERE", "PRELEVEMENT TEOM",
+                    "TRESOR PUBLIC IMPOT LOCAL"):
+        assert import_bancaire.categoriser(libelle, -1162.0) == "impot_local"
+
+
+def test_e08_cfe_et_taxe_fonciere_vont_dans_des_comptes_distincts():
+    """Le point qui compte pour le déclarant : deux comptes, deux lignes."""
+    assert gabarits.GABARITS["cfe"]["compte"] == "635110"
+    assert gabarits.GABARITS["impot_local"]["compte"] == "635130"
+
+
+@pytest.mark.parametrize("montant,attendu", [
+    (-180.0,  "petit_equipement"),        # sous le seuil : charge
+    (-499.0,  "petit_equipement"),
+    (-501.0,  "attente_decaissement"),    # au-dessus : immobilisation
+    (-1850.0, "attente_decaissement"),    # le scénario du rapport
+])
+def test_e09_seuil_dimmobilisation_applique_a_l_import(montant, attendu):
+    """Au-delà de 500 € HT, un meuble destiné au logement meublé est une
+    IMMOBILISATION (218400), pas du petit équipement (606320). Aucun test
+    de montant n'existait dans le module."""
+    assert import_bancaire.categoriser("ACHAT MOBILIER CONFORAMA", montant) == attendu
+
+
+def test_e09_le_seuil_est_la_regle_versionnee_pas_une_constante(base):
+    """Le seuil vit dans « Réglementation » et se lit au millésime de
+    l'exercice. Un import daté de 2026 doit suivre la valeur 2026."""
+    import parametres
+    parametres.definir(base, "seuil_immobilisation", 1000.0,
+                       date_debut="2026-01-01", reference="test",
+                       commentaire="relèvement fictif")
+    # 800 € : au-dessus de 500 (défaut) mais sous le nouveau seuil 2026.
+    assert import_bancaire.categoriser("ACHAT MOBILIER CONFORAMA", -800.0,
+                                       base, 2026) == "petit_equipement"
+    assert import_bancaire.categoriser("ACHAT MOBILIER CONFORAMA", -1200.0,
+                                       base, 2026) == "attente_decaissement"
+
+
+def test_e09_le_seuil_ne_touche_que_les_gabarits_concernes():
+    """Une charge sans drapeau `seuil_immo` n'est pas plafonnée : une taxe
+    foncière de 1 420 € reste une taxe foncière."""
+    assert import_bancaire.categoriser("DGFIP TAXE FONCIERE", -1420.0) == "impot_local"
+    assert import_bancaire.categoriser("PRLV SYNDIC APPEL T1", -2500.0) == "charge_copro"
+
+
+def test_e09_analyser_sert_le_millesime_de_la_ligne(tmp_path):
+    """Le seuil dépend de l'exercice : analyser() le déduit de la date de
+    l'opération, pas de l'année courante."""
+    p = tmp_path / "releve.csv"
+    p.write_text("date;libelle;montant\n"
+                 "15/06/2026;ACHAT MOBILIER CONFORAMA;-1850,00\n",
+                 encoding="utf-8")
+    props = import_bancaire.analyser(str(p))["propositions"]
+    assert props[0]["type"] == "attente_decaissement"

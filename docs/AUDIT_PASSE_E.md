@@ -725,6 +725,57 @@ traitement d'E-01 devra router ces lignes vers l'attente, ou le modèle devra
 introduire un compte de trésorerie distinct (question déjà posée au §5 du
 rapport, « absence de compte 512/530 »).
 
+### Lot 4 — E-07, E-08, E-09 (traité)
+
+**E-07 — accents.** `_norm()` replie désormais les accents (NFD + filtrage des
+combinantes) pour la recherche par mots-clés. « PRELEVEMENT TAXE FONCIÈRE »
+est reconnu comme sa forme non accentuée.
+
+Une distinction a été introduite au passage : `_cle_libelle()` — minuscules et
+espaces seulement, **sans repli d'accents** — sert la clé de l'historique. La
+comparaison s'y fait côté SQL et SQLite ne replie pas les accents ; replier
+d'un seul côté aurait creusé un écart de plus.
+
+**E-08 — CFE.** La règle `cfe` passe AVANT `impot_local`. Les trois libellés
+réalistes d'un avis de CFE contiennent « dgfip » ou « tresor public », qui
+matchaient d'abord : la règle était inatteignable en pratique. Taxe foncière,
+TEOM et « impôt local » continuent de tomber en `impot_local` (635130), la CFE
+va en `cfe` (635110), et la ligne « dont CFE » de la liasse cesse d'être
+servie à zéro.
+
+**E-09 — seuil d'immobilisation.** L'import teste enfin le montant.
+`_depasse_le_seuil()` lit la **règle fiscale versionnée**
+`seuil_immobilisation` au millésime de l'opération (500 € par défaut,
+BOI-BIC-CHG-20-30-10), et `analyser()` sert ce millésime depuis la date de la
+ligne. Au-delà du seuil, aucune proposition n'est faite : une immobilisation
+ne se saisit pas comme une opération, elle se crée dans la page
+Immobilisations avec sa durée et son plan. La ligne part en attente, où elle
+bloque la liasse.
+
+Le contrôle `c_depense_immobilisable` signalait déjà le dépassement, mais
+APRÈS l'écriture, en avertissement. Le seuil agit maintenant au moment de la
+proposition.
+
+Non-régression : 17 tests supplémentaires (84 dans `tests/test_passe_e.py`).
+
+### E-12 — cause supplémentaire trouvée : `LOWER()` de SQLite est ASCII
+
+En vérifiant qu'E-07 ne dégradait pas l'historique, un défaut plus profond
+est apparu. `suggerer_depuis_historique` compare `_cle_libelle(libelle)`
+(Python, Unicode) à `LOWER(TRIM(libelle))` (SQLite, **ASCII seulement**) :
+« CHAUDIÈRE » devient « chaudière » d'un côté et reste « CHAUDIèRE » de
+l'autre. **L'historique ne retrouve donc aucun libellé accentué**, quel que
+soit son degré de stabilité.
+
+Le rapport attribue l'inefficacité de l'historique à la seule égalité stricte
+du libellé (E-12). C'en est une deuxième cause, indépendante, et elle touche
+une bonne part des libellés bancaires français. Le défaut **préexiste** à la
+passe E : `_norm` et `LOWER` divergeaient déjà.
+
+Figé par un test `xfail(strict=True)` — `test_e12_historique_sur_libelle_
+accentue_connu_pour_echouer` — qui échouera bruyamment le jour où E-12 sera
+corrigé, pour qu'on pense à le repasser en test normal.
+
 ### E-20 — Les produits exceptionnels ne sont pas isolés (constat ouvert)
 
 **Fichier / fonction** : `liasse.py`, calcul des cases 218/232.

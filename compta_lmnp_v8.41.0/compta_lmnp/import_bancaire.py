@@ -25,6 +25,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+import unicodedata
 import gabarits as _gabarits
 import operations
 
@@ -36,8 +37,15 @@ REGLES = [
     (("syndic", "copro", "copropriete"),        "charge_copro"),
     (("orange", "free", "sfr", "bouygues", "internet", "box", "fibre"), "telecom"),
     (("chaudiere", "entretien", "reparation", "plomb", "depannage"), "maintenance"),
-    (("taxe fonciere", "teom", "tresor public", "dgfip", "impot local"), "impot_local"),
+    # La CFE AVANT les impôts locaux. Dans l'autre ordre, la règle « cfe »
+    # était inatteignable en pratique : les trois libellés réalistes d'un
+    # avis de CFE — « DGFIP COTISATION FONCIERE DES ENTREPRISES »,
+    # « TRESOR PUBLIC CFE 2026 », « CFE 2026 DGFIP » — contiennent tous
+    # « dgfip » ou « tresor public », qui matchaient d'abord. Le plan
+    # distingue pourtant 635110 (CET) de 635130 (autres impôts locaux), et
+    # la liasse imprime une ligne « dont CFE » servie à zéro (constat E-08).
     (("cfe", "cotisation fonciere"),            "cfe"),
+    (("taxe fonciere", "teom", "tresor public", "dgfip", "impot local"), "impot_local"),
     (("les acteurs payants actuels", "comptab", "expert comptable"),   "honoraires"),
     (("frais", "commission", "cotisation carte", "agios"), "frais_bancaires"),
     (("ikea", "electromenager", "darty", "boulanger", "mobilier"), "petit_equipement"),
@@ -75,8 +83,31 @@ VENTILATION_REQUISE = ("pret", "prets", "emprunt", "echeance", "mensualite",
 ATTENTE = {"produit": "attente_encaissement", "charge": "attente_decaissement"}
 
 
-def _norm(s: str) -> str:
+def _cle_libelle(s: str) -> str:
+    """Clé de comparaison EXACTE d'un libellé, pour l'historique.
+
+    Volontairement distincte de _norm() : la comparaison se fait côté SQL
+    (`LOWER(TRIM(libelle))`), et SQLite ne replie pas les accents. Replier
+    ici et pas là-bas rendrait l'historique introuvable pour tout libellé
+    accentué — un défaut ajouté en corrigeant E-07.
+    """
     return (s or "").strip().lower()
+
+
+def _norm(s: str) -> str:
+    """Normalise un libellé pour la RECHERCHE PAR MOTS-CLÉS : minuscules,
+    puis repli des accents.
+
+    Les clés de REGLES sont écrites sans accent (« taxe fonciere »,
+    « chaudiere », « copropriete », « reparation ») alors que les libellés
+    SEPA des banques en ligne les conservent. « PRELEVEMENT TAXE FONCIÈRE »
+    tombait donc dans le fourre-tout quand « TAXE FONCIERE » était reconnu —
+    et taxe foncière, entretien de chaudière et appels de copropriété sont
+    l'essentiel des charges d'un dossier LMNP (constat E-07).
+    """
+    s = _cle_libelle(s)
+    return "".join(c for c in unicodedata.normalize("NFD", s)
+                   if not unicodedata.combining(c))
 
 
 def _contient(lib: str, cle: str) -> bool:
@@ -126,7 +157,25 @@ def _coherent(type_op: str, montant: float, conn=None) -> bool:
     return fiche["nature"] == _nature_attendue(montant)
 
 
-def categoriser(libelle: str, montant: float, conn=None) -> str:
+def _seuil_immobilisation(conn=None, annee: int | None = None) -> float:
+    """Seuil au-delà duquel une dépense s'immobilise, pour l'exercice visé.
+
+    C'est une RÈGLE FISCALE VERSIONNÉE (menu Réglementation), pas une
+    constante : chaque exercice est lu à son millésime. 500 € par défaut,
+    tolérance BOI-BIC-CHG-20-30-10.
+    """
+    if conn is None or annee is None:
+        return 500.0
+    try:
+        import parametres
+        return float(parametres.valeur(conn, "seuil_immobilisation", annee,
+                                       defaut=500.0))
+    except Exception:                     # noqa: BLE001 — le seuil ne doit
+        return 500.0                      # jamais faire échouer un import
+
+
+def categoriser(libelle: str, montant: float, conn=None,
+                annee: int | None = None) -> str:
     """Renvoie le type de gabarit proposé pour une ligne de relevé.
 
     Priorité 1 : l'HISTORIQUE des saisies validées (un libellé déjà rencontré
@@ -154,8 +203,33 @@ def categoriser(libelle: str, montant: float, conn=None) -> str:
     regles = REGLES_ENCAISSEMENT if montant > 0 else REGLES
     for cles, type_op in regles:
         if any(_contient(lib, k) for k in cles):
-            return type_op if _coherent(type_op, montant, conn) else attente
+            if not _coherent(type_op, montant, conn):
+                return attente
+            if _depasse_le_seuil(type_op, montant, conn, annee):
+                return attente
+            return type_op
     return attente
+
+
+def _depasse_le_seuil(type_op: str, montant: float, conn=None,
+                      annee: int | None = None) -> bool:
+    """Un meuble ou un appareil au-delà du seuil n'est pas une charge.
+
+    Le gabarit porte le drapeau `seuil_immo` et un contrôle signalait déjà
+    le dépassement APRÈS coup ; l'import, lui, ne testait aucun montant et
+    proposait « petit équipement » pour un achat de 1 850 €. Sur-déduction
+    l'année de l'achat, aucun amortissement les suivantes, 2033-C amputé —
+    c'est-à-dire la raison d'être du régime réel qui disparaît (E-09).
+
+    Aucune proposition n'est faite au-delà du seuil : une immobilisation ne
+    se saisit pas comme une opération, elle se crée dans la page
+    Immobilisations, avec sa durée et son plan d'amortissement. La ligne
+    part donc en attente, où elle bloque la liasse jusqu'à traitement.
+    """
+    g = _gabarits.tous(conn) if conn is not None else _gabarits.GABARITS
+    if not g.get(type_op, {}).get("seuil_immo"):
+        return False
+    return abs(montant) > _seuil_immobilisation(conn, annee)
 
 
 def suggerer_depuis_historique(conn, libelle: str) -> str | None:
@@ -168,7 +242,7 @@ def suggerer_depuis_historique(conn, libelle: str) -> str | None:
     n'est plus le seul — les deux comptes d'attente le portent aussi, et
     resuggérer une attente reconduirait indéfiniment le doute.
     """
-    lib = _norm(libelle)
+    lib = _cle_libelle(libelle)
     if len(lib) < 4:
         return None
     row = conn.execute(
@@ -295,7 +369,8 @@ def analyser(csv_path: str, conn=None) -> dict:
             continue
         date = _date_iso(r[0])
         libelle = " ".join(r[1].split())       # tabs/newlines → espace simple
-        type_op = categoriser(libelle, montant, conn)
+        annee = int(date[:4]) if date[:4].isdigit() else None
+        type_op = categoriser(libelle, montant, conn, annee)
         mensuel = type_op in ("loyer", "charges_locatives")
         propositions.append({
             "date_operation": date,
