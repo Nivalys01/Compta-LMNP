@@ -10,6 +10,9 @@
 # --- Anciennes versions de travail (contiennent des compta.db réels) --------
 v_ant/
 
+# --- Notes personnelles, hors périmètre du dépôt -----------------------------
+Base de connaissances diverses/
+
 # --- Artefacts de build : le paquet client se régénère avec build_client.py --
 *.zip
 dist/
