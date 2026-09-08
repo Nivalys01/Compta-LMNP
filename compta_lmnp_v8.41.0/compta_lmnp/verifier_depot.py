@@ -13,6 +13,13 @@ qui *dés-ignorait* explicitement la comptabilité réelle de l'auteur.
 Ce script ne fait pas confiance au .gitignore : il regarde ce que git
 publierait RÉELLEMENT, et cherche dedans les empreintes du dossier réel.
 
+Le périmètre est le DÉPÔT ENTIER, pas le paquet. `git ls-files` était lancé
+depuis ce dossier-ci, donc ne listait que l'arborescence du logiciel : un
+fichier placé à la racine du dépôt — un rapport d'audit dans docs/, une note
+de travail — échappait au contrôle alors qu'un dépôt public l'expose comme
+le reste. Le cas s'est produit : un rapport déposé dans docs/ portait le nom
+réel de l'exploitant sans qu'aucun contrôle ne le voie.
+
 Usage :
     python verifier_depot.py          # avant chaque push
     python verifier_depot.py --json   # sortie exploitable par la CI
@@ -28,16 +35,23 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # Chemins qui ne doivent JAMAIS être publiés.
+#
+# Les motifs s'ancrent sur un SEGMENT de chemin — « (^|/) » — et non sur le
+# début de la chaîne : depuis que le contrôle porte sur le dépôt entier, les
+# chemins sont relatifs à la RACINE du dépôt. Un « ^reference/ » ne verrait
+# plus « compta_lmnp_v8.41.0/compta_lmnp/reference/ » — le contrôle serait
+# devenu muet en donnant l'apparence de fonctionner, c'est-à-dire pire
+# qu'absent.
 CHEMINS_INTERDITS = [
-    re.compile(r"^reference/"),
-    re.compile(r"^seed_exemple\.sql$"),
+    re.compile(r"(^|/)reference/"),
+    re.compile(r"(^|/)seed_exemple\.sql$"),
     re.compile(r"\.db$"), re.compile(r"\.sqlite3?$"),
-    re.compile(r"^certs/"), re.compile(r"\.pem$"), re.compile(r"\.key$"),
-    re.compile(r"^sauvegardes/"), re.compile(r"^archives/"),
-    re.compile(r"^logs/"), re.compile(r"^imports_tmp/"),
-    re.compile(r"^dossiers\.json$"),
+    re.compile(r"(^|/)certs/"), re.compile(r"\.pem$"), re.compile(r"\.key$"),
+    re.compile(r"(^|/)sauvegardes/"), re.compile(r"(^|/)archives/"),
+    re.compile(r"(^|/)logs/"), re.compile(r"(^|/)imports_tmp/"),
+    re.compile(r"(^|/)dossiers\.json$"),
     # FEC : seul celui de démonstration est autorisé
-    re.compile(r"^(?!demo/FEC_DEMO_).*FEC\d{8}\.txt$"),
+    re.compile(r"(^|/)(?!FEC_DEMO_)[^/]*FEC\d{8}\.txt$"),
 ]
 
 # Empreintes du dossier réel, cherchées DANS le contenu publié. Elles sont
@@ -79,22 +93,44 @@ def _empreintes() -> list[tuple[str, str]]:
     return uniques
 
 
-def _fichiers_publies() -> list[str]:
-    """Ce que git publierait : suivis + non suivis non ignorés."""
+def racine_depot() -> str:
+    """Racine du dépôt git, ou ce dossier si le dépôt n'existe pas.
+
+    `git ls-files` ne liste que le sous-arbre du répertoire courant : lancé
+    depuis le paquet, il rendait 87 fichiers là où le dépôt en suit 90, et
+    docs/ n'était pas du nombre.
+    """
+    try:
+        r = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=HERE,
+                           capture_output=True, text=True, check=True)
+        return r.stdout.strip() or HERE
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return HERE
+
+
+def _fichiers_publies(racine: str | None = None) -> list[str]:
+    """Ce que git publierait : suivis + non suivis non ignorés.
+
+    Chemins relatifs à la racine du dépôt, pas à ce dossier.
+    """
+    racine = racine or racine_depot()
     try:
         suivis = subprocess.run(
-            ["git", "ls-files"], cwd=HERE, capture_output=True, text=True,
-            check=True).stdout.split()
+            ["git", "ls-files"], cwd=racine, capture_output=True, text=True,
+            check=True).stdout.splitlines()
         autres = subprocess.run(
-            ["git", "ls-files", "--others", "--exclude-standard"], cwd=HERE,
-            capture_output=True, text=True, check=True).stdout.split()
+            ["git", "ls-files", "--others", "--exclude-standard"], cwd=racine,
+            capture_output=True, text=True, check=True).stdout.splitlines()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return []
-    return sorted(set(suivis + autres))
+    return sorted({f for f in suivis + autres if f})
 
 
-def verifier() -> dict:
-    fichiers = _fichiers_publies()
+def verifier(racine: str | None = None) -> dict:
+    """`racine` n'est là que pour les tests : en usage réel, le contrôle
+    trouve la racine du dépôt tout seul."""
+    racine = racine or racine_depot()
+    fichiers = _fichiers_publies(racine)
     alertes: list[dict] = []
 
     for f in fichiers:
@@ -106,7 +142,7 @@ def verifier() -> dict:
 
     empreintes = _empreintes()
     for f in fichiers:
-        chemin = os.path.join(HERE, f)
+        chemin = os.path.join(racine, f)
         if not os.path.isfile(chemin) or os.path.getsize(chemin) > 5_000_000:
             continue
         try:
@@ -119,7 +155,7 @@ def verifier() -> dict:
                                 "motif": f"contient une donnée réelle ({quoi})"})
 
     return {"fichiers_publies": len(fichiers), "empreintes_cherchees":
-            len(empreintes), "alertes": alertes}
+            len(empreintes), "alertes": alertes, "racine": racine}
 
 
 def main() -> int:

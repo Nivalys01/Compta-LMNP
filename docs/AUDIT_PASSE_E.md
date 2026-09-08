@@ -554,6 +554,7 @@ Ces points sont posés comme **questions**, pas comme constats.
 | E-17 | Montants non alignés dans le suivi 39 C par bien | liasse_pdf | Mineur |
 | E-18 | `-0,00 €` | liasse_pdf | Mineur |
 | E-19 | `aide["note"]` seule chaîne non échappée | liasse_pdf | Mineur |
+| E-20 | Produits exceptionnels non isolés (case 218/232 gonflée) | liasse | À qualifier |
 
 **Lecture d'ensemble.** Le déséquilibre entre les trois pièces est net.
 `liasse_pdf.py` est sain sur le point qui comptait le plus — il ne
@@ -723,6 +724,40 @@ compte de l'exploitant. Un apport y serait donc débité **et** crédité — un
 traitement d'E-01 devra router ces lignes vers l'attente, ou le modèle devra
 introduire un compte de trésorerie distinct (question déjà posée au §5 du
 rapport, « absence de compte 512/530 »).
+
+### E-20 — Les produits exceptionnels ne sont pas isolés (constat ouvert)
+
+**Fichier / fonction** : `liasse.py`, calcul des cases 218/232.
+
+Constat né de la vérification d'E-10, et absent du rapport initial. La liasse
+traite les deux moitiés de l'exceptionnel de façon **asymétrique** :
+
+```python
+ligne 123 :  charges_exc = _somme(s, ("67",))    # -> case 300, ISOLÉE
+ligne 110 :  produits    = -_somme(s, ("7",))    # -> cases 218/232, TOUT CONFONDU
+```
+
+Les charges exceptionnelles ont leur case dédiée ; les produits exceptionnels
+n'en ont pas. `775000` — produits des cessions d'éléments d'actif, créé par
+`cession.py` — est donc additionné aux loyers dans le chiffre d'affaires.
+
+**Conséquence** : sur un exercice de cession, la case 218 est gonflée du prix
+de vente. Le résultat FINAL reste juste, la neutralisation opérant par
+ailleurs (`fiscal.agregats` isole `produits_cession` et `vnc_cession`), mais
+la **ventilation imprimée est fausse** — et c'est elle que le déclarant
+recopie sur sa déclaration.
+
+**Portée en LMNP.** L'exceptionnel n'y est pas anecdotique mais il est
+étroit : la cession d'un bien ou d'un composant, et l'indemnité d'assurance
+liée à la destruction d'un actif. Un sinistre courant — dégât des eaux, perte
+de loyers — est un produit d'exploitation ordinaire (`758000`), ce que le
+lot 2 a mis en place. Les comptes 67/77 existent ici précisément pour être
+**sortis** du résultat BIC, la cession relevant en LMNP non professionnel des
+plus-values des particuliers.
+
+**Gravité : à qualifier** (majeur si la ventilation imprimée fait foi pour le
+déclarant, mineur si elle n'est qu'indicative). Les numéros de case sont à
+recouper avec le CERFA 2033-B en vigueur avant correction.
 
 ### Point ouvert — support des exports à colonnes débit/crédit séparées
 

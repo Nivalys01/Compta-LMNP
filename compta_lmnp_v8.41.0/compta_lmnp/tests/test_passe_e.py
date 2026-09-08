@@ -492,3 +492,79 @@ def test_e01_import_complet_ne_cree_plus_de_recette_fictive(base, tmp_path):
     # 320 € d'APL (loyer) + 800 € d'indemnité (produit courant) = 1 120 €.
     # Le dépôt de garantie (dette) et l'apport (attente) restent dehors.
     assert round(apres - avant, 2) == 1120.00
+
+
+# ═══ Contrôle de publication — le trou trouvé en traitant la passe E ════
+#
+# `git ls-files` était lancé depuis le dossier du paquet : il ne listait que
+# l'arborescence du logiciel. Un fichier placé à la racine du dépôt — le
+# rapport d'audit dans docs/ — échappait au contrôle, alors qu'un dépôt
+# public l'expose comme le reste. Le cas s'est produit pour de bon.
+
+import subprocess
+
+
+@pytest.mark.parametrize("chemin,interdit", [
+    ("compta_lmnp_v8.41.0/compta_lmnp/reference/FEC_REFERENCE_2023.txt", True),
+    ("un/dossier/quelconque/compta.db",                                  True),
+    ("compta_lmnp_v8.41.0/compta_lmnp/seed_exemple.sql",                 True),
+    ("paquet/certs/serveur.pem",                                         True),
+    ("a/b/sauvegardes/compta-20260101.db",                               True),
+    ("compta_lmnp_v8.41.0/compta_lmnp/demo/FEC_DEMO_2025.txt",          False),
+    ("compta_lmnp_v8.41.0/compta_lmnp/app.py",                          False),
+    ("docs/AUDIT_PASSE_E.md",                                           False),
+])
+def test_chemins_interdits_reconnus_a_toute_profondeur(chemin, interdit):
+    """Les motifs sont ancrés sur un SEGMENT de chemin. Ancrés sur le début
+    de la chaîne, ils seraient devenus muets dès que les chemins sont
+    devenus relatifs à la racine — un contrôle qui ne voit plus rien tout en
+    ayant l'air de fonctionner est pire qu'un contrôle absent."""
+    import verifier_depot
+    touche = any(m.search(chemin) for m in verifier_depot.CHEMINS_INTERDITS)
+    assert touche is interdit, chemin
+
+
+def test_verifier_depot_voit_les_fichiers_hors_du_paquet(tmp_path, monkeypatch):
+    """Le scénario réel : une donnée personnelle dans un fichier situé à la
+    racine du dépôt, hors de l'arborescence du logiciel."""
+    import verifier_depot
+    repo = tmp_path / "depot"
+    (repo / "docs").mkdir(parents=True)
+    (repo / "paquet").mkdir()
+    (repo / "docs" / "rapport.md").write_text(
+        "| `VIR M MARTIN APPORT` | +5 000,00 |\n", encoding="utf-8")
+    (repo / "paquet" / "app.py").write_text("# rien de personnel\n",
+                                            encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+
+    # Empreinte factice : le test n'a pas à manipuler la vraie identité.
+    monkeypatch.setattr(verifier_depot, "_empreintes",
+                        lambda: [("nom de l'exploitant", "MARTIN")])
+    r = verifier_depot.verifier(str(repo))
+
+    assert r["fichiers_publies"] == 2
+    fautifs = {a["fichier"] for a in r["alertes"]}
+    assert "docs/rapport.md" in fautifs, r["alertes"]
+
+
+def test_verifier_depot_reste_muet_sur_un_depot_propre(tmp_path, monkeypatch):
+    """Contrepartie : pas de faux positif."""
+    import verifier_depot
+    repo = tmp_path / "depot"
+    (repo / "docs").mkdir(parents=True)
+    (repo / "docs" / "rapport.md").write_text("| `VIR M DUPONT APPORT` |\n",
+                                              encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    monkeypatch.setattr(verifier_depot, "_empreintes",
+                        lambda: [("nom de l'exploitant", "MARTIN")])
+    assert verifier_depot.verifier(str(repo))["alertes"] == []
+
+
+def test_verifier_depot_couvre_bien_la_racine_du_depot_reel():
+    """Sur ce dépôt-ci : le contrôle doit voir docs/, qui vit hors du paquet."""
+    import verifier_depot
+    fichiers = verifier_depot._fichiers_publies()
+    if not fichiers:
+        pytest.skip("pas de dépôt git ici")
+    assert any(f.startswith("docs/") for f in fichiers), \
+        "le contrôle ne voit pas docs/ — le trou est revenu"
