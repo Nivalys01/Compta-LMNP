@@ -1,0 +1,363 @@
+# Compta LMNP — Copyright © 2026 Sylvain FAURE. Tous droits réservés.
+# Logiciel propriétaire — voir LICENSE.txt. Reproduction et revente interdites
+# sans autorisation écrite de l'auteur.
+
+"""
+Export PDF de la liasse fiscale — J7.
+
+Prend le dictionnaire produit par `liasse.generer()` et le met en page dans
+un PDF A4 : page de garde, 2031/2031 bis, 2033-A, 2033-B, 2033-C, suivi des
+reports (39 C + déficits LMNP), aide 2042C-PRO et contrôles de cohérence.
+
+Ce document est un ÉTAT DE TRAVAIL fidèle aux montants calculés — pas un
+fac-similé des formulaires CERFA : les numéros de cases officiels y figurent
+pour permettre le report champ à champ dans la télédéclaration (ou par
+l'expert-comptable). Filigrane « PROVISOIRE » si l'exercice n'est pas clos.
+
+Dépendance : reportlab (installée par les lanceurs au premier démarrage).
+"""
+from __future__ import annotations
+
+from xml.sax.saxutils import escape as _xml
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import (Paragraph, SimpleDocTemplate, Spacer, Table,
+                                TableStyle)
+
+BLEU = colors.HexColor("#1e3a5f")
+GRIS = colors.HexColor("#8a93a3")
+FOND = colors.HexColor("#f7f8fa")
+VERT = colors.HexColor("#1a7f37")
+ROUGE = colors.HexColor("#b42318")
+
+
+def _eur(x) -> str:
+    """1234.5 → '1 234,50 €' (insécable fine espace non requise en PDF)."""
+    if x is None:
+        return "—"
+    s = f"{x:,.2f}".replace(",", " ").replace(".", ",")
+    return f"{s} €"
+
+
+def _styles():
+    base = getSampleStyleSheet()
+    return {
+        "titre": ParagraphStyle("titre", parent=base["Title"],
+                                textColor=BLEU, fontSize=20, spaceAfter=4),
+        "sous": ParagraphStyle("sous", parent=base["Normal"],
+                               textColor=GRIS, fontSize=10, spaceAfter=12),
+        "h2": ParagraphStyle("h2", parent=base["Heading2"], textColor=BLEU,
+                             fontSize=13, spaceBefore=14, spaceAfter=6),
+        "normal": ParagraphStyle("normal", parent=base["Normal"], fontSize=9,
+                                 leading=12),
+        "note": ParagraphStyle("note", parent=base["Normal"], fontSize=8,
+                               textColor=GRIS, leading=10, spaceBefore=4),
+    }
+
+
+def _table(lignes, largeurs=None, aligne_droite=(1,)):
+    """Table 2 colonnes+ : entête grisée, montants alignés à droite."""
+    t = Table(lignes, colWidths=largeurs, hAlign="LEFT")
+    style = [
+        ("FONTSIZE", (0, 0), (-1, -1), 8.5),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("BACKGROUND", (0, 0), (-1, 0), FOND),
+        ("TEXTCOLOR", (0, 0), (-1, 0), BLEU),
+        ("LINEBELOW", (0, 0), (-1, 0), 0.75, BLEU),
+        ("LINEBELOW", (0, 1), (-1, -2), 0.25, colors.HexColor("#e4e7ec")),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+    ]
+    for col in aligne_droite:
+        style.append(("ALIGN", (col, 0), (col, -1), "RIGHT"))
+    t.setStyle(TableStyle(style))
+    return t
+
+
+def _ligne_tot(t: Table, index: int) -> None:
+    t.setStyle(TableStyle([
+        ("FONTNAME", (0, index), (-1, index), "Helvetica-Bold"),
+        ("LINEABOVE", (0, index), (-1, index), 1, BLEU),
+    ]))
+
+
+def _pied_de_page(provisoire: bool):
+    def dessiner(canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Helvetica", 7.5)
+        canvas.setFillColor(GRIS)
+        canvas.drawString(15 * mm, 10 * mm,
+                          "Compta LMNP — état de travail à faire valider par "
+                          "un expert-comptable avant tout dépôt.")
+        canvas.drawRightString(A4[0] - 15 * mm, 10 * mm,
+                               f"Page {doc.page}")
+        if provisoire:
+            canvas.setFont("Helvetica-Bold", 60)
+            canvas.setFillColor(colors.Color(0.71, 0.13, 0.09, alpha=0.08))
+            canvas.saveState()
+            canvas.translate(A4[0] / 2, A4[1] / 2)
+            canvas.rotate(45)
+            canvas.drawCentredString(0, 0, "PROVISOIRE")
+            canvas.restoreState()
+        canvas.restoreState()
+    return dessiner
+
+
+def generer_pdf(L: dict, chemin_ou_buffer) -> None:
+    """Écrit le PDF de la liasse `L` (= liasse.generer()) dans un chemin ou un buffer."""
+    st = _styles()
+    doc = SimpleDocTemplate(
+        chemin_ou_buffer, pagesize=A4,
+        leftMargin=15 * mm, rightMargin=15 * mm,
+        topMargin=15 * mm, bottomMargin=18 * mm,
+        title=f"Liasse fiscale LMNP {L['annee']}",
+        author="Compta LMNP")
+    E = []  # flowables
+
+    # ── Page de garde ────────────────────────────────────────────────────
+    exp = L.get("exploitant") or {}
+    statut = ("exercice clos" if not L["provisoire"]
+              else "exercice NON clôturé — chiffres provisoires")
+    E.append(Paragraph(f"Liasse fiscale LMNP — exercice {L['annee']}",
+                       st["titre"]))
+    # _xml() : les textes des Paragraph sont interprétés comme du balisage
+    # par ReportLab — toute donnée UTILISATEUR doit être échappée, sinon un
+    # nom contenant « < » fait planter la génération (même famille de défaut
+    # que la XSS corrigée en v7, appliquée à la frontière PDF).
+    ident = " · ".join(x for x in (
+        exp.get("nom"), exp.get("siret") and f"SIRET {exp['siret']}",
+        exp.get("adresse")) if x)
+    E.append(Paragraph(f"{_xml(ident) or 'Exploitant non renseigné'}"
+                       f" &nbsp;—&nbsp; {statut}", st["sous"]))
+
+    g = L["page_garde"]
+    E.append(_table([
+        ["Chiffres clés", "Montant"],
+        ["Recettes de l'exercice (CA HT)", _eur(g["ca_ht"])],
+        ["Résultat fiscal LMNP", _eur(g["resultat_fiscal"])],
+        ["Déficit LMNP généré", _eur(g["deficit_lmnp"])],
+        ["Revenu imposable (2042C-PRO)", _eur(g["revenu_imposable"])],
+        ["Amortissements en report (art. 39 C)", _eur(g["restant_39c"])],
+        ["Déficits LMNP en stock", _eur(g["restant_deficits"])],
+        ["Total des reports disponibles", _eur(g["restant_total"])],
+    ], largeurs=[110 * mm, 60 * mm]))
+
+    # ── Projection de clôture (exercice ouvert uniquement) ───────────────
+    # Les tableaux ci-dessous reflètent les ÉCRITURES. Or la dotation aux
+    # amortissements n'est comptabilisée qu'à la clôture : sans ce bloc, le
+    # déclarant lisait toute l'année un résultat fiscal qui l'ignorait.
+    proj = L.get("projection_cloture")
+    if proj and proj["dotation_previsionnelle"]:
+        E.append(Paragraph("Projection — si l'exercice était clôturé "
+                           "aujourd'hui", st["h2"]))
+        E.append(Paragraph(
+            "Les tableaux qui suivent ne portent que les écritures "
+            "enregistrées. La dotation aux amortissements de l'exercice "
+            "n'est comptabilisée qu'à la clôture : ces chiffres-là "
+            "l'anticipent, d'après le plan d'amortissement.", st["sous"]))
+        E.append(_table([
+            ["Projection de clôture", "Montant"],
+            ["Dotation aux amortissements de l'exercice",
+             _eur(proj["dotation_previsionnelle"])],
+            ["Résultat comptable projeté",
+             _eur(proj["resultat_comptable_projete"])],
+            ["Amortissements reportés (art. 39 C) projetés",
+             _eur(proj["report_39c_projete"])],
+            ["Résultat fiscal projeté",
+             _eur(proj["resultat_fiscal_projete"])],
+        ], largeurs=[110 * mm, 60 * mm]))
+
+    # ── 2031 / 2031 bis ──────────────────────────────────────────────────
+    r = L["f2031"]
+    E.append(Paragraph("2031-SD — Récapitulation", st["h2"]))
+    lignes = [["Rubrique", "Montant"],
+              ["Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)",
+               _eur(r["resultat_fiscal_1"])]]
+    if r["bic_non_pro_7a_benefice"] is not None:
+        lignes.append(["BIC non professionnel — bénéfice (cadre 7a)",
+                       _eur(r["bic_non_pro_7a_benefice"])])
+    if r["bic_non_pro_7b_deficit"] is not None:
+        lignes.append(["BIC non professionnel — déficit (cadre 7b)",
+                       _eur(r["bic_non_pro_7b_deficit"])])
+    E.append(_table(lignes, largeurs=[110 * mm, 60 * mm]))
+
+    # ── 2033-A ───────────────────────────────────────────────────────────
+    a = L["f2033a"]
+    E.append(Paragraph("2033-A — Bilan simplifié", st["h2"]))
+    ta = _table([
+        ["Actif", "Montant"],
+        ["Immobilisations corporelles — brut (case 028)",
+         _eur(a["immo_corporelles_brut_028"])],
+        ["Amortissements (case 030)", _eur(a["amortissements_030"])],
+        ["Immobilisations corporelles — net", _eur(a["immo_corporelles_net"])],
+        ["Total actif net (case 112)", _eur(a["total_actif_net_112"])],
+    ], largeurs=[110 * mm, 60 * mm])
+    _ligne_tot(ta, 4)
+    E.append(ta)
+    E.append(Spacer(1, 4))
+    tp = _table([
+        ["Passif", "Montant"],
+        ["Capital individuel (case 120)", _eur(a["capital_individuel_120"])],
+        ["Résultat de l'exercice (case 136)", _eur(a["resultat_exercice_136"])],
+        ["Total capitaux propres (case 142)", _eur(a["total_capitaux_142"])],
+        ["Total passif (case 180)", _eur(a["total_passif_180"])],
+    ], largeurs=[110 * mm, 60 * mm])
+    _ligne_tot(tp, 4)
+    E.append(tp)
+
+    # ── 2033-B ───────────────────────────────────────────────────────────
+    b = L["f2033b"]
+    E.append(Paragraph("2033-B — Compte de résultat simplifié", st["h2"]))
+    tb = _table([
+        ["Rubrique", "Montant"],
+        ["Produits d'exploitation (cases 218/232)", _eur(b["produits_218"])],
+        ["Autres charges externes (case 242)", _eur(b["charges_externes_242"])],
+        ["Impôts et taxes (case 244) — dont CFE " + _eur(b["dont_cfe_243"]),
+         _eur(b["impots_244"])],
+        ["Dotations aux amortissements (case 254)", _eur(b["dotations_254"])],
+        ["Total des charges d'exploitation (case 264)",
+         _eur(b["total_charges_264"])],
+        ["Résultat d'exploitation (case 270)",
+         _eur(b["resultat_exploitation_270"])],
+        ["Charges financières — intérêts d'emprunt (case 294)",
+         _eur(b["charges_financieres_294"])],
+        ["Bénéfice ou perte (case 310)", _eur(b["benefice_ou_perte_310"])],
+    ], largeurs=[110 * mm, 60 * mm])
+    _ligne_tot(tb, 8)
+    E.append(tb)
+
+    lignes = [["Réintégrations / déductions", "Montant"],
+              ["Réintégration — amortissements excédentaires art. 39 C (case 318)",
+               _eur(b["reintegration_amort_318"])]]
+    for lib, m in b["reintegrations_detail"]:
+        lignes.append([f"Réintégration — {lib} (case 330)", _eur(m)])
+    for lib, m in b["deductions_detail"]:
+        lignes.append([f"Déduction — {lib} (case 350)", _eur(m)])
+    lignes.append(["Résultat fiscal ligne 352 (doit valoir 0 — activité "
+                   "déclarée en 2031 bis)", _eur(b["resultat_fiscal_352"])])
+    tr = _table(lignes, largeurs=[110 * mm, 60 * mm])
+    _ligne_tot(tr, len(lignes) - 1)
+    E.append(Spacer(1, 4))
+    E.append(tr)
+
+    # ── 2033-C ───────────────────────────────────────────────────────────
+    c = L["f2033c"]
+    E.append(Paragraph("2033-C — Immobilisations et amortissements", st["h2"]))
+    lignes = [["Rubrique", "Brut début", "Augment.", "Brut fin",
+               "Amort. début", "Dotation", "Amort. fin"]]
+    for rub in c["rubriques"]:
+        lignes.append([rub["libelle"],
+                       _eur(rub["brut_debut"]), _eur(rub["augmentations"]),
+                       _eur(rub["brut_fin"]), _eur(rub["amort_debut"]),
+                       _eur(rub["dotation"]), _eur(rub["amort_fin"])])
+    tt = c["totaux"]
+    lignes.append(["Totaux", _eur(tt["brut_debut"]), _eur(tt["augmentations"]),
+                   _eur(tt["brut_fin"]), _eur(tt["amort_debut"]),
+                   _eur(tt["dotation"]), _eur(tt["amort_fin"])])
+    t = _table(lignes, largeurs=[46 * mm] + [20.5 * mm] * 6,
+               aligne_droite=range(1, 7))
+    _ligne_tot(t, len(lignes) - 1)
+    E.append(t)
+
+    E.append(Paragraph("Détail par composant", st["h2"]))
+    lignes = [["Composant", "Valeur brute", "Durée", "Dotation",
+               "Cumul fin", "VNC fin"]]
+    for d in c["detail_composants"]:
+        lignes.append([Paragraph(_xml(d["libelle"]), st["normal"]),
+                       _eur(d["valeur_brute"]),
+                       f"{d['duree']} ans" if d["duree"] else "—",
+                       _eur(d["dotation"]), _eur(d["cumul_fin"]),
+                       _eur(d["vnc_fin"])])
+    E.append(_table(lignes, largeurs=[58 * mm, 24 * mm, 16 * mm,
+                                      24 * mm, 24 * mm, 24 * mm],
+                    aligne_droite=range(1, 6)))
+
+    # ── Suivi des reports ────────────────────────────────────────────────
+    rep = L["reports"]
+    s39 = rep["suivi_39c"]
+    E.append(Paragraph("Suivi des reports — article 39 C", st["h2"]))
+    E.append(_table([
+        ["Rubrique", "Montant"],
+        ["Stock d'ouverture", _eur(s39.get("stock_ouverture"))],
+        ["Amortissements reportés cette année", _eur(s39.get("report_annee"))],
+        ["Amortissements repris cette année", _eur(s39.get("utilisation_annee"))],
+        ["Stock à la clôture", _eur(s39.get("stock_cloture"))],
+    ], largeurs=[110 * mm, 60 * mm]))
+
+    # Ventilation logement par logement — affichée dès
+    # que la comptabilité compte plusieurs biens.
+    par_bien = rep.get("suivi_39c_par_bien") or []
+    if len(par_bien) > 1:
+        E.append(Paragraph("Suivi du stock 39 C, logement par logement",
+                           st["h2"]))
+        avec_sorties = any(v.get("sortie_bien") for v in par_bien)
+        entetes = ["Bien", "Ouverture", "Reporté", "Repris"]
+        if avec_sorties:
+            entetes.append("Sorti (G')")
+        entetes.append("Stock fin")
+        lignes_b = [entetes]
+        for v in par_bien:
+            ligne = [Paragraph(_xml(v["libelle"]), st["normal"]),
+                     _eur(v["stock_ouverture"]), _eur(v["report_bien"]),
+                     _eur(v["utilisation_bien"])]
+            if avec_sorties:
+                ligne.append(_eur(v.get("sortie_bien", 0)))
+            ligne.append(_eur(v["stock_cloture"]))
+            lignes_b.append(ligne)
+        larg = [60 * mm] + [22 * mm] * (len(entetes) - 1)
+        E.append(_table(lignes_b, largeurs=larg))
+
+    E.append(Paragraph("Déficits LMNP par millésime", st["h2"]))
+    if rep["deficits"]:
+        lignes = [["Origine", "Montant initial", "Solde", "Expire fin"]]
+        for d in rep["deficits"]:
+            lignes.append([str(d["annee_origine"]), _eur(d["montant_initial"]),
+                           _eur(d["solde"]), (str(d["annee_expiration"]) + (" — périmé" if d.get("perime") else ""))])
+        lignes.append(["Total", "", _eur(rep["total_deficits"]), ""])
+        t = _table(lignes, largeurs=[30 * mm, 45 * mm, 45 * mm, 30 * mm],
+                   aligne_droite=(1, 2))
+        _ligne_tot(t, len(lignes) - 1)
+        E.append(t)
+    else:
+        E.append(Paragraph("Aucun déficit LMNP en stock.", st["normal"]))
+
+    # ── Aide 2042C-PRO ───────────────────────────────────────────────────
+    aide = L["aide_2042c"]
+    E.append(Paragraph("Aide au report — 2042C-PRO", st["h2"]))
+    lignes = [["Case", "Montant"]]
+    if aide["case_5NA"] is not None:
+        lignes.append(["5NA — bénéfice location meublée non professionnelle",
+                       _eur(aide["case_5NA"])])
+    if aide["case_5NY"] is not None:
+        lignes.append(["5NY — déficit location meublée non professionnelle",
+                       _eur(aide["case_5NY"])])
+    for cd in aide["cases_deficits_anterieurs"]:
+        lignes.append([f"{cd['case']} — déficit {cd['annee_origine']} "
+                       "non encore déduit", _eur(cd["montant"])])
+    if len(lignes) == 1:
+        lignes.append(["Aucune case à servir", "—"])
+    E.append(_table(lignes, largeurs=[110 * mm, 60 * mm]))
+    E.append(Paragraph(aide["note"], st["note"]))
+
+    # ── Contrôles de cohérence ───────────────────────────────────────────
+    E.append(Paragraph("Contrôles de cohérence internes", st["h2"]))
+    lignes = [["Contrôle", "Résultat", "Détail"]]
+    for ctl in L["controles"]:
+        lignes.append([Paragraph(_xml(ctl["nom"]), st["normal"]),
+                       "conforme" if ctl["ok"] else "ANOMALIE",
+                       Paragraph(_xml(ctl["detail"]), st["normal"])])
+    t = _table(lignes, largeurs=[80 * mm, 22 * mm, 68 * mm],
+               aligne_droite=())
+    for i, ctl in enumerate(L["controles"], start=1):
+        t.setStyle(TableStyle([
+            ("TEXTCOLOR", (1, i), (1, i), VERT if ctl["ok"] else ROUGE),
+            ("FONTNAME", (1, i), (1, i), "Helvetica-Bold")]))
+    E.append(t)
+
+    pied = _pied_de_page(L["provisoire"])
+    doc.build(E, onFirstPage=pied, onLaterPages=pied)

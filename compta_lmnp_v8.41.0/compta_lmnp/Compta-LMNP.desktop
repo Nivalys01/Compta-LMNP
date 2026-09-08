@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Compta LMNP
+Comment=Comptabilité LMNP au réel — démarre le logiciel et ouvre le navigateur
+# %k = emplacement de CE fichier. La spécification autorise un chemin OU une
+# URI « file:// » selon l'environnement : on retire le préfixe avant de s'en
+# servir, sinon « cd » échoue sans un mot. Pas de clé Path : elle exige un
+# chemin absolu, inconnu tant que l'utilisateur n'a pas choisi son dossier.
+Exec=sh -c 'p="$1"; p="${p#file://}"; cd "$(dirname "$p")" || exit 1; exec bash ./Compta-LMNP-Linux-macOS.sh' sh %k
+Terminal=true
+Icon=accessories-calculator
+Categories=Office;Finance;

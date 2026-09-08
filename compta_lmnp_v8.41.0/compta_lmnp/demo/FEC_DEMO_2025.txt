@@ -1,0 +1,133 @@
+JournalCode	JournalLib	EcritureNum	EcritureDate	CompteNum	CompteLib	CompAuxNum	CompAuxLib	PieceRef	PieceDate	EcritureLib	Debit	Credit	EcritureLet	DateLet	ValidDate	Montantdevise	Idevise
+AN	A Nouveaux	1	20250101	108000	Exploitant			NA	20250101	A Nouveaux		100578,44			20250205		
+AN	A Nouveaux	1	20250101	108000	Exploitant			NA	20250101	A Nouveaux	3282,93				20250205		
+AN	A Nouveaux	1	20250101	211550	Terrain			PIECE0	20250101	Terrain - A Nouveaux	6707,61				20250205		
+AN	A Nouveaux	1	20250101	213150	Bâtiment			PIECE0	20250101	Installation électrique - A Nouveaux	1299,87				20250205		
+AN	A Nouveaux	1	20250101	213150	Bâtiment			PIECE0	20250101	Aménagements intérieurs - A Nouveaux	23326,06				20250205		
+AN	A Nouveaux	1	20250101	213150	Bâtiment			PIECE0	20250101	Etanchéité - A Nouveaux	15596,33				20250205		
+AN	A Nouveaux	1	20250101	213150	Bâtiment			PIECE0	20250101	Aménagements intérieurs - A Nouveaux	0,08				20250205		
+AN	A Nouveaux	1	20250101	213150	Bâtiment			PIECE0	20250101	Gros oeuvre - A Nouveaux	45629,99				20250205		
+AN	A Nouveaux	1	20250101	218100	Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux	1470,59				20250205		
+AN	A Nouveaux	1	20250101	218100	Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux	1143,88				20250205		
+AN	A Nouveaux	1	20250101	218100	Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux	1564,13				20250205		
+AN	A Nouveaux	1	20250101	218100	Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux	5137,03				20250205		
+AN	A Nouveaux	1	20250101	218400	Mobilier			PIECE0	20250101	Mobilier - A Nouveaux	1963,72				20250205		
+AN	A Nouveaux	1	20250101	218400	Mobilier			PIECE0	20250101	Cuisine équipée - A Nouveaux	2574,55				20250205		
+AN	A Nouveaux	1	20250101	218400	Mobilier			PIECE0	20250101	Electroménager - A Nouveaux	1215,05				20250205		
+AN	A Nouveaux	1	20250101	218400	Mobilier			PIECE0	20250101	Mobilier - A Nouveaux	1499,86				20250205		
+AN	A Nouveaux	1	20250101	281315	Amort. Bâtiment			PIECE0	20250101	Gros oeuvre - A Nouveaux		2627,19			20250205		
+AN	A Nouveaux	1	20250101	281315	Amort. Bâtiment			PIECE0	20250101	Etanchéité - A Nouveaux		1975,53			20250205		
+AN	A Nouveaux	1	20250101	281315	Amort. Bâtiment			PIECE0	20250101	Aménagements intérieurs - A Nouveaux		0,02			20250205		
+AN	A Nouveaux	1	20250101	281315	Amort. Bâtiment			PIECE0	20250101	Installation électrique - A Nouveaux		205,83			20250205		
+AN	A Nouveaux	1	20250101	281315	Amort. Bâtiment			PIECE0	20250101	Aménagements intérieurs - A Nouveaux		2954,64			20250205		
+AN	A Nouveaux	1	20250101	281810	Amort. Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux		181,12			20250205		
+AN	A Nouveaux	1	20250101	281810	Amort. Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux		175,70			20250205		
+AN	A Nouveaux	1	20250101	281810	Amort. Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux		534,82			20250205		
+AN	A Nouveaux	1	20250101	281810	Amort. Installation et agencement			PIECE0	20250101	Travaux - A Nouveaux		160,54			20250205		
+AN	A Nouveaux	1	20250101	281840	Amort. Mobilier			PIECE0	20250101	Mobilier - A Nouveaux		1243,69			20250205		
+AN	A Nouveaux	1	20250101	281840	Amort. Mobilier			PIECE0	20250101	Mobilier - A Nouveaux		949,92			20250205		
+AN	A Nouveaux	1	20250101	281840	Amort. Mobilier			PIECE0	20250101	Cuisine équipée - A Nouveaux		815,27			20250205		
+AN	A Nouveaux	1	20250101	281840	Amort. Mobilier			PIECE0	20250101	Electroménager - A Nouveaux		769,53			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Aménagements intérieurs - A Nouveaux		20371,47			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Cuisine équipée - A Nouveaux		1759,28			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Electroménager - A Nouveaux		445,51			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Etanchéité - A Nouveaux		13620,80			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Gros oeuvre - A Nouveaux		43002,80			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Installation électrique - A Nouveaux		1094,04			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Mobilier - A Nouveaux		1269,97			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Terrain - A Nouveaux		6707,61			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	Travaux - A Nouveaux		8263,44			20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	A Nouveaux	100578,41				20250205		
+AN	A Nouveaux	1	20250101	472000	A nouveaux en attente			NA	20250101	A Nouveaux		3282,93			20250205		
+AN	A Nouveaux	2	20250101	120000	Résultat de l'exercice			NA	20250101	Résultat	760,56		556836120	20250101	20250205		
+AN	A Nouveaux	2	20250101	472000	A nouveaux en attente			NA	20250101	Résultat		760,56			20250205		
+AC	A Nouveaux callage	3	20250101	108000	Exploitant			NA	20250101	Répartition par exploitant		-3282,93			20260128		
+AC	A Nouveaux callage	3	20250101	108000	Exploitant			NA	20250101	Répartition par exploitant		3282,93			20260128		
+AC	A Nouveaux callage	3	20250101	472000	A nouveaux en attente			NA	20250101	Répartition par exploitant		3282,93			20260128		
+AC	A Nouveaux callage	3	20250101	472000	A nouveaux en attente			NA	20250101	Répartition par exploitant		-3282,93			20260128		
+BQ	Banque	4	20250101	108000	Exploitant			NA	20250101	29 Rue BERTAUX - Loyer hors charges locatives	620,10				20251004		
+BQ	Banque	4	20250101	708810	Loyers et autres produits			NA	20250101	29 Rue BERTAUX - Loyer hors charges locatives		620,10			20251004		
+BQ	Banque	5	20250101	108000	Exploitant			NA	20250101	29 Rue BERTAUX - Provision pour charges	78,00				20251004		
+BQ	Banque	5	20250101	708810	Loyers et autres produits			NA	20250101	29 Rue BERTAUX - Provision pour charges		78,00			20251004		
+BQ	Banque	6	20250101	108000	Exploitant			NA	20250101	29 Rue BERTAUX - Assurance Habitation 'Propriétaire Non Occupant' - pno de janvier à novembre		108,02			20251004		
+BQ	Banque	6	20250101	616110	Primes assurances			NA	20250101	29 Rue BERTAUX - Assurance Habitation 'Propriétaire Non Occupant' - pno de janvier à novembre	108,02				20251004		
+BQ	Banque	7	20250101	108000	Exploitant			NA	20250101	29 Rue BERTAUX - Assurance emprunteur - assurance 2025 emprunt avril		74,60			20251004		
+BQ	Banque	7	20250101	616110	Primes assurances			NA	20250101	29 Rue BERTAUX - Assurance emprunteur - assurance 2025 emprunt avril	74,60				20251004		
+BQ	Banque	8	20250112	108000	Exploitant			NA	20250112	29 Rue BERTAUX - Entretien et réparations - entretien chaudière		126,36			20251004		
+BQ	Banque	8	20250112	615200	Maintenance sur immobilier			NA	20250112	29 Rue BERTAUX - Entretien et réparations - entretien chaudière	126,36				20251004		
+BQ	Banque	9	20250205	108000	Exploitant			NA	20250205	Frais de comptabilité (facture cabinet comptable)		225,42			20251004		
+BQ	Banque	9	20250205	622610	Honoraires comptables			NA	20250205	Frais de comptabilité (facture cabinet comptable)	225,42				20251004		
+BQ	Banque	10	20250210	108000	Exploitant			NA	20250210	29 Rue BERTAUX - Charges courantes - solde 2024		84,72			20251004		
+BQ	Banque	10	20250210	614100	Charges locatives et de copropriété			NA	20250210	29 Rue BERTAUX - Charges courantes - solde 2024	84,72				20251004		
+BQ	Banque	11	20250312	108000	Exploitant			NA	20250312	29 Rue BERTAUX - Electroménager - monsieur cuisine de secours, vu le prix c'était une affaire		77,22			20251004		
+BQ	Banque	11	20250312	606320	Petit équipement			NA	20250312	29 Rue BERTAUX - Electroménager - monsieur cuisine de secours, vu le prix c'était une affaire	77,22				20251004		
+BQ	Banque	12	20250321	108000	Exploitant			NA	20250321	29 Rue BERTAUX - Charges courantes		474,97			20251004		
+BQ	Banque	12	20250321	614100	Charges locatives et de copropriété			NA	20250321	29 Rue BERTAUX - Charges courantes	474,97				20251004		
+BQ	Banque	13	20250321	108000	Exploitant			FR0210	20250321	29 Rue BERTAUX - Fond Travaux ALUR		23,77			20251004		
+BQ	Banque	13	20250321	614100	Charges locatives et de copropriété			FR0210	20250321	29 Rue BERTAUX - Fond Travaux ALUR	23,77				20251004		
+BQ	Banque	14	20250903	108000	Exploitant			NA	20250903	29 Rue BERTAUX - Internet - internet sfr de janvier à septembre 2025 (9 mois à 15.47)		108,60			20251004		
+BQ	Banque	14	20250903	626210	Télécoms			NA	20250903	29 Rue BERTAUX - Internet - internet sfr de janvier à septembre 2025 (9 mois à 15.47)	108,60				20251004		
+BQ	Banque	15	20250922	108000	Exploitant			NA	20250922	29 Rue BERTAUX - Charges courantes		477,23			20251004		
+BQ	Banque	15	20250922	614100	Charges locatives et de copropriété			NA	20250922	29 Rue BERTAUX - Charges courantes	477,23				20251004		
+BQ	Banque	16	20251001	108000	Exploitant			NA	20251001	29 Rue BERTAUX - Loyer hors charges locatives - loyer 02 -> 10 /2025	5580,90				20251004		
+BQ	Banque	16	20251001	708810	Loyers et autres produits			NA	20251001	29 Rue BERTAUX - Loyer hors charges locatives - loyer 02 -> 10 /2025		5580,90			20251004		
+BQ	Banque	17	20251001	108000	Exploitant			NA	20251001	29 Rue BERTAUX - Provision pour charges	702,00				20251004		
+BQ	Banque	17	20251001	708810	Loyers et autres produits			NA	20251001	29 Rue BERTAUX - Provision pour charges		702,00			20251004		
+BQ	Banque	18	20251001	108000	Exploitant			NA	20251001	29 Rue BERTAUX - Taxe enlèvement des ordures ménagères (TEOM)		171,60			20251004		
+BQ	Banque	18	20251001	635130	Autres impots locaux			NA	20251001	29 Rue BERTAUX - Taxe enlèvement des ordures ménagères (TEOM)	171,60				20251004		
+BQ	Banque	19	20251001	108000	Exploitant			NA	20251001	29 Rue BERTAUX - Taxe foncière		906,36			20251004		
+BQ	Banque	19	20251001	635130	Autres impots locaux			NA	20251001	29 Rue BERTAUX - Taxe foncière	906,36				20251004		
+BQ	Banque	20	20251201	108000	Exploitant			FR0210	20251201	29 Rue BERTAUX - Frais de tenue de compte - 2.20 par mois x 12		20,59			20251004		
+BQ	Banque	20	20251201	627810	Frais bancaires courants			FR0210	20251201	29 Rue BERTAUX - Frais de tenue de compte - 2.20 par mois x 12	20,59				20251004		
+BQ	Banque	21	20251201	108000	Exploitant			NA	20251201	29 Rue BERTAUX - Autres charges - Intérêts emprunt année 2025		863,04			20251004		
+BQ	Banque	21	20251201	628800	Autres charges			NA	20251201	29 Rue BERTAUX - Autres charges - Intérêts emprunt année 2025	863,04				20251004		
+OD	Opérations diverses	22	20250101	108000	Exploitant			NA	20250101	Affectation du résultat	760,56				20260128		
+OD	Opérations diverses	22	20250101	120000	Résultat de l'exercice			NA	20250101	Affectation du résultat		760,56	556836120	20250101	20260128		
+BQ	Banque	23	20250922	108000	Exploitant			NA	20250922	29 Rue BERTAUX - Charges courantes		474,97			20260128		
+BQ	Banque	23	20250922	614100	Charges locatives et de copropriété			NA	20250922	29 Rue BERTAUX - Charges courantes	474,97				20260128		
+BQ	Banque	24	20250922	108000	Exploitant			FR0210	20250922	29 Rue BERTAUX - Fond Travaux ALUR		23,77			20260128		
+BQ	Banque	24	20250922	614100	Charges locatives et de copropriété			FR0210	20250922	29 Rue BERTAUX - Fond Travaux ALUR	23,77				20260128		
+BQ	Banque	25	20251010	108000	Exploitant			NA	20251010	29 Rue BERTAUX - Entretien et réparations - entretien chaudière 2026		129,09			20260128		
+BQ	Banque	25	20251010	615200	Maintenance sur immobilier			NA	20251010	29 Rue BERTAUX - Entretien et réparations - entretien chaudière 2026	129,09				20260128		
+BQ	Banque	26	20251101	108000	Exploitant			NA	20251101	29 Rue BERTAUX - Dépôt de garantie rendu au locataire	600,60				20260128		
+BQ	Banque	26	20251101	108000	Exploitant			NA	20251101	29 Rue BERTAUX - Dépôt de garantie rendu au locataire		600,60			20260128		
+BQ	Banque	27	20251115	108000	Exploitant			NA	20251115	29 Rue BERTAUX - Loyer hors charges locatives	312,00				20260128		
+BQ	Banque	27	20251115	708810	Loyers et autres produits			NA	20251115	29 Rue BERTAUX - Loyer hors charges locatives		312,00			20260128		
+BQ	Banque	28	20251115	108000	Exploitant			FR0210	20251115	29 Rue BERTAUX - Provision pour charges	19,50				20260128		
+BQ	Banque	28	20251115	708810	Loyers et autres produits			FR0210	20251115	29 Rue BERTAUX - Provision pour charges		19,50			20260128		
+BQ	Banque	29	20251115	108000	Exploitant			NA	20251115	29 Rue BERTAUX - Dépôt de garantie versé par le locataire		585,00			20260128		
+BQ	Banque	29	20251115	108000	Exploitant			NA	20251115	29 Rue BERTAUX - Dépôt de garantie versé par le locataire	585,00				20260128		
+BQ	Banque	30	20251201	108000	Exploitant			FR0210	20251201	29 Rue BERTAUX - Internet - 15.47 * 3		36,20			20260128		
+BQ	Banque	30	20251201	626210	Télécoms			FR0210	20251201	29 Rue BERTAUX - Internet - 15.47 * 3	36,20				20260128		
+BQ	Banque	31	20251201	108000	Exploitant			NA	20251201	29 Rue BERTAUX - Cotisation Foncière des Entreprises (CFE)		265,98			20260128		
+BQ	Banque	31	20251201	635110	Contribution Economique Territoriale			NA	20251201	29 Rue BERTAUX - Cotisation Foncière des Entreprises (CFE)	265,98				20260128		
+BQ	Banque	32	20251201	108000	Exploitant			NA	20251201	29 Rue BERTAUX - Loyer hors charges locatives	585,00				20260128		
+BQ	Banque	32	20251201	708810	Loyers et autres produits			NA	20251201	29 Rue BERTAUX - Loyer hors charges locatives		585,00			20260128		
+BQ	Banque	33	20251201	108000	Exploitant			NA	20251201	29 Rue BERTAUX - Provision pour charges	78,00				20260128		
+BQ	Banque	33	20251201	708810	Loyers et autres produits			NA	20251201	29 Rue BERTAUX - Provision pour charges		78,00			20260128		
+OD	Opérations diverses	34	20251231	281315	Amort. Bâtiment			PIECE0	20251231	DAA - Aménagements intérieurs - Aménagement - 29 Rue BERTAUX		0,01			20260128		
+OD	Opérations diverses	34	20251231	281315	Amort. Bâtiment			PIECE0	20251231	DAA - Installation électrique - Electricité rénovation - 29 Rue BERTAUX		65,00			20260128		
+OD	Opérations diverses	34	20251231	281315	Amort. Bâtiment			PIECE0	20251231	DAA - Aménagements intérieurs - 29 Rue BERTAUX		933,04			20260128		
+OD	Opérations diverses	34	20251231	281315	Amort. Bâtiment			PIECE0	20251231	DAA - Etanchéité - 29 Rue BERTAUX		623,85			20260128		
+OD	Opérations diverses	34	20251231	281315	Amort. Bâtiment			PIECE0	20251231	DAA - Gros oeuvre - 29 Rue BERTAUX		829,64			20260128		
+OD	Opérations diverses	34	20251231	281810	Amort. Installation et agencement			PIECE0	20251231	DAA - Travaux - Carrelage - 29 Rue BERTAUX		57,20			20260128		
+OD	Opérations diverses	34	20251231	281810	Amort. Installation et agencement			PIECE0	20251231	DAA - Travaux - Huisseries coté Est  - 29 Rue BERTAUX		62,56			20260128		
+OD	Opérations diverses	34	20251231	281810	Amort. Installation et agencement			PIECE0	20251231	DAA - Travaux - Huisseries Coté OUEST - 29 Rue BERTAUX		205,48			20260128		
+OD	Opérations diverses	34	20251231	281810	Amort. Installation et agencement			PIECE0	20251231	DAA - Travaux - Porte d'entrée - 29 Rue BERTAUX		73,53			20260128		
+OD	Opérations diverses	34	20251231	281840	Amort. Mobilier			PIECE0	20251231	DAA - Cuisine équipée - Cuisine Fournisseur - 29 Rue BERTAUX		257,45			20260128		
+OD	Opérations diverses	34	20251231	281840	Amort. Mobilier			PIECE0	20251231	DAA - Electroménager - Fournisseur - 29 Rue BERTAUX		243,01			20260128		
+OD	Opérations diverses	34	20251231	281840	Amort. Mobilier			PIECE0	20251231	DAA - Mobilier - Mobilier Salon - 29 Rue BERTAUX		299,97			20260128		
+OD	Opérations diverses	34	20251231	281840	Amort. Mobilier			PIECE0	20251231	DAA - Mobilier - Mobiliers chambres principalement  - 29 Rue BERTAUX		392,75			20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Aménagements intérieurs - Aménagement - 29 Rue BERTAUX	0,01				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Cuisine équipée - Cuisine Fournisseur - 29 Rue BERTAUX	257,45				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Electroménager - Fournisseur - 29 Rue BERTAUX	243,01				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Installation électrique - Electricité rénovation - 29 Rue BERTAUX	65,00				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Mobilier - Mobilier Salon - 29 Rue BERTAUX	299,97				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Mobilier - Mobiliers chambres principalement  - 29 Rue BERTAUX	392,75				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Travaux - Carrelage - 29 Rue BERTAUX	57,20				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Travaux - Huisseries coté Est  - 29 Rue BERTAUX	62,56				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Aménagements intérieurs - 29 Rue BERTAUX	933,04				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Etanchéité - 29 Rue BERTAUX	623,85				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Gros oeuvre - 29 Rue BERTAUX	829,64				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Travaux - Huisseries Coté OUEST - 29 Rue BERTAUX	205,48				20260128		
+OD	Opérations diverses	34	20251231	681120	Dotation Amort. Corpo.			PIECE0	20251231	DAA - Travaux - Porte d'entrée - 29 Rue BERTAUX	73,53				20260128		

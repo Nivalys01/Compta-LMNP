@@ -1,0 +1,67 @@
+# =============================================================================
+#  Compta LMNP — fichiers exclus du dépôt public
+#
+#  RÈGLE ABSOLUE : ce dépôt ne doit contenir AUCUNE donnée réelle. Une fuite
+#  est irréversible — un fichier committé reste dans l'historique même après
+#  suppression, et un dépôt public est cloné, indexé, archivé en quelques
+#  minutes. Le script `verifier_depot.py` contrôle ce point avant publication.
+# =============================================================================
+
+# --- DOSSIER DE RÉFÉRENCE : identité et comptabilité RÉELLES ----------------
+#     (le dossier de démonstration anonymisé, lui, EST publié : demo/)
+reference/
+seed_exemple.sql
+
+# --- Données de l'utilisateur -----------------------------------------------
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+sauvegardes/
+archives/
+dossiers/
+dossiers.json
+logs/
+imports_tmp/
+
+# --- FEC exportés ------------------------------------------------------------
+#     Un FEC exporté contient la comptabilité réelle de son auteur. SEULE
+#     exception : le jeu de démonstration anonymisé, qui doit être publié
+#     (sans lui, le bac à sable est vide chez l'utilisateur).
+FEC*.txt
+*FEC????????.txt
+!demo/
+!demo/FEC_DEMO_*.txt
+
+# --- Secrets -----------------------------------------------------------------
+certs/
+*.pem
+*.key
+.env
+
+# --- Artefacts de construction ----------------------------------------------
+dist/
+build/
+*.spec
+.raccourci_bureau
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Outils ------------------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Éditeurs / OS ------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+*.swp

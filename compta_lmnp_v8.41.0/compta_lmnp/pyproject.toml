@@ -1,0 +1,21 @@
+# Compta LMNP — configuration qualité (utilisée par `ruff check .`)
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# Jeu de règles DÉCLARÉ, et non hérité du défaut de l'outil. Sans cette
+# ligne, le jeu appliqué changeait avec la version de ruff installée : une
+# mise à jour du linter faisait passer le projet de « propre » à
+# « 234 erreurs » sans qu'une seule ligne de code ait bougé. Sur un dépôt
+# public, cela veut dire une CI rouge un matin, sur une release qu'on n'a
+# pas demandée.
+select = ["E4", "E7", "E9", "F", "W"]
+# E402 toléré : les modules locaux s'importent nécessairement APRÈS le
+# sys.path.insert(HERE) d'amorçage (projet sans installation pip).
+ignore = ["E402"]
+
+[tool.ruff.lint.per-file-ignores]
+# Longues chaînes SQL/HTML historiques dans l'app et le CLI.
+"app.py" = ["E501"]
+"cli.py" = ["E501"]

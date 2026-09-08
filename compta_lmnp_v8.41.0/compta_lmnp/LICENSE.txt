@@ -1,0 +1,95 @@
+COMPTA LMNP — LICENCE D'UTILISATION
+Copyright © 2026 Sylvain FAURE. Tous droits réservés.
+
+==============================================================================
+RÉSUMÉ EN LANGAGE CLAIR (le texte qui suit fait foi)
+------------------------------------------------------------------------------
+Ce logiciel est GRATUIT. Vous pouvez l'utiliser sans limite pour votre propre
+comptabilité et transmettre le paquet officiel INTACT à qui vous voulez. Vous
+ne pouvez pas le vendre, le modifier pour le rediffuser, ni retirer les
+mentions d'auteur. Il est fourni sans garantie : les chiffres qu'il produit
+doivent être validés avant tout dépôt. Les dons sont volontaires et ne
+confèrent aucun droit supplémentaire.
+==============================================================================
+
+1. PROPRIÉTÉ
+Ce logiciel — code source, structure de données, interface, documentation et
+jeu de démonstration — est la propriété exclusive de Sylvain FAURE (ci-après
+« l'auteur »), et est protégé par le droit d'auteur (articles L111-1 et
+suivants du Code de la propriété intellectuelle). La présente licence
+n'opère AUCUN transfert de propriété : elle concède un droit d'usage, dans
+les limites ci-dessous. « Compta LMNP » désigne le nom du logiciel ; son
+usage pour désigner un autre produit est interdit.
+
+2. DROIT D'USAGE CONCÉDÉ (à titre gratuit)
+L'auteur concède à toute personne un droit GRATUIT, personnel, non exclusif
+et non transférable :
+   a) d'installer et d'utiliser le logiciel, sans limite de durée ni de
+      nombre de dossiers, pour la tenue de sa propre comptabilité de
+      location meublée ;
+   b) de réaliser toute copie de sauvegarde ;
+   c) de transmettre à des tiers le PAQUET DE DISTRIBUTION OFFICIEL, complet
+      et non modifié (archive telle que diffusée par l'auteur, la présente
+      licence incluse).
+
+3. INTERDICTIONS (sauf autorisation écrite préalable de l'auteur)
+   - vendre, louer ou sous-licencier le logiciel, ou en faire payer l'accès,
+     l'installation ou l'usage, directement ou indirectement ;
+   - diffuser une version modifiée, ou une œuvre dérivée du logiciel ;
+   - retirer ou altérer les mentions de copyright, la présente licence ou
+     l'identification de l'auteur ;
+   - utiliser le code source, en tout ou partie, dans un autre logiciel
+     diffusé.
+La consultation du code source à des fins d'étude personnelle ou d'audit de
+sécurité est permise ; sa réutilisation dans un produit diffusé ne l'est pas.
+
+4. DONS
+Le développement peut être soutenu par des dons volontaires. Un don est une
+libéralité : il ne constitue ni un achat, ni une souscription, ne confère
+aucun droit supplémentaire (support, fonctionnalité, priorité) et n'est pas
+remboursable.
+
+5. ABSENCE DE GARANTIE
+LE LOGICIEL EST FOURNI « EN L'ÉTAT », SANS AUCUNE GARANTIE, expresse ou
+implicite, notamment d'exactitude des calculs, de conformité à la
+réglementation fiscale en vigueur, ou d'adéquation à un usage particulier.
+La réglementation fiscale évolue ; les états produits (liasse, FEC,
+déclarations) sont des AIDES À LA PRÉPARATION qui doivent être vérifiés,
+au besoin par un professionnel qualifié, avant tout dépôt ou télédéclaration.
+L'utilisateur reste seul responsable de ses déclarations.
+
+6. RESPONSABILITÉ
+Dans les limites permises par la loi, l'auteur ne saurait être tenu
+responsable des dommages directs ou indirects résultant de l'usage ou de
+l'impossibilité d'usage du logiciel — y compris redressements, pénalités,
+intérêts de retard ou perte de données. Les dispositions d'ordre public,
+notamment en matière de dol et de faute lourde, demeurent applicables.
+
+7. DONNÉES
+Le logiciel fonctionne entièrement sur la machine de l'utilisateur et ne
+transmet aucune donnée à l'auteur ni à des tiers. Les données saisies
+appartiennent à l'utilisateur ; leur sauvegarde relève de sa responsabilité
+(des mécanismes de sauvegarde sont fournis à cet effet).
+
+8. RÉSILIATION
+Le droit d'usage prend fin de plein droit en cas de violation de la
+présente licence. L'utilisateur peut y mettre fin à tout moment en cessant
+d'utiliser le logiciel et en détruisant ses copies.
+
+9. COMPOSANTS TIERS
+Le logiciel s'appuie sur des composants sous licences libres, dont les
+termes s'appliquent à ces composants uniquement :
+   - Python (PSF License) ;
+   - Flask, Werkzeug, Jinja2, MarkupSafe, itsdangerous, click
+     (BSD-3-Clause) ;
+   - reportlab, composant facultatif d'export PDF (BSD).
+Ces licences sont permissives et compatibles avec la présente distribution ;
+les textes complets sont disponibles auprès de chaque projet. Aucun
+composant sous licence à réciprocité (GPL ou assimilée) n'est distribué
+avec le logiciel.
+
+10. DROIT APPLICABLE
+La présente licence est régie par le droit français. Tout litige relève des
+juridictions françaises compétentes, après recherche d'une solution amiable.
+
+Contact : sylvainfaure01@hotmail.fr

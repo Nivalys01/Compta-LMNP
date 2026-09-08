@@ -1,0 +1,64 @@
+# =============================================================================
+#  Dépôt Compta LMNP — exclusions à la racine
+#
+#  RÈGLE ABSOLUE : aucune donnée réelle dans ce dépôt. Un fichier committé
+#  reste dans l'historique même après suppression. Les règles ci-dessous
+#  doublent celles de compta_lmnp_v8.41.0/compta_lmnp/.gitignore : la
+#  protection doit tenir même si l'arborescence est déplacée ou dupliquée.
+# =============================================================================
+
+# --- Anciennes versions de travail (contiennent des compta.db réels) --------
+v_ant/
+
+# --- Artefacts de build : le paquet client se régénère avec build_client.py --
+*.zip
+dist/
+build/
+*.spec
+
+# --- Données réelles ---------------------------------------------------------
+compta.db
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+reference/
+seed_exemple.sql
+sauvegardes/
+archives/
+dossiers/
+dossiers.json
+logs/
+imports_tmp/
+
+# --- FEC exportés (comptabilité réelle) — sauf le jeu de démo anonymisé -----
+FEC*.txt
+*FEC????????.txt
+!demo/FEC_DEMO_*.txt
+
+# --- Secrets -----------------------------------------------------------------
+certs/
+*.pem
+*.key
+.env
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Outils ------------------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Éditeurs / OS ------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+*.swp

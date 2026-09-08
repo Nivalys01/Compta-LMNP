@@ -1,0 +1,8 @@
+# Outillage de développement — versions ÉPINGLÉES.
+#
+# Un linter non épinglé transforme une release de l'outil en CI rouge : le
+# jeu de règles par défaut de ruff s'est élargi entre deux versions et le
+# projet est passé de « propre » à 234 erreurs sans qu'une ligne de code
+# ait changé. Le jeu de règles est par ailleurs déclaré dans pyproject.toml.
+pytest==8.3.4
+ruff==0.16.0
