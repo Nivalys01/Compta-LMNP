@@ -189,10 +189,20 @@ def _reconstituer_operations(conn: sqlite3.Connection, annee: int) -> None:
     #   2. à défaut le compte, en retenant le PREMIER gabarit du catalogue
     #      (l'usage courant précède les cas particuliers), et non le
     #      dernier comme le faisait une simple affectation de dictionnaire.
+    # Seuls les gabarits de RÉSULTAT (classes 6 et 7) reconstituent une
+    # opération de démonstration. Depuis la passe E, des gabarits visent des
+    # comptes de BILAN — dépôt de garantie, capital d'emprunt, compte
+    # d'attente 472000. Sans ce filtre, la ligne 472000 des à-nouveaux de la
+    # démo devenait une « opération » de démonstration, rattachée à une
+    # écriture dont elle ne représentait qu'une fraction du montant.
+    comptes_resultat = {n for (n,) in conn.execute(
+        "SELECT numero FROM compte WHERE classe IN (6, 7)")}
+    catalogue_resultat = {t: g for t, g in catalogue.items()
+                          if g["compte"] in comptes_resultat}
     par_libelle = {g["libelle"].strip().lower(): (t, g["nature"])
-                   for t, g in catalogue.items()}
+                   for t, g in catalogue_resultat.items()}
     par_compte: dict[str, tuple[str, str]] = {}
-    for t, g in catalogue.items():
+    for t, g in catalogue_resultat.items():
         par_compte.setdefault(g["compte"], (t, g["nature"]))
     bien = conn.execute("SELECT id FROM bien ORDER BY id LIMIT 1").fetchone()
     bien_id = bien[0] if bien else None
@@ -280,7 +290,8 @@ if __name__ == "__main__":
 # La garde évite l'irritant classique des logiciels comptables : ouvrir une
 # base créée par une version PLUS RÉCENTE du logiciel (données invisibles ou
 # comportements faux), sans message compréhensible.
-VERSION_SCHEMA = 6        # …5: annulation d'opération, 6: quittances
+VERSION_SCHEMA = 7        # …5: annulation d'opération, 6: quittances,
+                          # 7: comptes 164/165/401/411/758 (passe E, E-10)
 
 # Index de performance. Aucun n'existait : SQLite n'indexe pas les clés
 # étrangères automatiquement, et tous les calculs (agrégats, contrôles,

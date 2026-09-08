@@ -51,10 +51,29 @@ GABARITS = {
     # protège des saisies inversées (signalé en revue du catalogue).
     "restitution_charges":   {"compte": "708810", "nature": "charge", "periodicite": "variable",
                               "groupe": "Produits", "libelle": "Restitution de charges au locataire"},
-    "indemnite_assurance":   {"compte": "778800", "nature": "produit", "periodicite": "variable",
+    "indemnite_assurance":   {"compte": "758000", "nature": "produit", "periodicite": "variable",
                               "groupe": "Produits", "libelle": "Indemnité d'assurance / produit divers"},
     "autres_produits":       {"compte": "708810", "nature": "produit", "periodicite": "variable",
                               "groupe": "Produits", "libelle": "Autres produits de location"},
+
+    # ── Dépôts & emprunts (mouvements de BILAN, hors résultat) ──────────────
+    #    Ces gabarits mouvementent des comptes de classe 1 : fiscal.py agrège
+    #    le résultat par CLASSE (6 et 7), ils en sont donc exclus d'office.
+    #    C'est tout l'objet du constat E-10 — sans ces comptes, un dépôt de
+    #    garantie devenait un loyer imposable et un remboursement de capital
+    #    une charge déductible.
+    "depot_garantie_recu":   {"compte": "165000", "nature": "produit", "periodicite": "variable",
+                              "groupe": "Dépôts & emprunts",
+                              "libelle": "Dépôt de garantie reçu (dette — non imposable)"},
+    "depot_garantie_restitue": {"compte": "165000", "nature": "charge", "periodicite": "variable",
+                              "groupe": "Dépôts & emprunts",
+                              "libelle": "Dépôt de garantie restitué (extinction de dette)"},
+    "emprunt_recu":          {"compte": "164000", "nature": "produit", "periodicite": "variable",
+                              "groupe": "Dépôts & emprunts",
+                              "libelle": "Déblocage d'emprunt reçu (dette — non imposable)"},
+    "emprunt_capital_rembourse": {"compte": "164000", "nature": "charge", "periodicite": "variable",
+                              "groupe": "Dépôts & emprunts",
+                              "libelle": "Remboursement d'emprunt — CAPITAL (non déductible)"},
 
     # ── Copropriété ─────────────────────────────────────────────────────────
     "charge_copro":          {"compte": "614100", "nature": "charge", "periodicite": "variable",
@@ -139,11 +158,26 @@ GABARITS = {
     "autres_charges":        {"compte": "628800", "nature": "charge", "periodicite": "variable",
                               "groupe": "Divers", "libelle": "Autres charges (à requalifier)",
                               "requalifier": True},
+
+    # ── Attente ─────────────────────────────────────────────────────────────
+    #    628800 est une charge IMMÉDIATEMENT DÉDUCTIBLE : y ranger une ligne
+    #    non reconnue « signale » le doute sans rien empêcher. 472000 est un
+    #    compte d'attente, et controles.py refuse BLOQUANTE une liasse dont
+    #    le solde n'est pas apuré : le doute empêche alors de déclarer faux.
+    "attente_encaissement":  {"compte": "472000", "nature": "produit", "periodicite": "variable",
+                              "groupe": "Attente",
+                              "libelle": "Encaissement à identifier (bloque la liasse)",
+                              "requalifier": True},
+    "attente_decaissement":  {"compte": "472000", "nature": "charge", "periodicite": "variable",
+                              "groupe": "Attente",
+                              "libelle": "Décaissement à identifier (bloque la liasse)",
+                              "requalifier": True},
 }
 
-ORDRE_GROUPES = ["Produits", "Copropriété", "Abonnements & énergie", "Assurances",
+ORDRE_GROUPES = ["Produits", "Dépôts & emprunts", "Copropriété",
+                 "Abonnements & énergie", "Assurances",
                  "Entretien & équipement", "Emprunt & banque", "Honoraires & gestion",
-                 "Déplacements", "Impôts & taxes", "Divers", "Personnalisé"]
+                 "Déplacements", "Impôts & taxes", "Divers", "Attente", "Personnalisé"]
 
 
 # ── Gabarits personnalisés (table) ───────────────────────────────────────────

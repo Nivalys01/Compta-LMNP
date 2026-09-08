@@ -59,8 +59,30 @@ def _palier_6(conn: sqlite3.Connection) -> None:
     quittances.assurer_schema(conn)
 
 
+def _palier_7(conn: sqlite3.Connection) -> None:
+    """v7 — comptes absents du plan livré (passe E, constat E-10).
+
+    Un dossier créé avant cette version n'a ni dette financière, ni compte
+    de dépôt de garantie : les gabarits qui les visent échoueraient sur la
+    clé étrangère `compte(numero)` au moment de la saisie, c'est-à-dire
+    chez l'utilisateur et pas ici. Les comptes sont donc créés sur les
+    bases existantes, à l'identique du seed livré.
+
+    INSERT OR IGNORE : le palier est rejouable, et il ne touche pas un
+    compte que l'utilisateur aurait créé lui-même sous le même numéro.
+    """
+    conn.executemany(
+        "INSERT OR IGNORE INTO compte (numero, libelle, type, classe) "
+        "VALUES (?,?,?,?)",
+        [("164000", "Emprunts auprès des établissements de crédit", "passif", 1),
+         ("165000", "Dépôts et cautionnements reçus", "passif", 1),
+         ("401000", "Fournisseurs", "passif", 4),
+         ("411000", "Locataires", "actif", 4),
+         ("758000", "Produits divers de gestion courante", "produit", 7)])
+
+
 PALIERS = {2: _palier_2, 3: _palier_3, 4: _palier_4, 5: _palier_5,
-           6: _palier_6}
+           6: _palier_6, 7: _palier_7}
 
 # Garde-fou de développement. La boucle de `migrer` ignorait silencieusement
 # un palier absent, puis marquait la base au niveau du logiciel : une base

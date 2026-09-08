@@ -39,7 +39,8 @@ def test_seed_journaux(conn):
     assert conn.execute("SELECT COUNT(*) FROM journal").fetchone()[0] == 4
 
 def test_seed_comptes(conn):
-    assert conn.execute("SELECT COUNT(*) FROM compte").fetchone()[0] == 33
+    # 38 depuis la passe E : +164000, +165000, +401000, +411000, +758000
+    assert conn.execute("SELECT COUNT(*) FROM compte").fetchone()[0] == 38
 
 def test_seed_composants(conn):
     assert conn.execute("SELECT COUNT(*) FROM composant").fetchone()[0] == 14

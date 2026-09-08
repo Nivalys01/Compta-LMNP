@@ -26,7 +26,7 @@ def compte(conn, table):
 def test_blanc_referentiel_present(tmp_path):
     conn = init_db.init_blanc(str(tmp_path / "b.db"), 2026)
     assert compte(conn, "journal") == 4
-    assert compte(conn, "compte") == 33
+    assert compte(conn, "compte") == 38     # +5 comptes, passe E (E-10)
     conn.close()
 
 def test_blanc_aucune_donnee_personnelle(tmp_path):

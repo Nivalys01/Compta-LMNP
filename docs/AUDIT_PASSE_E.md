@@ -597,6 +597,71 @@ sait lire, et rendre compte de chaque ligne rejetée.
 Non-régression : `tests/test_passe_e.py`, 26 tests reprenant les scénarios
 du rapport.
 
+### Lot 2 — E-10 (traité)
+
+`seed_referentiel.sql` passe de 33 à 38 comptes :
+
+| Compte | Type / classe | Ce qu'il rend possible |
+|---|---|---|
+| `164000` Emprunts auprès des établissements de crédit | passif, 1 | séparer capital (dette) et intérêts (`661100`) |
+| `165000` Dépôts et cautionnements reçus | passif, 1 | encaisser un dépôt de garantie sans le déclarer |
+| `401000` Fournisseurs | passif, 4 | facture reçue non payée à la clôture |
+| `411000` Locataires | actif, 4 | loyer impayé à la clôture (créance, donc actif) |
+| `758000` Produits divers de gestion courante | produit, 7 | produit COURANT hors du compte exceptionnel 778 |
+
+`init_db.VERSION_SCHEMA` passe à 7, avec `migrations._palier_7` : sans lui, un
+dossier existant n'aurait pas ces comptes et les nouveaux gabarits
+échoueraient sur la clé étrangère `compte(numero)` **chez l'utilisateur**.
+
+`gabarits.py` gagne six entrées et en corrige une :
+
+- `depot_garantie_recu` / `depot_garantie_restitue` → `165000` ;
+- `emprunt_recu` / `emprunt_capital_rembourse` → `164000` ;
+- `attente_encaissement` / `attente_decaissement` → `472000` ;
+- `indemnite_assurance` : `778800` → `758000`.
+
+Deux mécanismes préexistants font que cela suffit, sans toucher au moteur :
+`fiscal.agregats` agrège le résultat par **classe** de compte (6 et 7), donc
+les classes 1 et 4 en sont exclues d'office ; et `controles.c_compte_attente`
+refuse déjà en **BLOQUANT** un solde 472000 non apuré. Le compte d'attente
+réclamé par E-06 bloque donc réellement la liasse, là où `628800` se contente
+d'un avertissement sur une charge déjà déduite.
+
+Effet de bord corrigé au passage : la reconstruction des opérations de
+démonstration (`init_db`) mappait compte → gabarit sans filtre. Le nouveau
+gabarit sur `472000` faisait de la ligne d'attente des à-nouveaux une
+« opération » de démo. La reconstruction est désormais restreinte aux
+gabarits de résultat (classes 6 et 7), ce qui était le comportement de fait
+avant la passe E.
+
+Non-régression : 15 tests supplémentaires dans `tests/test_passe_e.py`.
+
+### Réserve — la conséquence annoncée pour les cases 218/232 n'existe pas
+
+E-10 conclut qu'un produit courant logé en `778800` « déforme la case 218/232
+que liasse_pdf imprime ». Vérification faite dans `liasse.py` :
+
+    produits = round(-_somme(s, ("7",)), 2)      # 218 / 232
+
+**Tous** les comptes de classe 7 sont additionnés sans distinction : la liasse
+ne sépare aujourd'hui ni 706, ni 708, ni 758, ni 778. Créer `758000` et y
+router l'indemnité d'assurance reste juste sur le fond — c'est le bon compte,
+778 étant exceptionnel — mais cela ne corrige aucun chiffre de la liasse
+actuelle. Le défaut réel, non relevé par l'audit, est que la liasse ne
+distingue pas les produits exceptionnels des produits d'exploitation.
+**À arbitrer** : est-ce un constat à ouvrir pour une passe ultérieure ?
+
+### Point ouvert — apport de l'exploitant (issu d'E-01)
+
+E-01 attend qu'un apport soit dirigé vers « le compte de l'exploitant
+108000 ». Or `gabarits.COMPTE_CONTREPARTIE` vaut déjà `108000` : dans ce
+modèle de caisse, 108000 tient à la fois le rôle de trésorerie et celui de
+compte de l'exploitant. Un apport y serait donc débité **et** crédité — une
+écriture nulle. Aucun gabarit d'apport n'a été créé pour cette raison ; le
+traitement d'E-01 devra router ces lignes vers l'attente, ou le modèle devra
+introduire un compte de trésorerie distinct (question déjà posée au §5 du
+rapport, « absence de compte 512/530 »).
+
 ### Point ouvert — support des exports à colonnes débit/crédit séparées
 
 E-02 est traité par un **refus explicite**, correctif minimal du rapport.

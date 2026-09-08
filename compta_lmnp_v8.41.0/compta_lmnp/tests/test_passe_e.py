@@ -168,3 +168,197 @@ def test_e03_proposer_reste_une_liste(tmp_path):
     p = _releve(tmp_path, "05/01/2026;VIR LOYER;795,50\n")
     props = import_bancaire.proposer(p)
     assert isinstance(props, list) and props[0]["type"] == "loyer"
+
+
+# ═══ E-10 — comptes manquants au plan livré ═════════════════════════════
+#
+# Le rapport ne relève AUCUNE erreur de type ni de classe dans les 33 comptes
+# livrés : le défaut est fait d'absences. Sans dette financière ni compte de
+# dépôt de garantie, une mensualité de prêt et un dépôt encaissé n'avaient
+# aucune destination correcte — ils partaient en charge et en produit.
+
+import sqlite3
+
+import fiscal
+import gabarits
+import init_db
+import migrations
+import operations
+
+COMPTES_E10 = {
+    "164000": ("passif",  1),   # emprunts auprès des établissements de crédit
+    "165000": ("passif",  1),   # dépôts et cautionnements reçus
+    "401000": ("passif",  4),   # fournisseurs
+    "411000": ("actif",   4),   # locataires (créance : actif, pas passif)
+    "758000": ("produit", 7),   # produits divers de gestion COURANTE
+}
+
+
+@pytest.fixture
+def base(tmp_path):
+    chemin = str(tmp_path / "compta.db")
+    init_db.init_blanc(chemin, 2026).close()
+    conn = sqlite3.connect(chemin)
+    conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("INSERT OR IGNORE INTO exploitant (id, nom, siren) "
+                 "VALUES (1, 'Exploitant test', '000000000')")
+    conn.execute("INSERT INTO bien (id, exploitant_id, libelle) "
+                 "VALUES (1, 1, 'Logement test')")
+    conn.commit()
+    yield conn
+    conn.close()
+
+
+@pytest.mark.parametrize("numero,attendu", sorted(COMPTES_E10.items()))
+def test_e10_comptes_presents_dans_une_base_neuve(base, numero, attendu):
+    row = base.execute("SELECT type, classe FROM compte WHERE numero=?",
+                       (numero,)).fetchone()
+    assert row is not None, f"compte {numero} absent du plan livré"
+    assert (row[0], row[1]) == attendu
+
+
+def test_e10_migration_cree_les_comptes_sur_une_base_existante(tmp_path):
+    """Un dossier créé avant la passe E n'a pas ces comptes. Sans le palier,
+    les nouveaux gabarits échoueraient sur la clé étrangère compte(numero)
+    — chez l'utilisateur, pas ici."""
+    chemin = str(tmp_path / "ancienne.db")
+    init_db.init_blanc(chemin, 2026).close()
+    conn = sqlite3.connect(chemin)
+    conn.executemany("DELETE FROM compte WHERE numero=?",
+                     [(n,) for n in COMPTES_E10])
+    conn.execute("UPDATE meta SET valeur='6' WHERE cle='version_schema'")
+    conn.commit()
+    conn.close()
+
+    migrations.migrer(chemin)
+
+    conn = sqlite3.connect(chemin)
+    presents = {n for (n,) in conn.execute(
+        "SELECT numero FROM compte WHERE numero IN "
+        "('164000','165000','401000','411000','758000')")}
+    conn.close()
+    assert presents == set(COMPTES_E10)
+
+
+def test_e10_palier_7_est_rejouable(tmp_path):
+    """INSERT OR IGNORE : rejouer le palier ne double ni n'écrase rien."""
+    chemin = str(tmp_path / "compta.db")
+    init_db.init_blanc(chemin, 2026).close()
+    conn = sqlite3.connect(chemin)
+    migrations._palier_7(conn)
+    migrations._palier_7(conn)
+    n = conn.execute("SELECT COUNT(*) FROM compte WHERE numero='165000'").fetchone()[0]
+    conn.close()
+    assert n == 1
+
+
+def _resultat(conn, annee=2026):
+    """Résultat comptable de l'exercice — fiscal.agregats agrège par CLASSE
+    de compte (6 et 7), ce qui met d'office les classes 1 et 4 hors résultat."""
+    return fiscal.agregats(conn, annee)["resultat_comptable"]
+
+
+def test_e10_depot_de_garantie_est_une_dette_pas_un_loyer(base):
+    """Le scénario d'E-01 vu depuis le plan : 700 € encaissés au titre d'un
+    dépôt de garantie ne doivent pas bouger d'un centime le résultat."""
+    avant = _resultat(base)
+    operations.saisir(base, type="depot_garantie_recu", montant=700.0,
+                      date_operation="2026-01-05", bien_id=1)
+    apres = _resultat(base)
+    assert apres == avant
+
+    lignes = base.execute(
+        "SELECT compte_num, debit, credit FROM ligne "
+        "ORDER BY compte_num").fetchall()
+    assert ("108000", 700.0, 0.0) in lignes      # trésorerie entrante
+    assert ("165000", 0.0, 700.0) in lignes      # dette envers le locataire
+
+
+def test_e10_remboursement_de_capital_nest_pas_une_charge(base):
+    """Le redressement le plus classique en LMNP au réel : 890 € de capital
+    remboursé passés en charge. Le compte 164000 les reçoit désormais, et
+    la classe 1 est hors du résultat."""
+    avant = _resultat(base)
+    operations.saisir(base, type="emprunt_capital_rembourse", montant=890.0,
+                      date_operation="2026-01-05", bien_id=1)
+    apres = _resultat(base)
+    assert apres == avant
+
+    charge6 = base.execute(
+        "SELECT COALESCE(SUM(l.debit),0) FROM ligne l "
+        "JOIN compte c ON c.numero=l.compte_num WHERE c.classe=6").fetchone()[0]
+    assert charge6 == 0.0
+
+
+def test_e10_interets_restent_deductibles(base):
+    """La contrepartie du test précédent : seuls les INTÉRÊTS se déduisent.
+    Le gabarit existait déjà, il ne doit pas être emporté par la correction."""
+    avant = _resultat(base)
+    operations.saisir(base, type="interets_emprunt", montant=210.0,
+                      date_operation="2026-01-05", bien_id=1)
+    apres = _resultat(base)
+    assert round(avant - apres, 2) == 210.0
+
+
+def test_e10_ecritures_restent_equilibrees(base):
+    """Un compte de bilan mal branché déséquilibrerait le FEC."""
+    for type_op, montant in (("depot_garantie_recu", 700.0),
+                             ("depot_garantie_restitue", 700.0),
+                             ("emprunt_recu", 120000.0),
+                             ("emprunt_capital_rembourse", 890.0),
+                             ("attente_encaissement", 320.0),
+                             ("attente_decaissement", 65.0)):
+        operations.saisir(base, type=type_op, montant=montant,
+                          date_operation="2026-01-05", bien_id=1)
+    d, c = base.execute(
+        "SELECT COALESCE(SUM(debit),0), COALESCE(SUM(credit),0) "
+        "FROM ligne").fetchone()
+    assert round(d, 2) == round(c, 2)
+
+
+def test_e10_depot_recu_puis_restitue_solde_la_dette(base):
+    """E-01 signalait qu'un dépôt restitué « repartirait en charge », faute
+    de compte d'accueil. Aller-retour : le 165000 revient à zéro."""
+    operations.saisir(base, type="depot_garantie_recu", montant=700.0,
+                      date_operation="2026-01-05", bien_id=1)
+    operations.saisir(base, type="depot_garantie_restitue", montant=700.0,
+                      date_operation="2026-11-30", bien_id=1)
+    solde = base.execute(
+        "SELECT COALESCE(SUM(credit),0) - COALESCE(SUM(debit),0) "
+        "FROM ligne WHERE compte_num='165000'").fetchone()[0]
+    assert round(solde, 2) == 0.0
+
+
+def test_e10_attente_bloque_la_liasse(base):
+    """La différence entre « signalé » et « bloquant » : 628800 est une
+    charge déductible qui n'empêche rien ; 472000 déclenche le contrôle
+    bloquant qui existait déjà dans controles.py."""
+    import controles
+    operations.saisir(base, type="attente_decaissement", montant=65.0,
+                      date_operation="2026-01-05", bien_id=1)
+    anomalies = controles.controler(base, 2026)
+    bloquants = [a for a in anomalies
+                 if a.code == "COMPTE_ATTENTE" and a.niveau == controles.BLOQUANT]
+    assert bloquants, f"aucun contrôle bloquant sur 472000 : {anomalies}"
+    assert "65.00" in bloquants[0].message
+
+
+def test_e10_indemnite_assurance_en_produit_courant(base):
+    """758 = produit COURANT de gestion. 778 est un compte EXCEPTIONNEL :
+    y loger une indemnité d'assurance est une erreur de nature."""
+    assert gabarits.GABARITS["indemnite_assurance"]["compte"] == "758000"
+    operations.saisir(base, type="indemnite_assurance", montant=800.0,
+                      date_operation="2026-01-05", bien_id=1)
+    solde = base.execute(
+        "SELECT COALESCE(SUM(credit),0) - COALESCE(SUM(debit),0) "
+        "FROM ligne WHERE compte_num='758000'").fetchone()[0]
+    assert round(solde, 2) == 800.0
+
+
+def test_e10_gabarits_pointent_vers_des_comptes_existants(base):
+    """Garde générale : un gabarit dont le compte n'est pas au plan échoue
+    sur la clé étrangère au moment de la SAISIE, donc chez l'utilisateur."""
+    plan = {n for (n,) in base.execute("SELECT numero FROM compte")}
+    orphelins = {cle: g["compte"] for cle, g in gabarits.GABARITS.items()
+                 if g["compte"] not in plan}
+    assert not orphelins, f"gabarits sans compte au plan : {orphelins}"

@@ -2003,14 +2003,16 @@ def test_comptes_absents_du_plan_sont_crees_avec_leur_type(tmp_path):
     p = str(tmp_path / "f.txt")
     _ecrire_fec(p, [
         _l_fec("AC", 1, "20260110", "615000", 1200, 0),
-        _l_fec("AC", 1, "20260110", "401000", 0, 1200),
+        # 512000 : encore absent du plan livré. 401000 y est entré avec la
+        # passe E (E-10) — il ne peut plus servir à tester la CRÉATION.
+        _l_fec("AC", 1, "20260110", "512000", 0, 1200),
     ])
     c = init_db.init(str(tmp_path / "b.db"), "blanc", annee_cible=2026)
     r = rejeu_fec.rejouer(c, p, 2026)
-    assert set(r["comptes_crees"]) >= {"615000", "401000"}
+    assert set(r["comptes_crees"]) >= {"615000", "512000"}
     types = dict(c.execute(
-        "SELECT numero, type FROM compte WHERE numero IN ('615000','401000')"))
-    assert types["615000"] == "charge" and types["401000"] == "passif"
+        "SELECT numero, type FROM compte WHERE numero IN ('615000','512000')"))
+    assert types["615000"] == "charge" and types["512000"] == "actif"
     # les comptes d'amortissement ont leur type propre, pas « passif »
     assert fec_io.type_du_compte("281315") == "amortissement"
     assert fec_io.type_du_compte("512000") == "actif"
