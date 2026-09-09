@@ -3,7 +3,7 @@
 # sans autorisation écrite de l'auteur.
 
 """
-Tests J0 + J1 — non-régression contre les chiffres réels (clôture 2025 les acteurs payants actuels).
+Tests J0 + J1 — non-régression contre les chiffres réels (clôture 2025 des logiciels du marché).
 Lancer :  pytest -q
 """
 import os
@@ -51,7 +51,7 @@ def test_terrain_non_amortissable(conn):
     assert r == (0, None)
 
 def test_valeur_brute_totale(conn):
-    # 139 908,66 € (terrain inclus) — valeurs EXACTES les acteurs payants actuels, pas arrondies.
+    # 139 908,66 € (terrain inclus) — valeurs EXACTES des logiciels du marché, pas arrondies.
     total = conn.execute("SELECT ROUND(SUM(valeur_brute),2) FROM composant").fetchone()[0]
     assert total == 139908.66
 

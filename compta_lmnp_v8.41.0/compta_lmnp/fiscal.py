@@ -9,7 +9,7 @@ DEUX FILES STRICTEMENT DISTINCTES (jamais cumulées) :
   - Report 39 C : amortissements non déductibles, reportables SANS limite de durée.
   - Déficit LMNP : imputable sur bénéfices de même nature, PÉREMPTION à 10 ans.
 
-⚠️ AVERTISSEMENT — ce module code la mécanique observée chez les acteurs payants actuels, mais le calcul
+⚠️ AVERTISSEMENT — ce module code la mécanique observée dans les logiciels du marché, mais le calcul
 du résultat fiscal d'un LMNP au réel comporte des subtilités (retraitements divers,
 ventilation des charges afférentes) qui doivent être validées par un expert-comptable
 avant tout usage en déclaration réelle.

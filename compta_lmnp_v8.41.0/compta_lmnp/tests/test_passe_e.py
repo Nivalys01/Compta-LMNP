@@ -1009,3 +1009,46 @@ def test_e20_aucun_numero_de_case_invente():
     for ligne in bloc.split("\n"):
         if "produits_financiers" in ligne or "produits_exceptionnels" in ligne:
             assert "case" not in ligne.lower(), ligne
+
+
+# Reconstruit à l'exécution : écrite en clair, elle ferait échouer le test
+# suivant sur ce fichier-ci.
+MOTIF_ANONYMISATION = " ".join(["les", "acteurs", "payants", "actuels"])
+
+
+def test_e14_les_motifs_danonymisation_sont_intacts():
+    """Garde-fou de reformulation. La prose du dépôt a été reformulée en
+    « les logiciels du marché », mais `outils_demo` utilise l'ancienne
+    formule comme MOTIF sur le seed et le FEC privés, où elle subsiste.
+    La reformuler ferait échouer l'anonymisation du jeu de démonstration
+    PUBLIÉ, en silence."""
+    src = open(os.path.join(HERE, "outils_demo.py"), encoding="utf-8").read()
+    assert src.count(MOTIF_ANONYMISATION) == 2, \
+        "les motifs d'anonymisation ont été modifiés — le jeu de démo publié " \
+        "risque de porter le nom d'un tiers"
+
+
+def test_e14_la_prose_du_depot_est_reformulee():
+    """L'envers du précédent : plus aucune occurrence hors des deux motifs."""
+    import subprocess
+    racine = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=HERE,
+                            capture_output=True, text=True)
+    if racine.returncode != 0:
+        pytest.skip("pas de dépôt git ici")
+    racine = racine.stdout.strip()
+    fichiers = subprocess.run(["git", "ls-files"], cwd=racine,
+                              capture_output=True, text=True).stdout.split("\n")
+    coupables = []
+    for f in fichiers:
+        if (not f or f.startswith("docs/")            # le rapport CITE l'origine
+                or f.endswith("outils_demo.py")        # les deux motifs
+                or f.endswith("test_passe_e.py")):     # ce fichier-ci
+            continue
+        try:
+            contenu = open(os.path.join(racine, f), encoding="utf-8",
+                           errors="ignore").read()
+        except OSError:
+            continue
+        if MOTIF_ANONYMISATION in contenu:
+            coupables.append(f)
+    assert not coupables, coupables

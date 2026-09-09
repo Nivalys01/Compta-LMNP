@@ -48,7 +48,7 @@ REGLES = [
     # la liasse imprime une ligne « dont CFE » servie à zéro (constat E-08).
     (("cfe", "cotisation fonciere"),            "cfe"),
     (("taxe fonciere", "teom", "tresor public", "dgfip", "impot local"), "impot_local"),
-    # « les acteurs payants actuels » occupait ce tableau : ce n'est pas un
+    # « les logiciels du marché » occupait ce tableau : ce n'est pas un
     # oubli de relecture mais le produit d'un remplacement global — le nom du
     # prestataire comptable historique a été anonymisé partout dans le projet,
     # y compris là où il servait de MOT-CLÉ BANCAIRE légitime (une facture de

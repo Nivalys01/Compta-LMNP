@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Schéma SQLite — Compta LMNP au réel + FEC  (jalon J1)
--- Calé sur la mécanique les acteurs payants actuels : 4 journaux, contrepartie trésorerie = 108000.
+-- Calé sur la mécanique des logiciels du marché : 4 journaux, contrepartie trésorerie = 108000.
 -- ============================================================================
 
 PRAGMA foreign_keys = ON;
@@ -42,7 +42,7 @@ CREATE TABLE compte (
 CREATE TABLE composant (
     id                INTEGER PRIMARY KEY,
     bien_id           INTEGER NOT NULL REFERENCES bien(id),
-    code_immo         TEXT    UNIQUE,         -- réf. pièce les acteurs payants actuels (MODYDW, MFGTAG…)
+    code_immo         TEXT    UNIQUE,         -- réf. pièce des logiciels du marché (MODYDW, MFGTAG…)
     libelle           TEXT    NOT NULL,
     categorie         TEXT,
     valeur_brute      REAL    NOT NULL,

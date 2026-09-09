@@ -188,7 +188,7 @@ def test_liasse_deficit_alimente_5ny_et_millesimes(tmp_path):
 
 def test_liasse_demo_reconcilie_bilan_ouverture(tmp_path):
     """Dossier démo (reprise FEC 2025 réel) : la liasse provisoire 2026 doit
-    réconcilier le bilan d'ouverture les acteurs payants actuels (brut 139 908,66 €, VNC 118 578,78 €)."""
+    réconcilier le bilan d'ouverture des logiciels du marché (brut 139 908,66 €, VNC 118 578,78 €)."""
     conn = init_db.init(str(tmp_path / "demo.db"), "demo", annee_cible=2026)
     L = liasse.generer(conn, 2026)
     conn.close()

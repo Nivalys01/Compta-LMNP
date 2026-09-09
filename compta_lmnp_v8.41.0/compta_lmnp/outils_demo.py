@@ -231,6 +231,13 @@ def construire_seed_demo() -> str:
                 src = src.replace(f"'{ancienne}'", f"'{nouvelle}'")
     # Le libellé du bien reprend souvent l'adresse : on le neutralise aussi.
     src = re.sub(r"'Appartement[^']*'", f"'{DEMO_BIEN}'", src)
+    # NE PAS reformuler cette chaîne. Ce n'est PAS de la prose : c'est le
+    # motif qui neutralise le nom du prestataire comptable dans le seed
+    # PRIVÉ, où il subsiste sous cette forme. La prose du dépôt a été
+    # reformulée en « les logiciels du marché » ; ces deux motifs-ci
+    # (ligne 73 et celle-ci) doivent continuer de matcher le seed et le FEC
+    # source, sans quoi l'anonymisation du jeu de démonstration PUBLIÉ
+    # échoue en silence.
     src = src.replace("les acteurs payants actuels", "prestataire")
 
     # 2. Codes de pièce du prestataire (6 majuscules entre quotes).

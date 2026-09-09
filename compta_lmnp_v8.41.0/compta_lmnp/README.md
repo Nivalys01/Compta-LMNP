@@ -7,7 +7,7 @@ un autre produit sont interdites — détail dans `LICENSE.txt`. Fourni sans
 garantie : les états produits (liasse, FEC) sont des aides à la préparation,
 à faire valider avant tout dépôt.
 
-Logiciel de comptabilité LMNP au réel destiné à **remplacer les acteurs payants actuels**, testé
+Logiciel de comptabilité LMNP au réel destiné à **remplacer les logiciels du marché**, testé
 contre les chiffres réels de clôture 2023-2025 (au centime).
 
 ## Installation et lancement
@@ -244,7 +244,7 @@ annee)`. Contenu, alimenté depuis la base :
   individuel, résultat) ;
 - **2033-B** compte de résultat + réintégrations/déductions détaillées
   (art. 39 C ligne 318, divers ligne 330, déductions ligne 350) — convention
-  les acteurs payants actuels : ligne 352 ramenée à 0, le résultat LMNP étant déclaré en 2031 bis ;
+  les logiciels du marché : ligne 352 ramenée à 0, le résultat LMNP étant déclaré en 2031 bis ;
 - **2033-C** immobilisations & amortissements par rubrique CERFA
   (420/430/450/470, 510-560) + détail par composant ;
 - **Suivi des reports** : 39 C (SUIV39C) et déficits LMNP par millésime avec
@@ -354,7 +354,7 @@ la liasse complète, case par case ; deux voies pour la transmettre :
    la page Liasse. Délai : 2ᵉ jour ouvré suivant le 1ᵉʳ mai, + 15 jours de
    tolérance télédéclaration (EFI-RP comme EDI).
 2. **EDI-TDFC — via un partenaire habilité DGFiP** : la voie qu'utilisait
-   les acteurs payants actuels (mentions « N° Interchange » et « Acceptée le » des anciennes
+   les logiciels du marché (mentions « N° Interchange » et « Acceptée le » des anciennes
    liasses). Des portails de saisie en ligne à bas coût existent — liste
    officielle sur impots.gouv.fr (« Tableau des solutions TDFC directes avec
    saisie en ligne »).

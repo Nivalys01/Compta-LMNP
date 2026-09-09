@@ -57,7 +57,7 @@ def lire_balance_interne(conn: sqlite3.Connection, annee: int) -> dict[str, floa
 
 def construire_an(conn: sqlite3.Connection, fec_path: str, annee_cible: int) -> None:
     """Insère l'AN d'ouverture `annee_cible` + l'OD d'affectation du résultat,
-    depuis un FEC de clôture EXTERNE (migration les acteurs payants actuels)."""
+    depuis un FEC de clôture EXTERNE (migration depuis un logiciel du marché)."""
     _construire_an_depuis_balance(conn, lire_balance_fec(fec_path), annee_cible)
 
 

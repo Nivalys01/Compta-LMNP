@@ -7,7 +7,7 @@ Jalon J3 — Sérialiseur FEC (A47 A-1).
 
 Exporte les écritures d'un exercice au format réglementaire :
 séparateur TABULATION, décimale VIRGULE, fins de ligne CRLF, dates AAAAMMJJ,
-18 colonnes dans l'ordre. Montants au format les acteurs payants actuels (zéros décimaux superflus
+18 colonnes dans l'ordre. Montants au format des logiciels du marché (zéros décimaux superflus
 supprimés ; champ vide quand le montant est nul).
 """
 from __future__ import annotations

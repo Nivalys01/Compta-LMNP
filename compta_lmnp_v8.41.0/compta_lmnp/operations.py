@@ -306,7 +306,7 @@ def saisir_acquisition(conn: sqlite3.Connection, *, compte_immo: str, montant: f
                        commit: bool = True) -> dict:
     """
     Écriture d'acquisition d'une immobilisation : débit compte 2xx / crédit
-    108000 (apport de l'exploitant, convention trésorerie les acteurs payants actuels). Sans elle,
+    108000 (apport de l'exploitant, convention trésorerie des logiciels du marché). Sans elle,
     le composant n'existerait qu'en référentiel et le bilan serait faux.
     """
     montant = round(float(montant), 2)

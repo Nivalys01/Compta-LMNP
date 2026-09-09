@@ -1341,7 +1341,7 @@ logiciel. Trois BLOQUANTS découverts et corrigés :
   Section « Importer un relevé bancaire » sur la page Saisie, en DEUX
   temps : analyse → propositions cochables → validation explicite. Rien
   n'est écrit sans accord ; jeton de session vérifié.
-- **Reprise d'un exercice inaccessible** (Nadia, migrante les acteurs payants actuels) :
+- **Reprise d'un exercice inaccessible** (Nadia, migrante depuis un logiciel du marché) :
   rejeu_fec.py n'était joignable qu'en code — l'argument « migrez
   facilement » était inutilisable par un client. Formulaire « Reprendre un
   exercice complet depuis son FEC » sur la page Nouvel exercice : exercice
@@ -1718,7 +1718,7 @@ sur le déficit 2021, et l'état final des reports (556 + 13 020 = 13 575).
 - **Nouveau module rejeu_fec.py** : import intégral d'un exercice depuis son
   FEC (journaux/comptes créés à la volée, montants négatifs des à-nouveaux
   normalisés par équivalence débit/crédit) — socle du test en or et d'une
-  future migration depuis un autre outil (les acteurs payants actuels…).
+  future migration depuis un autre outil (logiciels du marché…).
 - **Concurrence (BEGIN IMMEDIATE)** : une transaction qui lisait puis
   écrivait partait en « database is locked » immédiat si un écrivain s'était
   intercalé (l'upgrade de verrou SQLite n'attend jamais) ; et le rejeu de

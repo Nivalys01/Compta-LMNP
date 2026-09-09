@@ -9,7 +9,7 @@ Cinq personas rejoués sur le paquet client :
   - Sandrine (pressée) : BLOQUANT — import bancaire FANTÔME (module durci
     en v7.4, jamais câblé dans l'interface) → import en deux temps
     (propositions puis validation des lignes cochées) ;
-  - Nadia (migrante les acteurs payants actuels) : BLOQUANT — rejeu_fec inaccessible → reprise
+  - Nadia (migrante depuis un logiciel du marché) : BLOQUANT — rejeu_fec inaccessible → reprise
     d'un exercice complet depuis son FEC, page Nouvel exercice ;
   - Karim (maladroit) : le doublon du double-clic est rattrapé par le
     contrôle pré-clôture (vérifié) ; messages de format clairs ;

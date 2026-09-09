@@ -14,8 +14,8 @@ métier (français, termes du PCG et de la DGFiP).
 
 | Étape métier | Module | Rôle |
 |---|---|---|
-| Plan de comptes, journaux | `schema.sql`, `seed_referentiel.sql` | Référentiel calqué sur les FEC réels les acteurs payants actuels (comptes réellement utilisés, pas le PCG intégral). |
-| Saisie par fait métier | `operations.py` + `gabarits.py` | L'utilisateur saisit « un loyer », « une assurance » ; le gabarit impose le compte. Contrepartie unique : 108000 (Exploitant) — il n'y a pas de 512 car la trésorerie n'est pas suivie (choix les acteurs payants actuels). |
+| Plan de comptes, journaux | `schema.sql`, `seed_referentiel.sql` | Référentiel calqué sur les FEC réels des logiciels du marché (comptes réellement utilisés, pas le PCG intégral). |
+| Saisie par fait métier | `operations.py` + `gabarits.py` | L'utilisateur saisit « un loyer », « une assurance » ; le gabarit impose le compte. Contrepartie unique : 108000 (Exploitant) — il n'y a pas de 512 car la trésorerie n'est pas suivie (choix des logiciels du marché). |
 | **Guichet unique** | `ecritures.py` | TOUTE écriture passe par `inserer()` : partie double au centime, exercice ouvert, **conformité FEC par construction** (libellé/pièce obligatoires, date dans l'exercice, pas de caractères tabulaires). Transactions `BEGIN IMMEDIATE` + SAVEPOINT (atomicité crash), rejeu borné des collisions de numéro. C'est le module le plus défendu du code : le lire en premier. |
 | Import de relevés | `import_bancaire.py` | CSV bancaires (encodages Windows, montants « sales » tolérés), catégorisation par mots-clés. |
 | Reprise d'historique | `reprise.py`, `rejeu_fec.py` | `reprise` : balance N-1 → à-nouveaux (AN). `rejeu_fec` : réimport intégral d'un exercice depuis son FEC (migration depuis un autre outil). |

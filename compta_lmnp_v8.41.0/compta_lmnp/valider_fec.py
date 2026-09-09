@@ -7,7 +7,7 @@ Jalon J3 — Validateur FEC indépendant.
 
 Réplique les contrôles essentiels de l'outil Test Compta Demat de la DGFiP.
 N'enforce QUE des règles vérifiées sur des FEC réels acceptés par l'administration
-(notamment : PAS de contrôle de chronologie globale, que les acteurs payants actuels ne respecte pas).
+(notamment : PAS de contrôle de chronologie globale, que les logiciels du marché ne respectent pas).
 
 API :
     erreurs = valider(chemin)        # liste de messages ; vide => fichier conforme

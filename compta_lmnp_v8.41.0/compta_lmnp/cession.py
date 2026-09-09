@@ -2,7 +2,7 @@
 """
 Cession d'un bien — sortie comptable et fiscale d'un logement.
 
-Traduction comptable (pratique de la profession, identique à les acteurs payants actuels) :
+Traduction comptable (pratique de la profession, identique à celle des logiciels du marché) :
   1. dotation COMPLÉMENTAIRE prorata temporis, du 1er janvier à la date de
      cession (un bien s'amortit jusqu'à sa sortie) ;
   2. sortie de chaque composant : débit 28x (amortissements cumulés),

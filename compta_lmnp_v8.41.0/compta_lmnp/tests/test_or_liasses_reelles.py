@@ -97,7 +97,7 @@ def test_reports_finaux_au_31_12_2025(resultats):
 
 def test_imputation_2023_sur_deficit_2021(resultats):
     """Le bénéfice 2023 (729) s'impute sur le déficit 2021 (FIFO) : c'est
-    exactement le mécanisme visible dans l'historique les acteurs payants actuels (12 249 → 11 520)."""
+    exactement le mécanisme visible dans l'historique des logiciels du marché (12 249 → 11 520)."""
     assert abs(resultats[2023]["deficits"]["impute_sur_benefice"] - 729) <= 1
     assert resultats["deficits_finaux"][2021] == 11520
 
