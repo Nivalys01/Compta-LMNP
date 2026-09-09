@@ -31,6 +31,7 @@ import os
 import re
 import subprocess
 import sys
+import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -93,6 +94,28 @@ def _empreintes() -> list[tuple[str, str]]:
     return uniques
 
 
+def normaliser(texte: str) -> str:
+    """Forme de comparaison : minuscules, accents repliés, espaces réduits.
+
+    La recherche se faisait par sous-chaîne EXACTE (`valeur in contenu`).
+    « Martin Camille », « MARTIN  CAMILLE » (deux espaces) et un nom coupé
+    par un retour à la ligne passaient donc au travers — alors qu'un nom
+    recopié dans une documentation ou un commentaire ne reprend presque
+    jamais la casse exacte du seed. Le dédoublonnage juste au-dessus
+    comparait pourtant déjà en minuscules : l'intention était là, la
+    comparaison qui compte ne l'appliquait pas (constat F-09).
+    """
+    texte = unicodedata.normalize("NFD", (texte or "").lower())
+    texte = "".join(c for c in texte if not unicodedata.combining(c))
+    return " ".join(texte.split())
+
+
+def empreintes() -> list[tuple[str, str]]:
+    """Empreintes du dossier réel. Publique : la construction du paquet s'en
+    sert aussi, pour ne pas dupliquer la définition de ce qui est sensible."""
+    return _empreintes()
+
+
 def racine_depot() -> str:
     """Racine du dépôt git, ou ce dossier si le dépôt n'existe pas.
 
@@ -140,22 +163,71 @@ def verifier(racine: str | None = None) -> dict:
                                 "motif": "chemin interdit de publication"})
                 break
 
-    empreintes = _empreintes()
+    # ── F-02 : ne rien pouvoir lister n'est pas « rien à signaler » ─────
+    #    git absent du PATH, dépôt non initialisé, commande en échec :
+    #    _fichiers_publies() rend [] et le contrôle concluait au vert.
+    if not fichiers:
+        alertes.append({"gravite": "BLOQUANT", "fichier": "(dépôt)",
+                        "motif": "aucun fichier listé — dépôt git absent ou "
+                                 "commande git en échec : le contrôle n'a rien "
+                                 "pu examiner"})
+
+    # ── F-01 : sans empreintes, le contrôle ne peut PAS conclure ────────
+    #    Le dossier privé déplacé, un clone, un runner de CI : la liste est
+    #    vide et le verdict restait « aucune donnée personnelle ». Un
+    #    garde-fou qui approuve quand il ne peut pas travailler est pire
+    #    que pas de garde-fou, parce qu'on lui fait confiance.
+    liste = _empreintes()
+    if not liste:
+        alertes.append({"gravite": "BLOQUANT", "fichier": "(empreintes)",
+                        "motif": "aucune empreinte chargée — dossier privé "
+                                 "absent : le contrôle de CONTENU n'a pas eu "
+                                 "lieu, seuls les chemins ont été vus"})
+
+    cherchees = [(quoi, normaliser(valeur)) for quoi, valeur in liste]
     for f in fichiers:
         chemin = os.path.join(racine, f)
-        if not os.path.isfile(chemin) or os.path.getsize(chemin) > 5_000_000:
+        if not os.path.isfile(chemin):
+            continue
+        # F-12 : un fichier trop gros ou illisible était sauté EN SILENCE.
+        # Il est désormais signalé — un export comptable dépasse 5 Mo, et
+        # aucun motif de chemin ne couvre un .txt volumineux à la racine.
+        try:
+            taille = os.path.getsize(chemin)
+        except OSError:
+            taille = 0
+        if taille > 5_000_000:
+            alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                            "motif": f"non examiné ({taille // 1_000_000} Mo) "
+                                     "— vérifiez son contenu à la main"})
             continue
         try:
-            contenu = open(chemin, encoding="utf-8", errors="ignore").read()
-        except OSError:
+            # F-12 : errors="ignore" en utf-8 SUPPRIMAIT les accents d'un
+            # fichier cp1252 — « MARTÍN » devenait « MARTN » et l'empreinte
+            # ne matchait plus. On tente cp1252 en repli, comme l'import.
+            brut = open(chemin, "rb").read()
+        except OSError as exc:
+            alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                            "motif": f"illisible ({exc.__class__.__name__}) "
+                                     "— non examiné"})
             continue
-        for quoi, valeur in empreintes:
-            if valeur in contenu:
+        contenu = None
+        for enc in ("utf-8", "cp1252"):
+            try:
+                contenu = brut.decode(enc)
+                break
+            except UnicodeDecodeError:
+                continue
+        if contenu is None:
+            continue                    # binaire : rien de textuel à trouver
+        normalise = normaliser(contenu)
+        for quoi, valeur in cherchees:
+            if valeur and valeur in normalise:
                 alertes.append({"gravite": "BLOQUANT", "fichier": f,
                                 "motif": f"contient une donnée réelle ({quoi})"})
 
     return {"fichiers_publies": len(fichiers), "empreintes_cherchees":
-            len(empreintes), "alertes": alertes, "racine": racine}
+            len(liste), "alertes": alertes, "racine": racine}
 
 
 def main() -> int:
@@ -167,19 +239,23 @@ def main() -> int:
     print(f"Fichiers qui seraient publiés : {r['fichiers_publies']}")
     print(f"Empreintes du dossier réel recherchées : "
           f"{r['empreintes_cherchees']}")
-    if not r["fichiers_publies"]:
-        print("\n⚠ Aucun fichier listé : dépôt git non initialisé ici ?")
-        return 0
-    if not r["empreintes_cherchees"]:
-        print("  (dossier privé absent : contrôle des chemins uniquement)")
-    if r["alertes"]:
-        print(f"\n✗ {len(r['alertes'])} PROBLÈME(S) — NE PAS PUBLIER :")
-        for a in r["alertes"]:
+    bloquants = [a for a in r["alertes"] if a["gravite"] == "BLOQUANT"]
+    autres = [a for a in r["alertes"] if a["gravite"] != "BLOQUANT"]
+    if bloquants:
+        print(f"\n✗ {len(bloquants)} PROBLÈME(S) — NE PAS PUBLIER :")
+        for a in bloquants:
             print(f"    {a['fichier']} — {a['motif']}")
+        for a in autres:
+            print(f"    [{a['gravite']}] {a['fichier']} — {a['motif']}")
         print("\n  Corrigez le .gitignore, retirez le fichier de l'index "
-              "(git rm --cached), et relancez ce contrôle.")
+              "(git rm --cached), rétablissez le dossier privé si c'est lui "
+              "qui manque, et relancez ce contrôle.")
         return 1
-    print("\n✓ Aucune donnée personnelle dans ce qui serait publié.")
+    for a in autres:
+        print(f"    [{a['gravite']}] {a['fichier']} — {a['motif']}")
+    print(f"\n✓ {r['fichiers_publies']} fichier(s) examiné(s) avec "
+          f"{r['empreintes_cherchees']} empreinte(s) : aucune donnée "
+          "personnelle dans ce qui serait publié.")
     return 0
 
 

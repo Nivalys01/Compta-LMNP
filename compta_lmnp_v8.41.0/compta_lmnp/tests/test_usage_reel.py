@@ -216,6 +216,20 @@ def test_alur_annule_nest_pas_reintegre_dans_le_provisoire(dossier):
 # ce seed portait une identité RÉELLE et partait pourtant dans chaque
 # paquet, alors qu'il porte la mention « NE JAMAIS LIVRER ».
 
+def _voie_reelle() -> str:
+    """Nom de la rue de l'exploitant, LU dans le seed privé.
+
+    Il était écrit en clair dans ce fichier suivi par git,
+    et la garde de dépôt ne le voyait pas puisqu'elle ne cherche que
+    l'adresse entière : un test anti-fuite qui publiait lui-même ce qu'il
+    protège (constat F-11).
+    """
+    import re
+    reel = open(os.path.join(HERE, "seed_exemple.sql"), encoding="utf-8").read()
+    adr = re.search(r"'(\d+\s+[Rr]ue\s+([^,']+))", reel)
+    return adr.group(2).strip() if adr else ""
+
+
 def test_dossier_demo_ne_contient_aucune_donnee_reelle():
     demo = open(os.path.join(HERE, "seed_demo.sql"), encoding="utf-8").read()
     fec = open(os.path.join(HERE, "demo", "FEC_DEMO_2025.txt"),
@@ -227,7 +241,8 @@ def test_dossier_demo_ne_contient_aucune_donnee_reelle():
     for contenu in (demo, fec):
         assert nom not in contenu
         assert siren not in contenu
-        assert "Berteaux" not in contenu
+        voie = _voie_reelle()
+        assert voie and voie not in contenu
 
 
 def test_fec_demo_conforme_et_equilibre():
@@ -279,7 +294,8 @@ def test_paquet_client_sans_identite_reelle(tmp_path):
         contenu = b"".join(z.read(n) for n in noms
                            if n.endswith((".sql", ".txt")))
     assert b"123456789" not in contenu
-    assert "Berteaux".encode() not in contenu
+    voie = _voie_reelle()
+    assert voie and voie.encode() not in contenu
 
 
 # === Pense-bête : oublis récurrents =======================================

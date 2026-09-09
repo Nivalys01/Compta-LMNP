@@ -97,13 +97,65 @@ def construire() -> str:
         for f in fichiers:
             z.write(os.path.join(HERE, f), arcname=f"compta_lmnp/{f}")
 
-    # ── Garde anti-fuite : le zip ne contient RIEN d'interdit ────────────
+    # ── Garde anti-fuite n°1 : aucun NOM interdit ───────────────────────
     with zipfile.ZipFile(cible) as z:
         noms = [n.split("compta_lmnp/", 1)[-1] for n in z.namelist()]
     fuites = [n for n in noms for motif in INTERDITS if motif.search(n)]
     if fuites:
         os.remove(cible)
         raise SystemExit(f"FUITE BLOQUÉE — fichiers interdits : {fuites}")
+
+    # ── Garde anti-fuite n°2 : aucun CONTENU personnel ───────────────────
+    #
+    #    La garde ci-dessus compare des noms à une liste écrite à la main —
+    #    or les fichiers du zip SONT cette liste. Elle vérifiait donc qu'une
+    #    liste rédigée par l'auteur ne contenait pas ce qu'il n'y avait pas
+    #    mis : structurellement incapable de rien détecter (constat F-03).
+    #
+    #    Le cas qu'elle laissait passer est précisément celui pour lequel
+    #    elle existe : seed_demo.sql et le FEC de démonstration sont les
+    #    seuls fichiers du paquet DÉRIVÉS des données réelles, leur nom est
+    #    légitime, et personne ne relisait leur contenu (constat F-04).
+    #
+    #    Les empreintes viennent de verifier_depot, qui les lit dans le
+    #    dossier privé : une seule définition de ce qui est sensible.
+    #    HERE explicitement dans sys.path : ce script est aussi lancé par
+    #    build_client.py via runpy, qui n'ajoute PAS le dossier du script
+    #    aux chemins d'import. Sans cela la garde échouerait à l'import —
+    #    donc bloquerait la construction, mais pour une mauvaise raison.
+    if HERE not in sys.path:
+        sys.path.insert(0, HERE)
+    import verifier_depot
+    liste = verifier_depot.empreintes()
+    if not liste:
+        os.remove(cible)
+        raise SystemExit(
+            "CONSTRUCTION REFUSÉE — aucune empreinte n'a pu être chargée "
+            "(dossier privé absent ?). Le contenu du paquet n'a donc pas pu "
+            "être contrôlé : produire un paquet dans ces conditions "
+            "reviendrait à affirmer sans avoir vérifié.")
+    cherchees = [(quoi, verifier_depot.normaliser(v)) for quoi, v in liste]
+    fuites_contenu = []
+    with zipfile.ZipFile(cible) as z:
+        for entree in z.namelist():
+            brut = z.read(entree)
+            texte = None
+            for enc in ("utf-8", "cp1252"):
+                try:
+                    texte = brut.decode(enc)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            if texte is None:
+                continue
+            norme = verifier_depot.normaliser(texte)
+            for quoi, valeur in cherchees:
+                if valeur and valeur in norme:
+                    fuites_contenu.append(f"{entree} ({quoi})")
+    if fuites_contenu:
+        os.remove(cible)
+        raise SystemExit("FUITE BLOQUÉE — donnée personnelle dans le "
+                         f"contenu : {sorted(set(fuites_contenu))}")
 
     # ── Garde anti-oubli : tout fichier local invoqué par un lanceur doit
     #    être dans le paquet (sinon panne à l'installation chez le client).
@@ -122,7 +174,8 @@ def construire() -> str:
 
     taille = os.path.getsize(cible) // 1024
     print(f"✓ Paquet client : {cible} ({taille} Ko, {len(fichiers)} fichiers, "
-          "aucune donnée personnelle)")
+          f"contenu contrôlé contre {len(liste)} empreinte(s) du dossier "
+          "réel : aucune donnée personnelle)")
     return cible
 
 

@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 
 import fec_io
 
@@ -61,9 +62,36 @@ DEMO_BIEN = "Appartement de demonstration"
 # Libellés d'écriture : on remplace ce qui identifie (fournisseurs, numéros
 # de facture, noms de locataires) et on garde ce qui instruit (la nature de
 # l'opération, que le débutant doit pouvoir reconnaître).
-REMPLACEMENTS_LIBELLE = [
-    (re.compile(r"(?i)\bfaure\b\s*\w*"), "MARTIN"),
-    (re.compile(r"(?i)berteaux"), "Gergovia"),
+def _motifs_identite() -> list[tuple[re.Pattern, str]]:
+    """Motifs du nom et de la rue, LUS dans le seed privé.
+
+    Ils y figuraient en clair — le patronyme et le nom de la voie — dans un fichier
+    suivi par git. La correction précédente avait retiré les valeurs
+    COMPLÈTES ; les fragments servant de motifs étaient restés, et la garde
+    de dépôt ne les voyait pas puisqu'elle ne cherche que l'adresse entière
+    (constat F-11).
+    """
+    if not os.path.exists(SEED_SOURCE):
+        return []
+    src = open(SEED_SOURCE, encoding="utf-8").read()
+    motifs = []
+    m = re.search(r"INSERT INTO exploitant[^;]*?'([^']{4,})'", src, re.S)
+    if m:
+        for mot in m.group(1).split():
+            if len(mot) >= 4:
+                motifs.append((re.compile(rf"(?i)\b{re.escape(mot)}\b\s*\w*"),
+                               DEMO_NOM.split()[0]))
+    for adr in re.findall(r"'(\d+\s+[Rr]ue[^']{4,})'", src):
+        # « 12 Rue Exemple, 00000 Ville » -> le nom de la voie
+        voie = re.sub(r"^\d+\s+[Rr]ue\s+", "", adr).split(",")[0].strip()
+        for mot in voie.split():
+            if len(mot) >= 4:
+                motifs.append((re.compile(rf"(?i)\b{re.escape(mot)}\b"),
+                               DEMO_ADRESSE.split()[2].rstrip(",")))
+    return motifs
+
+
+REMPLACEMENTS_LIBELLE = _motifs_identite() + [
     (re.compile(r"(?i)\b(ikea|mda|leroy\s*merlin|april|castorama|but|conforama)\b"),
      "Fournisseur"),
     # Nom du prestataire comptable historique : il figurait dans les
@@ -97,9 +125,92 @@ def _termes_prives() -> list[tuple[re.Pattern, str]]:
 
 REMPLACEMENTS_LIBELLE += _termes_prives()
 
+
+def _exiger_les_prerequis() -> None:
+    """Refuse de fabriquer un jeu PUBLIÉ sans de quoi l'anonymiser.
+
+    `_termes_prives()` rendait [] en silence quand la liste manquait, et
+    `_motifs_identite()` fait de même : la génération se poursuivait SANS
+    UNE SEULE RÈGLE NOMINATIVE, et le jeu publié conservait les noms de
+    tiers intacts. Aucune exception, aucun avertissement (constat F-05).
+    """
+    manquants = [c for c in (SEED_SOURCE, FICHIER_TERMES, FEC_SOURCE)
+                 if not os.path.exists(c)]
+    if manquants:
+        raise SystemExit(
+            "GÉNÉRATION REFUSÉE — pièces du dossier privé absentes : "
+            f"{[os.path.basename(x) for x in manquants]}. Sans elles, "
+            "l'anonymisation n'aurait aucune règle à appliquer et "
+            "produirait un jeu PUBLIÉ portant les données réelles.")
+    if not _motifs_identite():
+        raise SystemExit(
+            "GÉNÉRATION REFUSÉE — aucun motif d'identité n'a pu être lu "
+            f"dans {os.path.basename(SEED_SOURCE)} : sa forme a changé.")
+    if not _termes_prives():
+        raise SystemExit(
+            "GÉNÉRATION REFUSÉE — la liste des termes à masquer est vide "
+            f"({os.path.basename(FICHIER_TERMES)}).")
+
+
+def _controler_apres_generation(chemin: str) -> None:
+    """Relit le fichier PRODUIT et y cherche les empreintes du dossier réel.
+
+    Les deux fonctions de construction écrivaient puis rendaient un chemin,
+    sans jamais relire leur sortie : toute défaillance des règles se
+    soldait par un jeu publié silencieusement dégradé (constat F-10). En
+    cas de trouvaille le fichier est SUPPRIMÉ — le réflexe que
+    `construire_distribution` a déjà pour son zip.
+    """
+    if HERE not in sys.path:
+        sys.path.insert(0, HERE)
+    import verifier_depot
+    empreintes = verifier_depot.empreintes()
+    if not empreintes:
+        os.remove(chemin)
+        raise SystemExit("CONTRÔLE IMPOSSIBLE — aucune empreinte disponible "
+                         f"pour relire {os.path.basename(chemin)}.")
+    norme = verifier_depot.normaliser(
+        open(chemin, encoding="utf-8", errors="replace").read())
+    trouves = [quoi for quoi, valeur in empreintes
+               if verifier_depot.normaliser(valeur) in norme]
+    if trouves:
+        os.remove(chemin)
+        raise SystemExit(
+            f"ANONYMISATION INCOMPLÈTE — {os.path.basename(chemin)} contient "
+            f"encore : {sorted(set(trouves))}. Fichier supprimé.")
+
 REMPLACEMENTS_PIECE = REMPLACEMENTS_LIBELLE + [
     (re.compile(r"\b[A-Z]{6}\b"), "PIECE0"),
 ]
+
+
+def _decouper_valeurs(tuple_sql: str) -> list[str]:
+    """Découpe le contenu d'un VALUES(...) SQL en tokens, virgules de
+    premier niveau seulement, en conservant les quotes.
+
+    Rend les valeurs NON quotées aussi (entiers, NULL) : sans elles, les
+    positions ne correspondent plus aux colonnes déclarées.
+    """
+    tokens, courant, dans_quote = [], [], False
+    i = 0
+    while i < len(tuple_sql):
+        c = tuple_sql[i]
+        if c == "'":
+            if dans_quote and i + 1 < len(tuple_sql) and tuple_sql[i + 1] == "'":
+                courant.append("''")        # quote échappée SQL
+                i += 2
+                continue
+            dans_quote = not dans_quote
+            courant.append(c)
+        elif c == "," and not dans_quote:
+            tokens.append("".join(courant).strip())
+            courant = []
+        else:
+            courant.append(c)
+        i += 1
+    if courant:
+        tokens.append("".join(courant).strip())
+    return [t for t in tokens if t]
 
 
 def _anonymiser(texte: str, regles) -> str:
@@ -140,6 +251,11 @@ def _mettre_a_l_echelle(lignes: list[list[str]], i_debit: int,
         cible[col] = f"{corrige:.2f}".replace(".", ",")
     return lignes
 
+
+# Colonnes du FEC porteuses de texte libre. Les autres sont des dates, des
+# montants ou des codes normalisés : rien d'identifiant ne s'y loge.
+COLONNES_A_ANONYMISER = ("JournalLib", "CompteLib", "CompAuxNum",
+                         "CompAuxLib", "PieceRef", "EcritureLib")
 
 COMPTE_ATTENTE = "472000"
 
@@ -191,6 +307,7 @@ def _resorber_compte_attente(lignes: list[list[str]], idx: dict) -> None:
 
 
 def construire_fec_demo() -> str:
+    _exiger_les_prerequis()
     entete, lignes = fec_io.lire_brut(FEC_SOURCE)
     idx = {c: i for i, c in enumerate(entete)}
     lignes = [x for x in lignes if len(x) >= len(fec_io.COLONNES)]
@@ -198,37 +315,78 @@ def construire_fec_demo() -> str:
     lignes = _mettre_a_l_echelle(lignes, idx["Debit"], idx["Credit"],
                                  idx["EcritureNum"])
     _resorber_compte_attente(lignes, idx)
+    # Toutes les colonnes TEXTUELLES, pas trois. `CompAuxLib` était
+    # anonymisée alors que `CompAuxNum`, son pendant immédiat, ne l'était
+    # pas : la paire était traitée à moitié. Un nom de locataire se loge
+    # aussi bien dans le libellé d'un compte (« 411 DUPONT ») que dans
+    # celui d'un journal (constat F-08).
     for x in lignes:
-        x[idx["EcritureLib"]] = _anonymiser(x[idx["EcritureLib"]],
-                                            REMPLACEMENTS_LIBELLE)
-        x[idx["PieceRef"]] = _anonymiser(x[idx["PieceRef"]],
-                                         REMPLACEMENTS_PIECE)
-        x[idx["CompAuxLib"]] = _anonymiser(x[idx["CompAuxLib"]],
-                                           REMPLACEMENTS_LIBELLE)
+        for colonne in COLONNES_A_ANONYMISER:
+            i = idx.get(colonne)
+            if i is None or i >= len(x):
+                continue
+            regles = (REMPLACEMENTS_PIECE if colonne in ("PieceRef", "CompAuxNum")
+                      else REMPLACEMENTS_LIBELLE)
+            x[i] = _anonymiser(x[i], regles)
 
     os.makedirs(os.path.dirname(FEC_DEMO), exist_ok=True)
     with open(FEC_DEMO, "w", encoding="utf-8", newline="") as f:
         f.write("\t".join(entete) + "\r\n")
         for x in lignes:
             f.write("\t".join(x) + "\r\n")
+    _controler_apres_generation(FEC_DEMO)
     return FEC_DEMO
 
 
 def construire_seed_demo() -> str:
+    _exiger_les_prerequis()
     src = open(SEED_SOURCE, encoding="utf-8").read()
 
     # 1. Identité — LUE dans le seed, jamais écrite ici. Ce fichier est
     #    publié : y inscrire en clair le nom et l'adresse à masquer
     #    reviendrait à publier exactement ce qu'il sert à protéger
     #    (détecté par verifier_depot.py avant la première publication).
-    m = re.search(r"INSERT INTO exploitant[^;]*?VALUES\s*\(([^;]*?)\);",
-                  src, re.S)
-    if m:
-        valeurs = re.findall(r"'((?:[^']|'')*)'", m.group(1))
-        remplacements = [DEMO_NOM, DEMO_SIREN, DEMO_ADRESSE]
-        for ancienne, nouvelle in zip(valeurs, remplacements):
-            if len(ancienne) >= 4:
-                src = src.replace(f"'{ancienne}'", f"'{nouvelle}'")
+    #    L'appariement se fait par NOM DE COLONNE, plus par position : avec
+    #    un INSERT déclaré (siren, nom, adresse), le SIREN recevait le nom
+    #    fictif et le nom recevait le SIREN fictif — le seed paraissait
+    #    anonymisé sans l'être (constat F-07). Et `if len(ancienne) >= 4`
+    #    laissait passer sans un mot toute valeur plus courte.
+    m = re.search(r"(?is)INSERT\s+(?:OR\s+\w+\s+)?INTO\s+[\"'`\[]?exploitant"
+                  r"[\"'`\]]?\s*\(([^)]*)\)\s*VALUES\s*\(([^;]*?)\);", src)
+    if not m:
+        # F-06 : le `if m:` sans `else` laissait l'identité RÉELLE traverser
+        # la fonction, et le fichier était écrit quand même. Trois formes
+        # SQL équivalentes sur quatre passaient au travers.
+        raise SystemExit(
+            "GÉNÉRATION REFUSÉE — l'INSERT de la table `exploitant` n'a pas "
+            f"la forme attendue dans {os.path.basename(SEED_SOURCE)} : "
+            "l'identité ne peut pas être remplacée de façon sûre.")
+    colonnes = [c.strip().strip('"`[]\'').lower() for c in m.group(1).split(",")]
+    # TOUTES les valeurs, quotées ou non, dans l'ordre : ne collecter que
+    # les chaînes entre quotes décalait l'appariement dès qu'une colonne
+    # portait un entier. Le seed déclare (id, nom, siren, adresse) et `id`
+    # n'est pas quoté : `nom` recevait donc la valeur de `id`, et l'identité
+    # traversait intacte — le défaut F-07 sous une autre forme, attrapé par
+    # le contrôle d'après génération (F-10) au premier essai.
+    valeurs = _decouper_valeurs(m.group(2))
+    if len(valeurs) != len(colonnes):
+        raise SystemExit(
+            f"GÉNÉRATION REFUSÉE — l'INSERT de `exploitant` déclare "
+            f"{len(colonnes)} colonne(s) pour {len(valeurs)} valeur(s) : "
+            "l'appariement ne peut pas être sûr.")
+    par_colonne = {"nom": DEMO_NOM, "siren": DEMO_SIREN,
+                   "adresse": DEMO_ADRESSE}
+    attendues = set(par_colonne) & set(colonnes)
+    if attendues != set(par_colonne):
+        raise SystemExit(
+            "GÉNÉRATION REFUSÉE — colonnes d'identité introuvables dans "
+            f"l'INSERT de `exploitant` : {sorted(set(par_colonne) - attendues)} "
+            "manquante(s).")
+    for colonne, brut in zip(colonnes, valeurs):
+        nouvelle = par_colonne.get(colonne)
+        if nouvelle is None or not (brut.startswith("'") and brut.endswith("'")):
+            continue
+        src = src.replace(brut, f"'{nouvelle}'")
     # Le libellé du bien reprend souvent l'adresse : on le neutralise aussi.
     src = re.sub(r"'Appartement[^']*'", f"'{DEMO_BIEN}'", src)
     # NE PAS reformuler cette chaîne. Ce n'est PAS de la prose : c'est le
@@ -281,6 +439,7 @@ def construire_seed_demo() -> str:
     )
     corps = src.split("\n", 5)[-1] if src.startswith("--") else src
     open(SEED_DEMO, "w", encoding="utf-8").write(entete + corps)
+    _controler_apres_generation(SEED_DEMO)
     return SEED_DEMO
 
 

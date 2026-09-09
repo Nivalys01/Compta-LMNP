@@ -320,11 +320,11 @@ appliqué au mauvais objet.
 `outils_demo.py` lignes 66-67 :
 
 ```python
-(re.compile(r"(?i)\bfaure\b\s*\w*"), "MARTIN"),
-(re.compile(r"(?i)berteaux"), "Gergovia"),
+(re.compile(r"(?i)\b<patronyme>\b\s*\w*"), "MARTIN"),
+(re.compile(r"(?i)<nom de la voie>"), "Gergovia"),
 ```
 
-`berteaux` est le nom de la rue de l'auteur ; il apparaît aussi dans
+Le second motif est le nom de la rue de l'auteur ; il apparaît aussi dans
 `tests/test_usage_reel.py` (2 occurrences). Les deux fichiers sont **suivis
 par git**.
 
@@ -379,7 +379,7 @@ bancaire en cp1252 traverse le contrôle deux fois.
    segment**, donc valables à toute profondeur. Vérifié sur huit chemins,
    `demo/FEC_DEMO_2025.txt` correctement épargné.
 3. **Le jeu de démonstration actuellement publié est propre.** Recherche de
-   `faure`, `berteaux`, `sylvain`, `clermont`, et du terme tiers dans
+   le patronyme, le nom de la voie, le prénom, la ville et le terme tiers
    `demo/FEC_DEMO_2025.txt` et `seed_demo.sql` : aucune occurrence
    identifiante. Les deux occurrences de `clermont` dans `seed_demo.sql`
    appartiennent à l'adresse **fictive** `DEMO_ADRESSE`.
@@ -445,3 +445,83 @@ La correction la plus rentable ne demande pas de réécrire ces fichiers : il
 suffit qu'**aucun des trois ne puisse conclure positivement sans avoir
 effectivement examiné quelque chose**. Trois conditions d'échec, quelques
 lignes chacune — F-01, F-05 et F-03 — referment les quatre critiques.
+
+---
+
+## Suivi des correctifs — les douze constats sont traités
+
+### `verifier_depot.py` — F-01, F-02, F-09, F-12
+
+Le contrôle ne peut plus conclure positivement sans avoir examiné quelque
+chose. Deux nouvelles alertes **BLOQUANTES** : aucune empreinte chargée
+(dossier privé absent), et aucun fichier listé (dépôt git absent ou commande
+en échec). Le mode `--json` de la CI échoue au même titre.
+
+Le verdict positif dit désormais ce qu'il a fait :
+`✓ 95 fichier(s) examiné(s) avec 4 empreinte(s) : aucune donnée personnelle`.
+
+`normaliser()` replie casse, accents et espaces des **deux côtés** : les six
+variantes du constat F-09 sont détectées. La troncature reste hors de portée,
+délibérément — la rattraper demanderait un rapprochement approximatif dont
+les faux positifs useraient le contrôle jusqu'à ce qu'on cesse de le lire.
+
+Les fichiers sont lus en binaire puis décodés utf-8 avec repli cp1252 : un
+relevé bancaire accentué n'est plus amputé. Un fichier trop gros ou illisible
+produit un **AVERTISSEMENT** au lieu d'un `continue` muet.
+
+### `construire_distribution.py` — F-03, F-04
+
+Une seconde garde lit le **contenu** de chaque entrée du zip et y cherche les
+empreintes, obtenues de `verifier_depot.empreintes()` — une seule définition
+de ce qui est sensible. En cas de trouvaille, le zip est **supprimé** et la
+construction échoue. Sans empreintes disponibles, elle refuse de produire
+quoi que ce soit.
+
+Le message final énonce ce qui a été vérifié :
+`contenu contrôlé contre 4 empreinte(s) du dossier réel`.
+
+### `outils_demo.py` — F-05, F-06, F-07, F-08, F-10, F-11
+
+`_exiger_les_prerequis()` refuse de fabriquer un jeu publié sans le seed
+privé, la liste des termes ou le FEC source — et refuse aussi si ces fichiers
+sont là mais ne donnent aucune règle exploitable.
+
+L'identité est remplacée **par nom de colonne**, plus par position, et
+l'absence de l'`INSERT` attendu fait échouer au lieu de laisser passer.
+
+`_controler_apres_generation()` relit chaque fichier produit, y cherche les
+empreintes et **supprime** le fichier fautif : le réflexe que
+`construire_distribution` avait déjà pour son zip, appliqué enfin au bon
+objet. Toutes les colonnes textuelles du FEC sont anonymisées, six au lieu de
+trois.
+
+Les motifs du patronyme et de la voie sont **dérivés du seed privé** au lieu
+d'être écrits en clair. Idem dans `tests/test_usage_reel.py`, dont les deux
+tests anti-fuite nommaient ce qu'ils protègent.
+
+### Ce que les correctifs ont révélé en s'appliquant
+
+**Le contrôle d'après génération a attrapé une régression au premier essai —
+la mienne.** En réécrivant l'appariement par nom de colonne (F-07), j'avais
+gardé `re.findall` sur les seules valeurs **quotées**. Or le seed déclare
+`(id, nom, siren, adresse)` et `id` n'est pas quoté : `nom` recevait la valeur
+de `id`, et l'identité traversait intacte. Le contrôle a refusé le fichier et
+l'a supprimé. `_decouper_valeurs()` découpe désormais le tuple SQL en gardant
+**toutes** les valeurs, quotées ou non, virgules à l'intérieur des chaînes et
+quotes échappées comprises.
+
+C'est la démonstration la plus courte de ce que valait F-10 : sans lui, cette
+régression serait partie dans le jeu publié sans un mot.
+
+**Le rapport lui-même a dû être corrigé.** Sa première rédaction citait
+l'adresse réelle en clair, en illustrant F-11. `verifier_depot` l'a bloquée
+avant le push. Le commit a été amendé, l'objet inaccessible purgé.
+
+### Vérifications
+
+- **690 tests passent, 0 échec** — dont 28 neufs dans `tests/test_passe_f.py`,
+  un par constat, reprenant les scénarios de ce rapport.
+- Le jeu de démonstration régénéré est **identique à l'octet près** à celui
+  qui était publié : l'anonymisation produisait déjà le bon résultat, les
+  gardes le prouvent au lieu de le supposer.
+- Plus aucune occurrence du nom de la voie dans les fichiers suivis.
