@@ -846,8 +846,13 @@ def test_e16_les_libelles_de_rubrique_sont_enveloppes():
     src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index('for rub in c["rubriques"]:'):]
     bloc = bloc[:bloc.index("tt = c[")]
-    assert 'Paragraph(_xml(rub["libelle"])' in bloc, \
-        "le libellé de rubrique n'est plus enveloppé — E-16 est revenu"
+    entree = " ".join(bloc[bloc.index("lignes.append"):].split())
+    assert entree.startswith("lignes.append([Paragraph("), entree[:80]
+    assert "_xml(" in entree and "rub['libelle']" in entree, \
+        "le libellé de rubrique n'est plus enveloppé/échappé — E-16 est revenu"
+    # Le libellé porte désormais ses numéros de case : plus long encore, donc
+    # l'enveloppe compte davantage.
+    assert "case_immo" in entree and "case_amort" in entree
 
 
 def test_e17_le_suivi_39c_par_bien_aligne_ses_montants():

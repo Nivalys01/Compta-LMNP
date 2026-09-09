@@ -1037,6 +1037,61 @@ Trois corrections en découlent.
 La formule de la case 310 est vérifiée par un test qui la recalcule à partir
 des cases publiées, cession comprise.
 
+### Vérification exhaustive des cases contre le CERFA 2026
+
+Les 7 pages du formulaire **2033-SD 2026 (cerfa 15948\*08)** ont été
+dépouillées et confrontées à toutes les cases que la liasse imprime.
+
+**2033-A — bilan simplifié : 6 cases, toutes justes.**
+
+| Case | Libellé officiel | Usage dans le code |
+|---|---|---|
+| 028 / 030 | Immobilisations corporelles (brut / amort.) | `immo_corporelles_brut_028`, `amortissements_030` |
+| 110 / 112 | Total général (I + II), brut / net | `total_actif_110`, `total_actif_net_112` |
+| 120 | Capital social ou individuel | `capital_individuel_120` |
+| 136 | Résultat de l'exercice | `resultat_exercice_136` |
+| 142 | Total I (capitaux propres) | `total_capitaux_142` |
+| 180 | Total général (I + II + III) | `total_passif_180` |
+
+**2033-B — compte de résultat : 15 cases, toutes justes** après les
+corrections du lot 8 (218, 230, 232, 242, 243, 244, 254, 264, 270, 280, 290,
+294, 300, 310, 318, 330, 350, 352, 370).
+
+**2033-C — immobilisations : les 8 numéros de rubrique sont exacts.**
+
+| Rubrique | Brut | Amortissements |
+|---|---|---|
+| Terrains | 420 | 510 |
+| Constructions | 430 | 520 |
+| Installations générales, agencements, aménagements divers | 450 | 540 |
+| Autres immobilisations corporelles | 470 | 560 |
+
+**Défaut corrigé au passage** : ces huit numéros étaient **calculés** par
+`liasse.py` (`case_immo`, `case_amort`) et **jamais rendus**. Le 2033-C était
+le seul tableau du document à ne pas porter ses cases, alors que le report
+champ à champ est la raison d'être de ce PDF. Même classe de défaut que la
+case 300 du lot 7 : produit, puis perdu en chemin.
+
+**2033-D à G — aucune case émise, et c'est correct.** Le 2033-D relève les
+provisions et amortissements dérogatoires, le 2033-E la valeur ajoutée pour
+la CVAE, les 2033-F et G la composition du capital et les filiales : rien de
+tout cela ne concerne un LMNP exploité en nom propre.
+
+**Une fausse alerte, signalée pour mémoire.** La case 350 a d'abord paru
+fausse : la ligne officielle où elle apparaît s'intitule « Créance due au
+titre du report en arrière du déficit », alors que le code y met une
+déduction de tout autre nature. La géométrie du formulaire tranche : `350`
+occupe la colonne résultat de la rubrique « Divers » des DÉDUCTIONS, et
+`346` n'est qu'une sous-case « dont » — exactement comme `330` porte les
+réintégrations diverses avec ses sous-cases `247` / `248`. **Le code est
+juste.**
+
+**Deux points hors de portée de ce contrôle** : les cases **5NA / 5NY** de
+l'aide au report appartiennent au formulaire **2042-C-PRO**, absent du PDF
+fourni ; et le libellé de rubrique « Installations générales, agencements »
+tronque l'intitulé officiel (« …, aménagements divers ») — sans conséquence,
+le numéro de case faisant foi.
+
 ### E-22 — Le bilan 2033-A ignore dettes et créances (constat ouvert)
 
 Trouvé en recoupant le 2033-A avec les comptes créés au lot 2. Le formulaire

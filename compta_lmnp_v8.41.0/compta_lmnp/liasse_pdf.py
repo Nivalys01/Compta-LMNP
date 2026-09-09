@@ -306,6 +306,11 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     # ── 2033-C ───────────────────────────────────────────────────────────
     c = L["f2033c"]
     E.append(Paragraph("2033-C — Immobilisations et amortissements", st["h2"]))
+    # Les numéros de case étaient CALCULÉS par liasse.py (case_immo,
+    # case_amort) et jamais rendus : le 2033-C était le seul tableau du
+    # document à ne pas porter les siens, alors que le report champ à champ
+    # est la raison d'être de ce PDF. Cases relevées sur le CERFA
+    # 2033-C-SD 2026 : 420/430/450/470 (brut), 510/520/540/560 (amort.).
     lignes = [["Rubrique", "Brut début", "Augment.", "Brut fin",
                "Amort. début", "Dotation", "Amort. fin"]]
     for rub in c["rubriques"]:
@@ -314,7 +319,9 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
         # Mesuré : « Installations generales, agencements et amenagements des
         # constructions » fait 279,2 pt dans une colonne qui en offre 118,4
         # — trois colonnes de montants recouvertes (constat E-16).
-        lignes.append([Paragraph(_xml(rub["libelle"]), st["normal"]),
+        lignes.append([Paragraph(
+            _xml(f"{rub['libelle']} (cases {rub['case_immo']} / "
+                 f"{rub['case_amort']})"), st["normal"]),
                        _eur(rub["brut_debut"]), _eur(rub["augmentations"]),
                        _eur(rub["brut_fin"]), _eur(rub["amort_debut"]),
                        _eur(rub["dotation"]), _eur(rub["amort_fin"])])
