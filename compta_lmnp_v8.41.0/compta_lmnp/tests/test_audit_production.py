@@ -26,6 +26,8 @@ import importlib
 import os
 import re
 import sys
+
+import conftest
 import zipfile
 
 import pytest
@@ -111,6 +113,7 @@ def test_pdf_est_une_dependance_optionnelle():
 
 
 def test_paquet_client_sans_donnees(tmp_path):
+    conftest.exiger_dossier_prive()
     sys.path.insert(0, HERE)
     import construire_distribution as cd
     anciens = os.getcwd()
@@ -338,6 +341,7 @@ def test_outil_anonymisation_ne_contient_pas_ce_quil_masque():
 
 
 def test_controle_de_publication_disponible_et_strict():
+    conftest.exiger_dossier_prive()
     import verifier_depot
     r = verifier_depot.verifier()
     assert r["fichiers_publies"] > 0
@@ -375,6 +379,7 @@ def test_un_seul_lanceur_shell_dans_le_paquet(tmp_path):
     bureau Linux, double-cliquer un .sh l'ouvre dans un éditeur : ouvrir
     l'un pour l'autre ne produit donc aucun message d'erreur, juste du code
     à l'écran et rien qui démarre."""
+    conftest.exiger_dossier_prive()
     import zipfile
     import construire_distribution as cd
     anciens = os.getcwd()

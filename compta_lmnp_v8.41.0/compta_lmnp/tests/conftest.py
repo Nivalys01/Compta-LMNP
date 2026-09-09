@@ -94,3 +94,32 @@ def pytest_sessionfinish(session, exitstatus):
     base = getattr(fabrique, "_basetemp", None)
     if base:
         _shutil.rmtree(base, ignore_errors=True)
+
+
+# ── Tests qui EXIGENT le dossier privé ────────────────────────────────────
+#
+# Depuis la passe F, construire_distribution et verifier_depot REFUSENT de
+# conclure sans empreintes : c'est tout l'objet des constats F-01 et F-03,
+# un garde-fou qui approuve quand il ne peut pas travailler étant pire que
+# pas de garde-fou. Conséquence directe : sur un clone public — donc sur un
+# runner d'intégration continue — ces deux outils échouent volontairement,
+# et les tests qui les appellent avec eux.
+#
+# Ils sont donc IGNORÉS quand le dossier privé est absent, comme les tests
+# de calage le sont déjà. Ce qu'ils vérifient n'a de sens que là où la
+# frontière existe : sur le poste qui détient les données réelles.
+
+def dossier_prive_present() -> bool:
+    import os as _os
+    racine = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+    return (_os.path.isdir(_os.path.join(racine, "reference"))
+            and _os.path.isfile(_os.path.join(racine, "seed_exemple.sql")))
+
+
+def exiger_dossier_prive() -> None:
+    """À appeler en tête d'un test qui ne peut pas s'exécuter sans lui."""
+    import pytest as _pytest
+    if not dossier_prive_present():
+        _pytest.skip("exige le dossier privé (reference/ + seed_exemple.sql) : "
+                     "les gardes de publication refusent de conclure sans "
+                     "empreintes — voir passe F, constats F-01 et F-03")

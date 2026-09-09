@@ -19,6 +19,8 @@ Lancer :  pytest -q tests/test_usage_reel.py
 import os
 import sys
 
+import conftest
+
 import pytest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -231,6 +233,7 @@ def _voie_reelle() -> str:
 
 
 def test_dossier_demo_ne_contient_aucune_donnee_reelle():
+    conftest.exiger_dossier_prive()
     demo = open(os.path.join(HERE, "seed_demo.sql"), encoding="utf-8").read()
     fec = open(os.path.join(HERE, "demo", "FEC_DEMO_2025.txt"),
                encoding="utf-8").read()
@@ -277,6 +280,7 @@ def test_demo_coherente_sans_le_dossier_reel(tmp_path, monkeypatch):
 
 
 def test_paquet_client_sans_identite_reelle(tmp_path):
+    conftest.exiger_dossier_prive()
     import construire_distribution as cd
     import zipfile
     anciens = os.getcwd()
