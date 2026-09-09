@@ -909,11 +909,22 @@ contenait **12 fichiers porteurs d'une empreinte réelle** (FEC d'archive, FEC
 d'import) répartis dans 4 répertoires — pytest conservant par défaut les trois
 dernières exécutions.
 
-`/tmp` est lisible par les autres utilisateurs sur une machine partagée, et
-survit à la session. Le dépôt est protégé, le paquet est protégé, mais le banc
-d'essai ne l'est pas. **Constat à ouvrir** : soit les tests de calage
-s'exécutent dans un répertoire temporaire à permissions restreintes, soit ils
-nettoient derrière eux (`--basetemp` dédié, purgé en fin de session).
+**Portée exacte, après vérification.** L'énoncé initial de ce constat était
+trop fort. `/tmp/pytest-of-<user>/` est créé par pytest en `drwx------` : les
+autres utilisateurs de la machine **ne peuvent pas y entrer**, même si les
+fichiers qu'il contient sont eux-mêmes en `-rw-r--r--`. Il n'y a donc pas
+d'exposition à un tiers local tant que cette permission tient.
+
+Ce qui reste vrai, et qui suffit à justifier le constat : la comptabilité
+réelle est **écrite en clair hors du dépôt**, elle **survit à la session**,
+et elle est conservée sur **trois exécutions** — soit, ici, une douzaine de
+fichiers répartis dans quatre répertoires. Elle échappe à tout ce que le
+projet a mis en place pour se protéger : `.gitignore`, `verifier_depot.py`,
+la garde de `construire_distribution.py`. Une sauvegarde système, un outil
+d'indexation ou une copie de `/tmp` la récupère sans obstacle.
+
+**Gravité : mineur** (et non majeur comme l'énoncé initial le laissait
+entendre).
 
 ### E-20 — Les produits exceptionnels ne sont pas isolés (constat ouvert)
 
@@ -948,6 +959,50 @@ plus-values des particuliers.
 **Gravité : à qualifier** (majeur si la ventilation imprimée fait foi pour le
 déclarant, mineur si elle n'est qu'indicative). Les numéros de case sont à
 recouper avec le CERFA 2033-B en vigueur avant correction.
+
+### Lot 7 — E-20 et E-21 (traités)
+
+**E-20 — produits exceptionnels.** Le constat s'est révélé plus large que son
+énoncé. `liasse.py` sépare désormais trois blocs :
+
+```python
+produits_tous = -_somme(s, ("7",))
+produits_fin  = -_somme(s, ("76",))          # produits financiers
+produits_exc  = -_somme(s, ("77",))          # produits exceptionnels
+produits      = produits_tous - produits_fin - produits_exc   # 218 / 232
+```
+
+Soustraits du total plutôt qu'énumérés par préfixe : un compte de classe 7
+oublié dans une énumération sortirait du résultat en silence, alors qu'ici il
+retombe en exploitation.
+
+Le bas de compte est **inchangé au centime** — ce qui sort de l'exploitation
+revient par les lignes financière et exceptionnelle. Seule la ventilation
+change, et un test le vérifie en recalculant l'ancienne formule.
+
+Défaut supplémentaire trouvé au passage : `charges_exceptionnelles_300` était
+**calculée mais jamais rendue dans le PDF**. Le prix de cession apparaissait
+donc sans sa contrepartie. Les trois lignes — produits financiers, produits
+exceptionnels, charges exceptionnelles — sont désormais imprimées.
+
+**Aucun numéro de case n'a été inventé** : les lignes « produits financiers »
+et « produits exceptionnels » du 2033-B sont affichées **sans numéro**, celui
+du CERFA en vigueur restant à recouper. Un test interdit qu'un numéro
+apparaisse sur ces deux lignes tant que la vérification n'est pas faite.
+**À recouper avec le CERFA.**
+
+**E-21 — copies réelles dans /tmp.** `tests/conftest.py` efface l'arborescence
+temporaire en fin de session, mais **seulement si la suite est passée** : en
+cas d'échec, ces fichiers sont la matière première du diagnostic et les
+supprimer rendrait l'échec inanalysable. Sur un clone public (pas de
+`reference/`), rien n'est touché — les données y sont anonymisées et
+l'inspection reste utile.
+
+Vérifié dans les deux sens : après une suite verte, `/tmp/pytest-of-<user>/`
+est vide ; après un échec, le répertoire et son contenu sont conservés.
+
+Non-régression : 6 tests supplémentaires (123 dans `tests/test_passe_e.py`).
+**Suite complète : 658 passés, 2 ignorés, 0 échec.**
 
 ### Point ouvert — support des exports à colonnes débit/crédit séparées
 

@@ -107,7 +107,20 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
     s39 = _suivi_39c(conn, annee)
     cf = _cloture_fiscale(conn, annee)
 
-    produits = round(-_somme(s, ("7",)), 2)                       # 218 / 232
+    # Produits d'EXPLOITATION seuls en 218/232. Le préfixe « 7 » captait
+    # toute la classe, donc le prix de cession (775000) entrait dans le
+    # chiffre d'affaires : sur un exercice de cession, la case 218 était
+    # gonflée du prix de vente. Le résultat final restait juste — la
+    # neutralisation opère ailleurs — mais la ventilation IMPRIMÉE était
+    # fausse, et c'est elle que le déclarant recopie (constat E-20).
+    #
+    # Les trois blocs sont soustraits du total plutôt qu'énumérés par
+    # préfixe : un compte de classe 7 oublié dans l'énumération sortirait
+    # du résultat en silence, alors qu'ici il retombe en exploitation.
+    produits_tous = round(-_somme(s, ("7",)), 2)
+    produits_fin = round(-_somme(s, ("76",)), 2)                  # financiers
+    produits_exc = round(-_somme(s, ("77",)), 2)                  # exceptionnels
+    produits = round(produits_tous - produits_fin - produits_exc, 2)  # 218 / 232
     charges_ext = _somme(s, ("60", "61", "62"))                   # 242
     impots = _somme(s, ("63",))                                   # 244
     dont_cfe = round(s.get("635110", 0.0), 2)                     # 243
@@ -122,7 +135,11 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
     # la valeur nette du bien, en silence.
     charges_exc = _somme(s, ("67",))                              # 300
     total_charges = round(charges_ext + impots + dotations, 2)    # 264 (exploitation)
-    resultat_comptable = round(produits - total_charges - charges_fi
+    # Le bas de compte reste À L'IDENTIQUE : ce qui sort de l'exploitation
+    # y revient par les lignes financière et exceptionnelle. Seule la
+    # VENTILATION change, jamais le résultat.
+    resultat_comptable = round(produits + produits_fin + produits_exc
+                               - total_charges - charges_fi
                                - charges_exc, 2)                  # 310
 
     resultat_fiscal_lmnp = ex["resultat_fiscal"]
@@ -195,6 +212,12 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
 
     return {
         "produits_218": produits, "total_produits_232": produits,
+        # Sans suffixe de case : les numéros officiels des lignes
+        # « produits financiers » et « produits exceptionnels » du 2033-B
+        # restent à recouper avec le CERFA en vigueur. Les afficher sous un
+        # numéro non vérifié serait pire que de les afficher sans numéro.
+        "produits_financiers": produits_fin,
+        "produits_exceptionnels": produits_exc,
         "charges_externes_242": charges_ext,
         "impots_244": impots, "dont_cfe_243": dont_cfe,
         "dotations_254": dotations, "total_charges_264": total_charges,

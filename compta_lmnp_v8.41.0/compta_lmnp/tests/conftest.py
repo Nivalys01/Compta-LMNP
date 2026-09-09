@@ -60,3 +60,37 @@ def pytest_collection_modifyitems(config, items):
             valeur = getattr(module, attribut, None)
             if isinstance(valeur, str) and "reference" in valeur:
                 setattr(module, attribut, demo)
+
+
+# ── Ne rien laisser traîner quand le dossier RÉEL est là (constat E-21) ────
+#
+# Sur la machine de développement, `dossier_demonstration()` fait pointer le
+# mode démo sur `reference/` : la suite écrit donc la comptabilité RÉELLE
+# dans les répertoires temporaires de pytest — FEC d'archive, FEC d'import,
+# bases. Ces fichiers survivent à la session et pytest en conserve trois
+# exécutions.
+#
+# Il n'y a pas d'exposition à un tiers local : pytest crée
+# `/tmp/pytest-of-<user>/` en 0700. Mais ces copies échappent à TOUT ce que
+# le projet a mis en place pour se protéger — .gitignore, verifier_depot,
+# la garde du paquet — et une sauvegarde système les emporte sans obstacle.
+#
+# On efface donc l'arborescence temporaire en fin de session, mais SEULEMENT
+# si la suite est passée : en cas d'échec, les fichiers sont la matière
+# première du diagnostic et les supprimer rendrait l'échec inanalysable.
+# Sur un clone public (pas de reference/), rien n'est touché : les données
+# y sont anonymisées, et l'inspection reste possible.
+
+def pytest_sessionfinish(session, exitstatus):
+    import os as _os
+    import shutil as _shutil
+
+    racine = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+    if not _os.path.isdir(_os.path.join(racine, "reference")):
+        return                          # jeu anonymisé : rien à protéger
+    if exitstatus != 0:
+        return                          # échec : on garde de quoi analyser
+    fabrique = getattr(session.config, "_tmp_path_factory", None)
+    base = getattr(fabrique, "_basetemp", None)
+    if base:
+        _shutil.rmtree(base, ignore_errors=True)

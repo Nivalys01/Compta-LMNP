@@ -900,3 +900,112 @@ def test_e15_avertissement_non_cerfa_present_dans_le_document():
     garde = src[src.index("# ── Page de garde"):src.index('g = L["page_garde"]')]
     assert "fac-similé des formulaires CERFA" in garde
     assert "état de travail" in garde
+
+
+# ═══ E-20 — les produits exceptionnels sont enfin isolés ════════════════
+
+import liasse  # noqa: E402
+
+
+def _ecriture(conn, annee, lignes, libelle="essai"):
+    """Insère une écriture équilibrée directement, sans passer par un
+    gabarit — les comptes de cession n'en ont pas."""
+    import cession
+    cession.assurer_schema(conn)          # crée 675000 / 775000
+    num = conn.execute(
+        "SELECT COALESCE(MAX(ecriture_num), 900) + 1 FROM ecriture "
+        "WHERE exercice_annee=?", (annee,)).fetchone()[0]
+    cur = conn.execute(
+        "INSERT INTO ecriture (journal_code, ecriture_num, ecriture_date, "
+        "exercice_annee, libelle, piece_ref) VALUES ('OD', ?, ?, ?, ?, 'NA')",
+        (num, f"{annee}-06-30", annee, libelle))
+    eid = cur.lastrowid
+    for compte, debit, credit in lignes:
+        conn.execute("INSERT INTO ligne (ecriture_id, compte_num, libelle, "
+                     "debit, credit) VALUES (?,?,?,?,?)",
+                     (eid, compte, libelle, debit, credit))
+    conn.commit()
+
+
+def test_e20_le_prix_de_cession_sort_du_chiffre_daffaires(base):
+    """Le préfixe « 7 » captait toute la classe : sur un exercice de
+    cession, la case 218 était gonflée du prix de vente — et c'est elle que
+    le déclarant recopie."""
+    operations.saisir(base, type="loyer", montant=9000.0,
+                      date_operation="2026-03-05", bien_id=1)
+    _ecriture(base, 2026, [("108000", 60000.0, 0.0), ("775000", 0.0, 60000.0)],
+              "prix de cession")
+
+    b = liasse.resultat_2033b(base, 2026)
+    assert b["produits_218"] == 9000.0, "le prix de cession est encore dans le CA"
+    assert b["total_produits_232"] == 9000.0
+    assert b["produits_exceptionnels"] == 60000.0
+
+
+def test_e20_le_resultat_final_est_inchange(base):
+    """Seule la VENTILATION change : ce qui sort de l'exploitation revient
+    par les lignes financière et exceptionnelle. Le bas de compte — la
+    case 310, celle qui porte le résultat — doit être au centime près celui
+    que produisait l'ancien calcul."""
+    operations.saisir(base, type="loyer", montant=9000.0,
+                      date_operation="2026-03-05", bien_id=1)
+    operations.saisir(base, type="charge_copro", montant=1200.0,
+                      date_operation="2026-04-05", bien_id=1)
+    _ecriture(base, 2026, [("108000", 60000.0, 0.0), ("775000", 0.0, 60000.0)],
+              "prix de cession")
+    _ecriture(base, 2026, [("675000", 45000.0, 0.0), ("108000", 0.0, 45000.0)],
+              "valeur comptable cédée")
+
+    b = liasse.resultat_2033b(base, 2026)
+    # Ancien calcul : TOUTE la classe 7, moins les charges.
+    ancien = round((9000.0 + 60000.0) - 1200.0 - 45000.0, 2)
+    assert b["benefice_ou_perte_310"] == ancien
+    # Et la ventilation, elle, est désormais juste.
+    assert b["produits_218"] == 9000.0
+    assert b["produits_exceptionnels"] == 60000.0
+    assert b["charges_exceptionnelles_300"] == 45000.0
+
+
+def test_e20_le_resultat_dexploitation_ne_compte_plus_la_cession(base):
+    """La case 270 dérive de 218 : elle était fausse du même montant."""
+    operations.saisir(base, type="loyer", montant=9000.0,
+                      date_operation="2026-03-05", bien_id=1)
+    _ecriture(base, 2026, [("108000", 60000.0, 0.0), ("775000", 0.0, 60000.0)])
+    b = liasse.resultat_2033b(base, 2026)
+    assert b["resultat_exploitation_270"] == 9000.0
+
+
+def test_e20_sans_cession_rien_ne_bouge(base):
+    """Contrepartie : un exercice ordinaire doit rendre exactement ce qu'il
+    rendait avant le correctif."""
+    operations.saisir(base, type="loyer", montant=9000.0,
+                      date_operation="2026-03-05", bien_id=1)
+    operations.saisir(base, type="charge_copro", montant=1200.0,
+                      date_operation="2026-04-05", bien_id=1)
+    b = liasse.resultat_2033b(base, 2026)
+    assert b["produits_218"] == 9000.0
+    assert b["produits_exceptionnels"] == 0.0
+    assert b["produits_financiers"] == 0.0
+    assert b["benefice_ou_perte_310"] == 7800.0
+
+
+def test_e20_les_trois_lignes_figurent_dans_le_pdf():
+    """La ligne des charges exceptionnelles était CALCULÉE depuis une passe
+    antérieure mais jamais rendue : le prix de cession apparaissait sans sa
+    contrepartie."""
+    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    bloc = src[src.index("# ── 2033-B"):src.index("Réintégrations / déductions")]
+    assert 'b["produits_financiers"]' in bloc
+    assert 'b["produits_exceptionnels"]' in bloc
+    assert 'b["charges_exceptionnelles_300"]' in bloc
+
+
+def test_e20_aucun_numero_de_case_invente():
+    """Les numéros officiels des lignes « produits financiers » et
+    « produits exceptionnels » du 2033-B n'ont pas été vérifiés : les
+    afficher sous un numéro non recoupé serait pire que sans numéro."""
+    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    bloc = src[src.index("# ── 2033-B"):src.index("Réintégrations / déductions")]
+    for ligne in bloc.split("\n"):
+        if "produits_financiers" in ligne or "produits_exceptionnels" in ligne:
+            assert "case" not in ligne.lower(), ligne

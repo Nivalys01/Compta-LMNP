@@ -269,9 +269,19 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
          _eur(b["resultat_exploitation_270"])],
         ["Charges financières — intérêts d'emprunt (case 294)",
          _eur(b["charges_financieres_294"])],
+        # Produits financiers et exceptionnels : sans numéro de case, celui
+        # du 2033-B restant à recouper avec le CERFA en vigueur. La ligne
+        # des charges exceptionnelles, elle, était CALCULÉE mais jamais
+        # rendue — le prix de cession apparaissait donc sans sa
+        # contrepartie (constat E-20).
+        ["Produits financiers", _eur(b["produits_financiers"])],
+        ["Produits exceptionnels — dont cessions",
+         _eur(b["produits_exceptionnels"])],
+        ["Charges exceptionnelles (case 300) — dont valeur comptable des "
+         "éléments cédés", _eur(b["charges_exceptionnelles_300"])],
         ["Bénéfice ou perte (case 310)", _eur(b["benefice_ou_perte_310"])],
     ], largeurs=[110 * mm, 60 * mm])
-    _ligne_tot(tb, 8)
+    _ligne_tot(tb, 11)     # la ligne 310, décalée par les trois ajouts
     E.append(tb)
 
     lignes = [["Réintégrations / déductions", "Montant"],
