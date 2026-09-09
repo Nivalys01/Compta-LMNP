@@ -799,3 +799,104 @@ def test_e14_plus_de_mot_cle_inerte_dans_les_regles():
 def test_e14_les_vrais_termes_matchent(libelle):
     """La place rendue est occupée par des termes qui matchent vraiment."""
     assert import_bancaire.categoriser(libelle, -225.0) == "honoraires"
+
+
+# ═══ E-15 à E-19 — la liasse PDF ════════════════════════════════════════
+#
+# Ces tests exigent reportlab (épinglé dans requirements-dev.txt depuis le
+# lot 5). Sans lui, cinq tests de la suite échouaient en permanence.
+
+pytest.importorskip("reportlab")
+
+import liasse_pdf  # noqa: E402
+
+
+@pytest.mark.parametrize("valeur,attendu", [
+    (-0.004,  "0,00 €"),      # résidu d'arrondi : zéro, sans signe
+    (-0.0049, "0,00 €"),
+    (0.0,     "0,00 €"),
+    (-0.006,  "-0,01 €"),     # au-delà du demi-centime : le signe reste
+    (-1234.5, "-1 234,50 €"),
+    (None,    "—"),
+])
+def test_e18_plus_de_zero_negatif(valeur, attendu):
+    """« -0,00 € » : un montant nul affecté d'un signe moins, dans un
+    document où le signe porte le sens."""
+    assert liasse_pdf._eur(valeur) == attendu
+
+
+def test_e18_les_montants_reels_ne_sont_pas_touches():
+    """Le seuil ne doit pas avaler un vrai centime."""
+    assert liasse_pdf._eur(0.01) == "0,01 €"
+    assert liasse_pdf._eur(-0.01) == "-0,01 €"
+
+
+def test_e16_les_libelles_de_rubrique_sont_enveloppes():
+    """Une chaîne brute ne se coupe pas dans une table reportlab : elle
+    déborde sur les colonnes voisines. Mesuré à 8,5 pt, « Installations
+    generales, agencements et amenagements des constructions » fait 279 pt
+    dans une colonne qui en offre 118."""
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+    long_libelle = ("Installations generales, agencements et amenagements "
+                    "des constructions")
+    utile = 46 * 2.834645 - 12          # 46 mm moins les paddings
+    assert stringWidth(long_libelle, "Helvetica", 8.5) > utile, \
+        "le libellé de référence ne déborde plus : revoir le test"
+
+    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    bloc = src[src.index('for rub in c["rubriques"]:'):]
+    bloc = bloc[:bloc.index("tt = c[")]
+    assert 'Paragraph(_xml(rub["libelle"])' in bloc, \
+        "le libellé de rubrique n'est plus enveloppé — E-16 est revenu"
+
+
+def test_e17_le_suivi_39c_par_bien_aligne_ses_montants():
+    """Le seul tableau où l'on compare des colonnes entre elles : quatre de
+    ses cinq colonnes de montants restaient alignées à gauche."""
+    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    bloc = src[src.index("larg = [60 * mm]"):]
+    bloc = bloc[:bloc.index("Déficits LMNP")]
+    assert "aligne_droite=range(1, len(entetes))" in bloc, \
+        "aligne_droite n'est plus passé — E-17 est revenu"
+
+
+def test_e19_la_note_daide_est_echappee():
+    """Toutes les autres chaînes de données passent par _xml(). L'exception
+    n'était pas motivée, et un « & » dans la note ferait échouer la
+    génération."""
+    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    assert 'Paragraph(_xml(aide["note"])' in src
+    assert 'Paragraph(aide["note"]' not in src
+
+
+def test_e15_le_pdf_porte_sa_date_et_sa_version(tmp_path):
+    """Deux tirages d'un même exercice, entre lesquels une écriture a été
+    corrigée, étaient visuellement indiscernables. Le pied de page porte
+    désormais l'horodatage et la version."""
+    import io
+    import re as _re
+    from datetime import datetime
+
+    pied = liasse_pdf._pied_de_page(provisoire=False)
+    # Le texte est figé à la construction du pied : on l'inspecte par la
+    # fermeture plutôt qu'en relisant les octets d'un PDF compressé.
+    signature = pied.__closure__[1].cell_contents
+    assert _re.match(r"Compta LMNP v\d+\.\d+\.\d+ — édité le "
+                     r"\d{2}/\d{2}/\d{4} à \d{2}:\d{2}$", signature), signature
+    assert datetime.now().strftime("%d/%m/%Y") in signature
+    del io, tmp_path
+
+
+def test_e15_la_version_vient_du_fichier_VERSION():
+    attendu = open(os.path.join(HERE, "VERSION"), encoding="utf-8").read().strip()
+    assert liasse_pdf._version() == attendu
+
+
+def test_e15_avertissement_non_cerfa_present_dans_le_document():
+    """L'avertissement vivait dans la docstring du module, donc nulle part
+    pour le lecteur — alors que la page de garde s'intitule « Liasse
+    fiscale LMNP », ce qu'on peut prendre pour un formulaire officiel."""
+    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    garde = src[src.index("# ── Page de garde"):src.index('g = L["page_garde"]')]
+    assert "fac-similé des formulaires CERFA" in garde
+    assert "état de travail" in garde

@@ -18,6 +18,8 @@ Dépendance : reportlab (installée par les lanceurs au premier démarrage).
 """
 from __future__ import annotations
 
+import os
+from datetime import datetime
 from xml.sax.saxutils import escape as _xml
 
 from reportlab.lib import colors
@@ -35,9 +37,17 @@ ROUGE = colors.HexColor("#b42318")
 
 
 def _eur(x) -> str:
-    """1234.5 → '1 234,50 €' (insécable fine espace non requise en PDF)."""
+    """1234.5 → '1 234,50 €' (insécable fine espace non requise en PDF).
+
+    Un résidu d'arrondi négatif — -0,004 — s'affichait « -0,00 € » : un
+    montant nul affecté d'un signe moins, dans un document où le signe
+    porte le sens. Le zéro est ramené au zéro positif AVANT formatage
+    (constat E-18).
+    """
     if x is None:
         return "—"
+    if abs(x) < 0.005:                 # sous le demi-centime : zéro tout court
+        x = 0.0
     s = f"{x:,.2f}".replace(",", " ").replace(".", ",")
     return f"{s} €"
 
@@ -86,7 +96,28 @@ def _ligne_tot(t: Table, index: int) -> None:
     ]))
 
 
+def _version() -> str:
+    """Version du logiciel, lue dans le fichier VERSION livré à côté."""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "VERSION"), encoding="utf-8") as f:
+            return f.read().strip()
+    except OSError:
+        return "?"
+
+
 def _pied_de_page(provisoire: bool):
+    """Pied de page : avertissement, horodatage d'édition, version, page.
+
+    Le document ne portait ni date, ni heure, ni version. Deux tirages d'un
+    même exercice, entre lesquels une écriture a été corrigée, étaient
+    visuellement indiscernables — sur une pièce destinée à un
+    expert-comptable ou à un dossier de contrôle, c'est la première chose
+    qui manque (constat E-15).
+    """
+    edite_le = datetime.now().strftime("%d/%m/%Y à %H:%M")
+    signature = f"Compta LMNP v{_version()} — édité le {edite_le}"
+
     def dessiner(canvas, doc):
         canvas.saveState()
         canvas.setFont("Helvetica", 7.5)
@@ -96,6 +127,8 @@ def _pied_de_page(provisoire: bool):
                           "un expert-comptable avant tout dépôt.")
         canvas.drawRightString(A4[0] - 15 * mm, 10 * mm,
                                f"Page {doc.page}")
+        canvas.setFont("Helvetica", 6.5)
+        canvas.drawString(15 * mm, 6.5 * mm, signature)
         if provisoire:
             canvas.setFont("Helvetica-Bold", 60)
             canvas.setFillColor(colors.Color(0.71, 0.13, 0.09, alpha=0.08))
@@ -134,6 +167,16 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
         exp.get("adresse")) if x)
     E.append(Paragraph(f"{_xml(ident) or 'Exploitant non renseigné'}"
                        f" &nbsp;—&nbsp; {statut}", st["sous"]))
+    # L'avertissement vivait dans la docstring du module, donc nulle part
+    # pour le lecteur — alors que la page de garde s'intitule « Liasse
+    # fiscale LMNP », ce qu'on peut prendre pour un formulaire officiel.
+    E.append(Paragraph(
+        "Ce document est un <b>état de travail</b> fidèle aux montants "
+        "calculés — <b>pas un fac-similé des formulaires CERFA</b>. Les "
+        "numéros de cases officiels y figurent pour permettre le report "
+        "champ à champ dans la télédéclaration, ou par l'expert-comptable.",
+        st["note"]))
+    E.append(Spacer(1, 6))
 
     g = L["page_garde"]
     E.append(_table([
@@ -251,7 +294,12 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     lignes = [["Rubrique", "Brut début", "Augment.", "Brut fin",
                "Amort. début", "Dotation", "Amort. fin"]]
     for rub in c["rubriques"]:
-        lignes.append([rub["libelle"],
+        # Enveloppé comme partout ailleurs : une chaîne brute ne se coupe pas
+        # dans une table reportlab, elle déborde sur les colonnes voisines.
+        # Mesuré : « Installations generales, agencements et amenagements des
+        # constructions » fait 279,2 pt dans une colonne qui en offre 118,4
+        # — trois colonnes de montants recouvertes (constat E-16).
+        lignes.append([Paragraph(_xml(rub["libelle"]), st["normal"]),
                        _eur(rub["brut_debut"]), _eur(rub["augmentations"]),
                        _eur(rub["brut_fin"]), _eur(rub["amort_debut"]),
                        _eur(rub["dotation"]), _eur(rub["amort_fin"])])
@@ -310,7 +358,12 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
             ligne.append(_eur(v["stock_cloture"]))
             lignes_b.append(ligne)
         larg = [60 * mm] + [22 * mm] * (len(entetes) - 1)
-        E.append(_table(lignes_b, largeurs=larg))
+        # `aligne_droite` n'était pas passé : le défaut (1,) n'alignait que
+        # « Ouverture », laissant « Reporté », « Repris », « Sorti » et
+        # « Stock fin » à gauche — dans le seul tableau où l'on compare des
+        # colonnes entre elles (constat E-17).
+        E.append(_table(lignes_b, largeurs=larg,
+                        aligne_droite=range(1, len(entetes))))
 
     E.append(Paragraph("Déficits LMNP par millésime", st["h2"]))
     if rep["deficits"]:
@@ -342,7 +395,9 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     if len(lignes) == 1:
         lignes.append(["Aucune case à servir", "—"])
     E.append(_table(lignes, largeurs=[110 * mm, 60 * mm]))
-    E.append(Paragraph(aide["note"], st["note"]))
+    # Seule chaîne de données à échapper au traitement : l'exception n'était
+    # pas motivée, et un « & » dans la note ferait échouer la génération.
+    E.append(Paragraph(_xml(aide["note"]), st["note"]))
 
     # ── Contrôles de cohérence ───────────────────────────────────────────
     E.append(Paragraph("Contrôles de cohérence internes", st["h2"]))

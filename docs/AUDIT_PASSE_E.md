@@ -555,6 +555,7 @@ Ces points sont posés comme **questions**, pas comme constats.
 | E-18 | `-0,00 €` | liasse_pdf | Mineur |
 | E-19 | `aide["note"]` seule chaîne non échappée | liasse_pdf | Mineur |
 | E-20 | Produits exceptionnels non isolés (case 218/232 gonflée) | liasse | À qualifier |
+| E-21 | La suite de tests dépose des copies réelles dans /tmp | tests | À qualifier |
 
 **Lecture d'ensemble.** Le déséquilibre entre les trois pièces est net.
 `liasse_pdf.py` est sain sur le point qui comptait le plus — il ne
@@ -850,6 +851,69 @@ Deux points à ne pas casser en reformulant : `outils_demo.py` lignes 73 et
 seed privés, où elle est effectivement présente (2 occurrences dans
 `seed_exemple.sql`). Les toucher casserait l'anonymisation du jeu de
 démonstration.
+
+### Lot 6 — E-15 à E-19 (traité) : la liasse PDF
+
+Les cinq mineurs reproduits sous **reportlab 5.0.1**, alors que le rapport
+avait mesuré sous 4.4.10 : les largeurs sortent **identiques au dixième de
+point** (107,7 pt et 279,2 pt pour 118,4 pt utiles). Les métriques Helvetica
+n'ont pas bougé entre les deux majeures.
+
+**E-15 — traçabilité du tirage.** Le pied de page porte désormais
+`Compta LMNP v8.41.0 — édité le JJ/MM/AAAA à HH:MM`, la version étant lue
+dans le fichier `VERSION`. Deux tirages d'un même exercice, entre lesquels
+une écriture a été corrigée, étaient auparavant indiscernables. L'avertissement
+« pas un fac-similé des formulaires CERFA » quitte la docstring du module —
+où le lecteur ne le voyait jamais — pour la page de garde, sous le titre qui
+peut faire croire à un formulaire officiel.
+
+**E-16 — débordement 2033-C.** Les libellés de rubrique sont enveloppés dans
+`Paragraph(_xml(...))`, comme le tableau « Détail par composant » juste en
+dessous le faisait déjà. L'incohérence était interne au même fichier.
+
+**E-17 — alignement du suivi 39 C par bien.** `aligne_droite=range(1,
+len(entetes))` est passé explicitement, comme dans tous les autres tableaux
+de montants. Quatre colonnes sur cinq restaient à gauche, dans le seul
+tableau où l'on compare des colonnes entre elles.
+
+**E-18 — zéro négatif.** `_eur()` ramène au zéro positif tout ce qui est sous
+le demi-centime. Vérifié qu'un vrai centime n'est pas avalé : `_eur(-0.01)`
+rend toujours `-0,01 €`.
+
+**E-19 — échappement.** `_xml(aide["note"])`, comme toutes les autres chaînes
+de données du fichier.
+
+Vérification de bout en bout : un PDF réellement généré porte le pied de page
+horodaté sur chaque page et l'avertissement CERFA en garde.
+
+Non-régression : 33 tests supplémentaires (117 dans `tests/test_passe_e.py`).
+**Suite complète : 652 passés, 2 ignorés, 0 échec.**
+
+### Incident — un PDF de test écrit hors du dépôt portait les données réelles
+
+En vérifiant E-15 de bout en bout, j'ai généré un PDF avec
+`init_db.init(..., "demo")` dans un répertoire temporaire. Le PDF portait le
+nom, l'adresse et la comptabilité réels.
+
+**Ce n'est pas un défaut du logiciel** : `dossier_demonstration()` documente
+le comportement — le mode démo prend le dossier de référence s'il est présent
+(machine de développement) et le jeu anonymisé sinon (poste client). Sur cette
+machine, « démo » veut donc dire « données réelles », et c'est voulu. Le
+fichier a été supprimé ; la vérification a été refaite sur une base **vierge**,
+avec un exploitant fictif.
+
+**Ce que l'incident révèle en revanche**, et qui n'est ni dans le rapport ni
+traité : **exécuter la suite de tests dépose des copies de la comptabilité
+réelle dans `/tmp`**. Après quelques exécutions, `/tmp/pytest-of-<user>/`
+contenait **12 fichiers porteurs d'une empreinte réelle** (FEC d'archive, FEC
+d'import) répartis dans 4 répertoires — pytest conservant par défaut les trois
+dernières exécutions.
+
+`/tmp` est lisible par les autres utilisateurs sur une machine partagée, et
+survit à la session. Le dépôt est protégé, le paquet est protégé, mais le banc
+d'essai ne l'est pas. **Constat à ouvrir** : soit les tests de calage
+s'exécutent dans un répertoire temporaire à permissions restreintes, soit ils
+nettoient derrière eux (`--basetemp` dédié, purgé en fin de session).
 
 ### E-20 — Les produits exceptionnels ne sont pas isolés (constat ouvert)
 
