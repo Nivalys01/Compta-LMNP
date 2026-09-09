@@ -1,17 +1,21 @@
-# Outillage de développement — versions ÉPINGLÉES.
+# Environnement de DÉVELOPPEMENT — versions ÉPINGLÉES.
 #
 # Un linter non épinglé transforme une release de l'outil en CI rouge : le
 # jeu de règles par défaut de ruff s'est élargi entre deux versions et le
 # projet est passé de « propre » à 234 erreurs sans qu'une ligne de code
 # ait changé. Le jeu de règles est par ailleurs déclaré dans pyproject.toml.
-pytest==8.3.4
+#
+# Installer l'ensemble :  pip install -r requirements-dev.txt
+pytest==9.1.1
 ruff==0.16.0
 
-# reportlab n'est pas de l'outillage : c'est une dépendance RUNTIME de
-# liasse_pdf.py, que les lanceurs installent chez l'utilisateur (sans
-# l'épingler, et sans bloquer si elle échoue — tout marche sauf l'export
-# PDF). Elle figure ici parce que sans elle cinq tests de la suite
-# échouent sur un ModuleNotFoundError : un environnement de développement
-# incomplet donnait cinq échecs permanents qu'on finissait par ignorer,
-# c'est-à-dire le pire état pour une suite de tests.
+# Les deux suivantes ne sont pas de l'outillage : ce sont des dépendances
+# RUNTIME, que les lanceurs installent chez l'utilisateur sans les épingler
+# (et sans bloquer pour reportlab, dont l'absence ne coûte que l'export
+# PDF). Elles figurent ici parce que la SUITE DE TESTS en dépend :
+#   - flask     : les tests de bout en bout passent par le client web ;
+#   - reportlab : cinq tests de la liasse PDF échouaient sans elle.
+# Un environnement de développement incomplet donne des échecs permanents
+# qu'on finit par ignorer — le pire état pour une suite de tests.
+flask==3.1.3
 reportlab==5.0.1

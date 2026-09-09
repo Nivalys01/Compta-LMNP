@@ -29,7 +29,6 @@ import pytest
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 
-import construire_distribution  # noqa: E402
 import outils_demo  # noqa: E402
 import verifier_depot  # noqa: E402
 
