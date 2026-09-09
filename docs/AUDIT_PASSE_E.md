@@ -776,6 +776,81 @@ Figé par un test `xfail(strict=True)` — `test_e12_historique_sur_libelle_
 accentue_connu_pour_echouer` — qui échouera bruyamment le jour où E-12 sera
 corrigé, pour qu'on pense à le repasser en test normal.
 
+### Lot 5 — E-11, E-12, E-13, E-14 (traité)
+
+**E-11 — dates.** `_date_iso()` valide et lève. Une année sur deux chiffres
+est **refusée plutôt que devinée** : choisir le siècle à la place de
+l'utilisateur, sur une pièce comptable, c'est risquer de dater tout un
+exercice à côté sans que rien ne le signale. Mois 13, 30 février et
+`ab/cd/2026` sont refusés avec un message exploitable. Conformément à E-03,
+une date fautive est un **rejet de ligne**, pas la mort du fichier.
+
+**E-12 — historique.** Deux causes, dont une seule était au rapport.
+
+1. *Égalité stricte.* `_signature()` réduit le libellé à ses mots
+   alphabétiques : « FACTURE CABINET DUPONT 2025 » et « … 2026 » se
+   reconnaissent. Volontairement conservateur — la signature garde l'ordre
+   et la totalité des mots, donc « VIR FACTURE CABINET DUPONT 2025 » ne
+   matche pas. Une suggestion trop généreuse produirait des écritures
+   fausses, ce qui est pire que pas de suggestion. La correspondance exacte
+   prime sur l'approchante.
+2. *`LOWER()` de SQLite est ASCII* (non relevé par le rapport). La
+   comparaison se fait désormais en Python des deux côtés.
+
+Le filtre `source='saisie'` est **conservé**. Le rapport suggère qu'il prive
+l'outil de sa source d'amélioration ; en l'état, le guichet d'import ne
+permet pas de corriger le type avant validation — apprendre des lignes
+importées reviendrait donc à réapprendre les propositions de l'outil, et à
+renforcer ses propres erreurs. À rouvrir le jour où le guichet permettra la
+correction ligne à ligne.
+
+**E-13 — `charges_locatives`.** Déjà atteignable depuis le lot 3 :
+`REGLES_ENCAISSEMENT` produit ce type sur « provision charges », « charges
+locatives » et « forfait charges ». La période mensuelle est servie. Figé par
+des tests.
+
+**E-14 — mot-clé inerte.** Corrigé dans `REGLES`, mais le diagnostic du
+rapport est à amender (voir ci-dessous).
+
+Non-régression : 18 tests supplémentaires. **Suite complète : 639 passés,
+2 ignorés, 0 échec** — `reportlab==5.0.1` est désormais épinglé dans
+`requirements-dev.txt`, ce qui éteint les 5 échecs d'environnement qui
+traînaient.
+
+### E-14 — le diagnostic du rapport est à corriger
+
+Le rapport voit dans `les acteurs payants actuels` « un fragment de prose
+resté dans la table », signe que « la table n'a pas été relue ». La recherche
+sur l'ensemble du projet dit autre chose : **25 occurrences dans 17 fichiers
+suivis**, dont `schema.sql`, `README.md`, `ARCHITECTURE.md`, `CHANGELOG.md`,
+`fiscal.py`, `cession.py`, `export_fec.py`, `operations.py`, `reprise.py`,
+`valider_fec.py`, `outils_demo.py` et cinq fichiers de tests.
+
+C'est le produit d'un **remplacement global**, pas d'un oubli :
+`outils_demo.py` l'écrit noir sur blanc — « Nom du prestataire comptable
+historique : il figurait dans les libellés d'écriture du FEC source, donc
+dans le jeu de démonstration PUBLIÉ. Nommer un tiers dans un dépôt public
+n'apporte rien et l'expose autant que nous. » Le nom du prestataire a été
+remplacé partout par cette périphrase.
+
+Deux conséquences distinctes :
+
+- **Dans `REGLES`, c'est un défaut réel** : la clé occupait la place d'un
+  mot-clé bancaire légitime — une facture de cabinet porte son nom sur le
+  relevé. Elle est remplacée par `comptab`, `expert comptable`,
+  `expertise comptable`, `fiduciaire`, `cabinet comptable`. **Corrigé.**
+- **Ailleurs, ce sont 24 occurrences de prose anonymisée**, grammaticalement
+  bancales (« Calé sur la mécanique les acteurs payants actuels ») mais
+  sémantiquement voulues. Ce n'est pas un défaut de code. **Non corrigé** :
+  reformuler relève d'une décision éditoriale — par exemple « l'outil du
+  prestataire comptable » ou « les logiciels du marché ». À trancher.
+
+Deux points à ne pas casser en reformulant : `outils_demo.py` lignes 73 et
+234 **utilisent la périphrase comme motif de remplacement** sur le FEC et le
+seed privés, où elle est effectivement présente (2 occurrences dans
+`seed_exemple.sql`). Les toucher casserait l'anonymisation du jeu de
+démonstration.
+
 ### E-20 — Les produits exceptionnels ne sont pas isolés (constat ouvert)
 
 **Fichier / fonction** : `liasse.py`, calcul des cases 218/232.

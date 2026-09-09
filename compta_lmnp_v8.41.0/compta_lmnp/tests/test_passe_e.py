@@ -598,13 +598,13 @@ def test_e07_la_cle_de_l_historique_nest_pas_repliee():
     assert import_bancaire._cle_libelle("TAXE FONCIÈRE") == "taxe foncière"
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "LOWER() de SQLite est ASCII : « CHAUDIÈRE » y reste « CHAUDIèRE » alors "
-    "que Python rend « chaudière ». L'historique ne retrouve donc AUCUN "
-    "libellé accentué. Cause supplémentaire d'E-12, non relevée par le "
-    "rapport, à traiter avec ce constat — pas une régression d'E-07, le "
-    "défaut préexiste."))
-def test_e12_historique_sur_libelle_accentue_connu_pour_echouer(base):
+def test_e12_historique_retrouve_un_libelle_accentue(base):
+    """Corrigé au lot 5. `LOWER()` de SQLite est ASCII : « CHAUDIÈRE » y
+    restait « CHAUDIèRE » quand Python rendait « chaudière », si bien que
+    l'historique ne retrouvait AUCUN libellé accentué. La comparaison se
+    fait désormais en Python, des deux côtés. Ce test était `xfail(strict)`
+    entre les lots 4 et 5 : c'est lui qui a signalé que le défaut était
+    réparé."""
     operations.saisir(base, type="maintenance", montant=210.0,
                       date_operation="2026-03-01", bien_id=1,
                       libelle="ENTRETIEN CHAUDIÈRE ANNUEL", source="saisie")
@@ -681,3 +681,121 @@ def test_e09_analyser_sert_le_millesime_de_la_ligne(tmp_path):
                  encoding="utf-8")
     props = import_bancaire.analyser(str(p))["propositions"]
     assert props[0]["type"] == "attente_decaissement"
+
+
+# ═══ E-11 / E-12 / E-13 / E-14 — les mineurs de l'import ════════════════
+
+@pytest.mark.parametrize("brut,attendu", [
+    ("05/01/2026", "2026-01-05"),
+    ("2026-01-05", "2026-01-05"),
+    ("5/1/2026",   "2026-01-05"),     # sans zéros de tête
+])
+def test_e11_dates_valides_acceptees(brut, attendu):
+    assert import_bancaire._date_iso(brut) == attendu
+
+
+@pytest.mark.parametrize("brut,motif", [
+    ("05/01/26",   "deux chiffres"),   # an 26 et période « 26-01 » auparavant
+    ("31/13/2026", "inexistante"),     # mois 13
+    ("30/02/2026", "inexistante"),     # 30 février
+    ("ab/cd/2026", "illisible"),       # ValueError d'int() non rattrapée
+    ("05/2026",    "illisible"),
+])
+def test_e11_dates_invalides_refusees(brut, motif):
+    """Aucune validation n'existait. Une année sur deux chiffres est refusée
+    plutôt que devinée : choisir le siècle à la place de l'utilisateur, sur
+    une pièce comptable, c'est risquer de dater tout un exercice à côté."""
+    with pytest.raises(ValueError, match=motif):
+        import_bancaire._date_iso(brut)
+
+
+def test_e11_une_date_fautive_est_un_rejet_pas_la_mort_du_fichier(tmp_path):
+    """Cohérent avec E-03 : ce qui n'est pas lisible est compté et rendu.
+    Une seule ligne datée n'importe comment ne doit pas emporter le relevé."""
+    p = tmp_path / "releve.csv"
+    p.write_text("date;libelle;montant\n"
+                 "05/01/2026;VIR LOYER;795,50\n"
+                 "05/01/26;VIR LOYER FEVRIER;795,50\n"
+                 "07/01/2026;PRLV SYNDIC;-120,50\n", encoding="utf-8")
+    r = import_bancaire.analyser(str(p))
+    assert len(r["propositions"]) == 2
+    assert len(r["rejets"]) == 1
+    assert r["rejets"][0]["ligne"] == 3
+    assert "deux chiffres" in r["rejets"][0]["raison"]
+
+
+def test_e12_historique_tolere_une_reference_variable(base):
+    """Le scénario du rapport : les libellés bancaires portent une référence
+    ou une date qui change d'un mois à l'autre. L'égalité stricte rendait la
+    fonctionnalité — présentée comme « Priorité 1 » — inopérante."""
+    operations.saisir(base, type="honoraires", montant=225.0,
+                      date_operation="2026-01-15", bien_id=1,
+                      libelle="FACTURE CABINET DUPONT 2025", source="saisie")
+    for libelle in ("FACTURE CABINET DUPONT 2025",      # exact
+                    "FACTURE CABINET DUPONT 2026",      # référence variable
+                    "facture cabinet dupont 9999"):     # casse + référence
+        assert import_bancaire.suggerer_depuis_historique(base, libelle) \
+            == "honoraires", libelle
+
+
+def test_e12_la_signature_reste_conservatrice(base):
+    """Un mot en tête suffit à distinguer : une suggestion trop généreuse
+    produirait des écritures fausses, ce qui est pire que pas de suggestion."""
+    operations.saisir(base, type="honoraires", montant=225.0,
+                      date_operation="2026-01-15", bien_id=1,
+                      libelle="FACTURE CABINET DUPONT 2025", source="saisie")
+    assert import_bancaire.suggerer_depuis_historique(
+        base, "VIR FACTURE CABINET DUPONT 2025") is None
+
+
+def test_e12_l_exact_prime_sur_l_approchant(base):
+    """Deux natures partagent la signature : la correspondance exacte
+    tranche, elle en sait plus."""
+    operations.saisir(base, type="honoraires", montant=225.0,
+                      date_operation="2026-01-15", bien_id=1,
+                      libelle="FACTURE CABINET 2025", source="saisie")
+    for _ in range(3):
+        operations.saisir(base, type="maintenance", montant=90.0,
+                          date_operation="2026-02-15", bien_id=1,
+                          libelle="FACTURE CABINET 2026", source="saisie")
+    assert import_bancaire.suggerer_depuis_historique(
+        base, "FACTURE CABINET 2025") == "honoraires"
+
+
+def test_e13_charges_locatives_est_atteignable():
+    """Aucune règle ne produisait ce type — seul l'historique y menait — et
+    `mensuel = type_op in ("loyer", "charges_locatives")` ne servait donc
+    jamais la période pour une provision refacturée mensuellement."""
+    for libelle in ("VIR PROVISION CHARGES T1", "VIR CHARGES LOCATIVES MARS",
+                    "VIR FORFAIT CHARGES"):
+        assert import_bancaire.categoriser(libelle, 60.0) == "charges_locatives"
+
+
+def test_e13_la_periode_est_bien_servie(tmp_path):
+    """Le symptôme visible du constat : un flux mensuel sans période."""
+    p = tmp_path / "releve.csv"
+    p.write_text("05/03/2026;VIR PROVISION CHARGES MARS;60,00\n", encoding="utf-8")
+    prop = import_bancaire.analyser(str(p))["propositions"][0]
+    assert prop["type"] == "charges_locatives"
+    assert prop["periode"] == "2026-03"
+
+
+def test_e14_plus_de_mot_cle_inerte_dans_les_regles():
+    """Le fragment n'était pas un oubli de relecture : c'est le produit d'un
+    remplacement global qui a anonymisé le nom du prestataire comptable
+    partout, y compris là où il servait de mot-clé bancaire légitime."""
+    for cles, _type in import_bancaire.REGLES:
+        for cle in cles:
+            assert "acteurs payants" not in cle, cles
+            assert len(cle.split()) <= 2, f"clé improbable sur un relevé : {cle!r}"
+
+
+@pytest.mark.parametrize("libelle", [
+    "FACTURE CABINET COMPTABLE",
+    "HONORAIRES EXPERT COMPTABLE",
+    "PRLV FIDUCIAIRE DU CENTRE",
+    "VIR EXPERTISE COMPTABLE 2026",
+])
+def test_e14_les_vrais_termes_matchent(libelle):
+    """La place rendue est occupée par des termes qui matchent vraiment."""
+    assert import_bancaire.categoriser(libelle, -225.0) == "honoraires"

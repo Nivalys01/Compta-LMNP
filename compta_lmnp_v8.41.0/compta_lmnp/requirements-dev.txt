@@ -6,3 +6,12 @@
 # ait changé. Le jeu de règles est par ailleurs déclaré dans pyproject.toml.
 pytest==8.3.4
 ruff==0.16.0
+
+# reportlab n'est pas de l'outillage : c'est une dépendance RUNTIME de
+# liasse_pdf.py, que les lanceurs installent chez l'utilisateur (sans
+# l'épingler, et sans bloquer si elle échoue — tout marche sauf l'export
+# PDF). Elle figure ici parce que sans elle cinq tests de la suite
+# échouent sur un ModuleNotFoundError : un environnement de développement
+# incomplet donnait cinq échecs permanents qu'on finissait par ignorer,
+# c'est-à-dire le pire état pour une suite de tests.
+reportlab==5.0.1

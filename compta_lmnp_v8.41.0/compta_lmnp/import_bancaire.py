@@ -26,6 +26,8 @@ import csv
 import io
 import re
 import unicodedata
+from datetime import date
+
 import gabarits as _gabarits
 import operations
 
@@ -46,7 +48,14 @@ REGLES = [
     # la liasse imprime une ligne « dont CFE » servie à zéro (constat E-08).
     (("cfe", "cotisation fonciere"),            "cfe"),
     (("taxe fonciere", "teom", "tresor public", "dgfip", "impot local"), "impot_local"),
-    (("les acteurs payants actuels", "comptab", "expert comptable"),   "honoraires"),
+    # « les acteurs payants actuels » occupait ce tableau : ce n'est pas un
+    # oubli de relecture mais le produit d'un remplacement global — le nom du
+    # prestataire comptable historique a été anonymisé partout dans le projet,
+    # y compris là où il servait de MOT-CLÉ BANCAIRE légitime (une facture de
+    # cabinet porte son nom sur le relevé). La clé est donc devenue inerte, et
+    # sa place est rendue à des termes qui matchent vraiment (constat E-14).
+    (("comptab", "expert comptable", "expertise comptable", "fiduciaire",
+      "cabinet comptable"), "honoraires"),
     (("frais", "commission", "cotisation carte", "agios"), "frais_bancaires"),
     (("ikea", "electromenager", "darty", "boulanger", "mobilier"), "petit_equipement"),
 ]
@@ -128,11 +137,40 @@ def _contient(lib: str, cle: str) -> bool:
 
 
 def _date_iso(s: str) -> str:
-    s = s.strip()
+    """Convertit une date de relevé en AAAA-MM-JJ. Lève ValueError sinon.
+
+    Aucune validation n'existait : `05/01/26` produisait « 26-01-05 » et une
+    période « 26-01 », soit une date de l'an 26 rattachée à un exercice
+    inexistant ; `31/13/2026` produisait un mois 13 ; `ab/cd/2026` laissait
+    remonter une ValueError d'`int()` sans message exploitable, hors de
+    `proposer` (constat E-11).
+
+    Une année sur deux chiffres est REFUSÉE plutôt que devinée : choisir le
+    siècle à la place de l'utilisateur, sur une pièce comptable, c'est
+    prendre le risque de dater tout un exercice à côté sans que rien ne le
+    signale. Le message dit quoi réexporter.
+    """
+    s = (s or "").strip()
     if "/" in s:                       # JJ/MM/AAAA
-        j, m, a = s.split("/")
-        return f"{a}-{int(m):02d}-{int(j):02d}"
-    return s                            # déjà AAAA-MM-JJ
+        parties = s.split("/")
+        if len(parties) != 3:
+            raise ValueError(f"date illisible : {s!r} (format attendu "
+                             "JJ/MM/AAAA ou AAAA-MM-JJ)")
+        j, m, a = (p.strip() for p in parties)
+        if len(a) == 2:
+            raise ValueError(
+                f"année sur deux chiffres : {s!r}. Le siècle n'est pas "
+                "devinable — réexportez le relevé avec des années sur "
+                "quatre chiffres.")
+        if not (j.isdigit() and m.isdigit() and a.isdigit()):
+            raise ValueError(f"date illisible : {s!r} (format attendu "
+                             "JJ/MM/AAAA ou AAAA-MM-JJ)")
+        s = f"{int(a):04d}-{int(m):02d}-{int(j):02d}"
+    try:
+        date.fromisoformat(s)          # existence réelle : mois 13, 30/02…
+    except ValueError:
+        raise ValueError(f"date inexistante ou mal formée : {s!r}") from None
+    return s
 
 
 def _nature_attendue(montant: float) -> str:
@@ -232,6 +270,22 @@ def _depasse_le_seuil(type_op: str, montant: float, conn=None,
     return abs(montant) > _seuil_immobilisation(conn, annee)
 
 
+def _signature(libelle: str) -> str:
+    """Libellé réduit à ses mots ALPHABÉTIQUES, accents repliés.
+
+    « FACTURE CABINET DUPONT 2025 » et « FACTURE CABINET DUPONT 2026 »
+    partagent la même signature : c'est ce qui permet à l'historique de
+    reconnaître un libellé dont seule la référence ou la date varie —
+    l'écrasante majorité des libellés bancaires.
+
+    Volontairement conservateur : la signature garde l'ORDRE et la TOTALITÉ
+    des mots. « VIR FACTURE CABINET DUPONT 2025 » ne matchera donc pas, un
+    mot en tête suffisant à la distinguer. Une suggestion trop généreuse
+    produirait des écritures fausses, ce qui est pire que pas de suggestion.
+    """
+    return " ".join(re.findall(r"[a-z]{2,}", _norm(libelle)))
+
+
 def suggerer_depuis_historique(conn, libelle: str) -> str | None:
     """Type le plus fréquemment associé à ce libellé (normalisé) dans les
     opérations déjà saisies, tous exercices confondus. None si inconnu ou
@@ -242,17 +296,32 @@ def suggerer_depuis_historique(conn, libelle: str) -> str | None:
     n'est plus le seul — les deux comptes d'attente le portent aussi, et
     resuggérer une attente reconduirait indéfiniment le doute.
     """
-    lib = _cle_libelle(libelle)
+    lib = _norm(libelle)
     if len(lib) < 4:
         return None
-    row = conn.execute(
-        "SELECT type, COUNT(*) AS n FROM operation "
-        "WHERE LOWER(TRIM(COALESCE(libelle,''))) = ? AND source='saisie' "
-        "GROUP BY type ORDER BY n DESC LIMIT 1", (lib,)).fetchone()
-    if not row:
+    sig = _signature(libelle)
+
+    # Comparaison faite en PYTHON, pas en SQL. `LOWER()` de SQLite est
+    # ASCII : « CHAUDIÈRE » y restait « CHAUDIèRE » quand Python rendait
+    # « chaudière », et l'historique ne retrouvait AUCUN libellé accentué.
+    # Le volume en jeu — les opérations saisies d'un dossier LMNP — ne
+    # justifie pas de contourner cela par une extension SQLite.
+    exacts: dict[str, int] = {}
+    signatures: dict[str, int] = {}
+    for type_op, libelle_hist in conn.execute(
+            "SELECT type, libelle FROM operation "
+            "WHERE source='saisie' AND libelle IS NOT NULL"):
+        if _norm(libelle_hist) == lib:
+            exacts[type_op] = exacts.get(type_op, 0) + 1
+        if sig and _signature(libelle_hist) == sig:
+            signatures[type_op] = signatures.get(type_op, 0) + 1
+
+    candidats = exacts or signatures        # l'exact prime sur l'approchant
+    if not candidats:
         return None
-    fiche = _gabarits.tous(conn).get(row[0], {})
-    return None if fiche.get("requalifier") else row[0]
+    type_op = max(candidats, key=candidats.get)
+    fiche = _gabarits.tous(conn).get(type_op, {})
+    return None if fiche.get("requalifier") else type_op
 
 
 # Séparateurs de milliers (espace ordinaire, insécable, fine insécable) et
@@ -367,7 +436,13 @@ def analyser(csv_path: str, conn=None) -> dict:
             rejets.append({"ligne": n, "contenu": delim.join(r).strip(),
                            "raison": f"montant illisible ({r[2].strip()!r})"})
             continue
-        date = _date_iso(r[0])
+        try:
+            date_op = _date_iso(r[0])
+        except ValueError as exc:
+            rejets.append({"ligne": n, "contenu": delim.join(r).strip(),
+                           "raison": str(exc)})
+            continue
+        date = date_op
         libelle = " ".join(r[1].split())       # tabs/newlines → espace simple
         annee = int(date[:4]) if date[:4].isdigit() else None
         type_op = categoriser(libelle, montant, conn, annee)
