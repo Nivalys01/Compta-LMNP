@@ -556,6 +556,7 @@ Ces points sont posés comme **questions**, pas comme constats.
 | E-19 | `aide["note"]` seule chaîne non échappée | liasse_pdf | Mineur |
 | E-20 | Produits exceptionnels non isolés (case 218/232 gonflée) | liasse | À qualifier |
 | E-21 | La suite de tests dépose des copies réelles dans /tmp | tests | À qualifier |
+| E-22 | Le bilan 2033-A ignore dettes et créances (cases 156, 166, 068/070) | liasse | À qualifier |
 
 **Lecture d'ensemble.** Le déséquilibre entre les trois pièces est net.
 `liasse_pdf.py` est sain sur le point qui comptait le plus — il ne
@@ -1003,6 +1004,68 @@ est vide ; après un échec, le répertoire et son contenu sont conservés.
 
 Non-régression : 6 tests supplémentaires (123 dans `tests/test_passe_e.py`).
 **Suite complète : 658 passés, 2 ignorés, 0 échec.**
+
+### Lot 8 — cases du 2033-B confirmées sur le CERFA 2026
+
+Le formulaire officiel **2033-B-SD 2026 (cerfa n° 15948\*08)** a été fourni.
+Il ferme le point ouvert du lot 7 et en ouvre un autre.
+
+| Case | Libellé officiel | Ce qui l'alimente ici |
+|---|---|---|
+| 218 | Production vendue — Services | loyers (`708810`) |
+| 230 | Autres produits | `758000` — indemnités, divers |
+| 232 | Total des produits d'exploitation (I) | 218 + 230 |
+| 280 | Produits financiers (III) | classe 76 |
+| 290 | Produits exceptionnels (IV) | classe 77, dont `775000` |
+| 294 | Charges financières (V) | classe 66 |
+| 300 | Charges exceptionnelles (VI) | classe 67, dont `675000` |
+| 310 | Produits (I + III + IV) − Charges (II + V + VI + VII) | VII nul en LMNP |
+
+Trois corrections en découlent.
+
+1. **Cases 280 et 290 servies.** Les deux lignes étaient affichées sans
+   numéro depuis le lot 7, faute de vérification. Le test qui INTERDISAIT
+   d'en afficher un est remplacé par celui qui vérifie qu'ils sont justes.
+2. **Case 230 séparée de la 218.** Défaut créé par le lot 2 : depuis que
+   l'indemnité d'assurance va en `758000`, la ranger en « production
+   vendue » gonflait la 218 d'un produit qui n'en est pas. La 232 devient
+   une vraie somme au lieu d'un doublon de la 218.
+3. **Ordre du formulaire respecté** — 280, 294, 290, 300, 310. Le document
+   sert au report champ à champ : suivre l'ordre du CERFA est sa raison
+   d'être. Et la case 243 s'intitule « dont CFE **et CVAE** ».
+
+La formule de la case 310 est vérifiée par un test qui la recalcule à partir
+des cases publiées, cession comprise.
+
+### E-22 — Le bilan 2033-A ignore dettes et créances (constat ouvert)
+
+Trouvé en recoupant le 2033-A avec les comptes créés au lot 2. Le formulaire
+porte les lignes qu'il faut :
+
+- **156** Emprunts et dettes assimilées → `164000`, `165000`
+- **166** Fournisseurs et comptes rattachés → `401000`
+- **068 / 070** Clients et comptes rattachés → `411000`
+
+Or `liasse.bilan_2033a` construit le bilan **à partir des seules
+immobilisations** : `total_passif = immo_net`, et le contrôle d'équilibre
+compare `immo_net` à lui-même — il ne peut donc rien détecter. Le code
+l'assume : « bilan LMNP sans dettes ni trésorerie 512 ».
+
+Dans ce modèle de caisse, les deux omissions se compensent : un dépôt de
+garantie de 700 € débite `108000` et crédite `165000`, aucun des deux
+n'étant au bilan. L'égalité tient, mais **les cases 156, 166 et 068/070
+restent vides alors qu'elles devraient être servies**.
+
+Le lot 2 rend la limite plus lourde qu'elle ne l'était : un LMNP avec un
+emprunt a une dette au passif que la 2033-A n'imprime pas. Ce n'est pas une
+régression — avant le lot 2 ces flux tombaient en charge ou en produit,
+donc faux autrement — mais c'est désormais un **silence** là où il y avait
+une erreur visible.
+
+Corriger suppose d'introduire un compte de trésorerie (512/530) et de
+construire un vrai passif : un changement de modèle, hors de la passe E.
+Le §5 du rapport posait déjà la question de l'absence de 512/530.
+**Gravité : à qualifier.**
 
 ### Point ouvert — support des exports à colonnes débit/crédit séparées
 

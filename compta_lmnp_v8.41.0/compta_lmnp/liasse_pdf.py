@@ -258,30 +258,35 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     E.append(Paragraph("2033-B — Compte de résultat simplifié", st["h2"]))
     tb = _table([
         ["Rubrique", "Montant"],
-        ["Produits d'exploitation (cases 218/232)", _eur(b["produits_218"])],
+        ["Production vendue — services, loyers (case 218)",
+         _eur(b["produits_218"])],
+        ["Autres produits (case 230)", _eur(b["autres_produits_230"])],
+        ["Total des produits d'exploitation (case 232)",
+         _eur(b["total_produits_232"])],
         ["Autres charges externes (case 242)", _eur(b["charges_externes_242"])],
-        ["Impôts et taxes (case 244) — dont CFE " + _eur(b["dont_cfe_243"]),
-         _eur(b["impots_244"])],
+        ["Impôts et taxes (case 244) — dont CFE et CVAE "
+         + _eur(b["dont_cfe_243"]), _eur(b["impots_244"])],
         ["Dotations aux amortissements (case 254)", _eur(b["dotations_254"])],
         ["Total des charges d'exploitation (case 264)",
          _eur(b["total_charges_264"])],
         ["Résultat d'exploitation (case 270)",
          _eur(b["resultat_exploitation_270"])],
+        # Ordre et numéros repris du CERFA 2033-B-SD 2026 (n° 15948*08) :
+        # 280 puis 294, puis 290 puis 300, avant la case 310. Le document
+        # sert au report champ à champ — suivre l'ordre du formulaire est
+        # sa raison d'être. La ligne des charges exceptionnelles était
+        # CALCULÉE mais jamais rendue, le prix de cession apparaissant sans
+        # sa contrepartie (constat E-20).
+        ["Produits financiers (case 280)", _eur(b["produits_financiers_280"])],
         ["Charges financières — intérêts d'emprunt (case 294)",
          _eur(b["charges_financieres_294"])],
-        # Produits financiers et exceptionnels : sans numéro de case, celui
-        # du 2033-B restant à recouper avec le CERFA en vigueur. La ligne
-        # des charges exceptionnelles, elle, était CALCULÉE mais jamais
-        # rendue — le prix de cession apparaissait donc sans sa
-        # contrepartie (constat E-20).
-        ["Produits financiers", _eur(b["produits_financiers"])],
-        ["Produits exceptionnels — dont cessions",
-         _eur(b["produits_exceptionnels"])],
+        ["Produits exceptionnels — dont cessions (case 290)",
+         _eur(b["produits_exceptionnels_290"])],
         ["Charges exceptionnelles (case 300) — dont valeur comptable des "
          "éléments cédés", _eur(b["charges_exceptionnelles_300"])],
         ["Bénéfice ou perte (case 310)", _eur(b["benefice_ou_perte_310"])],
     ], largeurs=[110 * mm, 60 * mm])
-    _ligne_tot(tb, 11)     # la ligne 310, décalée par les trois ajouts
+    _ligne_tot(tb, 13)     # la ligne 310, décalée par les ajouts 230/232
     E.append(tb)
 
     lignes = [["Réintégrations / déductions", "Montant"],

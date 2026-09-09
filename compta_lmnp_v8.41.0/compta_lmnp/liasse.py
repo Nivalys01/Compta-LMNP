@@ -117,10 +117,24 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
     # Les trois blocs sont soustraits du total plutôt qu'énumérés par
     # préfixe : un compte de classe 7 oublié dans l'énumération sortirait
     # du résultat en silence, alors qu'ici il retombe en exploitation.
+    # Cases confirmées sur le CERFA 2033-B-SD 2026 (n° 15948*08) :
+    #   218 Production vendue — Services      (les loyers : une prestation)
+    #   230 Autres produits                   (758000 : indemnités, divers)
+    #   232 Total des produits d'exploitation (I) = 218 + 230 ici
+    #   280 Produits financiers (III)
+    #   290 Produits exceptionnels (IV)
+    # et la formule de la case 310 : Produits (I + III + IV) − Charges
+    # (II + V + VI + VII), VII étant nul en LMNP (pas d'IS).
     produits_tous = round(-_somme(s, ("7",)), 2)
-    produits_fin = round(-_somme(s, ("76",)), 2)                  # financiers
-    produits_exc = round(-_somme(s, ("77",)), 2)                  # exceptionnels
-    produits = round(produits_tous - produits_fin - produits_exc, 2)  # 218 / 232
+    produits_fin = round(-_somme(s, ("76",)), 2)                  # 280
+    produits_exc = round(-_somme(s, ("77",)), 2)                  # 290
+    # 75x = autres produits de gestion courante. Depuis que l'indemnité
+    # d'assurance va en 758000 (constat E-10), la ranger en 218 gonflerait
+    # la « production vendue » d'un produit qui n'en est pas.
+    autres_produits = round(-_somme(s, ("75",)), 2)               # 230
+    production_vendue = round(produits_tous - produits_fin - produits_exc
+                              - autres_produits, 2)               # 218
+    produits = round(production_vendue + autres_produits, 2)      # 232
     charges_ext = _somme(s, ("60", "61", "62"))                   # 242
     impots = _somme(s, ("63",))                                   # 244
     dont_cfe = round(s.get("635110", 0.0), 2)                     # 243
@@ -211,13 +225,11 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
     ligne_352 = round(resultat_comptable + reint_318 + reint_330 - deduc_350, 2)
 
     return {
-        "produits_218": produits, "total_produits_232": produits,
-        # Sans suffixe de case : les numéros officiels des lignes
-        # « produits financiers » et « produits exceptionnels » du 2033-B
-        # restent à recouper avec le CERFA en vigueur. Les afficher sous un
-        # numéro non vérifié serait pire que de les afficher sans numéro.
-        "produits_financiers": produits_fin,
-        "produits_exceptionnels": produits_exc,
+        "produits_218": production_vendue,
+        "autres_produits_230": autres_produits,
+        "total_produits_232": produits,
+        "produits_financiers_280": produits_fin,
+        "produits_exceptionnels_290": produits_exc,
         "charges_externes_242": charges_ext,
         "impots_244": impots, "dont_cfe_243": dont_cfe,
         "dotations_254": dotations, "total_charges_264": total_charges,

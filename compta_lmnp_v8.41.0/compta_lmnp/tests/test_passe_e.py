@@ -939,7 +939,7 @@ def test_e20_le_prix_de_cession_sort_du_chiffre_daffaires(base):
     b = liasse.resultat_2033b(base, 2026)
     assert b["produits_218"] == 9000.0, "le prix de cession est encore dans le CA"
     assert b["total_produits_232"] == 9000.0
-    assert b["produits_exceptionnels"] == 60000.0
+    assert b["produits_exceptionnels_290"] == 60000.0
 
 
 def test_e20_le_resultat_final_est_inchange(base):
@@ -962,7 +962,7 @@ def test_e20_le_resultat_final_est_inchange(base):
     assert b["benefice_ou_perte_310"] == ancien
     # Et la ventilation, elle, est désormais juste.
     assert b["produits_218"] == 9000.0
-    assert b["produits_exceptionnels"] == 60000.0
+    assert b["produits_exceptionnels_290"] == 60000.0
     assert b["charges_exceptionnelles_300"] == 45000.0
 
 
@@ -984,8 +984,8 @@ def test_e20_sans_cession_rien_ne_bouge(base):
                       date_operation="2026-04-05", bien_id=1)
     b = liasse.resultat_2033b(base, 2026)
     assert b["produits_218"] == 9000.0
-    assert b["produits_exceptionnels"] == 0.0
-    assert b["produits_financiers"] == 0.0
+    assert b["produits_exceptionnels_290"] == 0.0
+    assert b["produits_financiers_280"] == 0.0
     assert b["benefice_ou_perte_310"] == 7800.0
 
 
@@ -995,20 +995,63 @@ def test_e20_les_trois_lignes_figurent_dans_le_pdf():
     contrepartie."""
     src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index("# ── 2033-B"):src.index("Réintégrations / déductions")]
-    assert 'b["produits_financiers"]' in bloc
-    assert 'b["produits_exceptionnels"]' in bloc
+    assert 'b["produits_financiers_280"]' in bloc
+    assert 'b["produits_exceptionnels_290"]' in bloc
     assert 'b["charges_exceptionnelles_300"]' in bloc
 
 
-def test_e20_aucun_numero_de_case_invente():
-    """Les numéros officiels des lignes « produits financiers » et
-    « produits exceptionnels » du 2033-B n'ont pas été vérifiés : les
-    afficher sous un numéro non recoupé serait pire que sans numéro."""
+def test_e20_numeros_de_case_conformes_au_cerfa_2026():
+    """Numéros relevés sur le CERFA 2033-B-SD 2026 (n° 15948*08) fourni par
+    l'auteur. Ce test remplace celui qui INTERDISAIT d'afficher un numéro
+    tant que la vérification n'était pas faite : elle l'est."""
     src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index("# ── 2033-B"):src.index("Réintégrations / déductions")]
-    for ligne in bloc.split("\n"):
-        if "produits_financiers" in ligne or "produits_exceptionnels" in ligne:
-            assert "case" not in ligne.lower(), ligne
+    # Une entrée de tableau peut tenir sur deux lignes source : on découpe
+    # sur les entrées, pas sur les retours à la ligne, sinon le test casse
+    # au premier reformatage.
+    entrees = [" ".join(e.split()) for e in bloc.split("],")]
+    for cle, case in (("produits_218", "218"),
+                      ("autres_produits_230", "230"),
+                      ("total_produits_232", "232"),
+                      ("produits_financiers_280", "280"),
+                      ("produits_exceptionnels_290", "290"),
+                      ("charges_exceptionnelles_300", "300")):
+        entree = next(e for e in entrees if f'b["{cle}"]' in e)
+        assert f"case {case}" in entree, (cle, entree)
+
+
+def test_e20_les_loyers_et_les_autres_produits_sont_distingues(base):
+    """Case 218 « Production vendue — Services » : les loyers. Case 230
+    « Autres produits » : le reste de la gestion courante. Depuis que
+    l'indemnité d'assurance va en 758000 (E-10), la ranger en 218
+    gonflerait la production vendue d'un produit qui n'en est pas."""
+    operations.saisir(base, type="loyer", montant=9000.0,
+                      date_operation="2026-03-05", bien_id=1)
+    operations.saisir(base, type="indemnite_assurance", montant=800.0,
+                      date_operation="2026-04-05", bien_id=1)
+    b = liasse.resultat_2033b(base, 2026)
+    assert b["produits_218"] == 9000.0
+    assert b["autres_produits_230"] == 800.0
+    assert b["total_produits_232"] == 9800.0
+
+
+def test_e20_la_case_310_suit_la_formule_du_cerfa(base):
+    """« Produits (I + III + IV) – Charges (II + V + VI + VII) », VII étant
+    nul en LMNP (pas d'impôt sur les sociétés)."""
+    operations.saisir(base, type="loyer", montant=9000.0,
+                      date_operation="2026-03-05", bien_id=1)
+    operations.saisir(base, type="indemnite_assurance", montant=800.0,
+                      date_operation="2026-04-05", bien_id=1)
+    operations.saisir(base, type="charge_copro", montant=1200.0,
+                      date_operation="2026-04-05", bien_id=1)
+    _ecriture(base, 2026, [("108000", 60000.0, 0.0), ("775000", 0.0, 60000.0)])
+    _ecriture(base, 2026, [("675000", 45000.0, 0.0), ("108000", 0.0, 45000.0)])
+    b = liasse.resultat_2033b(base, 2026)
+    produits = (b["total_produits_232"] + b["produits_financiers_280"]
+                + b["produits_exceptionnels_290"])
+    charges = (b["total_charges_264"] + b["charges_financieres_294"]
+               + b["charges_exceptionnelles_300"])
+    assert round(produits - charges, 2) == b["benefice_ou_perte_310"]
 
 
 # Reconstruit à l'exécution : écrite en clair, elle ferait échouer le test
