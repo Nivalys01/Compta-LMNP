@@ -27,8 +27,20 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 /* Bleu marine ASM, avec le jaune de l'onglet actif : le bandeau porte les
    couleurs du club, et le contraste jaune sur marine est plus franc que
    le blanc sur bleu moyen d'avant. */
+/* Bandeau VERROUILLÉ en haut de la fenêtre. Les pages longues — grand
+   livre, liasse, contrôles — faisaient disparaître la navigation et le
+   sélecteur d'exercice : changer d'onglet demandait de remonter. `sticky`
+   plutôt que `fixed` : l'élément garde sa place dans le flux, donc aucune
+   marge de compensation à régler sur `main`, et rien ne se glisse dessous
+   au chargement.
+
+   z-index 30 : au-dessus du contenu, mais SOUS les infobulles (40) et leur
+   flèche (41) — une infobulle déclenchée dans la première ligne d'un
+   tableau doit passer par-dessus le bandeau, pas dessous. */
 header { background: #002b5c; color: #fff;
-         display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+         display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+         position: sticky; top: 0; z-index: 30;
+         box-shadow: 0 2px 6px rgba(0,0,0,.18); }
 .brand { font-size: 16px; font-weight: 700; padding: 0 24px;
          letter-spacing: .4px; white-space: nowrap; }
 nav { display: flex; flex: 1; }

@@ -594,6 +594,14 @@ document.addEventListener("submit", function (ev) {{
 
 @app.route("/")
 def root():
+    # PREMIER DÉMARRAGE : on ouvre sur « Démarrer », pas sur la saisie.
+    # L'ordre des onglets plaçait déjà « ▶ Démarrer » en tête quand aucun
+    # exploitant n'est enregistré, mais la racine redirigeait quand même
+    # vers la saisie : le débutant arrivait sur un formulaire inutilisable —
+    # il n'y a ni exploitant, ni bien à qui rattacher une opération — au
+    # lieu de la page qui lui dit par où commencer.
+    if not _dossier_configure():
+        return redirect(url_for("dossiers_page"))
     conn = _conn()
     a = _annee_courante(conn)
     conn.close()
