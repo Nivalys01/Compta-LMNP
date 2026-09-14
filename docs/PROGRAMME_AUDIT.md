@@ -7,17 +7,19 @@ fonctionné** sur les passes A à F, et de ce qui leur a échappé.
 ## Comment s'en servir
 
 1. Coller le **préambule** (section 1) en tête de chaque prompt.
-2. Coller ensuite **une seule** passe (sections 3 à 15). Une passe par
+2. Coller la section **1 bis** (interdiction de lecture) — toujours.
+3. Coller ensuite **une seule** passe (sections 3 à 15). Une passe par
    conversation : mélanger les domaines dilue la revue.
-3. Joindre les fichiers listés sous « Pièces à joindre » — **tous**, et rien
+4. Indiquer les fichiers listés sous « Pièces à joindre » — **tous**, et rien
    de plus. Une passe qui reçoit trop de code survole ; une passe à qui il
    manque une pièce invente.
-4. Mettre à jour la section 2 (« déjà trouvé ») avant chaque nouvelle passe,
+5. Mettre à jour la section 2 (« déjà trouvé ») avant chaque nouvelle passe,
    sinon la revue resignale ce qui est corrigé et on perd sa confiance.
 
-**Ne jamais joindre `reference/`, `seed_exemple.sql`, ni un export réel.**
-Une passe n'a jamais besoin de données réelles pour trouver un défaut : les
-scénarios se construisent. Les passes E et F l'ont vérifié sur 34 constats.
+**L'IA a accès au dossier de projet entier, données réelles comprises.** Le
+préambule lui interdit donc de LIRE certains fichiers — ce n'est plus une
+question de ce qu'on transmet, mais de ce qu'on demande de ne pas ouvrir.
+Cette interdiction est la section 1 bis : ne pas la retirer du prompt.
 
 ---
 
@@ -108,6 +110,72 @@ scénarios se construisent. Les passes E et F l'ont vérifié sur 34 constats.
 > équivalent fictif. Ce piège s'est refermé deux fois à la dernière passe :
 > un nom réel recopié depuis un rapport dans un test, puis une adresse réelle
 > écrite dans le rapport qui décrivait précisément cette faute.
+>
+> La manière la plus sûre de tenir cette règle est de ne pas ouvrir les
+> fichiers qui en contiennent : voir l'interdiction de lecture ci-dessous,
+> qui fait partie du prompt.
+
+---
+
+## 1 bis. Fichiers à NE PAS LIRE — à coller avec le préambule
+
+> ### Interdiction de lecture
+>
+> Tu as accès au dossier de projet entier, **données réelles comprises**. Tu
+> ne dois **pas ouvrir** les fichiers suivants, ni en citer le contenu, ni
+> t'en servir pour construire un scénario :
+>
+> | Chemin | Ce qu'il contient |
+> |---|---|
+> | `reference/` (tout le répertoire) | trois FEC RÉELS — identité, SIREN, adresse, comptabilité complète — et la liste des tiers à ne jamais publier |
+> | `seed_exemple.sql` | la même identité, en jeu de données |
+> | `*.db`, `*.sqlite`, `*.sqlite3` | la comptabilité tenue |
+> | `sauvegardes/` | copies de cette base |
+> | `archives/` | FEC exportés réels, et leur manifeste d'empreintes |
+> | `logs/`, `imports_tmp/`, `dossiers.json` | journaux, relevés déposés, registre des dossiers |
+> | tout `.pdf`, `.docx`, `.xlsx` à la racine du dépôt | documents de travail, dont un bilan établi par un cabinet |
+>
+> **Ce que tu peux lire sans réserve** : tout le code, `schema.sql`,
+> `seed_referentiel.sql` (le plan de comptes générique), et le jeu de
+> démonstration **anonymisé** — `seed_demo.sql` et `demo/FEC_DEMO_2025.txt`.
+> Ce dernier a la même structure que le FEC réel, avec des valeurs fictives :
+> il suffit à tout ce qu'un audit demande.
+>
+> ### Pourquoi
+>
+> Trois raisons, dont une qui n'est pas de principe.
+>
+> 1. **Un audit n'a pas besoin de données réelles.** Trente-quatre constats
+>    ont été trouvés sur les passes précédentes, aucun ne l'a exigé : les
+>    scénarios se construisent, et un cas limite construit exprès est plus
+>    probant qu'un cas trouvé par hasard dans un vrai dossier.
+> 2. **Ton rapport sera versionné dans le dépôt**, qui part sur un hébergeur
+>    distant. Ce que tu y écris est publié. Le piège s'est refermé deux fois :
+>    un nom réel recopié depuis un rapport dans un fichier de test, puis une
+>    adresse réelle écrite dans le rapport qui décrivait précisément cette
+>    faute. Les deux fois, c'est un contrôle automatique qui a bloqué avant la
+>    publication — ne compte pas sur lui.
+> 3. **Lire ces fichiers t'induirait en erreur sur ce que voit un
+>    utilisateur.** Le dossier réel est le cas particulier de l'auteur, tenu
+>    depuis 2023, sans anomalie. Les défauts qui comptent sont ceux d'un
+>    dossier neuf, d'un premier exercice, d'un FEC de cabinet tiers — c'est-à-dire
+>    de ce que tu construis, pas de ce que tu trouves.
+>
+> ### Une exception, et une seule
+>
+> Plusieurs modules **prennent ces fichiers pour entrée** :
+> `outils_demo.py` les anonymise, `verifier_depot.py` en dérive les empreintes
+> qu'il traque, `init_db.py` bascule dessus en mode démonstration quand ils
+> sont là. Les auditer suppose de comprendre ce qu'ils en font.
+>
+> Tu peux donc **lire le code qui les touche**, et **la structure** de ces
+> fichiers — noms de colonnes, forme d'un `INSERT`, nombre de lignes — mais
+> **jamais les valeurs**. Si tu as besoin d'un échantillon, prends
+> `seed_demo.sql` : il a la même forme et des valeurs fictives.
+>
+> Si tu penses qu'un constat ne peut pas être établi sans lire une valeur
+> réelle, **dis-le dans la section « Non vérifiable »** plutôt que de la lire.
+> C'est exactement à cela que cette section sert.
 
 ---
 
