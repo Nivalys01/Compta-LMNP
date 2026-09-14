@@ -88,10 +88,23 @@ onglets.
 **Gravité : critique.** C'est le seul constat de cette revue qui ouvre une
 porte depuis l'extérieur.
 
-**Correctif** : contrôler `Origin`/`Referer` dans le `before_request` déjà en
-place — quelques lignes, aucune dépendance, et suffisant pour un service
-strictement local. Un jeton par formulaire serait plus orthodoxe mais touche
-les 30 routes et les gabarits.
+**CORRIGÉ** — `_garde_origine()`, un `before_request` qui refuse en **403**
+toute méthode d'écriture dont l'origine annoncée diffère de celle du
+logiciel. Reproduit après correctif : `POST /cloturer` depuis
+`http://evil.example` rend 403, l'exercice reste ouvert, et le refus est
+journalisé.
+
+Règle retenue, et son revers assumé : une origine **présente et différente**
+est refusée ; une origine **absente** est acceptée. Ce second point est
+délibéré — curl, la ligne de commande et le client de test n'envoient ni
+`Origin` ni `Referer`, et les exiger ferait du contrôle un obstacle sans rien
+gagner : un navigateur envoie **toujours** `Origin` sur un POST inter-site
+(« null » si la politique de référent le masque, ce qui est refusé aussi).
+Un jeton par formulaire serait plus orthodoxe, mais toucherait les 30 routes
+et tous les gabarits pour couvrir le même scénario.
+
+Sept tests figent le comportement, dont celui qui fige le choix ci-dessus
+pour qu'il ne passe pas pour un oubli.
 
 ---
 
@@ -326,7 +339,7 @@ récapitulatif reste honnête : une revue qui efface ses erreurs ne se relit pas
 
 | # | Constat | Fichier | Gravité |
 |---|---|---|---|
-| D2-01 | Aucune protection CSRF ; sans cookie, la requête vise le dossier réel | app.py | Critique |
+| D2-01 | Aucune protection CSRF ; sans cookie, la requête vise le dossier réel | app.py | Critique — **corrigé** |
 | D2-02 | Clôture CLI sans archivage FEC, commentaire affirmant le contraire | cli.py | Majeur |
 | D2-03 | Clôture validée en base avant l'archivage ; un échec d'archivage passe pour un échec de clôture | app.py | Majeur |
 | D2-04 | Validation d'import non transactionnelle, sans idempotence | app.py | Majeur |

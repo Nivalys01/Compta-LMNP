@@ -556,7 +556,7 @@ Ces points sont posés comme **questions**, pas comme constats.
 | E-19 | `aide["note"]` seule chaîne non échappée | liasse_pdf | Mineur |
 | E-20 | Produits exceptionnels non isolés (case 218/232 gonflée) | liasse | À qualifier |
 | E-21 | La suite de tests dépose des copies réelles dans /tmp | tests | À qualifier |
-| E-22 | Le bilan 2033-A ignore dettes et créances (cases 156, 166, 068/070) | liasse | À qualifier |
+| E-22 | Le bilan 2033-A ignore dettes et créances | liasse | **Clos — choix assumé** |
 
 **Lecture d'ensemble.** Le déséquilibre entre les trois pièces est net.
 `liasse_pdf.py` est sain sur le point qui comptait le plus — il ne
@@ -1092,7 +1092,7 @@ fourni ; et le libellé de rubrique « Installations générales, agencements »
 tronque l'intitulé officiel (« …, aménagements divers ») — sans conséquence,
 le numéro de case faisant foi.
 
-### E-22 — Le bilan 2033-A ignore dettes et créances (constat ouvert)
+### E-22 — Le bilan 2033-A ignore dettes et créances — CLOS, choix assumé
 
 Trouvé en recoupant le 2033-A avec les comptes créés au lot 2. Le formulaire
 porte les lignes qu'il faut :
@@ -1117,10 +1117,20 @@ régression — avant le lot 2 ces flux tombaient en charge ou en produit,
 donc faux autrement — mais c'est désormais un **silence** là où il y avait
 une erreur visible.
 
-Corriger suppose d'introduire un compte de trésorerie (512/530) et de
-construire un vrai passif : un changement de modèle, hors de la passe E.
-Le §5 du rapport posait déjà la question de l'absence de 512/530.
-**Gravité : à qualifier.**
+**Décision de l'auteur : le choix est assumé, le constat est clos.** La
+comptabilité est tenue sans comptes de tiers ni trésorerie, contrepartie
+unique `108000` ; les cases 156, 166 et 068/070 restent donc vides, et
+l'égalité du bilan tient parce que les deux omissions se compensent.
+
+Ce qui devait être garanti l'est : un FEC de cabinet **portant** ces comptes
+s'importe sans rien perdre — l'emprunt, la banque et les tiers entrent en
+base, ils n'entrent simplement pas au bilan. C'est figé par
+`tests/test_import_cabinet.py::test_le_bilan_ignore_tiers_et_tresorerie`,
+qui vérifie l'un ET l'autre : le solde d'emprunt présent en base, et son
+absence des cases.
+
+Corriger supposerait un compte de trésorerie (512/530) et un vrai passif —
+changement de modèle, écarté.
 
 ### Point ouvert — support des exports à colonnes débit/crédit séparées
 

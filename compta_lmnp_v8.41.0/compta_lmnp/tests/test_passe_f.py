@@ -350,3 +350,131 @@ def test_f11_les_motifs_didentite_viennent_du_dossier_prive():
     assert motifs, "aucun motif d'identité dérivé du seed"
     src = open(os.path.join(HERE, "outils_demo.py"), encoding="utf-8").read()
     assert "_motifs_identite()" in src.split("REMPLACEMENTS_LIBELLE =")[1][:80]
+
+
+# ═══ D2-01 — la garde d'origine (CSRF) ══════════════════════════════════
+#
+# Le modèle de menace reposait sur « 127.0.0.1, donc jamais exposé » : exact
+# pour le réseau, sans effet pour le navigateur. Toute page ouverte dans le
+# même navigateur pouvait poster ici — et `samesite=Lax` empêchant l'envoi
+# du cookie sur une requête inter-site, `_dossier_actif()` retombait sur
+# PRINCIPAL : la requête forgée visait TOUJOURS la comptabilité réelle.
+
+@pytest.fixture
+def client_web(tmp_path, monkeypatch):
+    import sqlite3
+
+    import init_db
+    db = str(tmp_path / "compta.db")
+    monkeypatch.setenv("COMPTA_DB", db)
+    init_db.init(db, "blanc", annee_cible=2026).close()
+    c = sqlite3.connect(db)
+    c.execute("INSERT INTO exploitant (id,nom,siren) VALUES (1,'MARTIN Jean','000000000')")
+    c.execute("INSERT INTO bien (id,exploitant_id,libelle) VALUES (1,1,'Logement')")
+    c.commit(); c.close()
+    import app as webapp
+    webapp.app.config["TESTING"] = True
+    # On DEMANDE au logiciel où il écrit, au lieu de le supposer : le module
+    # est mis en cache par sys.modules, si bien qu'un test ultérieur dans la
+    # même session réutilise le chemin résolu au premier import — la base
+    # du test précédent, pas la sienne.
+    with webapp.app.test_request_context("/"):
+        reel = webapp._db_path()
+    if not os.path.exists(reel):
+        init_db.init(reel, "blanc", annee_cible=2026).close()
+    c = sqlite3.connect(reel)
+    c.execute("INSERT OR IGNORE INTO exploitant (id,nom,siren) "
+              "VALUES (1,'MARTIN Jean','000000000')")
+    c.execute("INSERT OR IGNORE INTO bien (id,exploitant_id,libelle) "
+              "VALUES (1,1,'Logement')")
+    c.execute("DELETE FROM operation")
+    c.execute("UPDATE exercice SET statut='ouvert' WHERE annee=2026")
+    c.commit(); c.close()
+    return webapp.app.test_client(), reel
+
+
+def _compter_operations(db):
+    import sqlite3
+    c = sqlite3.connect(db)
+    n = c.execute("SELECT COUNT(*) FROM operation").fetchone()[0]
+    c.close()
+    return n
+
+
+SAISIE = {"type": "loyer", "montant": "795.50",
+          "date_operation": "2026-03-05", "bien_id": "1"}
+
+
+def test_d201_une_ecriture_dorigine_etrangere_est_refusee(client_web):
+    """Le scénario reproduit avant correctif : un formulaire caché sur une
+    page quelconque postait ici, et l'exercice se clôturait."""
+    cl, db = client_web
+    r = cl.post("/saisir", data=SAISIE,
+                headers={"Origin": "http://evil.example"})
+    assert r.status_code == 403, r.status_code
+    assert _compter_operations(db) == 0, "l'écriture est passée malgré tout"
+
+
+def test_d201_le_referer_etranger_est_refuse_aussi(client_web):
+    """Certains navigateurs n'envoient que le Referer : les deux en-têtes
+    sont contrôlés."""
+    cl, db = client_web
+    r = cl.post("/saisir", data=SAISIE,
+                headers={"Referer": "http://evil.example/piege.html"})
+    assert r.status_code == 403
+    assert _compter_operations(db) == 0
+
+
+def test_d201_origin_null_est_refuse(client_web):
+    """Une politique de référent restrictive fait envoyer « null » plutôt
+    que d'omettre l'en-tête : ce n'est pas l'origine attendue."""
+    cl, db = client_web
+    r = cl.post("/saisir", data=SAISIE, headers={"Origin": "null"})
+    assert r.status_code == 403
+    assert _compter_operations(db) == 0
+
+
+def test_d201_la_cloture_forgee_est_refusee(client_web):
+    """La route la plus lourde de conséquences : irréversible, et elle ne
+    demande de connaître aucune donnée de l'utilisateur."""
+    import sqlite3
+    cl, db = client_web
+    r = cl.post("/cloturer", data={"annee": "2026", "forcer": "1"},
+                headers={"Origin": "http://evil.example"})
+    assert r.status_code == 403
+    c = sqlite3.connect(db)
+    statut, = c.execute("SELECT statut FROM exercice WHERE annee=2026").fetchone()
+    c.close()
+    assert statut == "ouvert", "l'exercice a été clôturé par une requête forgée"
+
+
+def test_d201_une_ecriture_du_logiciel_passe(client_web):
+    """Contrepartie indispensable : l'usage normal ne doit pas être gêné.
+    Le navigateur annonce l'origine du logiciel lui-même."""
+    cl, db = client_web
+    r = cl.post("/saisir", data=SAISIE,
+                headers={"Origin": "http://localhost"},
+                base_url="http://localhost")
+    assert r.status_code in (200, 302), r.status_code
+    assert _compter_operations(db) == 1
+
+
+def test_d201_sans_entete_dorigine_la_requete_passe(client_web):
+    """Choix DÉLIBÉRÉ, figé ici pour qu'il ne passe pas pour un oubli :
+    curl, la ligne de commande et le client de test n'envoient ni Origin ni
+    Referer, et les exiger transformerait le contrôle en obstacle sans rien
+    gagner — un navigateur envoie TOUJOURS Origin sur un POST inter-site."""
+    cl, db = client_web
+    r = cl.post("/saisir", data=SAISIE)
+    assert r.status_code in (200, 302)
+    assert _compter_operations(db) == 1
+
+
+def test_d201_les_lectures_ne_sont_pas_genees(client_web):
+    """La garde ne porte que sur les méthodes qui CHANGENT l'état : une
+    lecture forgée ne coûte rien, et refuser les GET casserait la
+    navigation depuis un signet."""
+    cl, _ = client_web
+    r = cl.get("/saisie", headers={"Referer": "http://evil.example"},
+               follow_redirects=True)
+    assert r.status_code == 200

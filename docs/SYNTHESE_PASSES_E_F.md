@@ -229,7 +229,7 @@ en `0700` — énoncé corrigé dans le rapport, gravité d'E-21 ramenée de maj
 
 | Sujet | Pourquoi ce n'est pas fait |
 |---|---|
-| **E-22** — le bilan 2033-A ignore dettes et créances (cases 156, 166, 068/070) | `bilan_2033a` pose `total_passif = immo_net` et le contrôle d'équilibre compare `immo_net` à lui-même. Corriger suppose un compte de trésorerie (512/530) et un vrai passif : changement de modèle. |
+| ~~**E-22**~~ — le bilan ignore dettes et créances | **Clos : choix assumé.** La comptabilité est tenue sans tiers ni trésorerie. Ce qui devait être garanti l'est — un FEC de cabinet portant ces comptes s'importe sans rien perdre, figé par `test_import_cabinet.py`. |
 | **Exports bancaires à 4 colonnes** | En attente du format exact des relevés réellement utilisés. Le refus explicite est en place ; lire la paire débit/crédit reste à construire. |
 | **Cases 5NA / 5NY** | Elles appartiennent au formulaire 2042-C-PRO, non fourni. |
 | **Filtre `source='saisie'` de l'historique** | Conservé : le guichet d'import ne permet pas de corriger le type avant validation, donc apprendre des lignes importées reviendrait à réapprendre les propositions de l'outil. À rouvrir quand le guichet le permettra. |

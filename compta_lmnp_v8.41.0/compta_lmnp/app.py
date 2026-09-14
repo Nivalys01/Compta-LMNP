@@ -124,6 +124,66 @@ def _migrer_si_besoin() -> None:
         _MIGRES.discard(chemin)                  # réessayer au prochain accès
 
 
+# Méthodes qui CHANGENT l'état. Une lecture forgée ne coûte rien ; une
+# écriture forgée peut clôturer un exercice ou restaurer une sauvegarde.
+_METHODES_ECRITURE = {"POST", "PUT", "PATCH", "DELETE"}
+
+
+def _hote(url: str) -> str:
+    """« http://localhost:5000/x » -> « http://localhost:5000 »."""
+    from urllib.parse import urlsplit
+    p = urlsplit(url or "")
+    return f"{p.scheme}://{p.netloc}" if p.scheme and p.netloc else ""
+
+
+@app.before_request
+def _garde_origine():
+    """Refuse une écriture dont l'ORIGINE n'est pas le logiciel lui-même.
+
+    Le modèle de menace reposait sur `host="127.0.0.1"` — « l'application
+    n'est jamais exposée au réseau local ». C'est exact pour le réseau et
+    SANS EFFET pour le navigateur : toute page ouverte dans le même
+    navigateur pouvait poster ici. Reproduit avant correctif — un POST sans
+    cookie, sans Referer et sans jeton clôturait l'exercice.
+
+    Deux aggravations le rendaient pire qu'un CSRF ordinaire. `samesite=Lax`
+    empêche l'envoi du cookie `dossier` sur une requête inter-site, si bien
+    que `_dossier_actif()` retombait sur PRINCIPAL : une requête forgée
+    visait TOUJOURS la comptabilité réelle, jamais le bac à sable. Et les
+    routes concernées remplacent la base, clôturent, annulent, cèdent —
+    aucune ne demande de connaître les données de l'utilisateur.
+
+    Règle retenue : une origine PRÉSENTE et différente est refusée ; une
+    origine ABSENTE est acceptée. Ce second choix est délibéré — curl, la
+    ligne de commande et le client de test n'envoient aucun de ces
+    en-têtes, et les exiger transformerait le contrôle en obstacle sans
+    rien gagner : un navigateur, lui, envoie TOUJOURS `Origin` sur un POST
+    inter-site (« null » si la politique de référent le masque), donc
+    l'attaque par formulaire caché est bien couverte.
+    """
+    if request.method not in _METHODES_ECRITURE:
+        return None
+    attendu = _hote(request.base_url)
+    for entete in ("Origin", "Referer"):
+        valeur = request.headers.get(entete)
+        if not valeur:
+            continue
+        if _hote(valeur) != attendu:
+            app.logger.warning("Écriture refusée — %s %s depuis %s",
+                               request.method, request.path, valeur)
+            return (
+                "Requête refusée : elle ne vient pas du logiciel.\n\n"
+                f"Origine annoncée : {valeur}\n"
+                f"Origine attendue : {attendu}\n\n"
+                "Si vous lisiez cette page dans le logiciel, revenez à "
+                "l'accueil et refaites l'action. Si vous ne comprenez pas "
+                "ce message, ne refaites rien : une autre page de votre "
+                "navigateur a peut-être tenté d'agir sur votre "
+                "comptabilité.", 403, {"Content-Type": "text/plain; charset=utf-8"})
+        return None                     # origine présente et conforme
+    return None                         # aucune origine annoncée
+
+
 @app.before_request
 def _garde_version_schema():
     """Refus PÉDAGOGIQUE d'ouvrir une base plus récente que le logiciel
