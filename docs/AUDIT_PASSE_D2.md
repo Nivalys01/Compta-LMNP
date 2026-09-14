@@ -1,0 +1,340 @@
+# Revue passe D2 — couche web et ligne de commande
+
+Périmètre : `app.py` (2 015 lignes, 50 routes), `cli.py` (221 lignes), et
+`pages.py` là où il porte du comportement.
+
+## Ce que cette revue est, et ce qu'elle n'est pas
+
+La passe D (v8.40.0 / v8.41.0) avait relevé **29 constats, dont 9 critiques**.
+Les neuf critiques ont été traités ; **les 20 autres n'ont laissé aucune
+trace** — ni liste, ni numérotation, ni test. Ils sont perdus.
+
+Cette revue ne les reconstitue pas : c'est impossible. Elle repart des deux
+fichiers tels qu'ils sont aujourd'hui. Le recouvrement avec D-10…D-29 est donc
+**partiel et inconnaissable** — trois constats ci-dessous correspondent aux
+trois exemples dont l'auteur se souvenait, le reste est à prendre pour ce qu'il
+est : un état des lieux daté, pas un solde de comptes.
+
+Les constats sont numérotés **D2-xx** pour ne pas se confondre avec ceux de la
+passe D.
+
+## Vérification préalable : les 9 critiques de la passe D tiennent
+
+| # | Correctif annoncé | Localisation |
+|---|---|---|
+| D-01 | confirmations JS cassées | `app.py:480,487` — gestionnaire délégué sur `data-confirmer`, le texte ne passe plus par un littéral JS |
+| D-02 | bac à sable partageant les répertoires | `app.py:1452` `perennite.dossier_sauvegardes(_db_path())` ; `imports_tmp` indexé sur le `stem` |
+| D-03 | cookie du bac à 8 h | trois `set_cookie("dossier", …)`, tous en `max_age=180*24*3600` |
+| D-04 | `cli.py` sans dossier configurable | `cli.py:170` `--dossier SLUG`, `COMPTA_DB`, et `_annoncer_base()` |
+| D-05 | `cloturer` sans sauvegarde | `cmd_cloturer` sauvegarde — **mais pas entièrement, voir D2-02** |
+| D-07 | migration hors démarrage | `app.py:103` `_migrer_si_besoin()` |
+| D-08 | dossier récent verrouillant tout | `app.py:135-137`, exemption de `/dossiers/retour-principal` |
+| D-09 | dossier absent → base vierge | `FichierDossierAbsent` : classe 252, levée 278, `errorhandler` 981 |
+
+---
+
+## 1. Critique
+
+### D2-01 — Aucune protection CSRF, et l'absence de cookie vise le dossier RÉEL
+
+**Fichier / fonction** : `app.py`, les 30 routes `POST` ; `_dossier_actif()`
+lignes 237-250.
+
+**Scénario** — l'utilisateur a le logiciel ouvert et visite, dans le même
+navigateur, une page quelconque qui contient :
+
+```html
+<form action="http://localhost:5000/cloturer" method="POST">
+  <input type="hidden" name="annee" value="2026">
+  <input type="hidden" name="forcer" value="1">
+</form><script>document.forms[0].submit()</script>
+```
+
+**Attendu** : la requête est refusée — jeton absent, ou `Origin` étranger.
+
+**Produit** (sortie réelle, client de test sans cookie, sans `Referer`, sans
+jeton) :
+
+```
+dossier visé sans cookie : principal
+POST /saisir            -> 302
+opérations en base      -> 1   (écriture acceptée sans contrôle d'origine)
+POST /cloturer          -> 302 | exercice 2026 : ('clos',)
+```
+
+**L'exercice a été clôturé par une requête d'origine inconnue.** Il n'y a
+aucun jeton de formulaire, aucun contrôle de `Origin` ni de `Referer` : la
+recherche de `csrf`, `Origin`, `Referer` dans `app.py` rend **0**.
+
+Deux aggravations propres à ce logiciel :
+
+1. **`samesite="Lax"` n'aide pas, il nuit.** Lax empêche l'envoi du cookie
+   `dossier` sur un POST inter-site — donc `_dossier_actif()` ne trouve rien
+   et **retombe sur `PRINCIPAL`**. Une requête forgée ne peut pas viser le bac
+   à sable : elle vise toujours la comptabilité réelle.
+2. **Les routes concernées sont destructrices** :
+   `/sauvegardes/restaurer` (remplace la base), `/cloturer` (irréversible),
+   `/operation/<id>/annuler`, `/immobilisations/bien/<id>/ceder`,
+   `/bac-a-sable/reset`, `/exercice/reprendre-fec`. Aucune ne demande de
+   connaître les données de l'utilisateur : un formulaire caché suffit.
+
+**Conséquence** : le modèle de menace du logiciel repose sur
+« `host="127.0.0.1"`, l'application n'est jamais exposée au réseau local »
+(commentaire ligne 2014). C'est exact pour le réseau, **et sans effet pour le
+navigateur** : toute page ouverte dans le même navigateur peut poster sur
+localhost. La liaison locale protège des autres machines, pas des autres
+onglets.
+
+**Gravité : critique.** C'est le seul constat de cette revue qui ouvre une
+porte depuis l'extérieur.
+
+**Correctif** : contrôler `Origin`/`Referer` dans le `before_request` déjà en
+place — quelques lignes, aucune dépendance, et suffisant pour un service
+strictement local. Un jeton par formulaire serait plus orthodoxe mais touche
+les 30 routes et les gabarits.
+
+---
+
+## 2. Majeur
+
+### D2-02 — La clôture en ligne de commande n'archive pas le FEC, et son commentaire affirme le contraire
+
+**Fichier / fonction** : `cli.py::cmd_cloturer`, lignes 122-131.
+
+Le commentaire, en tête de la fonction :
+
+> *« La clôture web prend une sauvegarde et archive le FEC ; la version en
+> ligne de commande ne faisait ni l'un ni l'autre. Même opération, même
+> irréversibilité, même piste d'audit à conserver. »*
+
+**Produit** : `perennite.sauvegarder()` est bien appelé. `archiver_fec`
+**n'apparaît pas une seule fois dans `cli.py`** — 0 occurrence, contre 1 dans
+`app.py`.
+
+Le correctif de D-05 a donc été appliqué **à moitié**, et le commentaire
+décrit l'intention comme si elle était tenue. Une clôture faite en ligne de
+commande ne laisse aucune trace dans `archives/` ni aucune ligne dans
+`manifeste.csv` : **la piste d'audit — FEC figé et son empreinte SHA-256 —
+est absente pour tout exercice clos hors de l'interface web.**
+
+*Rapprochement proposé, à confirmer* : l'auteur se souvient d'un constat D
+formulé « colonne d'empreintes SHA-256 toujours vide ». Aucune colonne de ce
+genre n'existe au schéma (15 tables, 105 colonnes vérifiées, zéro orpheline).
+Il est possible que le constat visait ceci : l'empreinte n'est jamais
+enregistrée pour une clôture CLI.
+
+**Gravité : majeur.** Un commentaire qui affirme un correctif absent est pire
+qu'un correctif manquant : il empêche de le retrouver.
+
+---
+
+### D2-03 — La clôture web est validée en base avant l'archivage, et un échec d'archivage se présente comme un échec de clôture
+
+**Fichier / fonction** : `app.py::cloturer`, lignes 1136-1152.
+
+L'ordre est : sauvegarde → `fiscal.cloturer(conn, annee)` → `archiver_fec()`.
+Or `fiscal.cloturer` **committe** (`fiscal.py:555`).
+
+**Scénario** : le disque est plein, ou `archives/` n'est pas accessible en
+écriture, au moment de l'archivage.
+
+**Attendu** : ou bien la clôture est annulée, ou bien l'utilisateur apprend
+que l'exercice EST clos mais que l'archive manque.
+
+**Produit** : `except Exception as exc` rend
+`redirect(url_for("cloture", err=str(exc)))`. L'utilisateur lit un message
+d'erreur — et l'exercice est clos. Il relancera la clôture, qui échouera pour
+une autre raison (exercice déjà clos), sans jamais comprendre.
+
+**Gravité : majeur** (probabilité faible, confusion totale).
+
+---
+
+### D2-04 — La validation d'un import n'est pas transactionnelle
+
+**Fichier / fonction** : `app.py::import_valider`, boucle ligne 1783.
+
+C'est l'un des trois constats dont l'auteur se souvenait. Confirmé :
+
+```
+BEGIN/savepoint/rollback dans import_valider : False
+operations.saisir committe à chaque appel     : True
+```
+
+`operations.saisir` fait un `conn.commit()` par opération (`operations.py:81`).
+Un échec à la 7ᵉ ligne sur 10 laisse **les six premières en base**, sans
+retour arrière. L'`except Exception` rend « Import interrompu : … » alors que
+l'import est partiellement fait — et rien ne dit où il s'est arrêté.
+
+**Conséquence** : l'utilisateur relance l'import, et les six premières lignes
+sont saisies **deux fois**. Aucune clé d'idempotence n'existe côté import
+(constat déjà relevé au §5 de la passe E).
+
+**Gravité : majeur.**
+
+---
+
+### D2-05 — Le plan des comptes d'immobilisation vit dans la couche web, et la connaissance est dispersée
+
+**Fichier / fonction** : `app.py:293` — `COMPTES_IMMO`.
+
+```python
+COMPTES_IMMO = [
+    ("211550", "Terrain",                   None),
+    ("213150", "Bâtiment",                  "281315"),
+    ("218100", "Installation / agencement", "281810"),
+    ("218400", "Mobilier",                  "281840"),
+]
+```
+
+Troisième constat dont l'auteur se souvenait — confirmé, et **plus large que
+« dupliqué quatre fois »**. Le couple immobilisation → amortissement est
+exprimé dans **dix fichiers** : `app.py`, `liasse.py` (`RUBRIQUES_2033C`),
+`pages.py`, `amortissement.py`, `operations.py`, `controles.py`, `cession.py`,
+`schema.sql`, `seed_referentiel.sql`, `audit_cycle.py`.
+
+**Conséquence** : ajouter un compte d'immobilisation — un agencement sur un
+compte 2181 distinct, un véhicule — demande de penser à dix endroits, dont
+aucun ne référence les autres. Le risque n'est pas l'oubli d'un seul : c'est
+qu'un oubli reste invisible, chaque module continuant de fonctionner avec sa
+propre vue partielle.
+
+**Gravité : majeur** (dette, pas défaut : rien n'est faux aujourd'hui).
+
+---
+
+### D2-06 — La garde de migration n'est pas atomique sur un serveur threadé
+
+**Fichier / fonction** : `app.py::_migrer_si_besoin`, lignes 112-114.
+
+```python
+if chemin in _MIGRES:
+    return
+_MIGRES.add(chemin)
+```
+
+Le test et l'ajout sont deux opérations. Le serveur de développement Flask est
+**threadé par défaut**, et un navigateur ouvre plusieurs requêtes en parallèle
+sur la première page : deux threads peuvent évaluer le test à faux avant que
+l'un n'ajoute, et **lancer deux migrations concurrentes** sur la même base —
+chacune prenant sa propre sauvegarde, chacune appliquant ses paliers.
+
+Les paliers sont idempotents, ce qui limite les dégâts ; mais deux sauvegardes
+« avant-migration » horodatées à la seconde peuvent se recouvrir, et deux
+écritures concurrentes sur SQLite donnent un `database is locked` au premier
+chargement de page — sur le chemin le plus sensible du logiciel.
+
+**Attendu** : un verrou, ou `_MIGRES` alimenté avant tout travail sous un
+`threading.Lock`.
+
+**Gravité : majeur** par l'emplacement, faible par la probabilité.
+
+---
+
+## 3. Mineur
+
+### D2-07 — Les apostrophes sont retirées du texte utilisateur pour contourner un littéral JS
+
+**Fichier** : `pages.py:906`.
+
+```html
+onsubmit="return confirm('Passer l écriture de reprise ? Le résultat de
+l exercice n est pas modifié : seul le bilan est corrigé.')"
+```
+
+Trois apostrophes manquantes dans une phrase que l'utilisateur lit. Le
+correctif de fond existe depuis D-01 — le gestionnaire délégué sur
+`data-confirmer` — mais n'a pas été appliqué ici : c'est un contournement du
+symptôme, et il subsiste. `pages.py:739` est dans le même cas, sans apostrophe
+à supprimer.
+
+**Gravité : mineur**, correctif trivial et à fort rendement : ces deux
+confirmations restent les seules à pouvoir se casser à la prochaine
+reformulation.
+
+---
+
+### D2-08 — Cinq colonnes du FEC ne sont jamais renseignées
+
+Relevé en cherchant la « colonne d'empreintes » de la passe D : sur les
+105 colonnes du schéma, aucune n'est orpheline, mais **cinq ne reçoivent
+jamais de valeur** par aucun `INSERT` ni `UPDATE` du projet :
+
+`valid_date`, `ecriture_let`, `date_let`, `montant_devise`, `idevise`.
+
+Elles sont lues et exportées — donc présentes et vides dans le FEC produit.
+Pour le lettrage (`ecriture_let`, `date_let`) et la devise, c'est licite : ces
+colonnes sont facultatives quand l'usage ne s'y prête pas. Pour
+**`valid_date`**, c'est plus discutable : l'arrêté attend la date de validation
+de l'écriture, et un exercice clos en a une — la clôture l'écrit d'ailleurs
+dans `cloture_fiscale` sans la reporter sur les écritures.
+
+**Gravité : mineur**, mais à faire trancher : un contrôleur peut s'étonner
+d'un FEC dont aucune écriture n'est validée alors que l'exercice est clos.
+
+---
+
+## 4. Ce qui a été vérifié et tenu
+
+1. **Liaison strictement locale.** `app.run(host="127.0.0.1")`, commenté. Le
+   `debug` n'est pas activé par défaut.
+2. **`/archives/<nom>` ne permet pas de traversée.** Le nom est réduit à son
+   `basename` et l'extension est contrôlée (`.txt`) avant `send_file`.
+3. **Le cookie de dossier n'est jamais utilisé comme chemin.**
+   `_dossier_actif()` le valide contre le registre et retombe sur le principal
+   pour tout slug inconnu — le commentaire le dit explicitement. C'est propre ;
+   c'est le repli lui-même qui devient un problème avec D2-01.
+4. **Le jeton d'import est contrôlé.** `re.fullmatch(r"[0-9a-f]{32}")` plus
+   `os.path.basename` : le chemin du fichier temporaire n'est pas forgeable.
+5. **Le journal d'erreurs est rotatif et local** (512 Ko × 3), sans aucun
+   envoi réseau.
+6. **`cli.py init` ne peut pas écraser une base tenue** : `init_db.init` est
+   appelé sans `ecraser`, donc le refus de la passe B s'applique.
+7. **Le FEC de référence passé par `cli.py` retombe sur le jeu anonymisé**
+   quand le dossier privé est absent (`init_db` teste l'existence du fichier,
+   pas seulement la présence d'une chaîne).
+
+---
+
+## 5. Non vérifiable avec les pièces fournies
+
+- **Le recouvrement avec D-10…D-29.** Trois des huit constats ci-dessous
+  correspondent aux exemples mémorisés (D2-04, D2-05, et peut-être D2-02). Des
+  cinq autres, impossible de dire s'ils étaient déjà dans la passe D.
+- **`pages.py` n'a été lu que partiellement** (2 357 lignes) : seuls les
+  endroits portant du comportement — confirmations, formulaires — ont été
+  examinés. Les gabarits eux-mêmes n'ont pas été revus.
+- **Le comportement réel sous charge** (D2-06) n'a pas été provoqué : la
+  course est établie par lecture, pas par exécution.
+- **La conformité de `valid_date`** (D2-08) relève de l'arrêté A47 A-1 et
+  demande un avis, pas une lecture de code.
+
+---
+
+## Récapitulatif
+
+| # | Constat | Fichier | Gravité |
+|---|---|---|---|
+| D2-01 | Aucune protection CSRF ; sans cookie, la requête vise le dossier réel | app.py | Critique |
+| D2-02 | Clôture CLI sans archivage FEC, commentaire affirmant le contraire | cli.py | Majeur |
+| D2-03 | Clôture validée en base avant l'archivage ; un échec d'archivage passe pour un échec de clôture | app.py | Majeur |
+| D2-04 | Validation d'import non transactionnelle, sans idempotence | app.py | Majeur |
+| D2-05 | Plan immo/amort dans la couche web, exprimé dans dix fichiers | app.py | Majeur |
+| D2-06 | Garde de migration non atomique sur serveur threadé | app.py | Majeur |
+| D2-07 | Apostrophes retirées du texte pour contourner un littéral JS | pages.py | Mineur |
+| D2-08 | Cinq colonnes du FEC jamais renseignées, dont `valid_date` | schema | Mineur |
+
+**Lecture d'ensemble.** La couche web est nettement plus soignée que ne le
+laissait craindre l'absence de trace : les gardes sont documentées, le cookie
+est validé, le chemin d'archive est assaini, et les neuf critiques de la
+passe D tiennent tous. Les défauts qui restent sont d'une autre nature que
+ceux des passes E et F : non plus des chiffres faux ou des fuites, mais des
+**opérations qui s'arrêtent au milieu** — un import à moitié inséré, une
+clôture faite mais annoncée en échec, une piste d'audit absente d'un chemin
+sur deux.
+
+Une exception, et c'est le seul constat critique : **D2-01 est la première
+faille de cette revue qui vienne de l'extérieur.** Le raisonnement
+« `127.0.0.1`, donc pas exposé » est juste pour le réseau et faux pour le
+navigateur. Il tient par la liaison locale, alors que ce qui le menace est
+dans le même navigateur que l'utilisateur.
