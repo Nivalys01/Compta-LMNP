@@ -20,20 +20,29 @@ import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
+# Points d'entrée et outils : à la RACINE du paquet, comme les lanceurs et
+# les documents. Les lanceurs appellent app.py par son nom.
+ENTREES = ["app.py", "cli.py", "verifier_depot.py", "construire_exe.py"]
+
+# Modules métier : regroupés dans modules/ pour que LISEZ-MOI.md et les
+# lanceurs ne soient plus noyés sous trente-cinq fichiers Python. Le paquet
+# reproduit l'arborescence — sinon l'amorçage du chemin d'import, qui pointe
+# sur modules/, ne trouverait rien chez le client.
 MODULES_PROD = [
-    "app.py", "cli.py", "init_db.py", "migrations.py",
-    "schema.sql", "seed_referentiel.sql", "seed_demo.sql",
-    "demo/FEC_DEMO_2025.txt",
+    "init_db.py", "migrations.py",
+
     "ecritures.py", "operations.py", "gabarits.py", "import_bancaire.py",
     "amortissement.py", "cession.py", "fiscal.py", "parametres.py",
     "controles.py", "audit_cycle.py", "reprise.py", "rejeu_fec.py",
     "export_fec.py", "valider_fec.py", "liasse.py", "liasse_pdf.py",
     "perennite.py", "dossiers.py", "pense_bete.py", "veille_fiscale.py",
-    "fec_io.py", "migration_fec.py", "pages.py", "quittances.py", "construire_exe.py",
-    "verifier_depot.py",
+    "fec_io.py", "migration_fec.py", "pages.py", "quittances.py",
 ]
 # Un SEUL document d'accueil : README.md et LISEZ-MOI.md disaient chacun
 # une moitié de la même chose et se renvoyaient l'un à l'autre.
+# Données et documents : racine du paquet.
+DONNEES = ["schema.sql", "seed_referentiel.sql", "seed_demo.sql",
+           "demo/FEC_DEMO_2025.txt"]
 DOCS = ["LICENSE.txt", "CHANGELOG.md", "ARCHITECTURE.md", "LISEZ-MOI.md",
         "VERSION"]
 # Un SEUL fichier .sh est livré. Le générateur de certificat existait en
@@ -69,9 +78,11 @@ def construire() -> str:
     os.makedirs(os.path.join(HERE, "dist"), exist_ok=True)
     cible = os.path.join(HERE, "dist", f"compta_lmnp_client_v{version}.zip")
 
-    fichiers = MODULES_PROD + DOCS + LANCEURS
-    manquants = [f for f in fichiers
-                 if not os.path.exists(os.path.join(HERE, f))]
+    # (chemin dans le paquet, chemin sur le disque)
+    fichiers = ([(f"modules/{f}", f"modules/{f}") for f in MODULES_PROD]
+                + [(f, f) for f in ENTREES + DONNEES + DOCS + LANCEURS])
+    manquants = [d for _, d in fichiers
+                 if not os.path.exists(os.path.join(HERE, d))]
     if manquants:
         raise SystemExit(f"Fichiers manquants : {manquants}")
 
@@ -96,8 +107,9 @@ def construire() -> str:
                 "reecrivez-le en ASCII pur avec des fins de ligne CRLF.")
 
     with zipfile.ZipFile(cible, "w", zipfile.ZIP_DEFLATED) as z:
-        for f in fichiers:
-            z.write(os.path.join(HERE, f), arcname=f"compta_lmnp/{f}")
+        for dans_paquet, sur_disque in fichiers:
+            z.write(os.path.join(HERE, sur_disque),
+                    arcname=f"compta_lmnp/{dans_paquet}")
 
     # ── Garde anti-fuite n°1 : aucun NOM interdit ───────────────────────
     with zipfile.ZipFile(cible) as z:
@@ -167,7 +179,9 @@ def construire() -> str:
         texte = open(os.path.join(HERE, lanceur), encoding="utf-8",
                      errors="ignore").read()
         for ref in REFERENCES_LANCEURS.findall(texte):
-            if os.path.exists(os.path.join(HERE, ref)) and ref not in embarques:
+            embarque = (ref in embarques
+                        or f"modules/{ref}" in embarques)
+            if os.path.exists(os.path.join(HERE, ref)) and not embarque:
                 manquants_lanceurs.add(ref)
     if manquants_lanceurs:
         os.remove(cible)

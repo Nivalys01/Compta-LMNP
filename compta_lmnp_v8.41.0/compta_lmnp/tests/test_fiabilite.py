@@ -100,7 +100,9 @@ def test_crash_en_pleine_cloture_ne_laisse_rien(db):
     à la réouverture, ni dotation fantôme ni exercice à moitié clos."""
     script = f'''
 import os, sys
+# modules/ en plus de la racine : les modules métier y sont regroupés.
 sys.path.insert(0, {HERE!r})
+sys.path.insert(0, os.path.join({HERE!r}, "modules"))
 import sqlite3, fiscal, amortissement
 conn = sqlite3.connect({db!r})
 conn.execute("PRAGMA foreign_keys = ON")

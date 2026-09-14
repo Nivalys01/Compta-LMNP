@@ -25,7 +25,6 @@ PURE (aucun import, aucune fonction — un test le vérifie).
 Lancer :  python outils_sprite.py          # aperçu texte + SVG
 """
 from __future__ import annotations
-
 PALETTE = {
     "K": "#14121c",   # contour, noir franc
     "A": "#e8e6ef",   # armure, clair

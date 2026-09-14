@@ -17,7 +17,6 @@ import ipaddress
 import os
 import sys
 
-
 def generer(dossier: str | None = None) -> tuple[str, str]:
     from cryptography import x509
     from cryptography.hazmat.primitives import hashes, serialization

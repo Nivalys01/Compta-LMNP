@@ -18,6 +18,8 @@ import ast
 import os
 import sys
 
+import conftest
+
 import pytest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -77,7 +79,7 @@ def test_lire_brut_ne_filtre_rien(tmp_path):
 # === 2. pages.py : présentation pure =======================================
 
 def test_pages_sans_logique_ni_import_applicatif():
-    src = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    src = open(conftest.source("pages.py"), encoding="utf-8").read()
     arbre = ast.parse(src)
     for noeud in arbre.body:
         assert not isinstance(noeud, (ast.Import, ast.ImportFrom)), \
@@ -91,7 +93,7 @@ def test_pages_sans_logique_ni_import_applicatif():
 
 
 def test_app_reste_de_la_logique_pure():
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     # Le VRAI invariant n'est pas la taille — les routes légitimes
     # s'accumulent (panel bêta, ventilation guidée, corrections) — mais
     # l'absence de PRÉSENTATION dans app.py. On teste donc directement

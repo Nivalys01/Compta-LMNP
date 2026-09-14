@@ -13,6 +13,8 @@ import random
 import subprocess
 import sys
 
+import conftest
+
 import pytest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -128,7 +130,7 @@ def test_marathon_5_exercices_hostiles(conn, tmp_path):
     # Le FEC du dernier exercice passe le validateur indépendant.
     fec = str(tmp_path / "FEC2030.txt")
     export_fec.exporter(conn, 2030, fec)
-    r = subprocess.run([sys.executable, os.path.join(HERE, "valider_fec.py"),
+    r = subprocess.run([sys.executable, conftest.source("valider_fec.py"),
                         fec], capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr
 
@@ -153,6 +155,6 @@ def test_volume_300_operations_equilibre_exact(conn, tmp_path):
     assert abs(d - c) < 0.005            # pas un centime perdu en route
     fec = str(tmp_path / "FEC.txt")
     export_fec.exporter(conn, 2026, fec)
-    r = subprocess.run([sys.executable, os.path.join(HERE, "valider_fec.py"),
+    r = subprocess.run([sys.executable, conftest.source("valider_fec.py"),
                         fec], capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr

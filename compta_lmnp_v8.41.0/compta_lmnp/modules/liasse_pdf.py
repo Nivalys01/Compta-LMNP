@@ -99,8 +99,10 @@ def _ligne_tot(t: Table, index: int) -> None:
 def _version() -> str:
     """Version du logiciel, lue dans le fichier VERSION livré à côté."""
     try:
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                               "VERSION"), encoding="utf-8") as f:
+        # VERSION vit à la RACINE du paquet, ce module dans modules/ :
+        # deux dirname, pas un.
+        racine = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(racine, "VERSION"), encoding="utf-8") as f:
             return f.read().strip()
     except OSError:
         return "?"

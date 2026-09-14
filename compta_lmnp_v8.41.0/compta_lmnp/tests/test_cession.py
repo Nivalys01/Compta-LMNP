@@ -7,6 +7,8 @@ import os
 import subprocess
 import sys
 
+import conftest
+
 import pytest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,6 +95,6 @@ def test_fec_conforme_apres_cession(conn, tmp_path):
     fiscal.cloturer(conn, 2026)
     fec = str(tmp_path / "FEC.txt")
     export_fec.exporter(conn, 2026, fec)
-    v = subprocess.run([sys.executable, os.path.join(HERE, "valider_fec.py"),
+    v = subprocess.run([sys.executable, conftest.source("valider_fec.py"),
                         fec], capture_output=True, text=True)
     assert v.returncode == 0, v.stdout + v.stderr

@@ -1,5 +1,33 @@
 # Architecture — Compta LMNP
 
+## Arborescence du paquet
+
+```
+compta_lmnp/
+├── app.py, cli.py              points d'entrée — ce que les lanceurs appellent
+├── Compta-LMNP-*.sh/.bat       lanceurs, un par plateforme
+├── LISEZ-MOI.md                document d'accueil UNIQUE (installation + fonctions)
+├── ARCHITECTURE.md, CHANGELOG.md, LICENSE.txt, VERSION
+├── schema.sql, seed_*.sql      schéma et référentiels
+├── demo/                       jeu de démonstration anonymisé, PUBLIÉ
+├── modules/                    les 26 modules métier
+├── tests/                      la suite
+└── outils : construire_distribution.py, verifier_depot.py, outils_demo.py…
+```
+
+Les modules métier sont regroupés dans `modules/` : à plat, trente-cinq
+fichiers Python noyaient `LISEZ-MOI.md` et les lanceurs, c'est-à-dire
+exactement ce que l'utilisateur doit trouver en premier. Les points d'entrée
+et les fichiers cités par les lanceurs restent à la racine — un lanceur
+appelle `app.py` par son nom.
+
+Le paquet n'étant pas installé par pip (distribution par simple
+décompression), `app.py` et `cli.py` ajoutent `modules/` au chemin d'import
+en tête de fichier, avant le premier import métier. Les modules déplacés
+calculent leur `HERE` avec deux `dirname` au lieu d'un : la base, les seeds,
+`VERSION`, `reference/` et `demo/` vivent à la racine du paquet, pas à côté
+du code.
+
 Document destiné à un développeur expérimenté découvrant le code. Le code
 suit le **cycle comptable de la profession** : chaque module correspond à
 une étape que connaît tout comptable. Le vocabulaire du code est celui du

@@ -20,8 +20,6 @@ import sys
 import time
 import urllib.request
 import webbrowser
-
-
 def attendre_puis_ouvrir(url: str, delai: float = 25.0) -> bool:
     ctx = ssl.create_default_context()
     ctx.check_hostname = False

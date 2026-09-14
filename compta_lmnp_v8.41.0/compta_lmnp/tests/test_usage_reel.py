@@ -192,7 +192,7 @@ def test_projection_absente_si_exercice_clos(dossier):
 
 def test_regle_alur_a_une_source_unique():
     """La clôture ne doit pas recopier la règle : elle doit l'appeler."""
-    src = open(os.path.join(HERE, "fiscal.py"), encoding="utf-8").read()
+    src = open(conftest.source("fiscal.py"), encoding="utf-8").read()
     corps_cloturer = src.split("def cloturer(")[1]
     assert "_calcul_fiscal(" in corps_cloturer
     assert "retraitement_alur_auto" not in corps_cloturer, \
@@ -639,7 +639,7 @@ def test_assistant_present_sans_ressource_externe(tmp_path, monkeypatch):
 
 
 def test_assistant_ne_sinvite_pas():
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     bloc = p.split("ASSISTANT = ")[1].split('"""')[1]
     # masqué tant qu'aucune aide n'est demandée
     assert "#assistant { position: fixed" in p and "display: none" in p
@@ -651,13 +651,13 @@ def test_assistant_ne_sinvite_pas():
 def test_infobulles_fonctionnent_sans_javascript():
     """Le personnage est un confort, pas le support de l'aide : la bulle
     CSS doit rester autonome."""
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert ".aide:hover::after" in p            # infobulle purement CSS
     assert "content: attr(data-aide)" in p
 
 
 def test_assistant_respecte_le_mouvement_reduit():
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert "prefers-reduced-motion" in p
     bloc = p.split("prefers-reduced-motion")[1][:300]
     assert "animation: none" in bloc
@@ -682,7 +682,7 @@ def test_assistante_a_bien_trois_etats():
     for etat in ("sur-info", "sur-valide", "sur-anomalie"):
         assert etat in svg, etat
     assert 'class="corps"' in svg
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     # un seul état visible à la fois
     assert "#assistant .sur-info, #assistant .sur-valide" in p
     assert "#assistant.info     .sur-info     { display: block; }" in p
@@ -716,7 +716,7 @@ def test_assistante_nutilise_jamais_innerhtml():
 
 def test_assistante_reste_un_confort():
     """Sans JavaScript — ou pour qui l'a masquée — l'aide doit fonctionner."""
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert ".aide:hover::after" in p and "content: attr(data-aide)" in p
     assert "assistant=0" in p                       # masquage définitif
     assert "prefers-reduced-motion" in p
@@ -726,10 +726,10 @@ def test_stock_39c_perdu_a_la_cession_est_visible():
     """Le stock 39 C rattaché à un bien cédé est définitivement perdu. Il
     était tracé par bien dans le PDF, mais à l'écran le stock tombait à
     zéro sans un mot — comme s'il avait été utilisé."""
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert "L.reports.sortie_39c" in p
     assert "perdu à la cession" in p
-    src = open(os.path.join(HERE, "liasse.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse.py"), encoding="utf-8").read()
     assert '"sortie_39c"' in src
 
 
@@ -770,7 +770,7 @@ def test_ventilation_est_atomique(tmp_path, monkeypatch):
 
 
 def test_ventilation_refuse_un_montant_hors_de_proportion():
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     assert "montant hors de proportion" in src
 
 
@@ -921,7 +921,7 @@ def test_annulation_disponible_dans_la_liste_des_operations():
     """Le bouton avait DISPARU de la page — perdu lors d'une restauration —
     alors que la route existait toujours. Il est de nouveau là, dans sa
     propre colonne à côté de la duplication."""
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert "/annuler" in p
     assert "Dupliquer</th>" in p and "Annuler</th>" in p
     # une opération déjà annulée n'offre plus ni duplication ni annulation
@@ -931,9 +931,9 @@ def test_annulation_disponible_dans_la_liste_des_operations():
 def test_couleurs_lisibles_sur_le_bandeau():
     """Le nom du dossier était un lien SANS couleur explicite : bleu sur
     bleu, illisible. L'onglet courant ne se distinguait pas non plus."""
-    a = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    a = open(conftest.source("app.py"), encoding="utf-8").read()
     assert "color:#ffd54f" in a                 # nom du dossier
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     bloc = p.split("nav a.active")[1][:200]
     assert "#ffd54f" in bloc and "font-weight: 700" in bloc
     assert "background: rgba(0,0,0,.22)" in bloc
@@ -990,7 +990,7 @@ def test_avertissements_des_le_premier_exercice(bien_nu):
 def test_champ_retraitements_previent_du_double_comptage():
     """L'ALUR était donné en EXEMPLE alors qu'il est déjà réintégré
     automatiquement : le saisir là le comptait deux fois."""
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     bloc = p.split('name="retraitements"')[1][:1400]
     assert "laissez 0" in bloc
     assert "DOUBLE RETRAITEMENT" in bloc
@@ -1092,7 +1092,7 @@ def test_aucune_donnee_de_naissance_nest_collectee():
     à effacer sur demande."""
     import quittances
     for cible in ("quittances.py", "pages.py", "app.py", "schema.sql"):
-        src = open(os.path.join(HERE, cible), encoding="utf-8").read()
+        src = open(conftest.source(cible), encoding="utf-8").read()
         corps = "\n".join(ligne for ligne in src.splitlines()
                           if "naissance" not in ligne
                           or "RETIRÉS" in ligne or "ont existé" in ligne)
@@ -1258,7 +1258,7 @@ def test_base_ancienne_migre_vers_les_quittances(tmp_path):
 
 
 def test_bandeau_aux_couleurs_asm():
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert "header { background: #002b5c" in p      # bleu marine
     bloc = p.split("nav a.active")[1][:200]
     assert "#ffd54f" in bloc                        # jaune
@@ -1302,7 +1302,7 @@ def test_jonction_des_bilans_compare_cloture_et_ouverture():
     assert len(obs) == 2                       # 3 exercices → 2 jonctions
     assert all(o["type"] == "ok" for o in obs), [o["message"] for o in obs]
     # la comparaison porte bien sur l'ouverture, pas sur la clôture
-    src = open(os.path.join(HERE, "migration_fec.py"), encoding="utf-8").read()
+    src = open(conftest.source("migration_fec.py"), encoding="utf-8").read()
     assert "ouverture=True" in src
     assert 'compte.startswith("12")' in src
 
@@ -1576,7 +1576,7 @@ def test_deficit_menace_par_le_39c_est_signale(tmp_path):
 def test_le_logiciel_ne_reordonne_pas_silencieusement():
     """Savoir si la reprise du 39 C peut être différée se discute. Trancher
     en silence serait pire que le défaut lui-même."""
-    src = open(os.path.join(HERE, "controles.py"), encoding="utf-8").read()
+    src = open(conftest.source("controles.py"), encoding="utf-8").read()
     bloc = src.split("def c_deficit_menace_par_le_39c")[1][:2000]
     assert "ne CHANGE PAS cet ordre" in bloc
     assert "se discute" in bloc
@@ -1840,7 +1840,7 @@ def test_changement_de_duree_ne_sur_amortit_pas(tmp_path):
 def test_docstring_nencourage_plus_le_double_retraitement():
     """D5 — elle donnait le fonds ALUR en exemple de saisie manuelle,
     alors qu'il est réintégré automatiquement : les deux s'additionnaient."""
-    src = open(os.path.join(HERE, "fiscal.py"), encoding="utf-8").read()
+    src = open(conftest.source("fiscal.py"), encoding="utf-8").read()
     tete = src[:src.index('"""', src.index('"""') + 3)]
     assert "NE PAS y saisir le fonds de travaux ALUR" in tete
     assert "renseigné au cas par cas (ex. réintégration du fonds" not in tete
@@ -2178,7 +2178,7 @@ def test_repli_du_dossier_de_demonstration(tmp_path):
     """« fec_path or fec_defaut » retenait une chaîne non vide même quand
     le fichier n'existait pas : le repli sur le jeu anonymisé — sa seule
     raison d'être — n'était jamais atteint."""
-    src = open(os.path.join(HERE, "init_db.py"), encoding="utf-8").read()
+    src = open(conftest.source("init_db.py"), encoding="utf-8").read()
     assert "os.path.exists(fec_path)" in src
     assert 'p.add_argument("--fec", default=None)' in src
 
@@ -2291,7 +2291,7 @@ def test_sauvegardes_de_surete_hors_rotation():
     import perennite
     assert "avant-migration" in perennite.MOTIFS_SURETE
     assert "avant-reinitialisation" in perennite.MOTIFS_SURETE
-    src = open(os.path.join(HERE, "perennite.py"), encoding="utf-8").read()
+    src = open(conftest.source("perennite.py"), encoding="utf-8").read()
     bloc = src.split("def _rotation")[1][:600]
     assert "MOTIFS_SURETE" in bloc
 
@@ -2482,7 +2482,7 @@ def test_plafond_39c_majore_par_le_manuel_est_signale(tmp_path):
     plafond majoré d'autant. Le risque (charge non afférente au bien) est
     signalé au lieu d'être deviné."""
     import fiscal
-    src = open(os.path.join(HERE, "fiscal.py"), encoding="utf-8").read()
+    src = open(conftest.source("fiscal.py"), encoding="utf-8").read()
     assert 'max(0.0, autres)' in src           # comportement conservé
     assert "REFUSÉE" in src                    # et la raison écrite
     c = init_db.init(str(tmp_path / "p.db"), "blanc", annee_cible=2026)
@@ -2502,7 +2502,7 @@ def test_plafond_39c_majore_par_le_manuel_est_signale(tmp_path):
 
 
 def test_cession_preserve_les_composants_deja_sortis():
-    src = open(os.path.join(HERE, "cession.py"), encoding="utf-8").read()
+    src = open(conftest.source("cession.py"), encoding="utf-8").read()
     assert "date_sortie IS NULL OR date_sortie=''" in src
 
 
@@ -2564,7 +2564,7 @@ def test_confirmations_ne_sont_pas_du_javascript_casse():
     l'opération partait SANS aucune boîte de dialogue. Les deux qui
     fonctionnaient étaient précisément celles écrites sans apostrophe."""
     import re
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     for m in re.finditer(r'(onclick|onsubmit)="return confirm\((.{0,240}?)\)"',
                          p, re.S):
         corps = m.group(2)
@@ -2574,7 +2574,7 @@ def test_confirmations_ne_sont_pas_du_javascript_casse():
             assert nu.count("'") <= 2, f"apostrophe fermante : {corps[:60]!r}"
     # les deux réparées passent par un attribut, échappé par Jinja
     assert p.count("data-confirmer") >= 2
-    a = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    a = open(conftest.source("app.py"), encoding="utf-8").read()
     assert 'closest("[data-confirmer]")' in a
 
 
@@ -2621,7 +2621,7 @@ def test_cookie_du_bac_a_sable_ne_expire_pas_en_huit_heures():
     """Il durait 8 h là où les autres dossiers durent 180 jours : le cookie
     expirait souvent d'un jour à l'autre, et l'utilisateur se retrouvait
     dans le dossier PRINCIPAL en croyant être encore dans le bac à sable."""
-    a = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    a = open(conftest.source("app.py"), encoding="utf-8").read()
     bloc = a.split('set_cookie("dossier", "bac_a_sable"')[1][:120]
     assert "180*24*3600" in bloc, bloc
 
@@ -2631,7 +2631,7 @@ def test_cli_annonce_sa_base_et_vise_le_bon_dossier():
     l'interface résout le dossier courant : une clôture pouvait frapper un
     dossier qu'on ne regardait plus, et le chemin n'apparaissait nulle
     part."""
-    c = open(os.path.join(HERE, "cli.py"), encoding="utf-8").read()
+    c = open(conftest.source("cli.py"), encoding="utf-8").read()
     assert 'os.environ.get("COMPTA_DB")' in c
     assert 'add_argument("--dossier"' in c
     assert "_annoncer_base()" in c
@@ -2641,7 +2641,7 @@ def test_cli_annonce_sa_base_et_vise_le_bon_dossier():
 def test_cli_cloturer_sauvegarde_avant():
     """Même opération irréversible que la clôture web, qui elle sauvegarde
     et archive."""
-    c = open(os.path.join(HERE, "cli.py"), encoding="utf-8").read()
+    c = open(conftest.source("cli.py"), encoding="utf-8").read()
     bloc = c.split("def cmd_cloturer")[1][:700]
     assert 'motif="avant-cloture"' in bloc
     assert "Clôture refusée" in bloc
@@ -2685,12 +2685,12 @@ def test_base_absente_nest_pas_remplacee_par_une_vierge():
     remplacé par une base vierge : la comptabilité paraissait perdue, et le
     vrai fichier — souvent simplement pas encore disponible — se trouvait
     masqué."""
-    a = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    a = open(conftest.source("app.py"), encoding="utf-8").read()
     assert "class FichierDossierAbsent" in a
     assert "raise FichierDossierAbsent" in a
     bloc = a.split("raise FichierDossierAbsent")[0][-700:]
     assert "temporaire" in bloc.lower() or "TEMPORAIRE" in bloc
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert "PAGE_DOSSIER_ABSENT" in p
     assert "Rien n'a été créé ni modifié" in p
 

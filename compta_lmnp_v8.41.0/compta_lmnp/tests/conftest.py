@@ -5,8 +5,26 @@
 import os
 import sys
 
-# Rend les modules de la racine (init_db, reprise) importables depuis tests/.
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Rend le paquet importable depuis tests/ : la racine pour les points
+# d'entrée et les outils (app, cli, verifier_depot…), et modules/ pour les
+# modules métier, qui y ont été regroupés pour ne plus noyer LISEZ-MOI.md et
+# les lanceurs sous trente-cinq fichiers Python.
+_RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _RACINE)
+sys.path.insert(0, os.path.join(_RACINE, "modules"))
+
+
+def source(nom: str) -> str:
+    """Chemin du FICHIER SOURCE d'un module, où qu'il vive.
+
+    Les tests qui relisent le code — recherche d'une chaîne, d'un motif, d'un
+    commentaire — le trouvaient par `os.path.join(HERE, "fiscal.py")`. Le
+    regroupement des modules métier dans modules/ a cassé ces 56 appels d'un
+    coup. Passer par ici les rend indifférents à l'emplacement : un module
+    peut redéménager sans toucher un seul test.
+    """
+    direct = os.path.join(_RACINE, nom)
+    return direct if os.path.exists(direct) else os.path.join(_RACINE, "modules", nom)
 
 
 # ── Dossier de référence absent : le dépôt public reste testable ───────────

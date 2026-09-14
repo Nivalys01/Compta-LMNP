@@ -14,6 +14,8 @@ Lancer :  pytest -q tests/test_passe_e.py
 import os
 import sys
 
+import conftest
+
 import pytest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -843,7 +845,7 @@ def test_e16_les_libelles_de_rubrique_sont_enveloppes():
     assert stringWidth(long_libelle, "Helvetica", 8.5) > utile, \
         "le libellé de référence ne déborde plus : revoir le test"
 
-    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index('for rub in c["rubriques"]:'):]
     bloc = bloc[:bloc.index("tt = c[")]
     entree = " ".join(bloc[bloc.index("lignes.append"):].split())
@@ -858,7 +860,7 @@ def test_e16_les_libelles_de_rubrique_sont_enveloppes():
 def test_e17_le_suivi_39c_par_bien_aligne_ses_montants():
     """Le seul tableau où l'on compare des colonnes entre elles : quatre de
     ses cinq colonnes de montants restaient alignées à gauche."""
-    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index("larg = [60 * mm]"):]
     bloc = bloc[:bloc.index("Déficits LMNP")]
     assert "aligne_droite=range(1, len(entetes))" in bloc, \
@@ -869,7 +871,7 @@ def test_e19_la_note_daide_est_echappee():
     """Toutes les autres chaînes de données passent par _xml(). L'exception
     n'était pas motivée, et un « & » dans la note ferait échouer la
     génération."""
-    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse_pdf.py"), encoding="utf-8").read()
     assert 'Paragraph(_xml(aide["note"])' in src
     assert 'Paragraph(aide["note"]' not in src
 
@@ -901,7 +903,7 @@ def test_e15_avertissement_non_cerfa_present_dans_le_document():
     """L'avertissement vivait dans la docstring du module, donc nulle part
     pour le lecteur — alors que la page de garde s'intitule « Liasse
     fiscale LMNP », ce qu'on peut prendre pour un formulaire officiel."""
-    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse_pdf.py"), encoding="utf-8").read()
     garde = src[src.index("# ── Page de garde"):src.index('g = L["page_garde"]')]
     assert "fac-similé des formulaires CERFA" in garde
     assert "état de travail" in garde
@@ -998,7 +1000,7 @@ def test_e20_les_trois_lignes_figurent_dans_le_pdf():
     """La ligne des charges exceptionnelles était CALCULÉE depuis une passe
     antérieure mais jamais rendue : le prix de cession apparaissait sans sa
     contrepartie."""
-    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index("# ── 2033-B"):src.index("Réintégrations / déductions")]
     assert 'b["produits_financiers_280"]' in bloc
     assert 'b["produits_exceptionnels_290"]' in bloc
@@ -1009,7 +1011,7 @@ def test_e20_numeros_de_case_conformes_au_cerfa_2026():
     """Numéros relevés sur le CERFA 2033-B-SD 2026 (n° 15948*08) fourni par
     l'auteur. Ce test remplace celui qui INTERDISAIT d'afficher un numéro
     tant que la vérification n'était pas faite : elle l'est."""
-    src = open(os.path.join(HERE, "liasse_pdf.py"), encoding="utf-8").read()
+    src = open(conftest.source("liasse_pdf.py"), encoding="utf-8").read()
     bloc = src[src.index("# ── 2033-B"):src.index("Réintégrations / déductions")]
     # Une entrée de tableau peut tenir sur deux lignes source : on découpe
     # sur les entrées, pas sur les retours à la ligne, sinon le test casse
@@ -1070,7 +1072,7 @@ def test_e14_les_motifs_danonymisation_sont_intacts():
     formule comme MOTIF sur le seed et le FEC privés, où elle subsiste.
     La reformuler ferait échouer l'anonymisation du jeu de démonstration
     PUBLIÉ, en silence."""
-    src = open(os.path.join(HERE, "outils_demo.py"), encoding="utf-8").read()
+    src = open(conftest.source("outils_demo.py"), encoding="utf-8").read()
     assert src.count(MOTIF_ANONYMISATION) == 2, \
         "les motifs d'anonymisation ont été modifiés — le jeu de démo publié " \
         "risque de porter le nom d'un tiers"

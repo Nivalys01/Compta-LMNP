@@ -89,14 +89,14 @@ def test_journal_rotatif_et_idempotent(client):
 
 
 def test_ecoute_locale_et_debug_opt_in():
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     assert 'host="127.0.0.1"' in src              # jamais exposé au réseau
     assert re.search(r'debug = os\.environ\.get\("COMPTA_DEBUG"\) == "1"',
                      src)                          # debug jamais par défaut
 
 
 def test_migration_sauvegarde_avant_de_toucher():
-    src = open(os.path.join(HERE, "migrations.py"), encoding="utf-8").read()
+    src = open(conftest.source("migrations.py"), encoding="utf-8").read()
     corps = src.split("def migrer(")[1].split("def ")[0]
     assert "sauvegarder" in corps
     # la sauvegarde précède le premier palier
@@ -104,7 +104,7 @@ def test_migration_sauvegarde_avant_de_toucher():
 
 
 def test_pdf_est_une_dependance_optionnelle():
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     assert "except ImportError" in src
     assert "reportlab" in src                      # message d'orientation
     # l'import est bien DIFFÉRÉ : jamais en tête de module
@@ -177,7 +177,7 @@ def test_reportlab_non_bloquant_a_l_installation():
 def test_chemins_utilisateur_a_cote_de_l_executable_si_gele():
     """Compatibilité PyInstaller : les données de l'utilisateur doivent
     vivre à côté du .exe, pas dans le bundle temporaire."""
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     assert 'getattr(sys, "frozen", False)' in src
     assert "sys.executable" in src
 
@@ -191,7 +191,7 @@ def test_chemins_utilisateur_a_cote_de_l_executable_si_gele():
 # l'utilisateur à passer outre les avertissements de son navigateur.
 
 def test_https_nest_plus_le_defaut():
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     bloc = src.split('if __name__ == "__main__":')[1]
     assert 'os.environ.get("COMPTA_HTTPS") == "1"' in bloc
     # le chemin par défaut ne doit PAS charger de certificat
@@ -200,7 +200,7 @@ def test_https_nest_plus_le_defaut():
 
 
 def test_le_message_explique_l_absence_de_cadenas():
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    src = open(conftest.source("app.py"), encoding="utf-8").read()
     assert "contexte sécurisé" in src        # localhost EST un contexte sûr
     assert "traversent aucun réseau" in src
 
@@ -263,10 +263,10 @@ def test_licence_coherente_avec_le_modele_gratuit():
 
 
 def test_licence_livree_et_propriete_visible():
-    src = open(os.path.join(HERE, "construire_distribution.py"),
+    src = open(conftest.source("construire_distribution.py"),
                encoding="utf-8").read()
     assert '"LICENSE.txt"' in src
-    footer = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    footer = open(conftest.source("app.py"), encoding="utf-8").read()
     assert "© 2026 Sylvain FAURE" in footer          # visible dans l'UI
     # Document d'accueil unique depuis la fusion de README.md et
     # LISEZ-MOI.md : la mention de propriété y reste en tête.
@@ -275,7 +275,7 @@ def test_licence_livree_et_propriete_visible():
 
 
 def test_import_csv_marque_experimental():
-    p = open(os.path.join(HERE, "pages.py"), encoding="utf-8").read()
+    p = open(conftest.source("pages.py"), encoding="utf-8").read()
     assert "FONCTION EXPÉRIMENTALE" in p
     section = p.split("FONCTION EXPÉRIMENTALE")[1][:800]
     assert "Vérifiez chaque proposition" in section
@@ -325,7 +325,7 @@ def test_aucun_siren_reel_dans_les_sources():
 def test_outil_anonymisation_ne_contient_pas_ce_quil_masque():
     """Il portait en clair le nom et l'adresse à remplacer — publier cet
     outil revenait à publier exactement ce qu'il protège."""
-    src = open(os.path.join(HERE, "outils_demo.py"), encoding="utf-8").read()
+    src = open(conftest.source("outils_demo.py"), encoding="utf-8").read()
     # La mention de copyright, elle, doit évidemment y figurer : on
     # inspecte le corps du fichier, pas son en-tête légal.
     corps = "\n".join(ligne for ligne in src.splitlines()

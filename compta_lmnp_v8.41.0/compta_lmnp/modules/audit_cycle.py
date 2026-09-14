@@ -40,7 +40,11 @@ import sys
 import tempfile
 from datetime import date
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# Racine du PAQUET, pas du dossier de code : ce module vit dans
+# modules/, alors que la base, les seeds, VERSION, reference/ et
+# demo/ restent un cran au-dessus. Remonter ici évite de reprendre
+# chaque os.path.join(HERE, ...) du fichier.
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 
 import controles

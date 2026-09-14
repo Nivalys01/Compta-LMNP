@@ -12,6 +12,8 @@ import sqlite3
 import subprocess
 import sys
 
+import conftest
+
 import pytest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -124,7 +126,7 @@ def test_fec_archive_passe_le_validateur_independant(client, tmp_path):
     fecs = [f for f in os.listdir(archives) if f.endswith(".txt")]
     assert fecs
     r = subprocess.run(
-        [sys.executable, os.path.join(HERE, "valider_fec.py"),
+        [sys.executable, conftest.source("valider_fec.py"),
          os.path.join(archives, fecs[0])],
         capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr

@@ -27,6 +27,15 @@ if getattr(sys, "frozen", False):
     HERE = os.path.dirname(os.path.abspath(sys.executable))
 sys.path.insert(0, HERE)
 
+# ── Amorçage du chemin d'import ───────────────────────────────────────────
+#    Les modules métier vivent dans modules/ : sans ces lignes, « import
+#    fiscal » échoue. Le paquet n'est pas installé par pip — c'est le prix
+#    d'une distribution par simple décompression, et le lanceur ne peut pas
+#    le faire à notre place. À poser AVANT le premier import métier.
+_MODULES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modules")
+if _MODULES not in sys.path:
+    sys.path.insert(0, _MODULES)
+
 import controles
 import fiscal
 import init_db
@@ -48,7 +57,6 @@ import liasse as liasse_mod
 import perennite
 import quittances
 import dossiers as dossiers_mod
-
 
 def _lire_version() -> str:
     try:

@@ -22,6 +22,8 @@ import re
 import shutil
 import subprocess
 import sys
+
+import conftest
 import tempfile
 
 import pytest
@@ -40,7 +42,7 @@ def _depot_jetable(avec_git=True, contenu=None):
     box = tempfile.mkdtemp()
     paquet = os.path.join(box, "compta_lmnp")
     os.makedirs(paquet)
-    shutil.copy(os.path.join(HERE, "verifier_depot.py"), paquet)
+    shutil.copy(conftest.source("verifier_depot.py"), paquet)
     open(os.path.join(box, "note.md"), "w", encoding="utf-8").write(
         contenu or f"{FICTIF} — 123456789\n")
     if avec_git:
@@ -172,7 +174,9 @@ def _paquet_jetable(tmp_path, seed_demo_contenu):
         src = os.path.join(HERE, f)
         if os.path.isfile(src):
             shutil.copy(src, paquet)
-    for d in ("demo", "reference"):
+    # modules/ compris : les modules métier y ont été regroupés, et la
+    # construction du paquet les y cherche.
+    for d in ("modules", "demo", "reference"):
         if os.path.isdir(os.path.join(HERE, d)):
             shutil.copytree(os.path.join(HERE, d), os.path.join(paquet, d))
     open(os.path.join(paquet, "seed_demo.sql"), "w", encoding="utf-8").write(
@@ -222,7 +226,7 @@ def test_f03_sans_empreintes_le_paquet_nest_pas_construit(tmp_path):
 def test_f03_le_message_final_dit_contre_quoi_il_a_controle():
     """« aucune donnée personnelle » énonçait un fait que le programme
     n'établissait jamais."""
-    src = open(os.path.join(HERE, "construire_distribution.py"),
+    src = open(conftest.source("construire_distribution.py"),
                encoding="utf-8").read()
     assert "contenu contrôlé contre" in src
     assert "verifier_depot.empreintes()" in src
@@ -348,7 +352,7 @@ def test_f11_les_motifs_didentite_viennent_du_dossier_prive():
         pytest.skip("dossier privé absent sur cette machine")
     motifs = outils_demo._motifs_identite()
     assert motifs, "aucun motif d'identité dérivé du seed"
-    src = open(os.path.join(HERE, "outils_demo.py"), encoding="utf-8").read()
+    src = open(conftest.source("outils_demo.py"), encoding="utf-8").read()
     assert "_motifs_identite()" in src.split("REMPLACEMENTS_LIBELLE =")[1][:80]
 
 
@@ -371,7 +375,8 @@ def client_web(tmp_path, monkeypatch):
     c = sqlite3.connect(db)
     c.execute("INSERT INTO exploitant (id,nom,siren) VALUES (1,'MARTIN Jean','000000000')")
     c.execute("INSERT INTO bien (id,exploitant_id,libelle) VALUES (1,1,'Logement')")
-    c.commit(); c.close()
+    c.commit()
+    c.close()
     import app as webapp
     webapp.app.config["TESTING"] = True
     # On DEMANDE au logiciel où il écrit, au lieu de le supposer : le module
@@ -389,7 +394,8 @@ def client_web(tmp_path, monkeypatch):
               "VALUES (1,1,'Logement')")
     c.execute("DELETE FROM operation")
     c.execute("UPDATE exercice SET statut='ouvert' WHERE annee=2026")
-    c.commit(); c.close()
+    c.commit()
+    c.close()
     return webapp.app.test_client(), reel
 
 

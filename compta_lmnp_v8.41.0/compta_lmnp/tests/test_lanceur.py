@@ -5,6 +5,8 @@ import stat
 import subprocess
 import sys
 
+import conftest
+
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LANCEUR = os.path.join(HERE, "Compta-LMNP-Linux-macOS.sh")
 
@@ -64,7 +66,7 @@ def test_app_port_configurable(tmp_path):
     env = dict(os.environ, COMPTA_PORT="5107",
                COMPTA_DB=str(tmp_path / "compta.db"),
                COMPTA_DB_BAC_A_SABLE=str(tmp_path / "bac_a_sable.db"))
-    p = subprocess.Popen([sys.executable, os.path.join(HERE, "app.py")],
+    p = subprocess.Popen([sys.executable, conftest.source("app.py")],
                          cwd=HERE, env=env,
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
@@ -101,7 +103,7 @@ def test_avertissement_dev_server_contextualise(tmp_path):
     env = dict(os.environ, COMPTA_PORT="5121",
                COMPTA_DB=str(tmp_path / "compta.db"),
                COMPTA_DB_BAC_A_SABLE=str(tmp_path / "bac_a_sable.db"))
-    p = subprocess.Popen([sys.executable, os.path.join(HERE, "app.py")],
+    p = subprocess.Popen([sys.executable, conftest.source("app.py")],
                          cwd=HERE, env=env, stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT, text=True)
     try:

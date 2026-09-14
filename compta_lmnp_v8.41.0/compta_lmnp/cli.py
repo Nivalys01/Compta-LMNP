@@ -19,6 +19,17 @@ import argparse
 import os
 import sqlite3
 
+import sys
+
+# ── Amorçage du chemin d'import ───────────────────────────────────────────
+#    Les modules métier vivent dans modules/ : sans ces lignes, « import
+#    fiscal » échoue. Le paquet n'est pas installé par pip — c'est le prix
+#    d'une distribution par simple décompression, et le lanceur ne peut pas
+#    le faire à notre place. À poser AVANT le premier import métier.
+_MODULES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modules")
+if _MODULES not in sys.path:
+    sys.path.insert(0, _MODULES)
+
 import init_db
 import operations
 import controles
@@ -26,7 +37,6 @@ import export_fec
 import import_bancaire
 import fiscal
 from gabarits import GABARITS
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Base visée par la ligne de commande. Elle était codée en dur sur le
 # dossier principal, alors que l'interface web résout le dossier courant

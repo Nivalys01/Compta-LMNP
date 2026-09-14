@@ -23,7 +23,11 @@ import sqlite3
 
 import reprise
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# Racine du PAQUET, pas du dossier de code : ce module vit dans
+# modules/, alors que la base, les seeds, VERSION, reference/ et
+# demo/ restent un cran au-dessus. Remonter ici évite de reprendre
+# chaque os.path.join(HERE, ...) du fichier.
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Dossier de référence (RÉEL) : présent en développement, JAMAIS livré.
 FEC_REF_DEFAUT = os.path.join(HERE, "reference/FEC_REFERENCE_2025.txt")
 SEED_REF = "seed_exemple.sql"
