@@ -23,8 +23,21 @@ from gabarits import COMPTE_CONTREPARTIE, gabarit
 def saisir(conn: sqlite3.Connection, *, type: str, montant: float, date_operation: str,
            periode: str | None = None, bien_id: int = 1, tiers: str = "",
            libelle: str | None = None, exercice: int | None = None,
-           piece_ref: str | None = None, source: str = "saisie") -> dict:
-    """Crée une opération + son écriture équilibrée. Renvoie {operation_id, ecriture_id}."""
+           piece_ref: str | None = None, source: str = "saisie",
+           commit: bool = True) -> dict:
+    """Crée une opération + son écriture équilibrée. Renvoie {operation_id, ecriture_id}.
+
+    `commit=False` laisse la transaction OUVERTE, pour qu'un appelant puisse
+    enchaîner plusieurs saisies et les valider — ou les annuler — en bloc.
+    C'est ce que la validation d'un import bancaire réclamait : elle bouclait
+    sur cette fonction, qui committait à chaque tour, si bien qu'un échec à
+    la septième ligne sur dix laissait les six premières en base, sans retour
+    arrière ni indication de l'endroit où l'import s'était arrêté.
+
+    Le défaut par défaut reste `True` : tous les autres appelants — le
+    guichet de saisie, la duplication, les tests — attendent une opération
+    durable au retour.
+    """
     g = gabarit(type, conn)
     if bien_id is not None and not conn.execute(
             "SELECT 1 FROM bien WHERE id=?", (bien_id,)).fetchone():
@@ -78,7 +91,8 @@ def saisir(conn: sqlite3.Connection, *, type: str, montant: float, date_operatio
         (annee, type, bien_id, tiers, periode, date_operation, montant, lib, eid, source),
     )
     oid = cur.lastrowid
-    conn.commit()
+    if commit:
+        conn.commit()
     return {"operation_id": oid, "ecriture_id": eid, "ecriture_num": num,
             "montant": montant}
 

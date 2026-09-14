@@ -28,16 +28,15 @@ ENTREES = ["app.py", "cli.py", "verifier_depot.py", "construire_exe.py"]
 # lanceurs ne soient plus noyés sous trente-cinq fichiers Python. Le paquet
 # reproduit l'arborescence — sinon l'amorçage du chemin d'import, qui pointe
 # sur modules/, ne trouverait rien chez le client.
-MODULES_PROD = [
-    "init_db.py", "migrations.py",
-
-    "ecritures.py", "operations.py", "gabarits.py", "import_bancaire.py",
-    "amortissement.py", "cession.py", "fiscal.py", "parametres.py",
-    "controles.py", "audit_cycle.py", "reprise.py", "rejeu_fec.py",
-    "export_fec.py", "valider_fec.py", "liasse.py", "liasse_pdf.py",
-    "perennite.py", "dossiers.py", "pense_bete.py", "veille_fiscale.py",
-    "fec_io.py", "migration_fec.py", "pages.py", "quittances.py",
-]
+# TOUT modules/ est embarqué, par LECTURE DU RÉPERTOIRE et non par liste
+# écrite à la main. La liste énumérée a laissé échapper `plan_immo.py` le jour
+# de sa création : le paquet se construisait sans erreur, et l'application
+# échouait à l'import CHEZ LE CLIENT — pas ici. La garde « PAQUET INCOMPLET »
+# ne couvrait pas ce cas, elle ne vérifie que les fichiers cités par les
+# LANCEURS. Même défaut de principe que la garde anti-fuite d'avant la passe F :
+# une liste rédigée à la main ne peut pas signaler ce qu'on a oublié d'y mettre.
+MODULES_PROD = sorted(f for f in os.listdir(os.path.join(HERE, "modules"))
+                      if f.endswith(".py"))
 # Un SEUL document d'accueil : README.md et LISEZ-MOI.md disaient chacun
 # une moitié de la même chose et se renvoyaient l'un à l'autre.
 # Données et documents : racine du paquet.

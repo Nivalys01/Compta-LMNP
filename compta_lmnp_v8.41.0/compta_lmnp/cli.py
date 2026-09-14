@@ -151,6 +151,24 @@ def cmd_cloturer(a):
         conn.close()
         return
     res = fiscal.cloturer(conn, a.annee, autres_retraitements=a.retraitements)
+    # Archivage du FEC : la version web le fait, celle-ci ne le faisait PAS,
+    # alors que le commentaire ci-dessus affirmait le contraire. Une clôture
+    # en ligne de commande ne laissait donc aucune trace dans archives/ ni
+    # aucune ligne dans manifeste.csv : la piste d'audit — FEC figé et son
+    # empreinte SHA-256 — manquait pour tout exercice clos hors du web.
+    #
+    # Et comme côté web, l'archivage vient APRÈS une clôture déjà committée :
+    # son échec est un avertissement, pas un échec de clôture.
+    try:
+        arch = perennite.archiver_fec(conn, a.annee, DB)
+        print(f"FEC archivé : {arch['chemin']}")
+        print(f"  empreinte SHA-256 : {arch['sha256'][:16]}… "
+              f"(consignée dans {os.path.basename(arch['manifeste'])})")
+    except Exception as exc:                         # noqa: BLE001
+        print(f"\nATTENTION : l'exercice {a.annee} EST clôturé, mais le FEC "
+              f"n'a pas pu être archivé ({exc}).")
+        print("  La piste d'audit manque : exportez le FEC à la main avec "
+              "« exporter-fec ».")
     conn.close()
     ag, s, d = res["agregats"], res["suivi_39c"], res["deficits"]
     print(f"Clôture {a.annee} :")

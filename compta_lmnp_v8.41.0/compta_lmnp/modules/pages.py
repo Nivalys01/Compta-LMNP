@@ -760,7 +760,12 @@ PAGE_IMMO = """
           <label class="field" style="margin:0">Prix (€)
             <span class="aide" data-aide="Prix de cession de l'acte. La plus-value relève du régime des particuliers (déclarée par le notaire) : elle est neutralisée dans le résultat LMNP.">?</span></label>
           <input type="number" name="prix_cession" step="0.01" min="0" required style="width:120px">
-          <button type="submit" onclick="return confirm('Céder définitivement ce bien ? Les composants seront sortis du bilan.')">Valider la cession</button>
+          <!-- data-confirmer, pas un littéral JS : le texte y est un
+               ATTRIBUT, donc apostrophes et sauts de ligne sans danger.
+               C'est le mécanisme posé en passe D ; ces deux confirmations
+               ne l'avaient pas reçu et contournaient le problème en
+               RETIRANT les apostrophes du texte lu par l'utilisateur. -->
+          <button type="submit" data-confirmer="Céder définitivement ce bien ? Les composants seront sortis du bilan.">Valider la cession</button>
         </form>
       </details>
     {% endif %}
@@ -927,7 +932,7 @@ PAGE_IMMO = """
       l'origine — l'écart réapparaîtra à chaque liasse, et la valeur nette
       comptable servant au calcul d'une future plus-value sera fausse.</p>
       <form method="post" action="/immobilisations/reprendre-amortissements"
-            onsubmit="return confirm('Passer l écriture de reprise ? Le résultat de l exercice n est pas modifié : seul le bilan est corrigé.')">
+            data-confirmer="Passer l'écriture de reprise ? Le résultat de l'exercice n'est pas modifié : seul le bilan est corrigé.">
         <input type="hidden" name="annee" value="{{ annee }}">
         <button type="submit">Reprendre les amortissements antérieurs</button>
       </form>

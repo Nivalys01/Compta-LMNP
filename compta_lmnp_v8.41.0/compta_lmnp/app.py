@@ -11,6 +11,7 @@ import io
 import json
 import os
 import sqlite3
+import threading
 import logging
 import sys
 from datetime import date
@@ -42,6 +43,7 @@ import init_db
 import migrations
 import operations
 import pense_bete
+import plan_immo
 import cession
 import amortissement
 import import_bancaire
@@ -105,7 +107,15 @@ def _form_float(nom: str, defaut=None):
         return defaut
 
 
+# Verrou : le test d'appartenance et l'ajout sont DEUX opérations, et le
+# serveur de développement Flask est threadé par défaut. Un navigateur ouvre
+# plusieurs requêtes en parallèle sur la première page : deux threads
+# pouvaient trouver l'ensemble vide avant que l'un n'y écrive, et lancer
+# DEUX migrations concurrentes sur la même base — chacune prenant sa propre
+# sauvegarde, et SQLite rendant « database is locked » au premier
+# chargement, sur le chemin le plus sensible du logiciel.
 _MIGRES: set = set()
+_VERROU_MIGRATION = threading.Lock()
 
 
 def _migrer_si_besoin() -> None:
@@ -117,9 +127,10 @@ def _migrer_si_besoin() -> None:
         chemin = _db_path()
     except FichierDossierAbsent:
         return                                   # traité par son gestionnaire
-    if chemin in _MIGRES:
-        return
-    _MIGRES.add(chemin)
+    with _VERROU_MIGRATION:
+        if chemin in _MIGRES:
+            return
+        _MIGRES.add(chemin)
     try:
         c = sqlite3.connect(chemin)
         try:
@@ -357,13 +368,12 @@ def _catalogue(conn):
             {k for k, v in g.items() if v["nature"] == "produit"},
             {k: v["libelle"] for k, v in g.items()})
 
-# Comptes immobilisation disponibles (compte_immo → compte_amort ou None)
-COMPTES_IMMO = [
-    ("211550", "Terrain",                         None),
-    ("213150", "Bâtiment",                        "281315"),
-    ("218100", "Installation / agencement",       "281810"),
-    ("218400", "Mobilier",                        "281840"),
-]
+# Comptes immobilisation disponibles (compte_immo → compte_amort ou None).
+# La table vivait ICI, en dur, dans la couche web — une connaissance
+# comptable logée dans la présentation, et dupliquée avec celle de liasse.py
+# sans que l'une référence l'autre. Source unique désormais :
+# modules/plan_immo.py (constat D2-05).
+COMPTES_IMMO = plan_immo.pour_la_saisie()
 
 # ── Helpers DB ───────────────────────────────────────────────────────────────
 
@@ -1219,17 +1229,36 @@ def cloturer():
         if not _en_bac_a_sable():
             perennite.sauvegarder(_db_path(), "avant-cloture")
         res = fiscal.cloturer(conn, annee, autres_retraitements=retr)
+        # À PARTIR D'ICI L'EXERCICE EST CLOS — fiscal.cloturer a committé.
+        # L'archivage qui suit est une piste d'audit, pas une condition : il
+        # était dans le même try que la clôture, si bien qu'un disque plein
+        # rendait « erreur » alors que l'exercice était clos. L'utilisateur
+        # relançait, se heurtait à « exercice déjà clos », et ne comprenait
+        # pas. Un échec d'archivage est désormais un AVERTISSEMENT sur une
+        # clôture réussie.
         info_archive = ""
+        echec_archive = ""
         if not _en_bac_a_sable():
-            arch = perennite.archiver_fec(conn, annee, _db_path())
-            info_archive = (" | FEC archivé : "
-                            f"{os.path.basename(arch['chemin'])}")
+            try:
+                arch = perennite.archiver_fec(conn, annee, _db_path())
+                info_archive = (" | FEC archivé : "
+                                f"{os.path.basename(arch['chemin'])}")
+            except Exception as exc:                 # noqa: BLE001
+                app.logger.exception("Archivage du FEC %s impossible", annee)
+                echec_archive = (
+                    f" | ATTENTION : l'exercice EST clôturé, mais le FEC n'a "
+                    f"pas pu être archivé ({exc}). La piste d'audit manque — "
+                    f"exportez le FEC {annee} à la main depuis la page "
+                    "Archives.")
         conn.close()
         ag = res["agregats"]
         ok = (f"Exercice {annee} clôturé. "
               f"Résultat comptable : {ag['resultat_comptable']:.2f} € | "
               f"Résultat fiscal : {res['resultat_fiscal']:.2f} € | "
               f"Dotation : {ag['dotation']:.2f} €" + info_archive)
+        if echec_archive:
+            return redirect(url_for("cloture", annee=annee,
+                                    warn=ok + echec_archive))
         return redirect(url_for("cloture", annee=annee, ok=ok))
     except Exception as exc:
         conn.close()
@@ -1864,15 +1893,33 @@ def import_valider():
     try:
         props = import_bancaire.proposer(chemin, conn)
         faites, ecartees = 0, 0
-        for i, p in enumerate(props):
-            if i not in retenues:
-                ecartees += 1
-                continue
-            operations.saisir(conn, type=p["type"], montant=p["montant"],
-                              date_operation=p["date_operation"],
-                              periode=p.get("periode"),
-                              libelle=p.get("libelle"), source="import")
-            faites += 1
+        # TOUT OU RIEN. `saisir` committait à chaque tour : un échec à la
+        # septième ligne sur dix laissait les six premières en base, sans
+        # retour arrière, et le message « Import interrompu » ne disait pas
+        # où l'on s'était arrêté. L'utilisateur relançait, et les six
+        # premières étaient saisies DEUX fois — l'import ne porte aucune clé
+        # d'idempotence.
+        try:
+            for i, p in enumerate(props):
+                if i not in retenues:
+                    ecartees += 1
+                    continue
+                operations.saisir(conn, type=p["type"], montant=p["montant"],
+                                  date_operation=p["date_operation"],
+                                  periode=p.get("periode"),
+                                  libelle=p.get("libelle"), source="import",
+                                  commit=False)
+                faites += 1
+            conn.commit()
+        except Exception as exc:                     # noqa: BLE001
+            conn.rollback()
+            app.logger.exception("Import annulé à la ligne %s", faites + 1)
+            return redirect(url_for("saisie", err=(
+                f"Import ANNULÉ à la ligne {faites + 1} sur "
+                f"{len(retenues)} : {exc}\n\nAucune opération n'a été "
+                "enregistrée — la base est exactement dans l'état où elle "
+                "était. Corrigez la ligne fautive dans le relevé et "
+                "relancez l'analyse.")))
         os.remove(chemin)
         return redirect(url_for("saisie",
             ok=f"Import terminé : {faites} opération(s) enregistrée(s), "

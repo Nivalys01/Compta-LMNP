@@ -484,3 +484,206 @@ def test_d201_les_lectures_ne_sont_pas_genees(client_web):
     r = cl.get("/saisie", headers={"Referer": "http://evil.example"},
                follow_redirects=True)
     assert r.status_code == 200
+
+
+# ═══ D2-02 à D2-07 — les constats sans échéance ═════════════════════════
+
+def test_d202_la_cloture_en_ligne_de_commande_archive_le_fec():
+    """Le commentaire de cmd_cloturer affirmait que la version CLI archivait
+    désormais le FEC « comme la version web ». Elle prenait la sauvegarde et
+    n'archivait rien : aucune trace dans archives/, aucune ligne dans
+    manifeste.csv, donc aucune empreinte SHA-256 pour tout exercice clos
+    hors de l'interface web."""
+    src = open(os.path.join(HERE, "cli.py"), encoding="utf-8").read()
+    bloc = src[src.index("def cmd_cloturer"):]
+    bloc = bloc[:bloc.index("\ndef ")]
+    assert "archiver_fec" in bloc
+    assert "sha256" in bloc, "l'empreinte n'est pas restituée à l'utilisateur"
+
+
+def test_d203_un_echec_darchivage_nest_pas_un_echec_de_cloture():
+    """fiscal.cloturer COMMITTE : l'archivage qui suit ne peut plus rendre
+    « erreur », sinon l'utilisateur relance une clôture déjà faite et se
+    heurte à « exercice déjà clos » sans comprendre."""
+    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    bloc = src[src.index("def cloturer"):]
+    bloc = bloc[:bloc.index("\n@app.route")]
+    # L'archivage a son propre try, et son échec produit un avertissement.
+    apres_cloture = bloc[bloc.index("fiscal.cloturer"):]
+    assert "try:" in apres_cloture, "l'archivage partage encore le try de la clôture"
+    assert "echec_archive" in apres_cloture
+    assert "warn=" in apres_cloture, "un échec d'archivage rend encore une erreur"
+
+
+def test_d204_saisir_peut_ne_pas_committer():
+    """Sans quoi aucun appelant ne peut grouper plusieurs saisies."""
+    import inspect
+
+    import operations
+    assert "commit" in inspect.signature(operations.saisir).parameters
+
+
+def test_d204_la_validation_dimport_est_tout_ou_rien():
+    """saisir committait à chaque tour : un échec à la septième ligne sur dix
+    laissait les six premières en base, et une relance les saisissait DEUX
+    fois — l'import ne porte aucune clé d'idempotence."""
+    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    bloc = src[src.index("def import_valider"):]
+    bloc = bloc[:bloc.index("\n@app.route")]
+    assert "commit=False" in bloc
+    assert "conn.rollback()" in bloc
+    assert "conn.commit()" in bloc
+    assert "ANNULÉ" in bloc, "le message ne dit pas que RIEN n'a été écrit"
+
+
+def test_d204_un_import_qui_echoue_ne_laisse_rien(tmp_path, monkeypatch):
+    """Vérification par EXÉCUTION, pas par lecture : on fait échouer la
+    troisième saisie et on compte ce qui reste."""
+    import sqlite3
+
+    import init_db
+    import operations
+    db = str(tmp_path / "compta.db")
+    conn = init_db.init(db, "blanc", annee_cible=2026)
+    conn.execute("INSERT INTO exploitant (id,nom,siren) VALUES (1,'MARTIN','000000000')")
+    conn.execute("INSERT INTO bien (id,exploitant_id,libelle) VALUES (1,1,'Logement')")
+    conn.commit()
+    lignes = [795.50, 120.00, -1.00, 60.00]      # la 3e est refusée
+    faites = 0
+    try:
+        for m in lignes:
+            operations.saisir(conn, type="loyer", montant=m,
+                              date_operation="2026-03-05", bien_id=1,
+                              commit=False)
+            faites += 1
+        conn.commit()
+    except ValueError:
+        conn.rollback()
+    conn.close()
+    c = sqlite3.connect(db)
+    n = c.execute("SELECT COUNT(*) FROM operation").fetchone()[0]
+    e = c.execute("SELECT COUNT(*) FROM ecriture WHERE journal_code='BQ'").fetchone()[0]
+    c.close()
+    assert faites == 2, "la troisième ligne aurait dû être refusée"
+    assert n == 0, f"{n} opération(s) laissée(s) en base après annulation"
+    assert e == 0, f"{e} écriture(s) orpheline(s) laissée(s) en base"
+
+
+def test_d205_le_plan_des_immobilisations_a_une_source_unique():
+    """La table vivait dans app.py — couche web — ET dans liasse.py, sans que
+    l'une référence l'autre."""
+    import liasse
+    import plan_immo
+    assert liasse.RUBRIQUES_2033C == plan_immo.pour_le_2033c()
+    assert liasse.ORDRE_RUBRIQUES == plan_immo.ordre_rubriques()
+    web = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    assert "plan_immo.pour_la_saisie()" in web
+    assert '"281315"' not in web, "un compte d'amortissement est encore en dur"
+
+
+def test_d205_ajouter_un_compte_ne_demande_quun_seul_endroit(monkeypatch):
+    """La propriété qui compte : le menu de saisie ET les rubriques du 2033-C
+    suivent la même table."""
+    import plan_immo
+    complete = dict(plan_immo.IMMOBILISATIONS)
+    complete["218200"] = {"libelle": "Matériel", "amort": "281820",
+                          "rubrique": "materiel", "rubrique_libelle": "Matériel",
+                          "case_brut": "440", "case_amort": "530"}
+    monkeypatch.setattr(plan_immo, "IMMOBILISATIONS", complete)
+    assert ("218200", "Matériel", "281820") in plan_immo.pour_la_saisie()
+    assert plan_immo.pour_le_2033c()["218200"][2] == "440"
+    assert "materiel" in plan_immo.ordre_rubriques()
+
+
+def test_d206_la_garde_de_migration_est_atomique():
+    """Test puis ajout étaient deux opérations, et le serveur de
+    développement Flask est threadé : deux requêtes parallèles sur la
+    première page pouvaient lancer DEUX migrations concurrentes."""
+    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    assert "_VERROU_MIGRATION" in src
+    bloc = src[src.index("def _migrer_si_besoin"):]
+    bloc = bloc[:bloc.index("\n@app.before_request")]
+    avant_ajout = bloc[:bloc.index("_MIGRES.add(chemin)")]
+    assert "with _VERROU_MIGRATION:" in avant_ajout
+
+
+def test_d207_les_confirmations_ne_mutilent_plus_le_texte():
+    """Deux confirmations contournaient le littéral JS en RETIRANT les
+    apostrophes du texte lu par l'utilisateur — « Passer l écriture de
+    reprise ». Le mécanisme data-confirmer, posé en passe D, rend le texte
+    intact parce qu'il est un attribut."""
+    src = open(conftest.source("pages.py"), encoding="utf-8").read()
+    assert "return confirm(" not in src, "une confirmation est encore un littéral JS"
+    assert "l'écriture de reprise" in src
+    assert "l exercice n est pas" not in src
+
+
+def test_d208_une_fonction_de_lecture_ne_termine_pas_la_transaction(tmp_path):
+    """Trouvé en VÉRIFIANT le correctif D2-04, et plus profond que lui.
+
+    `gabarits.assurer_table` committait inconditionnellement. Comme
+    `gabarit()` — appelée à chaque saisie — y passe, tout appelant
+    travaillant en `commit=False` voyait sa transaction terminée sous ses
+    pieds : à la deuxième saisie, la première était committée, et un
+    `rollback` n'annulait plus que la dernière ligne. Le tout-ou-rien de
+    l'import était donc faux MALGRÉ le correctif.
+
+    Le contrat vérifié ici est général : semer une table au premier accès ne
+    doit pas valider le travail de l'appelant.
+    """
+    import sqlite3
+
+    import gabarits
+    import init_db
+    import parametres
+    db = str(tmp_path / "compta.db")
+    conn = init_db.init(db, "blanc", annee_cible=2026)
+    # Un enregistrement TÉMOIN, inséré et volontairement NON validé.
+    conn.execute("INSERT INTO exploitant (id, nom, siren) "
+                 "VALUES (2, 'Témoin', '000000001')")
+    assert conn.in_transaction
+    gabarits.assurer_table(conn)
+    parametres.assurer(conn)
+    gabarits.tous(conn)
+    parametres.valeur(conn, "seuil_immobilisation", 2026, defaut=500.0)
+    assert conn.in_transaction, "la transaction a été terminée par une lecture"
+    conn.rollback()
+    conn.close()
+    c = sqlite3.connect(db)
+    reste = c.execute("SELECT COUNT(*) FROM exploitant WHERE id = 2").fetchone()[0]
+    c.close()
+    assert reste == 0, "le travail non validé a été committé par une lecture"
+
+
+def test_d209_le_paquet_embarque_tous_les_modules():
+    """Trouvé en décompressant le paquet AILLEURS, pas par la suite.
+
+    MODULES_PROD était une liste écrite à la main : le jour où `plan_immo.py`
+    a été créé, le paquet s'est construit sans une erreur et l'application a
+    échoué à l'import CHEZ LE CLIENT. La garde « PAQUET INCOMPLET » ne couvre
+    pas ce cas — elle ne vérifie que les fichiers cités par les LANCEURS.
+    Même défaut de principe que la garde anti-fuite d'avant la passe F : une
+    liste rédigée à la main ne peut pas signaler ce qu'on a oublié d'y mettre.
+
+    Le répertoire est désormais LU, et ce test le vérifie sur le zip produit.
+    """
+    import zipfile
+
+    import conftest as _c
+
+    import construire_distribution
+    _c.exiger_dossier_prive()
+    sur_disque = {f for f in os.listdir(os.path.join(HERE, "modules"))
+                  if f.endswith(".py")}
+    assert set(construire_distribution.MODULES_PROD) == sur_disque
+
+    anciens = os.getcwd()
+    os.chdir(HERE)
+    try:
+        chemin = construire_distribution.construire()
+    finally:
+        os.chdir(anciens)
+    with zipfile.ZipFile(chemin) as z:
+        dans_paquet = {n.split("modules/", 1)[1] for n in z.namelist()
+                       if "/modules/" in n}
+    assert dans_paquet == sur_disque, sorted(sur_disque - dans_paquet)

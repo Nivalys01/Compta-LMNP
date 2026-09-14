@@ -114,7 +114,13 @@ def assurer(conn: sqlite3.Connection) -> None:
             conn.execute(
                 "INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, "
                 "commentaire) VALUES (?,?,?,?,?)", (cle, valeur, debut, ref, com))
-    conn.commit()
+    # Même précaution que `gabarits.assurer_table` : cette fonction sème la
+    # table au premier accès, donc sur un chemin de LECTURE — `valeur()`
+    # l'appelle. Committer inconditionnellement terminerait la transaction
+    # d'un appelant travaillant en commit=False, sans qu'il le sache
+    # (constat D2-08).
+    if not conn.in_transaction:
+        conn.commit()
 
 
 def valeur(conn: sqlite3.Connection, cle: str, annee: int,

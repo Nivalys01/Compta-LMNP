@@ -340,12 +340,14 @@ récapitulatif reste honnête : une revue qui efface ses erreurs ne se relit pas
 | # | Constat | Fichier | Gravité |
 |---|---|---|---|
 | D2-01 | Aucune protection CSRF ; sans cookie, la requête vise le dossier réel | app.py | Critique — **corrigé** |
-| D2-02 | Clôture CLI sans archivage FEC, commentaire affirmant le contraire | cli.py | Majeur |
-| D2-03 | Clôture validée en base avant l'archivage ; un échec d'archivage passe pour un échec de clôture | app.py | Majeur |
-| D2-04 | Validation d'import non transactionnelle, sans idempotence | app.py | Majeur |
-| D2-05 | Plan immo/amort dans la couche web, exprimé dans dix fichiers | app.py | Majeur |
-| D2-06 | Garde de migration non atomique sur serveur threadé | app.py | Majeur |
-| D2-07 | Apostrophes retirées du texte pour contourner un littéral JS | pages.py | Mineur |
+| D2-02 | Clôture CLI sans archivage FEC | cli.py | Majeur — **corrigé** |
+| D2-03 | Un échec d'archivage passait pour un échec de clôture | app.py | Majeur — **corrigé** |
+| D2-04 | Validation d'import non transactionnelle | app.py | Majeur — **corrigé** |
+| D2-05 | Plan immo/amort dans la couche web, dupliqué | app.py | Majeur — **corrigé** |
+| D2-06 | Garde de migration non atomique | app.py | Majeur — **corrigé** |
+| D2-07 | Apostrophes retirées du texte utilisateur | pages.py | Mineur — **corrigé** |
+| D2-08 | Une lecture terminait la transaction de l'appelant | gabarits, parametres | Majeur — **corrigé** |
+| D2-09 | Le paquet n'embarquait pas un module nouveau | construire_distribution | Critique — **corrigé** |
 | ~~D2-08~~ | ~~Colonnes du FEC jamais renseignées~~ — **constat annulé, il était faux** | — | — |
 
 **Lecture d'ensemble.** La couche web est nettement plus soignée que ne le
@@ -460,3 +462,93 @@ le 2033-A ne retient que les immobilisations. C'est le choix de modèle assumé,
 et le test le dit explicitement.
 
 Non-régression : `tests/test_import_cabinet.py`, 22 tests.
+
+---
+
+## Suivi des correctifs — D2-02 à D2-07 traités, deux constats nouveaux
+
+### Les six constats sans échéance
+
+**D2-02 — la clôture en ligne de commande archive le FEC.** Elle prenait la
+sauvegarde et n'archivait rien, alors que son propre commentaire affirmait le
+contraire. Vérifié par exécution : la clôture CLI rend désormais le chemin de
+l'archive **et l'empreinte SHA-256 consignée au manifeste**.
+
+**D2-03 — un échec d'archivage n'est plus un échec de clôture.** `fiscal.cloturer`
+committe : l'archivage qui suit a son propre `try`, et son échec produit un
+**avertissement sur une clôture réussie**, nommant l'archive manquante et la
+marche à suivre. Auparavant, l'utilisateur lisait « erreur », relançait, et se
+heurtait à « exercice déjà clos » sans comprendre.
+
+**D2-04 — la validation d'import est tout ou rien.** `operations.saisir` accepte
+`commit=False` ; la boucle valide une fois, et `rollback` en cas d'échec. Le
+message dit **où** l'import s'est arrêté et que **rien** n'a été écrit.
+
+**D2-05 — le plan des immobilisations a une source unique.** `modules/plan_immo.py`
+remplace la table qui vivait en dur dans `app.py` — couche web — ET dans
+`liasse.py`, sans que l'une référence l'autre. Un test vérifie qu'ajouter un
+compte n'exige qu'un seul endroit.
+
+**D2-06 — la garde de migration est atomique.** `threading.Lock` autour du test
+et de l'ajout.
+
+**D2-07 — les confirmations ne mutilent plus le texte.** Les deux dernières
+passent par `data-confirmer` : « Passer l'écriture de reprise ? » a retrouvé
+ses apostrophes.
+
+### D2-08 — Une fonction de lecture terminait la transaction de l'appelant
+
+**Trouvé en vérifiant D2-04, et plus profond que lui.**
+
+`gabarits.assurer_table` committait inconditionnellement. Or `gabarit()` — appelée
+à **chaque** saisie — y passe. Tout appelant travaillant en `commit=False` voyait
+donc sa transaction terminée sous ses pieds : à la deuxième saisie la première
+était committée, et un `rollback` n'annulait plus que la dernière ligne.
+
+```
+après saisie 1   in_transaction=True   opérations=1
+après saisie 2   in_transaction=True   opérations=2
+après rollback   in_transaction=False  opérations=1   ← une survit
+```
+
+**Le tout-ou-rien de D2-04 était donc faux malgré le correctif**, et seule la
+vérification par EXÉCUTION l'a montré : un test qui relit le code aurait conclu
+au succès. `parametres.assurer` portait le même défaut, sur le même chemin de
+lecture. Les deux ne committent plus si une transaction est déjà ouverte — le
+`CREATE TABLE IF NOT EXISTS` est transactionnel en SQLite, il peut voyager dans
+celle de l'appelant.
+
+**Gravité : majeur.** Le contrat `commit=False` existait depuis la passe B, où il
+avait été introduit pour rendre la clôture atomique face à une coupure de
+courant. Il était silencieusement rompu.
+
+### D2-09 — Le paquet n'embarquait pas un module nouveau
+
+**Trouvé en décompressant le paquet ailleurs, pas par la suite de tests.**
+
+`MODULES_PROD` était une liste écrite à la main. Le jour où `plan_immo.py` a été
+créé, le paquet s'est construit **sans une erreur** et l'application a échoué à
+l'import **chez le client** :
+
+```
+ModuleNotFoundError: No module named 'plan_immo'
+```
+
+La garde « PAQUET INCOMPLET » ne couvre pas ce cas : elle ne vérifie que les
+fichiers cités par les **lanceurs**. C'est le défaut de principe de F-03,
+resurgi ailleurs — *une liste rédigée à la main ne peut pas signaler ce qu'on a
+oublié d'y mettre.*
+
+Le répertoire `modules/` est désormais **lu**, pas énuméré, et un test compare
+le contenu du zip au contenu du disque.
+
+**Gravité : critique** — le paquet livré ne démarrait pas.
+
+### Vérifications
+
+- **730 tests** sur ce poste, **584 passés / 148 ignorés** sur un clone sans
+  dossier privé, `ruff` propre.
+- Paquet construit (45 fichiers, 27 modules), **décompressé ailleurs et
+  démarré** : c'est l'installation du client qui est éprouvée.
+- Clôture en ligne de commande exécutée sur cette copie : sauvegarde, FEC
+  archivé, empreinte au manifeste.

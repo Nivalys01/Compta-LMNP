@@ -183,6 +183,19 @@ ORDRE_GROUPES = ["Produits", "Dépôts & emprunts", "Copropriété",
 # ── Gabarits personnalisés (table) ───────────────────────────────────────────
 
 def assurer_table(conn: sqlite3.Connection) -> None:
+    """Crée la table des gabarits personnalisés si elle manque.
+
+    NE COMMITTE PAS quand une transaction est déjà ouverte. Elle committait
+    inconditionnellement, et comme `gabarit()` — appelée à CHAQUE saisie —
+    passe par `_personnalises()`, qui passe par ici, tout appelant travaillant
+    en `commit=False` voyait sa transaction terminée en douce sous ses pieds.
+    Observé sur la validation d'un import : la deuxième saisie committait la
+    première, si bien qu'un `rollback` n'annulait plus que la dernière ligne
+    — exactement l'inverse du tout-ou-rien recherché (constat D2-08).
+
+    Le `CREATE TABLE IF NOT EXISTS` est transactionnel en SQLite : il peut
+    voyager dans la transaction de l'appelant sans dommage.
+    """
     conn.execute(
         "CREATE TABLE IF NOT EXISTS gabarit_personnalise ("
         "  cle          TEXT PRIMARY KEY,"
@@ -193,7 +206,8 @@ def assurer_table(conn: sqlite3.Connection) -> None:
         "               CHECK (periodicite IN ('mensuel','annuel','variable')),"
         "  retraitement TEXT,"
         "  actif        INTEGER NOT NULL DEFAULT 1)")
-    conn.commit()
+    if not conn.in_transaction:
+        conn.commit()
 
 
 def ajouter_personnalise(conn: sqlite3.Connection, *, cle: str, libelle: str,

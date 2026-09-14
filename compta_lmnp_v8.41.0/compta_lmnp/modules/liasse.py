@@ -30,18 +30,17 @@ from __future__ import annotations
 
 import sqlite3
 
+import plan_immo
+
 import amortissement
 
 TOL = 0.005
 
-# Rubrique CERFA du 2033-C par compte d'immobilisation.
-RUBRIQUES_2033C = {
-    "211550": ("terrains",       "Terrains",                                        "420", "510"),
-    "213150": ("constructions",  "Constructions",                                   "430", "520"),
-    "218100": ("installations",  "Installations générales, agencements",            "450", "540"),
-    "218400": ("autres_immo",    "Autres immobilisations corporelles",              "470", "560"),
-}
-ORDRE_RUBRIQUES = ["terrains", "constructions", "installations", "autres_immo"]
+# Rubrique CERFA du 2033-C par compte d'immobilisation. La table était ici ET
+# dans app.py, sans que l'une référence l'autre : ajouter un compte demandait
+# d'y penser deux fois, et un oubli restait invisible (constat D2-05).
+RUBRIQUES_2033C = plan_immo.pour_le_2033c()
+ORDRE_RUBRIQUES = plan_immo.ordre_rubriques()
 
 
 # ── Helpers balance ──────────────────────────────────────────────────────────
