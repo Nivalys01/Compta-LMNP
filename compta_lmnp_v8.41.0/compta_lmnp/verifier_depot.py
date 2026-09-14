@@ -55,6 +55,11 @@ CHEMINS_INTERDITS = [
     re.compile(r"(^|/)(?!FEC_DEMO_)[^/]*FEC\d{8}\.txt$"),
 ]
 
+# Formats dont le texte est compressé ou encodé : les lire ne prouve rien.
+OPAQUES = (".pdf", ".zip", ".gz", ".tar", ".7z", ".rar", ".docx", ".xlsx",
+           ".pptx", ".odt", ".ods", ".png", ".jpg", ".jpeg", ".webp", ".db",
+           ".sqlite", ".sqlite3")
+
 # Empreintes du dossier réel, cherchées DANS le contenu publié. Elles sont
 # lues depuis le dossier privé quand il est là : le script n'a donc pas
 # besoin de contenir lui-même les données qu'il protège.
@@ -211,6 +216,19 @@ def verifier(racine: str | None = None) -> dict:
                             "motif": f"illisible ({exc.__class__.__name__}) "
                                      "— non examiné"})
             continue
+        # Formats dont le contenu N'EST PAS inspectable : le texte y est
+        # compressé (PDF, archives, bureautique) et la recherche
+        # d'empreintes n'y trouverait rien — sans échouer pour autant. Le
+        # cas s'est produit : un bilan comptable RÉEL, déposé en PDF à la
+        # racine, n'était ni suivi ni ignoré ; le contrôle le lisait comme
+        # du cp1252, n'y voyait aucune empreinte, et concluait au vert.
+        # Un format qu'on ne sait pas lire doit être DIT, pas traversé.
+        if f.lower().endswith(OPAQUES):
+            alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                            "motif": "format dont le contenu n'est pas "
+                                     "inspectable — vérifiez à la main qu'il "
+                                     "ne porte aucune donnée personnelle"})
+            continue
         contenu = None
         for enc in ("utf-8", "cp1252"):
             try:
@@ -219,7 +237,10 @@ def verifier(racine: str | None = None) -> dict:
             except UnicodeDecodeError:
                 continue
         if contenu is None:
-            continue                    # binaire : rien de textuel à trouver
+            alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                            "motif": "binaire non décodable — contenu non "
+                                     "examiné"})
+            continue
         normalise = normaliser(contenu)
         for quoi, valeur in cherchees:
             if valeur and valeur in normalise:

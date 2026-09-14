@@ -266,6 +266,11 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
         ["Autres charges externes (case 242)", _eur(b["charges_externes_242"])],
         ["Impôts et taxes (case 244) — dont CFE et CVAE "
          + _eur(b["dont_cfe_243"]), _eur(b["impots_244"])],
+        # 250 et 262 : sans elles, un compte de charge hors des préfixes
+        # nommés n'apparaissait dans AUCUNE case, tout en pesant sur le
+        # résultat. 262 est le reste rendu visible.
+        ["Rémunérations du personnel (case 250)", _eur(b["personnel_250"])],
+        ["Autres charges (case 262)", _eur(b["autres_charges_262"])],
         ["Dotations aux amortissements (case 254)", _eur(b["dotations_254"])],
         ["Total des charges d'exploitation (case 264)",
          _eur(b["total_charges_264"])],
@@ -286,7 +291,7 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
          "éléments cédés", _eur(b["charges_exceptionnelles_300"])],
         ["Bénéfice ou perte (case 310)", _eur(b["benefice_ou_perte_310"])],
     ], largeurs=[110 * mm, 60 * mm])
-    _ligne_tot(tb, 13)     # la ligne 310, décalée par les ajouts 230/232
+    _ligne_tot(tb, 15)     # la ligne 310, décalée par les ajouts 230/232/250/262
     E.append(tb)
 
     lignes = [["Réintégrations / déductions", "Montant"],

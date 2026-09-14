@@ -13,6 +13,18 @@ v_ant/
 # --- Notes personnelles, hors périmètre du dépôt -----------------------------
 Base de connaissances diverses/
 
+# --- Documents de travail déposés à la racine --------------------------------
+#     Un PDF comptable réel (bilan établi par un cabinet) y a séjourné sans
+#     être ni suivi ni ignoré : un « git add -A » l'aurait publié, et le
+#     contrôle de dépôt ne peut PAS voir dedans — le texte d'un PDF est
+#     compressé, la recherche d'empreintes n'y trouve rien. Les documents
+#     déposés à la racine sont donc exclus par principe ; un document qui
+#     doit être versionné se met dans docs/.
+/*.pdf
+/*.docx
+/*.xlsx
+/*.odt
+
 # --- Artefacts de build : le paquet client se régénère avec build_client.py --
 *.zip
 dist/

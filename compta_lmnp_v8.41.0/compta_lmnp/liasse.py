@@ -135,10 +135,28 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
     production_vendue = round(produits_tous - produits_fin - produits_exc
                               - autres_produits, 2)               # 218
     produits = round(production_vendue + autres_produits, 2)      # 232
+    # Les charges se DÉDUISENT du total de la classe, elles ne s'énumèrent
+    # pas. L'énumération par préfixe — 60/61/62, 63, 66, 67, plus le seul
+    # compte 681120 — laissait 64 (personnel), 65 (autres charges de
+    # gestion), 68 hors 681120 et 69 hors de TOUTE case : sur un FEC de
+    # cabinet, 12 000 € de dotation portés en 6811000 disparaissaient de la
+    # liasse imprimée tout en restant dans le résultat, et `liasse` divergeait
+    # de `fiscal.agregats` d'exactement ce montant.
+    #
+    # C'est le raisonnement déjà appliqué aux produits (constat E-20), qui
+    # n'avait pas été porté sur les charges : ce qui n'est pas reconnu doit
+    # RETOMBER dans une case visible, jamais s'évaporer.
+    charges_classe6 = _somme(s, ("6",))
+    charges_exc = _somme(s, ("67",))                              # 300
     charges_ext = _somme(s, ("60", "61", "62"))                   # 242
     impots = _somme(s, ("63",))                                   # 244
+    # 243 « dont CFE et CVAE » : lu sur le compte du plan LIVRÉ. Un plan de
+    # cabinet numérote autrement (6351200 relevé sur un bilan réel) et la
+    # case reste alors à zéro — aucun préfixe ne distingue la CET des autres
+    # impôts directs. Non déterminable sans correspondance de plans.
     dont_cfe = round(s.get("635110", 0.0), 2)                     # 243
-    dotations = round(s.get("681120", 0.0), 2)                    # 254
+    personnel = _somme(s, ("64",))                                # 250
+    dotations = _somme(s, ("681",))                               # 254
     charges_fi = _somme(s, ("66",))                               # 294 (intérêts d'emprunt)
     # Charges EXCEPTIONNELLES (classe 67), au premier rang desquelles la
     # valeur comptable des éléments cédés (675000). Les produits étaient
@@ -147,8 +165,15 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
     # comptait la recette de la vente sans sa contrepartie. Sur une cession
     # à titre gratuit, le résultat comptable s'en trouvait majoré de toute
     # la valeur nette du bien, en silence.
-    charges_exc = _somme(s, ("67",))                              # 300
-    total_charges = round(charges_ext + impots + dotations, 2)    # 264 (exploitation)
+    # 264 = TOUTE la classe 6 moins le financier et l'exceptionnel. Formulé
+    # ainsi, aucun compte de charge ne peut manquer au total, quel que soit
+    # le plan du cabinet d'origine.
+    total_charges = round(charges_classe6 - charges_fi - charges_exc, 2)  # 264
+    # 262 « Autres charges » : le reste, rendu VISIBLE. S'il n'est pas nul,
+    # c'est que le FEC porte des comptes de charge que les cases nommées ne
+    # couvrent pas — au déclarant de savoir où les reporter.
+    autres_charges = round(total_charges - charges_ext - impots
+                           - personnel - dotations, 2)            # 262
     # Le bas de compte reste À L'IDENTIQUE : ce qui sort de l'exploitation
     # y revient par les lignes financière et exceptionnelle. Seule la
     # VENTILATION change, jamais le résultat.
@@ -232,6 +257,7 @@ def resultat_2033b(conn: sqlite3.Connection, annee: int) -> dict:
         "produits_exceptionnels_290": produits_exc,
         "charges_externes_242": charges_ext,
         "impots_244": impots, "dont_cfe_243": dont_cfe,
+        "personnel_250": personnel, "autres_charges_262": autres_charges,
         "dotations_254": dotations, "total_charges_264": total_charges,
         "charges_financieres_294": charges_fi,
         "resultat_exploitation_270": round(produits - total_charges, 2),

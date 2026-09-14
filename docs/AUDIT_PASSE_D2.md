@@ -349,3 +349,101 @@ faille de cette revue qui vienne de l'extérieur.** Le raisonnement
 « `127.0.0.1`, donc pas exposé » est juste pour le réseau et faux pour le
 navigateur. Il tient par la liaison locale, alors que ce qui le menace est
 dans le même navigateur que l'utilisateur.
+
+---
+
+## Complément — import d'un FEC de cabinet (classes 1 à 7)
+
+Ajouté après coup, sur demande : le bilan sans comptes de tiers est un choix
+assumé, mais un FEC remis par un cabinet en contient toujours. Le plan de test
+est calqué sur un bilan LMNP **réellement établi par un cabinet** : numéros à
+**sept chiffres** (`5120100` banque, `6811000` dotation, `1640000` emprunt,
+`4110100` locataire), là où le plan livré en compte six. Montants et identité
+fictifs.
+
+### D2-09 — Un compte de charge hors des préfixes énumérés disparaît de la liasse
+
+**Fichier / fonction** : `liasse.resultat_2033b`.
+
+`liasse` **énumérait** des préfixes de classe 6 — `60/61/62` → 242, `63` → 244,
+`66` → 294, `67` → 300 — plus le **seul compte** `681120` pour la case 254. Or
+`fiscal.agregats` prend **toute la classe 6**. Les préfixes `64`, `65`, `68`
+hors `681120` et `69` n'atterrissaient donc dans **aucune case**.
+
+**Scénario** : un cabinet porte sa dotation en `6811000`.
+
+**Produit** (sorties réelles, avant correctif) :
+
+```
+dotation du cabinet (6811000)      : 12000.00
+case 254 rend                      :     0.00
+fiscal.agregats resultat_comptable : -14767.99
+liasse case 310                    :  -2767.99
+écart                              :  12000.00
+```
+
+**Les 12 000 € ne figuraient nulle part au 2033-B** — ni en 254, ni en 242, ni
+en 244 — tout en pesant sur le résultat. Les deux modules qui calculent le
+résultat divergeaient d'exactement le montant ignoré, et rien ne le signalait :
+le contrôle d'équilibre du bilan compare `immo_net` à lui-même, il ne peut pas
+le voir.
+
+C'est le raisonnement du constat E-20 — *« les trois blocs sont soustraits du
+total plutôt qu'énumérés par préfixe : un compte oublié dans l'énumération
+sortirait du résultat en silence »* — appliqué aux produits et **jamais porté
+sur les charges**.
+
+**Corrigé** : `total_charges_264` vaut désormais la classe 6 entière moins le
+financier et l'exceptionnel ; les cases 250 (personnel) et 262 (autres charges)
+sont servies et imprimées, 262 recueillant le reste. Ce qui n'est pas reconnu
+**retombe dans une case visible** au lieu de s'évaporer. Après correctif :
+case 254 = 12 000 €, écart entre les deux modules = **0,00 €**.
+
+**Gravité : critique** — c'était le seul défaut de cette série à falsifier un
+chiffre reporté par le déclarant.
+
+### D2-10 — Le type de la classe 4 contredisait le plan livré
+
+Traité dans le même lot : `fec_io.type_du_compte` rangeait **toute** la classe 4
+au passif, si bien qu'un compte auxiliaire de locataire (`4110100`) était créé
+comme une **dette** alors que le plan livré déclare `411000` à l'**actif**. Les
+tranches sans ambiguïté sont désormais tranchées — 40, 42, 43 au passif, 41 à
+l'actif. Les tranches mixtes par construction (44 État, 45 associés, 46 divers,
+48 régularisation) restent au repli : c'est le sens du solde qui décide, pas le
+numéro.
+
+### D2-11 — Un PDF comptable réel pouvait être publié sans un mot
+
+Trouvé en cherchant le document de référence : un bilan établi par un cabinet
+séjournait **à la racine du dépôt**, ni suivi ni ignoré. Un `git add -A`
+l'aurait publié, et le contrôle **n'aurait rien dit** : le texte d'un PDF est
+compressé, la recherche d'empreintes n'y trouve rien — elle ne échoue pas, elle
+ne trouve rien, ce qui est pire.
+
+**Corrigé** en deux temps : les documents déposés à la racine (`/*.pdf`,
+`/*.docx`, `/*.xlsx`, `/*.odt`) sont exclus par principe ; et
+`verifier_depot` signale désormais en **AVERTISSEMENT** tout format dont il ne
+peut pas inspecter le contenu, au lieu de le traverser en silence. Même famille
+que F-01 : un contrôle qui ne peut pas travailler doit le dire.
+
+### Ce qui tient, et ce qui reste
+
+**Tient.** L'import lui-même est solide : les 19 comptes du plan de cabinet
+sont créés avec le bon type et la bonne classe, l'équilibre est préservé au
+centime, le FEC à sept chiffres passe le validateur, et un produit de classe 79
+(transferts de charges) retombe bien en exploitation.
+
+**Limite assumée, figée par un test.** La case 243 « dont CFE et CVAE » est lue
+sur le compte du plan livré (`635110`). Un cabinet numérote autrement —
+`6351200` relevé sur le bilan réel — et **aucun préfixe ne distingue la CET des
+autres impôts directs**. La case reste donc vide alors que la CET a été payée.
+Ce n'est pas corrigeable sans une correspondance de plans ; le test
+`test_la_case_243_reste_a_zero_sur_un_plan_de_cabinet` fige la limite pour
+qu'elle ne passe pas pour un succès.
+
+**Toujours ouvert — E-22.** L'emprunt de 96 000 €, la banque et les tiers du
+FEC de cabinet sont bien en base, et n'apparaissent dans aucune case du bilan :
+le 2033-A ne retient que les immobilisations. C'est le choix de modèle assumé,
+et le test le dit explicitement.
+
+Non-régression : `tests/test_import_cabinet.py`, 22 tests.
