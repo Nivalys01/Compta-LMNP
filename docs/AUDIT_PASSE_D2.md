@@ -254,25 +254,34 @@ reformulation.
 
 ---
 
-### D2-08 — Cinq colonnes du FEC ne sont jamais renseignées
+### D2-08 — RETIRÉ : le constat était faux
 
-Relevé en cherchant la « colonne d'empreintes » de la passe D : sur les
-105 colonnes du schéma, aucune n'est orpheline, mais **cinq ne reçoivent
-jamais de valeur** par aucun `INSERT` ni `UPDATE` du projet :
+**Énoncé initial** : « cinq colonnes du FEC ne sont jamais renseignées, dont
+`valid_date` sur un exercice clos ».
 
-`valid_date`, `ecriture_let`, `date_let`, `montant_devise`, `idevise`.
+**Il est faux, et la partie qui portait un enjeu fiscal l'était entièrement.**
+`valid_date` **est** écrite — `ecritures.py:183`, dans la liste de colonnes de
+l'`INSERT` — et l'export la restitue (`export_fec.py:55`). Vérifié de bout en
+bout : un FEC exporté par le logiciel porte bien sa `ValidDate`
+(`20260305`) et **passe son propre validateur sans une anomalie.**
 
-Elles sont lues et exportées — donc présentes et vides dans le FEC produit.
-Pour le lettrage (`ecriture_let`, `date_let`) et la devise, c'est licite : ces
-colonnes sont facultatives quand l'usage ne s'y prête pas. Pour
-**`valid_date`**, c'est plus discutable : l'arrêté attend la date de validation
-de l'écriture, et un exercice clos en a une — la clôture l'écrit d'ailleurs
-dans `cloture_fiscale` sans la reporter sur les écritures.
+L'erreur venait de ma méthode : j'avais cherché `INSERT|UPDATE|SET` et le nom
+de colonne **sur la même ligne**, alors que l'`INSERT` d'`ecritures.py` s'étale
+sur plusieurs. Le contrôle refait correctement donne :
 
-**Gravité : mineur**, mais à faire trancher : un contrôleur peut s'étonner
-d'un FEC dont aucune écriture n'est validée alors que l'exercice est clos.
+| Colonne | Écrite par un INSERT |
+|---|---|
+| `valid_date` | **oui** |
+| `ecriture_let`, `date_let` | non |
+| `montant_devise`, `idevise` | non |
 
----
+Restent donc quatre colonnes vides — le **lettrage** et la **devise**. Toutes
+quatre sont facultatives au FEC quand l'usage ne s'y prête pas : une
+comptabilité LMNP en euros, sans lettrage, les laisse légitimement vides. Ce
+n'est pas un défaut.
+
+**Constat annulé.** Il est conservé ici, et non supprimé, pour que le
+récapitulatif reste honnête : une revue qui efface ses erreurs ne se relit pas.
 
 ## 4. Ce qui a été vérifié et tenu
 
@@ -306,8 +315,10 @@ d'un FEC dont aucune écriture n'est validée alors que l'exercice est clos.
   examinés. Les gabarits eux-mêmes n'ont pas été revus.
 - **Le comportement réel sous charge** (D2-06) n'a pas été provoqué : la
   course est établie par lecture, pas par exécution.
-- **La conformité de `valid_date`** (D2-08) relève de l'arrêté A47 A-1 et
-  demande un avis, pas une lecture de code.
+- **Les colonnes de lettrage et de devise** : leur caractère facultatif au
+  regard de l'arrêté A47 A-1 relève d'un avis, pas d'une lecture de code — mais
+  la conformité du FEC produit, elle, est établie : le validateur du projet
+  l'accepte sans anomalie.
 
 ---
 
@@ -322,7 +333,7 @@ d'un FEC dont aucune écriture n'est validée alors que l'exercice est clos.
 | D2-05 | Plan immo/amort dans la couche web, exprimé dans dix fichiers | app.py | Majeur |
 | D2-06 | Garde de migration non atomique sur serveur threadé | app.py | Majeur |
 | D2-07 | Apostrophes retirées du texte pour contourner un littéral JS | pages.py | Mineur |
-| D2-08 | Cinq colonnes du FEC jamais renseignées, dont `valid_date` | schema | Mineur |
+| ~~D2-08~~ | ~~Colonnes du FEC jamais renseignées~~ — **constat annulé, il était faux** | — | — |
 
 **Lecture d'ensemble.** La couche web est nettement plus soignée que ne le
 laissait craindre l'absence de trace : les gardes sont documentées, le cookie

@@ -268,8 +268,10 @@ def test_licence_livree_et_propriete_visible():
     assert '"LICENSE.txt"' in src
     footer = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
     assert "© 2026 Sylvain FAURE" in footer          # visible dans l'UI
-    readme = open(os.path.join(HERE, "README.md"), encoding="utf-8").read()
-    assert "tous droits réservés" in readme
+    # Document d'accueil unique depuis la fusion de README.md et
+    # LISEZ-MOI.md : la mention de propriété y reste en tête.
+    accueil = open(os.path.join(HERE, "LISEZ-MOI.md"), encoding="utf-8").read()
+    assert "tous droits réservés" in accueil
 
 
 def test_import_csv_marque_experimental():

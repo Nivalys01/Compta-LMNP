@@ -482,6 +482,22 @@ document.addEventListener("click", function (ev) {{
     ev.stopPropagation();
   }}
 }}, true);
+// Infobulles d'aide : recentrage quand elles toucheraient un bord.
+// Elles sont posees en CSS pur, centrees sur leur pastille — donc coupees
+// des que la pastille est a moins d'une demi-largeur du bord de la
+// fenetre. Ce script ne fait que POSER une classe : sans JavaScript,
+// l'infobulle reste centree et lisible comme avant, elle depasse
+// simplement. Amelioration progressive, jamais un prerequis.
+document.addEventListener("mouseover", function (ev) {{
+  var a = ev.target.closest(".aide");
+  if (!a || !a.hasAttribute("data-aide")) return;
+  a.classList.remove("aide-gauche", "aide-droite");
+  var r = a.getBoundingClientRect();
+  var demi = 140;                       // moitie de la largeur maximale
+  if (r.left + r.width / 2 - demi < 8) a.classList.add("aide-gauche");
+  else if (r.left + r.width / 2 + demi > window.innerWidth - 8)
+    a.classList.add("aide-droite");
+}}, true);
 document.addEventListener("submit", function (ev) {{
   var f = ev.target.closest("form[data-confirmer]");
   if (f && !window.confirm(f.getAttribute("data-confirmer"))) {{

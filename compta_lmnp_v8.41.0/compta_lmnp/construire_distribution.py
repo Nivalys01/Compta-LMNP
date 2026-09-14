@@ -32,7 +32,9 @@ MODULES_PROD = [
     "fec_io.py", "migration_fec.py", "pages.py", "quittances.py", "construire_exe.py",
     "verifier_depot.py",
 ]
-DOCS = ["LICENSE.txt", "README.md", "CHANGELOG.md", "ARCHITECTURE.md", "LISEZ-MOI.md",
+# Un SEUL document d'accueil : README.md et LISEZ-MOI.md disaient chacun
+# une moitié de la même chose et se renvoyaient l'un à l'autre.
+DOCS = ["LICENSE.txt", "CHANGELOG.md", "ARCHITECTURE.md", "LISEZ-MOI.md",
         "VERSION"]
 # Un SEUL fichier .sh est livré. Le générateur de certificat existait en
 # double (.sh et .py) et s'affichait juste à côté du lanceur : sur un

@@ -54,14 +54,31 @@ main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* ── Cards ── */
+/* `overflow: hidden` a été RETIRÉ d'ici. Il servait à ce que le bandeau
+   coloré respecte les coins arrondis — mais il rognait aussi toute
+   infobulle dépassant de la carte, c'est-à-dire la plupart de celles
+   posées près d'un bord. Les coins sont désormais arrondis sur le bandeau
+   lui-même, ce qui règle l'arrondi sans rien rogner. */
 .card { background: #fff; border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,.12); margin-bottom: 24px; overflow: hidden; }
-.card-/* Bleu marine ASM, avec le jaune de l'onglet actif : le bandeau porte les
+        box-shadow: 0 1px 4px rgba(0,0,0,.12); margin-bottom: 24px; }
+
+/* Bleu marine, avec le jaune de l'onglet actif : le bandeau porte les
    couleurs du club, et le contraste jaune sur marine est plus franc que
-   le blanc sur bleu moyen d'avant. */
-header { background: #002b5c; color: #fff; padding: 10px 20px;
+   le blanc sur bleu moyen d'avant.
+
+   ATTENTION — ce commentaire était collé AU MILIEU du sélecteur, entre
+   « .card- » et « header », ce qui le coupait en deux : `.card-header`
+   ne recevait donc JAMAIS son `color: #fff`. Seules les variantes de
+   couleur s'appliquaient, en posant un fond sans toucher au texte, qui
+   héritait du noir du corps de page — titres noirs sur vert, ambre ou
+   rouge foncé, illisibles. Un commentaire ne se place pas dans un
+   sélecteur. */
+.card-header { background: #002b5c; color: #fff; padding: 10px 20px;
                font-weight: 600; font-size: 12px;
-               text-transform: uppercase; letter-spacing: .8px; }
+               text-transform: uppercase; letter-spacing: .8px;
+               border-radius: 8px 8px 0 0; }
+/* Les variantes ne changent QUE le fond : la couleur du texte vient de la
+   règle de base, et doit y rester — la redéclarer ici la ferait diverger. */
 .card-header.green  { background: #1a6b3a; }
 .card-header.amber  { background: #7a5200; }
 .card-header.red    { background: #7a1c1c; }
@@ -107,6 +124,13 @@ label.field .opt { font-weight: 400; color: #999; }
         border-top-color: #1e2b3d; opacity: 0; visibility: hidden;
         transition: opacity .12s ease; z-index: 41; }
 .aide:hover::after, .aide:hover::before { opacity: 1; visibility: visible; }
+/* Bords de fenêtre : l'infobulle est centrée sur sa pastille, donc coupée
+   dès que celle-ci est à moins d'une demi-largeur du bord. Ces deux
+   variantes l'ancrent du bon côté ; la classe est posée au survol par le
+   script de mise en page. Sans JavaScript, rien ne les active et
+   l'infobulle reste centrée — elle dépasse, elle ne disparaît pas. */
+.aide.aide-gauche::after  { left: 0; transform: none; }
+.aide.aide-droite::after  { left: auto; right: 0; transform: none; }
 .flash-err { white-space: pre-line; }   /* messages multi-lignes lisibles */
 
 /* ── L'assistante ─────────────────────────────────────────────────────

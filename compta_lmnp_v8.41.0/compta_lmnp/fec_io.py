@@ -93,6 +93,21 @@ def type_du_compte(numero: str) -> str:
         return "amortissement"
     if numero.startswith("47"):
         return "attente"
+    # La classe 4 — les comptes de TIERS — ne se déduit pas de son premier
+    # chiffre : 401 fournisseurs est au passif, 411 clients à l'actif. Tout
+    # ranger en passif contredisait le plan livré, qui déclare bien `411000`
+    # en `actif` : un FEC de cabinet portant des auxiliaires (411DUPONT,
+    # 4110000001) créait donc des créances typées comme des dettes.
+    #
+    # Seules les tranches SANS ambiguïté sont tranchées ici. 44 (État),
+    # 45 (associés), 46 (divers) et 48 (régularisation) sont mixtes par
+    # construction — c'est le SENS DU SOLDE qui décide, pas le numéro : elles
+    # restent au repli, et le bilan LMNP les ignore de toute façon (la
+    # comptabilité est tenue sans comptes de tiers, cf. constat E-22).
+    if numero.startswith(("40", "42", "43")):
+        return "passif"                  # fournisseurs, personnel, organismes
+    if numero.startswith("41"):
+        return "actif"                   # clients, locataires : une CRÉANCE
     return {"1": "passif", "2": "actif", "3": "actif", "4": "passif",
             "5": "actif", "6": "charge", "7": "produit",
             "8": "attente"}.get(numero[0], "attente")

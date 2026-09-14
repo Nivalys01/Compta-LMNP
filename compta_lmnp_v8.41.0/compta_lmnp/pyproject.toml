@@ -1,7 +1,11 @@
 # Compta LMNP — configuration qualité (utilisée par `ruff check .`)
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+# 3.12 : c'est déjà la version que le lanceur Windows demande
+# d'installer, et celle sur laquelle le logiciel est éprouvé. La
+# valeur py310 laissait ruff tolérer une syntaxe plus ancienne que
+# ce que le projet exige réellement.
+target-version = "py312"
 
 [tool.ruff.lint]
 # Jeu de règles DÉCLARÉ, et non hérité du défaut de l'outil. Sans cette
