@@ -30,6 +30,51 @@ import gabarits as _g
 
 TOL = 0.005
 
+# ── Familles de comptes, reconnues par PRÉFIXE et non par égalité ─────────
+#
+# Tout ce module identifiait ses comptes par `l.compte_num = '681120'` ou
+# `IN ('622610', …)`. Le plan livré tient sur six chiffres ; un cabinet en
+# utilise sept, et la reprise d'un FEC crée ces comptes tels quels. Chaque
+# égalité stricte devenait alors une qualification fiscale MANQUÉE, en
+# silence et sans qu'aucun total ne bouge :
+#
+#   - une dotation en 6811200 n'était plus une dotation : elle tombait dans
+#     les charges ordinaires, et son excédent devenait un DÉFICIT — soumis
+#     à la péremption décennale — au lieu d'un report 39 C sans limite ;
+#   - des honoraires en 6226100 n'étaient plus exclus du plafond ;
+#   - un produit de cession en 7750000 n'était plus neutralisé, et gonflait
+#     le plafond comme s'il s'agissait d'un loyer.
+#
+# Un compte se reconnaît donc à sa RACINE PCG, qui est ce que le plan
+# comptable normalise ; ses subdivisions en héritent, par construction.
+PREFIXE_DOTATION = "6811"        # dotations aux amortissements sur immo.
+PREFIXE_PRODUIT_CESSION = "775"  # produits de cession d'éléments d'actif
+PREFIXE_VNC_CESSION = "675"      # valeur comptable des éléments cédés
+
+# Produits qui ne sont PAS des loyers acquis. Le plafond de l'article 39 C
+# se calcule sur « le loyer acquis diminué des autres charges afférentes au
+# bien » : un produit financier, un produit exceptionnel, une reprise sur
+# provision ou un transfert de charges n'augmentent pas la capacité
+# d'amortissement de la location. Tous les produits de classe 7 y étaient
+# comptés — un produit financier fictif de 1 000 € absorbait donc
+# immédiatement 1 000 € d'amortissement au lieu de les faire reporter.
+PREFIXES_PRODUITS_HORS_LOYERS = ("76", "77", "78", "79")
+
+
+def _sql_prefixe(colonne: str, prefixes) -> tuple[str, list]:
+    """(fragment SQL, paramètres) testant l'appartenance par préfixe."""
+    if isinstance(prefixes, str):
+        prefixes = (prefixes,)
+    if not prefixes:
+        return "0", []
+    return ("(" + " OR ".join(f"{colonne} LIKE ?" for _ in prefixes) + ")",
+            [f"{p}%" for p in prefixes])
+
+
+def est_compte_dotation(numero: str) -> bool:
+    """Le compte est-il un compte de dotation aux amortissements ?"""
+    return (numero or "").strip().startswith(PREFIXE_DOTATION)
+
 
 # --- Agrégats comptables de l'exercice (lus dans les écritures) -------------
 
@@ -57,6 +102,30 @@ def comptes_hors_plafond_39c(conn: sqlite3.Connection) -> list[str]:
     return [r[0] for r in conn.execute("SELECT numero FROM compte_hors_plafond_39c")]
 
 
+def racines_hors_plafond_39c(conn: sqlite3.Connection) -> list[str]:
+    """Les mêmes exclusions, réduites à leur RACINE.
+
+    La table ne peut contenir que des comptes existants (clé étrangère), ce
+    qui la lie au plan livré à six chiffres. Les honoraires comptables d'un
+    cabinet arrivent en 6226100 : le compte exact n'y figure pas, l'exclusion
+    ne jouait pas, et 500 € passaient du déficit au report 39 C sans qu'un
+    contrôle ne le voie. On compare donc par préfixe, et une subdivision
+    hérite de l'exclusion de sa racine.
+
+    La racine `675` est ajoutée d'office : la valeur comptable d'un élément
+    cédé est une charge de CESSION, jamais afférente à la location, et elle
+    doit être exclue même si le compte 675000 du plan livré est absent de la
+    base (référentiel minimal, dossier importé).
+    """
+    racines = {r for r in comptes_hors_plafond_39c(conn)}
+    racines.add(PREFIXE_VNC_CESSION)
+    # Une racine qui en préfixe une autre la rend inutile : on garde la plus
+    # courte, pour que la liste reste lisible dans les messages.
+    return sorted(r for r in racines
+                  if not any(r != autre and r.startswith(autre)
+                             for autre in racines))
+
+
 def agregats(conn: sqlite3.Connection, annee: int) -> dict:
     """Produits, charges hors dotations, dotation, résultat comptable, plafond 39C."""
     def somme(filtre, signe_debit=True):
@@ -67,37 +136,48 @@ def agregats(conn: sqlite3.Connection, annee: int) -> dict:
         v = conn.execute(q, (annee,)).fetchone()[0]
         return v if signe_debit else -v
 
+    def somme_prefixes(prefixes, signe_debit=True):
+        cond, args = _sql_prefixe("l.compte_num", prefixes)
+        v = conn.execute(
+            "SELECT COALESCE(SUM(l.debit-l.credit),0) FROM ligne l "
+            "JOIN ecriture e ON e.id=l.ecriture_id "
+            f"WHERE e.exercice_annee=? AND {cond}", (annee, *args)).fetchone()[0]
+        return v if signe_debit else -v
+
+    cond_daa, args_daa = _sql_prefixe("l.compte_num", PREFIXE_DOTATION)
     produits = somme("c.classe=7", signe_debit=False)              # crédit - débit
-    charges_hors_daa = somme("c.classe=6 AND l.compte_num<>'681120'")
-    dotation = somme("l.compte_num='681120'")
+    charges_hors_daa = conn.execute(
+        "SELECT COALESCE(SUM(l.debit-l.credit),0) FROM ligne l "
+        "JOIN ecriture e ON e.id=l.ecriture_id "
+        "JOIN compte c ON c.numero=l.compte_num "
+        f"WHERE e.exercice_annee=? AND c.classe=6 AND NOT {cond_daa}",
+        (annee, *args_daa)).fetchone()[0]
+    dotation = somme_prefixes(PREFIXE_DOTATION)
     resultat_comptable = round(produits - charges_hors_daa - dotation, 2)
     # Plafond 39 C = loyers acquis - charges AFFÉRENTES AU BIEN (art. 39 C,
     # II-2). Les charges de structure (honoraires comptables, CFE…) sont
     # exclues du calcul — voir comptes_hors_plafond_39c().
-    exclus = comptes_hors_plafond_39c(conn)
-    hors_plafond = 0.0
-    if exclus:
-        ph = ",".join("?" * len(exclus))
-        hors_plafond = conn.execute(
-            "SELECT COALESCE(SUM(l.debit-l.credit),0) FROM ligne l "
-            "JOIN ecriture e ON e.id=l.ecriture_id "
-            f"WHERE e.exercice_annee=? AND l.compte_num IN ({ph})",
-            (annee, *exclus)).fetchone()[0]
-    produits_cession = -conn.execute(
+    exclus = racines_hors_plafond_39c(conn)
+    hors_plafond = somme_prefixes(exclus) if exclus else 0.0
+    produits_cession = somme_prefixes(PREFIXE_PRODUIT_CESSION, signe_debit=False)
+    vnc_cession = somme_prefixes(PREFIXE_VNC_CESSION)
+    # Les LOYERS ACQUIS : les produits de la location, à l'exclusion de ce
+    # qui n'en est pas (financier, exceptionnel, reprises, transferts). La
+    # base retranchait seulement le produit de cession d'un compte nommé,
+    # et tout le reste de la classe 7 majorait le plafond.
+    cond_hl, args_hl = _sql_prefixe("l.compte_num", PREFIXES_PRODUITS_HORS_LOYERS)
+    produits_hors_loyers = -conn.execute(
         "SELECT COALESCE(SUM(l.debit-l.credit),0) FROM ligne l "
         "JOIN ecriture e ON e.id=l.ecriture_id "
-        "WHERE e.exercice_annee=? AND l.compte_num='775000'",
-        (annee,)).fetchone()[0]
-    vnc_cession = conn.execute(
-        "SELECT COALESCE(SUM(l.debit-l.credit),0) FROM ligne l "
-        "JOIN ecriture e ON e.id=l.ecriture_id "
-        "WHERE e.exercice_annee=? AND l.compte_num='675000'",
-        (annee,)).fetchone()[0]
+        "JOIN compte c ON c.numero=l.compte_num "
+        f"WHERE e.exercice_annee=? AND c.classe=7 AND {cond_hl}",
+        (annee, *args_hl)).fetchone()[0]
+    loyers_acquis = round(produits - produits_hors_loyers, 2)
     charges_afferentes = round(charges_hors_daa - hors_plafond, 2)
-    # Le plafond 39 C se calcule sur les LOYERS ACQUIS : le produit de
-    # cession (775000) n'en fait pas partie.
-    plafond_39c = round(produits - produits_cession - charges_afferentes, 2)
+    plafond_39c = round(loyers_acquis - charges_afferentes, 2)
     return {"produits": round(produits, 2),
+            "loyers_acquis": loyers_acquis,
+            "produits_hors_loyers": round(produits_hors_loyers, 2),
             "charges_hors_daa": round(charges_hors_daa, 2),
             "charges_hors_plafond": round(hors_plafond, 2),
             "charges_afferentes": charges_afferentes,
@@ -152,7 +232,22 @@ def _stock_39c_ouverture(conn: sqlite3.Connection, annee: int) -> float:
     return row[0] if row else 0.0
 
 
+def _annee_stock_ouverture(conn: sqlite3.Connection, annee: int) -> int | None:
+    """L'exercice d'où provient le stock d'ouverture de `annee`."""
+    row = conn.execute(
+        "SELECT exercice_annee FROM suivi_39c WHERE exercice_annee < ? "
+        "ORDER BY exercice_annee DESC LIMIT 1", (annee,)).fetchone()
+    return row[0] if row else None
+
+
 # --- Moteur déficits LMNP (FIFO, péremption 10 ans) -------------------------
+
+def _table_suivi_deficits(conn):
+    """Migration additive pour les dossiers existants, sans commit implicite."""
+    conn.execute("CREATE TABLE IF NOT EXISTS suivi_deficits ("
+                 "exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee), "
+                 "details_json TEXT NOT NULL)")
+
 
 def traiter_deficit(conn: sqlite3.Connection, annee: int, resultat_fiscal: float,
                     commit: bool = True) -> dict:
@@ -170,10 +265,21 @@ def traiter_deficit(conn: sqlite3.Connection, annee: int, resultat_fiscal: float
     """
     duree = int(parametres.valeur(conn, "duree_report_deficit_lmnp",
                                   annee, defaut=10))
+    import json
+
+    _table_suivi_deficits(conn)
+    if conn.execute("SELECT 1 FROM suivi_deficits WHERE exercice_annee=?",
+                    (annee,)).fetchone():
+        raise ValueError(f"Les déficits de {annee} ont déjà été traités.")
     cur = conn.cursor()
+    ouverture = {r[0]: r[1] for r in cur.execute(
+        "SELECT id, solde FROM deficit_lmnp WHERE annee_origine<=?", (annee,))}
+    pertes = {}
+    imputations = {}
     perimes = cur.execute("SELECT id, solde FROM deficit_lmnp "
                           "WHERE annee_expiration < ? AND solde > 0", (annee,)).fetchall()
-    for did, _ in perimes:
+    for did, perdu in perimes:
+        pertes[did] = round(perdu, 2)
         cur.execute("UPDATE deficit_lmnp SET solde=0 WHERE id=?", (did,))
 
     impute = 0.0
@@ -187,14 +293,29 @@ def traiter_deficit(conn: sqlite3.Connection, annee: int, resultat_fiscal: float
         reste = round(resultat_fiscal, 2)
         for did, solde in cur.execute(
             "SELECT id, solde FROM deficit_lmnp WHERE solde>0 AND annee_expiration>=? "
-            "ORDER BY annee_origine", (annee,)).fetchall():
+            "AND annee_origine<? ORDER BY annee_origine, id", (annee, annee)).fetchall():
             if reste <= TOL:
                 break
             pris = round(min(solde, reste), 2)
             cur.execute("UPDATE deficit_lmnp SET solde=ROUND(solde-?,2) WHERE id=?", (pris, did))
             reste = round(reste - pris, 2)
             impute += pris
+            imputations[did] = pris
 
+    # Instantané autonome : ne dépend ni des soldes futurs ni du montant
+    # initial (qui peut déjà avoir été partiellement consommé à la reprise).
+    details = []
+    for did, origine, initial, solde, expiration in cur.execute(
+            "SELECT id, annee_origine, montant_initial, solde, annee_expiration "
+            "FROM deficit_lmnp WHERE annee_origine<=? ORDER BY annee_origine, id",
+            (annee,)):
+        details.append(dict(annee_origine=origine, montant_initial=round(initial, 2),
+                            solde=round(solde, 2), annee_expiration=expiration,
+                            solde_ouverture=round(ouverture.get(did, 0), 2),
+                            impute=imputations.get(did, 0),
+                            perte_peremption=pertes.get(did, 0)))
+    cur.execute("INSERT INTO suivi_deficits VALUES (?, ?)",
+                (annee, json.dumps(details)))
     if commit:
         conn.commit()
     total = cur.execute("SELECT COALESCE(SUM(solde),0) FROM deficit_lmnp").fetchone()[0]
@@ -234,19 +355,151 @@ def _table_39c_bien(conn: sqlite3.Connection) -> None:
 
 
 def _repartir(total: float, poids: dict[int, float]) -> dict[int, float]:
-    """Répartit `total` au prorata de `poids`, arrondi au centime, en ajustant
-    la dernière part pour que la somme retombe EXACTEMENT sur le total."""
-    if not poids or total == 0:
+    """Répartit `total` au prorata de `poids`, au centime, la somme des parts
+    retombant EXACTEMENT sur le total — et aucune part négative.
+
+    L'ajustement portait sur la DERNIÈRE part, à qui l'on donnait le reste :
+    quand les arrondis des précédentes dépassaient déjà le total, ce reste
+    était NÉGATIF. Sur quatre biens se partageant deux centimes, la dernière
+    part valait −0,01 € — un mouvement de reprise négatif enregistré en
+    base, et un centime de stock local en excès.
+
+    On répartit donc par PLUS FORT RESTE : chaque part reçoit sa valeur
+    tronquée au centime, puis les centimes encore à distribuer vont aux
+    parts dont la décimale abandonnée était la plus grande. C'est la même
+    règle que celle des répartitions de sièges, et elle ne peut pas rendre
+    de part négative quand le total ne l'est pas.
+    """
+    if not poids or abs(total) < TOL:
         return dict.fromkeys(poids, 0.0)
-    masse = sum(poids.values())
+    masse = sum(v for v in poids.values() if v > 0)
     if masse <= 0:                       # aucun poids : tout à la 1re clé
         parts = dict.fromkeys(poids, 0.0)
         parts[min(poids)] = round(total, 2)
         return parts
-    cles = sorted(poids)
-    parts = {b: round(total * poids[b] / masse, 2) for b in cles[:-1]}
-    parts[cles[-1]] = round(total - sum(parts.values()), 2)
+    if total < 0:                        # un total négatif garde l'ancienne
+        cles = sorted(poids)             # règle : il n'a pas de « reste »
+        parts = {b: round(total * max(poids[b], 0.0) / masse, 2)
+                 for b in cles[:-1]}
+        parts[cles[-1]] = round(total - sum(parts.values()), 2)
+        return parts
+    centimes_total = int(round(total * 100))
+    exacts = {b: centimes_total * max(poids[b], 0.0) / masse for b in poids}
+    parts_c = {b: int(v) for b, v in exacts.items()}
+    reste = centimes_total - sum(parts_c.values())
+    ordre = sorted(poids, key=lambda b: (-(exacts[b] - parts_c[b]), b))
+    for b in ordre[:reste]:
+        parts_c[b] += 1
+    return {b: round(c / 100, 2) for b, c in parts_c.items()}
+
+
+def _repartir_borne(total: float, poids: dict[int, float],
+                    plafonds: dict[int, float]) -> dict[int, float]:
+    """Comme `_repartir`, mais aucune part ne dépasse son plafond — et ce qui
+    est ainsi écrêté est REDISTRIBUÉ sur celles qui ont encore de la place.
+
+    L'utilisation du stock antérieur était répartie librement, puis chaque
+    part était rabotée à ce que le bien possédait réellement. Le total
+    reparti n'était alors plus le total global : les deux suivis, local et
+    global, cessaient de concorder sans que rien ne le dise.
+    """
+    restant = round(total, 2)
+    parts = dict.fromkeys(poids, 0.0)
+    disponibles = dict(poids)
+    for _ in range(len(poids) + 1):
+        if restant <= TOL or not disponibles:
+            break
+        proposition = _repartir(restant, disponibles)
+        bouge = False
+        for b, p in proposition.items():
+            place = round(plafonds.get(b, 0.0) - parts[b], 2)
+            prise = round(min(p, max(0.0, place)), 2)
+            if prise > 0:
+                parts[b] = round(parts[b] + prise, 2)
+                restant = round(restant - prise, 2)
+                bouge = True
+            if round(plafonds.get(b, 0.0) - parts[b], 2) <= TOL:
+                disponibles.pop(b, None)
+        if not bouge:
+            break
     return parts
+
+
+def _insuffisances_par_bien(conn: sqlite3.Connection, annee: int,
+                            dotations: dict[int, float]) -> dict[int, float]:
+    """Par bien : ce que sa dotation dépasse de sa marge locative.
+
+    C'est cette insuffisance qui produit le report de l'article 39 C — la
+    limitation s'apprécie bien par bien, même si le plafond se calcule
+    globalement. Un bien dont les loyers couvrent sa dotation n'en produit
+    aucun, et ne doit donc pas s'en voir attribuer.
+
+    La marge se lit dans les OPÉRATIONS, seule couche qui rattache un
+    montant à un bien. Un bien sans opération — historique repris depuis un
+    FEC — n'a pas de marge connue : il rend une insuffisance nulle, et
+    l'appelant retombe alors sur la répartition par dotations.
+    """
+    natures = {t: g.get("nature") for t, g in _g.tous(conn).items()}
+    produits, charges = {}, {}
+    try:
+        import operations as _ops
+        _ops.assurer_colonne_annulee(conn)
+        lignes = conn.execute(
+            "SELECT bien_id, type, COALESCE(SUM(montant),0) FROM operation "
+            "WHERE exercice_annee=? AND COALESCE(annulee,0)=0 "
+            "AND bien_id IS NOT NULL GROUP BY bien_id, type", (annee,))
+    except sqlite3.Error:
+        return dict.fromkeys(dotations, 0.0)
+    for bien_id, type_op, montant in lignes:
+        cible = produits if natures.get(type_op) == "produit" else charges
+        cible[bien_id] = round(cible.get(bien_id, 0.0) + float(montant), 2)
+    # Si AUCUN bien ne porte d'opération, la couche métier n'est pas tenue
+    # dans ce dossier — un historique repris depuis un FEC, typiquement — et
+    # aucune marge n'est connue de personne : l'appelant retombera sur les
+    # dotations. Mais dès qu'elle est tenue, un bien sans opération a bien
+    # une marge NULLE pour l'exercice ; lui prêter une insuffisance nulle
+    # reviendrait à priver de report le seul bien qui n'a pas de loyer.
+    if not produits and not charges:
+        return dict.fromkeys(dotations, 0.0)
+    out = {}
+    for bien_id, dotation in dotations.items():
+        marge = round(produits.get(bien_id, 0.0) - charges.get(bien_id, 0.0), 2)
+        out[bien_id] = round(max(0.0, dotation - max(0.0, marge)), 2)
+    return out
+
+
+def _dotation_de_cession(conn: sqlite3.Connection, annee: int,
+                         bien_id: int) -> float:
+    """Dotation complémentaire passée à la cession de CE bien.
+
+    Elle se reconnaît à la RÉFÉRENCE DE PIÈCE, qui porte l'identifiant du
+    bien. L'ancien rattachement comparait le libellé des lignes au libellé
+    des composants du bien : deux biens dont un composant porte le même nom
+    — « Mobilier », disons — et chacun se voyait attribuer la dotation de
+    l'autre, ce qui faussait toute la répartition du report.
+
+    Les dossiers antérieurs à cette correction portent la pièce générique
+    « DAA-CESSION » : on retombe alors sur l'ancien rattachement, mais
+    restreint aux libellés qui n'appartiennent QU'À CE BIEN. Sur une
+    collision de noms, il rend zéro plutôt qu'un multiple.
+    """
+    cond, args = _sql_prefixe("l.compte_num", PREFIXE_DOTATION)
+    r = conn.execute(
+        "SELECT COALESCE(ROUND(SUM(l.debit - l.credit), 2), 0) "
+        "FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
+        f"WHERE e.exercice_annee = ? AND {cond} AND e.piece_ref = ?",
+        (annee, *args, f"DAA-CESSION-{bien_id}")).fetchone()
+    if r and r[0]:
+        return float(r[0])
+    r = conn.execute(
+        "SELECT COALESCE(ROUND(SUM(l.debit - l.credit), 2), 0) "
+        "FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
+        f"WHERE e.exercice_annee = ? AND {cond} AND e.piece_ref = 'DAA-CESSION' "
+        "AND l.libelle IN (SELECT 'DAA cession - ' || c.libelle "
+        "  FROM composant c WHERE c.bien_id = ? AND c.libelle NOT IN "
+        "  (SELECT libelle FROM composant WHERE bien_id <> ?))",
+        (annee, *args, bien_id, bien_id)).fetchone()
+    return float(r[0]) if r and r[0] else 0.0
 
 
 def _ventiler_39c_par_bien(conn: sqlite3.Connection, annee: int, s: dict) -> float:
@@ -268,6 +521,15 @@ def _ventiler_39c_par_bien(conn: sqlite3.Connection, annee: int, s: dict) -> flo
             "date_cession < ?", (f"{annee + 1}-01-01",))}
     except sqlite3.OperationalError:
         cedes = set()                     # colonne absente : aucune cession
+    # Le bien qui reçoit ce qu'on ne sait pas attribuer. C'était « le plus
+    # ancien », sans égard pour sa cession : un dossier migré sans détail
+    # historique voyait son stock global entier atterrir sur un bien DÉJÀ
+    # SORTI, puis disparaître avec lui dès la clôture suivante — avec, au
+    # passage, le report de l'exercice courant produit par le seul bien
+    # encore actif. Un stock qu'on ne sait pas attribuer doit au moins
+    # rester sur un bien qui existe encore.
+    conserves = [b for b in biens if b not in cedes]
+    refuge = conserves[0] if conserves else biens[0]
 
     # Dotations de l'exercice par bien (plan d'amortissement). À défaut
     # (reprise d'historique via rejeu FEC : dotation déjà dans les
@@ -296,33 +558,61 @@ def _ventiler_39c_par_bien(conn: sqlite3.Connection, annee: int, s: dict) -> flo
     for bien_id in cedes:
         if bien_id in dot:
             continue
-        r = conn.execute(
-            "SELECT COALESCE(ROUND(SUM(l.debit - l.credit), 2), 0) "
-            "FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
-            "WHERE e.exercice_annee = ? AND l.compte_num = '681120' "
-            "AND l.libelle IN (SELECT 'DAA cession - ' || c.libelle "
-            "                  FROM composant c WHERE c.bien_id = ?)",
-            (annee, bien_id)).fetchone()
-        if r and r[0]:
-            dot[bien_id] = float(r[0])
+        dotation_cession = _dotation_de_cession(conn, annee, bien_id)
+        if dotation_cession:
+            dot[bien_id] = dotation_cession
     if not dot:
         # Aucun plan pour l'exercice (reprise d'historique par rejeu FEC :
         # la dotation est déjà dans les écritures). On ne peut pas deviner
-        # à quel bien elle revient — on la porte donc sur le bien le plus
-        # ancien, faute de mieux, et on le DIT plutôt que de le taire.
-        dot = {biens[0]: s["dotation_exercice"]}
+        # à quel bien elle revient — on la porte donc sur le bien refuge,
+        # faute de mieux, et on le DIT plutôt que de le taire.
+        #
+        # Le refuge est un bien NON CÉDÉ. C'était « le plus ancien », si
+        # bien qu'un dossier dont le premier bien avait été vendu voyait le
+        # report de l'exercice — produit par le seul bien encore actif —
+        # attribué au sortant, puis perdu avec lui dès cette clôture.
+        dot = {refuge: s["dotation_exercice"]}
 
-    # Stocks d'ouverture : ventilation N-1 si elle existe ; sinon l'historique
-    # global est hérité par le bien le plus ancien (activation en cours de vie).
-    ouv = dict(conn.execute(
-        "SELECT bien_id, stock_cloture FROM suivi_39c_bien WHERE exercice_annee="
-        "(SELECT MAX(exercice_annee) FROM suivi_39c_bien WHERE exercice_annee<?)",
-        (annee,)))
-    if not ouv:
-        ouv = {biens[0]: s["stock_ouverture"]}
+    # Stocks d'ouverture : la ventilation DU MÊME MILLÉSIME que le stock
+    # global d'ouverture. Elle était lue sur le dernier exercice ventilé
+    # quel qu'il soit : un détail de 2024 pouvait ainsi accompagner un
+    # global de 2025, et les deux suivis présentaient des totaux différents
+    # sans que rien ne le signale — 3 000 € sans propriétaire dans un cas
+    # reproduit. Le détail d'une autre année n'est pas le détail de
+    # celle-ci.
+    annee_source = _annee_stock_ouverture(conn, annee)
+    ouv = {}
+    if annee_source is not None:
+        ouv = dict(conn.execute(
+            "SELECT bien_id, stock_cloture FROM suivi_39c_bien "
+            "WHERE exercice_annee=?", (annee_source,)))
+    ouv = {b: v for b, v in ouv.items() if abs(v) > TOL}
+    # Ce qui reste sans propriétaire va au bien refuge, et l'invariant
+    # « somme des stocks locaux = stock global » redevient vrai par
+    # construction. Le contrôle `VENTILATION_39C` le dit à l'utilisateur :
+    # cette affectation est un pis-aller, pas une donnée.
+    ecart = round(s["stock_ouverture"] - sum(ouv.values()), 2)
+    if abs(ecart) > TOL:
+        ouv[refuge] = round(ouv.get(refuge, 0.0) + ecart, 2)
 
-    reports = _repartir(s["report_annee"], dot)
-    utilisations = _repartir(s["utilisation_annee"], ouv)
+    # POIDS DU REPORT : l'INSUFFISANCE de chaque bien, et non sa dotation.
+    # Le report naît des biens dont la dotation dépasse leur marge locative
+    # (BOFiP, II, § 100) ; le répartir au prorata des dotations en donnait
+    # une part à un bien qui couvrait la sienne par ses loyers. Cette part
+    # partait ensuite avec lui à la cession, au détriment du bien qui
+    # l'avait réellement produite. Faute de marge connue par bien — un
+    # dossier repris d'un FEC n'a pas d'opérations —, on retombe sur les
+    # dotations, comme avant.
+    insuffisances = _insuffisances_par_bien(conn, annee, dot)
+    poids_report = insuffisances if sum(insuffisances.values()) > TOL else dot
+
+    reports = _repartir(s["report_annee"], poids_report)
+    # L'utilisation ne peut pas excéder ce que chaque bien possède : elle
+    # était répartie librement puis rabotée bien par bien, et le total
+    # reparti cessait d'égaler le total global.
+    capacites = {b: round(ouv.get(b, 0.0) + reports.get(b, 0.0), 2)
+                 for b in set(ouv) | set(reports)}
+    utilisations = _repartir_borne(s["utilisation_annee"], ouv, capacites)
 
     conn.execute("DELETE FROM suivi_39c_bien WHERE exercice_annee=?", (annee,))
     total_sorti = 0.0

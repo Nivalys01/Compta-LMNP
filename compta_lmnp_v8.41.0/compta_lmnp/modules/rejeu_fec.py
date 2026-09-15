@@ -17,6 +17,7 @@ Particularités gérées :
 """
 from __future__ import annotations
 
+import datetime
 import sqlite3
 from collections import defaultdict
 
@@ -25,15 +26,48 @@ import fec_io
 import ecritures
 
 
+def _date_iso(valeur: str, ou: str) -> str:
+    """AAAAMMJJ du FEC -> AAAA-MM-JJ de la base. Chaîne vide -> vide."""
+    valeur = (valeur or "").strip()
+    if not valeur:
+        return ""
+    if len(valeur) != 8 or not valeur.isdigit():
+        raise ValueError(f"{ou} : date '{valeur}' illisible "
+                         "(huit chiffres AAAAMMJJ attendus).")
+    try:
+        d = datetime.date(int(valeur[:4]), int(valeur[4:6]), int(valeur[6:]))
+    except ValueError:
+        raise ValueError(f"{ou} : date '{valeur}' inexistante au "
+                         "calendrier.") from None
+    return d.isoformat()
+
+
 def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int) -> dict:
     """Insère toutes les écritures du FEC dans l'exercice `annee` (déjà
     ouvert). Retourne {"ecritures": n, "normalisees": n, "comptes_crees": [...]}."""
     lignes = fec_io.lignes_nommees(fec_path)
+    if not lignes:
+        raise ValueError(
+            "Ce fichier ne contient aucune ligne d'écriture exploitable : "
+            "rien n'a été repris. Vérifiez qu'il s'agit bien du FEC de "
+            "l'exercice à reprendre.")
 
-    for code, lib in sorted({(r["JournalCode"], r["JournalLib"])
+    # Le libellé d'un journal DÉJÀ connu du plan n'est pas remplacé par
+    # celui du fichier (INSERT OR IGNORE) : c'est un choix — le plan livré
+    # est la référence — mais il fait que le ré-export ne rend pas le
+    # libellé du FEC source. On ne le subit plus en silence : la divergence
+    # est rapportée à l'appelant, qui l'annonce.
+    journaux_renommes = []
+    for code, lib in sorted({((r["JournalCode"] or "").strip(),
+                              (r["JournalLib"] or "").strip())
                              for r in lignes}):
-        conn.execute("INSERT OR IGNORE INTO journal (code, libelle) VALUES (?,?)",
-                     (code, lib))
+        existant = conn.execute("SELECT libelle FROM journal WHERE code=?",
+                                (code,)).fetchone()
+        if existant is None:
+            conn.execute("INSERT INTO journal (code, libelle) VALUES (?,?)",
+                         (code, lib))
+        elif lib and existant[0] != lib:
+            journaux_renommes.append(f"{code} : « {lib} » → « {existant[0]} »")
     comptes_crees = []
     for num, lib in sorted({(r["CompteNum"], r["CompteLib"])
                             for r in lignes}):
@@ -68,14 +102,23 @@ def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int) -> dict:
     par_ecriture: dict[tuple, list] = defaultdict(list)
     for r in lignes:
         par_ecriture[((r["JournalCode"] or "").strip(),
-                      int(r["EcritureNum"]))].append(r)
+                      (r["EcritureNum"] or "").strip())].append(r)
 
     # La base impose l'unicité du numéro dans l'exercice, alors que les
     # numéros du FEC source peuvent se répéter d'un journal à l'autre : on
     # renumérote alors en continu, dans l'ordre des dates du fichier.
+    #
+    # EcritureNum est ALPHANUMÉRIQUE dans l'arrêté : « BQ0001 » est un
+    # numéro légal, et le `int()` qui se trouvait ici faisait échouer toute
+    # reprise d'un fichier qui en portait — sur un `invalid literal for
+    # int()`, que rien n'expliquait. La colonne `ecriture_num` de la base
+    # est un entier : on renumérote donc, comme pour les numéros répétés,
+    # au lieu de refuser le fichier. Le retour le dit (`renumerotees`).
     ordre = sorted(par_ecriture,
                    key=lambda k: (par_ecriture[k][0]["EcritureDate"], k))
-    renumeroter = len(ordre) != len({n for _, n in ordre})
+    numeriques = all(n.isdigit() for _j, n in ordre)
+    renumeroter = (not numeriques
+                   or len(ordre) != len({n for _, n in ordre}))
 
     # Une reprise s'annule ENTIÈREMENT ou n'a pas lieu. Les écritures sont
     # insérées sans commit intermédiaire ; sans ce rollback, une reprise
@@ -87,9 +130,25 @@ def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int) -> dict:
     try:
         for rang, cle in enumerate(ordre, start=1):
             grp = par_ecriture[cle]
-            num = rang if renumeroter else cle[1]
+            num = rang if renumeroter else int(cle[1])
             r0 = grp[0]
-            d = r0["EcritureDate"]
+            ou = f"écriture {cle[0]}/{cle[1]}"
+            # Toutes les lignes d'une écriture portent LA MÊME date : c'est
+            # ce qui fait d'elles une écriture. Seule celle de la première
+            # ligne était lue, et les autres étaient réécrites avec : deux
+            # lignes datées de deux ANNÉES différentes étaient reprises,
+            # sans un mot, sous l'année de la première — une écriture d'un
+            # autre exercice entrait ainsi dans celui-ci. La garde du
+            # guichet ne pouvait pas la voir, puisque la date lui arrivait
+            # déjà uniformisée.
+            dates = {(r["EcritureDate"] or "").strip() for r in grp}
+            if len(dates) > 1:
+                raise ValueError(
+                    f"Le FEC porte des dates différentes sur les lignes de "
+                    f"l'{ou} : {', '.join(sorted(dates))}. Les lignes d'une "
+                    "même écriture doivent partager sa date. Corrigez le "
+                    "fichier source avant l'import.")
+            d = _date_iso(r0["EcritureDate"], ou.capitalize())
             lgs = []
             for r in grp:
                 deb = fec_io.nombre(r["Debit"])
@@ -100,16 +159,32 @@ def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int) -> dict:
                 elif cre < 0:
                     deb, cre = deb - cre, 0.0
                     n_norm += 1
+                # Les champs facultatifs du FEC source sont CONSERVÉS.
+                # Ils étaient perdus : identification auxiliaire, lettrage
+                # et devise revenaient vides au ré-export, et un fichier
+                # censé être repris à l'identique ne l'était plus.
                 lgs.append((r["CompteNum"], round(deb, 2), round(cre, 2),
-                            r["EcritureLib"]))
+                            r["EcritureLib"],
+                            {"comp_aux_num": r["CompAuxNum"],
+                             "comp_aux_lib": r["CompAuxLib"],
+                             "ecriture_let": r["EcritureLet"],
+                             "date_let": _date_iso(r["DateLet"],
+                                                   f"DateLet de l'{ou}"),
+                             "montant_devise": r["Montantdevise"],
+                             "idevise": r["Idevise"]}))
             ecritures.inserer(conn, journal=r0["JournalCode"],
-                              date=f"{d[:4]}-{d[4:6]}-{d[6:]}", annee=annee,
+                              date=d, annee=annee,
                               libelle=r0["EcritureLib"] or "reprise",
                               piece_ref=r0["PieceRef"] or "NA",
+                              piece_date=_date_iso(r0["PieceDate"],
+                                                   f"PieceDate de l'{ou}"),
+                              valid_date=_date_iso(r0["ValidDate"],
+                                                   f"ValidDate de l'{ou}"),
                               num=num, commit=False, lignes=lgs)
         conn.commit()
     except Exception:
         conn.rollback()
         raise
     return {"ecritures": len(par_ecriture), "normalisees": n_norm,
-            "comptes_crees": comptes_crees, "renumerotees": renumeroter}
+            "comptes_crees": comptes_crees, "renumerotees": renumeroter,
+            "journaux_renommes": journaux_renommes}

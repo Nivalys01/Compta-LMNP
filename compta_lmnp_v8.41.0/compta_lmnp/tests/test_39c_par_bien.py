@@ -53,9 +53,10 @@ def test_mono_bien_ventilation_egale_global(conn):
     assert v["stock_cloture"] == pytest.approx(s["stock_cloture"])
 
 
-def test_deux_biens_report_ventile_au_prorata_des_dotations(conn):
-    """Deux biens avec dotations distinctes : le report global se répartit au
-    prorata des dotations, et la somme retombe sur le global au centime."""
+def test_deux_biens_report_ventile_selon_leur_insuffisance(conn):
+    """Deux biens avec dotations distinctes : le report global se répartit
+    selon l'INSUFFISANCE de chacun — sa dotation moins sa marge locative —
+    et la somme retombe sur le global au centime."""
     exp = conn.execute("SELECT id FROM exploitant LIMIT 1").fetchone()[0]
     conn.execute("INSERT INTO bien (id, exploitant_id, libelle, adresse) "
                  "VALUES (2, ?, 'Studio Riom', '1 rue des Fictifs, Riom')", (exp,))
@@ -77,10 +78,18 @@ def test_deux_biens_report_ventile_au_prorata_des_dotations(conn):
     assert set(par_bien) == {1, 2}
     dot_totale = sum(v["dotation_bien"] for v in par_bien.values())
     assert dot_totale == pytest.approx(s["dotation_exercice"], abs=0.01)
-    # prorata des dotations, au centime près (ajustement sur la dernière part)
-    attendu_b1 = round(s["report_annee"] * par_bien[1]["dotation_bien"]
-                       / dot_totale, 2)
+    # La clé n'est PLUS le prorata des dotations mais l'INSUFFISANCE de
+    # chaque bien — ce que sa dotation dépasse de sa marge locative (passe
+    # I, constat I-05). Le bien 1 perçoit 3 600 € de loyers, le bien 2
+    # aucun : le report doit se concentrer là où il naît.
+    loyers_b1 = 300 * 12
+    insuffisances = {b: max(0.0, par_bien[b]["dotation_bien"]
+                            - (loyers_b1 if b == 1 else 0.0))
+                     for b in (1, 2)}
+    masse = sum(insuffisances.values())
+    attendu_b1 = round(s["report_annee"] * insuffisances[1] / masse, 2)
     assert par_bien[1]["report_bien"] == pytest.approx(attendu_b1, abs=0.011)
+    assert par_bien[2]["report_bien"] > 0            # le bien sans loyer aussi
     assert round(par_bien[1]["report_bien"] + par_bien[2]["report_bien"], 2) \
         == pytest.approx(s["report_annee"])
     assert _somme_par_bien(conn, 2026) == pytest.approx(s["stock_cloture"])

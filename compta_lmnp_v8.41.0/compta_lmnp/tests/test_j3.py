@@ -117,12 +117,21 @@ def test_rejet_colonne_obligatoire_vide(tmp_path):
     errs = v.valider(ecrire(tmp_path, lg))
     assert any("PieceRef" in e for e in errs)
 
-def test_rejet_trou_numerotation(tmp_path):
+def test_trou_numerotation_observe_mais_non_bloquant(tmp_path):
+    """Un trou de numérotation est une OBSERVATION, pas un rejet.
+
+    La notice DGFiP (question 14) admet des ruptures justifiées par la
+    validation d'un brouillard : un fichier EXTERNE qui en comporte n'est
+    pas pour autant non conforme. La continuité des numéros que ce logiciel
+    PRODUIT, elle, reste exigée strictement — mais côté export et contrôles
+    (`controles.c_numerotation_fec`), là où leur provenance est connue.
+    """
     lg = [row[:] for row in LIGNES_OK]
     l3 = [["BQ","Banque","3","20260116","708810","Loyers et autres produits","","","NA","20260116","x","","10","","","20260116","",""],
           ["BQ","Banque","3","20260116","108000","Exploitant","","","NA","20260116","x","10","","","","20260116","",""]]
-    errs = v.valider(ecrire(tmp_path, lg + l3))   # 1 et 3, le 2 manque
-    assert any("non continue" in e for e in errs)
+    rapport = v.valider(ecrire(tmp_path, lg + l3), comme_dict=True)  # le 2 manque
+    assert rapport["erreurs"] == []
+    assert any("non continue" in o for o in rapport["observations"])
 
 def test_rejet_ecriture_une_seule_ligne(tmp_path):
     errs = v.valider(ecrire(tmp_path, [LIGNES_OK[0]]))  # une seule ligne

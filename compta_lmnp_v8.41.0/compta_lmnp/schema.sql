@@ -210,3 +210,9 @@ CREATE TABLE IF NOT EXISTS quittance (
     charges         REAL    NOT NULL DEFAULT 0,
     UNIQUE (locataire_id, periode)
 );
+
+-- Soldes arrêtés par exercice, y compris les millésimes épuisés et périmés.
+CREATE TABLE suivi_deficits (
+    exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee),
+    details_json TEXT NOT NULL
+);

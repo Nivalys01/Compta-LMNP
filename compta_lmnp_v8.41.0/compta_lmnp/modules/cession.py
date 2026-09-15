@@ -24,6 +24,8 @@ ce calcul appartient au notaire ; le pense-bête le rappelle.
 """
 from __future__ import annotations
 
+import math
+
 import datetime
 import sqlite3
 
@@ -109,7 +111,21 @@ def ceder_bien(conn: sqlite3.Connection, bien_id: int, date_cession: str,
         raise ValueError(f"Date de cession invalide : {date_cession!r} "
                          "(format AAAA-MM-JJ).") from None
     annee = d.year
-    if float(prix_cession) < 0:
+    # `nan < 0` est FAUX, comme toute comparaison avec nan : le prix passait
+    # ce contrôle, puis `nan > 0` était faux à son tour et aucune écriture de
+    # produit n'était générée. La cession s'enregistrait quand même —
+    # composants sortis, date de cession posée, 12 000 € d'actif disparus —
+    # pour une demande qui n'avait pas de prix. Le rejet des valeurs non
+    # finies du guichet d'écriture n'était jamais atteint, faute d'écriture.
+    try:
+        prix_cession = float(prix_cession)
+    except (TypeError, ValueError):
+        raise ValueError(f"Prix de cession invalide : {prix_cession!r} "
+                         "(un montant en euros est attendu).") from None
+    if not math.isfinite(prix_cession):
+        raise ValueError("Le prix de cession doit être un montant chiffré "
+                         "(valeur reçue : ni un nombre, ni un montant fini).")
+    if prix_cession < 0:
         raise ValueError("Le prix de cession ne peut pas être négatif.")
 
     composants = conn.execute(
@@ -142,20 +158,28 @@ def ceder_bien(conn: sqlite3.Connection, bien_id: int, date_cession: str,
         total_vnc += vnc
         total_vb += vb
 
+    # La référence de pièce PORTE L'IDENTIFIANT DU BIEN. Le suivi 39 C
+    # devait retrouver la dotation de cession d'un bien pour lui attribuer
+    # sa part du report ; il le faisait en comparant le LIBELLÉ des lignes
+    # (« DAA cession - <composant> »), ce qui suppose des libellés uniques.
+    # Deux biens meublés dont le composant s'appelle pareil — le cas le plus
+    # ordinaire qui soit — et chaque bien cédé se voyait attribuer la
+    # dotation de tous les autres : le stock conservé du bien restant
+    # fondait d'autant. Un identifiant ne se déduit pas d'une description.
     if lignes_dot:
         ecritures.inserer(conn, journal="OD", date=date_cession, annee=annee,
-                          piece_ref="DAA-CESSION", commit=False,
+                          piece_ref=f"DAA-CESSION-{bien_id}", commit=False,
                           libelle=f"Dotation complémentaire cession {bien[0]}",
                           lignes=lignes_dot)
     ecritures.inserer(conn, journal="OD", date=date_cession, annee=annee,
-                      piece_ref="CESSION", commit=False,
+                      piece_ref=f"CESSION-{bien_id}", commit=False,
                       libelle=f"Sortie d'actif - cession {bien[0]}",
                       lignes=lignes_sortie)
     # 3. Prix de cession.
     prix = round(float(prix_cession), 2)
     if prix > 0:
         ecritures.inserer(conn, journal="OD", date=date_cession, annee=annee,
-                          piece_ref="CESSION", commit=False,
+                          piece_ref=f"CESSION-{bien_id}", commit=False,
                           libelle=f"Prix de cession {bien[0]}",
                           lignes=[(CONTREPARTIE, prix, 0.0, "Prix de cession"),
                                   (COMPTE_PRODUIT, 0.0, prix, "Prix de cession")])

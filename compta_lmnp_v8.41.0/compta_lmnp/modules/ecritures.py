@@ -10,7 +10,8 @@ affectation du résultat, injections des audits) passent par `inserer()`, qui
 garantit les invariants du FEC A47 A-1 :
 
   - numérotation séquentielle par exercice (sauf numéro imposé) ;
-  - PieceDate et ValidDate alignées sur la date d'écriture ;
+  - PieceDate et ValidDate alignées sur la date d'écriture, sauf celles
+    qu'un FEC repris apporte et qu'il faut conserver telles quelles ;
   - équilibre débit/crédit vérifié AVANT insertion (rejet au centime),
     désactivable uniquement pour les injections d'anomalies volontaires
     des audits (verifier_equilibre=False).
@@ -87,6 +88,9 @@ def _verifier_conformite_fec(conn: sqlite3.Connection, *, journal: str,
     for lg in lignes:
         lib_ligne = lg[3] if len(lg) > 3 else ""
         _sans_cars_interdits(lib_ligne, f"Le libellé de la ligne {lg[0]}")
+        for nom, valeur in (lg[4] if len(lg) > 4 else {}).items():
+            _sans_cars_interdits(str(valeur or ""),
+                                 f"Le champ {nom} de la ligne {lg[0]}")
 
 
 def prochain_num(conn: sqlite3.Connection, annee: int) -> int:
@@ -95,32 +99,71 @@ def prochain_num(conn: sqlite3.Connection, annee: int) -> int:
         (annee,)).fetchone()[0]
 
 
+# Champs FEC facultatifs qu'une ligne peut porter en plus de son libellé,
+# avec leur colonne en base. Ils viennent d'un FEC repris : lettrage,
+# identification auxiliaire, montant en devise. La comptabilité native ne
+# les emploie pas — raison pour laquelle ils n'étaient pas transmis — mais
+# les effacer d'un fichier de cabinet qui les renseigne, c'est perdre
+# l'identification du tiers et le lettrage du document remis.
+CHAMPS_LIGNE = ("comp_aux_num", "comp_aux_lib", "ecriture_let", "date_let",
+                "montant_devise", "idevise")
+
+
 def inserer(conn: sqlite3.Connection, *, journal: str, date: str, annee: int,
-            libelle: str, lignes: list[tuple[str, float, float]],
+            libelle: str, lignes: list[tuple],
             piece_ref: str = "NA", num: int | None = None,
+            piece_date: str | None = None, valid_date: str | None = None,
             verifier_equilibre: bool = True, verifier_conformite: bool = True,
             commit: bool = True) -> dict:
     """
-    Insère une écriture et ses lignes [(compte, débit, crédit[, libellé]), …]
-    — le libellé de ligne, optionnel, remplace celui de l'écriture.
+    Insère une écriture et ses lignes
+    [(compte, débit, crédit[, libellé[, champs FEC]]), …] — le libellé de
+    ligne, optionnel, remplace celui de l'écriture ; les `champs FEC`,
+    optionnels, sont un dict des colonnes de CHAMPS_LIGNE (lettrage,
+    auxiliaires, devise) conservées telles quelles depuis un FEC repris.
+
+    `piece_date` et `valid_date` valent la date d'écriture par défaut, ce
+    qui est le cas de toute écriture SAISIE ici. Une écriture REJOUÉE
+    depuis un FEC externe apporte les siennes : les écraser par la date
+    d'écriture modifiait des dates de preuve — celle de la pièce
+    justificative et celle de la validation — dans un document censé être
+    repris à l'identique.
+
     Renvoie {'ecriture_id', 'ecriture_num'}.
     """
-    lignes = [(lg[0], lg[1], lg[2], lg[3] if len(lg) > 3 else libelle)
+    lignes = [(lg[0], lg[1], lg[2], lg[3] if len(lg) > 3 else libelle,
+               dict(lg[4]) if len(lg) > 4 and lg[4] else {})
               for lg in lignes]
     if not lignes:
         raise ValueError("Écriture sans ligne.")
-    for cpt, d, c, _l in lignes:
+    for cpt, d, c, _l, extra in lignes:
         # NaN/inf traversent les comparaisons d'équilibre (nan > TOL est faux)
         # et corrompraient le FEC : rejet inconditionnel, même pour les
         # injections d'anomalies volontaires (verifier_equilibre=False).
         if not (math.isfinite(d) and math.isfinite(c)):
             raise ValueError(f"Montant non fini sur le compte {cpt} : "
                              f"débit {d!r} / crédit {c!r}.")
-    total_d = round(sum(d for _, d, _c, _l in lignes), 2)
-    total_c = round(sum(c for _, _d, c, _l in lignes), 2)
+        inconnus = set(extra) - set(CHAMPS_LIGNE)
+        if inconnus:
+            raise ValueError(f"Champ de ligne inconnu : "
+                             f"{', '.join(sorted(inconnus))}.")
+
+    # L'équilibre se vérifie sur les montants QUI SERONT INSCRITS, donc sur
+    # les lignes déjà arrondies au centime. Le contrôle portait sur la somme
+    # des montants bruts, arrondie une seule fois à la fin, alors que
+    # l'insertion arrondit CHAQUE ligne : deux débits de 100,004 € contre un
+    # crédit de 200,008 € passaient le contrôle (200,01 = 200,01) et
+    # s'inscrivaient en 100,00 + 100,00 contre 200,01. Un centime de
+    # déséquilibre durable, que le validateur retrouvait ensuite dans le FEC
+    # — et aucun compte ne l'absorbait.
+    lignes = [(cpt, round(d, 2), round(c, 2), lib, extra)
+              for cpt, d, c, lib, extra in lignes]
+    total_d = round(sum(d for _, d, _c, _l, _e in lignes), 2)
+    total_c = round(sum(c for _, _d, c, _l, _e in lignes), 2)
     if verifier_equilibre and abs(total_d - total_c) > TOL:
         raise ValueError(f"Écriture déséquilibrée : débit {total_d:.2f} € / "
-                         f"crédit {total_c:.2f} €.")
+                         f"crédit {total_c:.2f} € (montants arrondis au "
+                         "centime, comme ils seront enregistrés).")
 
     # Conformité FEC par construction : toute écriture acceptée ici produit un
     # FEC conforme (règles miroir de valider_fec.py). verifier_conformite est
@@ -182,13 +225,16 @@ def inserer(conn: sqlite3.Connection, *, journal: str, date: str, annee: int,
                 "INSERT INTO ecriture (journal_code, ecriture_num, ecriture_date, "
                 "exercice_annee, piece_ref, piece_date, libelle, valid_date) "
                 "VALUES (?,?,?,?,?,?,?,?)",
-                (journal, num, date, annee, piece_ref, date, libelle, date))
+                (journal, num, date, annee, piece_ref,
+                 piece_date or date, libelle, valid_date or date))
             eid = cur.lastrowid
             cur.executemany(
-                "INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) "
-                "VALUES (?,?,?,?,?)",
-                [(eid, compte, lib_ligne, round(d, 2), round(c, 2))
-                 for compte, d, c, lib_ligne in lignes])
+                "INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, "
+                "credit, " + ", ".join(CHAMPS_LIGNE) + ") VALUES (?,?,?,?,?"
+                + ",?" * len(CHAMPS_LIGNE) + ")",
+                [(eid, compte, lib_ligne, d, c)
+                 + tuple(str(extra.get(col) or "") for col in CHAMPS_LIGNE)
+                 for compte, d, c, lib_ligne, extra in lignes])
         except sqlite3.IntegrityError as exc:
             cur.execute("ROLLBACK TO SAVEPOINT ecr_inserer")
             cur.execute("RELEASE SAVEPOINT ecr_inserer")

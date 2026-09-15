@@ -84,6 +84,65 @@ def ordre_rubriques() -> list[str]:
     return [f["rubrique"] for f in IMMOBILISATIONS.values()]
 
 
+def resoudre(compte_immo: str) -> str | None:
+    """Le compte du plan dont `compte_immo` est une SUBDIVISION, ou None.
+
+    Les comptes du plan livré tiennent sur six chiffres. Un cabinet en
+    utilise couramment sept — 2181000 pour ce que ce plan nomme 218100 — et
+    la reprise d'un FEC les crée tels quels. Toute correspondance était
+    établie par égalité STRICTE : 2181000 n'était donc rattaché à rien, et
+    ses montants tombaient dans le repli « autres immobilisations » du
+    2033-C, dans la mauvaise rubrique du formulaire, sans que le total
+    général ne bouge d'un centime — donc sans qu'aucun contrôle de
+    concordance puisse le voir.
+
+    On reconnaît désormais la subdivision par son PRÉFIXE, le plus long
+    d'abord. Ce qui ne correspond à aucun compte du plan reste non résolu :
+    2180000, compte générique, ne dit pas de quelle nature physique relève
+    le composant, et cela s'annonce (voir `c_compte_immo_inconnu`) plutôt
+    que de se deviner.
+    """
+    compte_immo = (compte_immo or "").strip()
+    if not compte_immo:
+        return None
+    if compte_immo in IMMOBILISATIONS:
+        return compte_immo
+    for connu in sorted(IMMOBILISATIONS, key=len, reverse=True):
+        if compte_immo.startswith(connu):
+            return connu
+    return None
+
+
+def fiche(compte_immo: str) -> dict | None:
+    """La fiche du plan correspondant au compte, subdivisions comprises."""
+    resolu = resoudre(compte_immo)
+    return IMMOBILISATIONS[resolu] if resolu else None
+
+
 def compte_amortissement(compte_immo: str) -> str | None:
     """Compte d'amortissement d'une immobilisation, None si non amortissable."""
-    return (IMMOBILISATIONS.get(compte_immo) or {}).get("amort")
+    return (fiche(compte_immo) or {}).get("amort")
+
+
+def amortissement_coherent(compte_immo: str, compte_amort: str) -> bool:
+    """Le compte d'amortissement va-t-il avec le compte d'immobilisation ?
+
+    Les subdivisions sont admises DES DEUX CÔTÉS : un cabinet qui tient son
+    agencement en 2181000 l'amortit en 2818100, et les deux sont bien les
+    subdivisions à sept chiffres de 218100 et 281810. Comparer les chaînes
+    à l'identique rejetterait ce couple parfaitement correct ; ne rien
+    comparer du tout laisse passer un terrain amorti sur un compte de
+    mobilier.
+    """
+    if resoudre(compte_immo) is None:
+        # Compte étranger au plan livré — le compte générique 2180000 d'un
+        # cabinet, par exemple. On ne sait pas ce qu'il devrait amortir :
+        # c'est INJUGEABLE, pas incohérent. Refuser ici bloquerait la
+        # clôture de tout dossier repris d'un FEC externe ; l'alerte
+        # `COMPTE_IMMO_INCONNU` dit ce qu'il y a à dire.
+        return True
+    attendu = compte_amortissement(compte_immo)
+    compte_amort = (compte_amort or "").strip()
+    if attendu is None:
+        return not compte_amort          # non amortissable : aucun compte 28
+    return bool(compte_amort) and compte_amort.startswith(attendu)

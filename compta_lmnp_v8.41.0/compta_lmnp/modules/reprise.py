@@ -30,13 +30,30 @@ def lire_balance_fec(fec_path: str) -> dict[str, float]:
     Sémantique historique préservée : une ligne porte une balance dès
     qu'elle atteint la colonne Credit (13 champs) — plus tolérant que le
     rejeu, qui exige les 18 colonnes, car la balance sert aussi à
-    contrôler des fichiers partiels."""
+    contrôler des fichiers partiels.
+
+    Ce qui est tolérant, c'est le SEUIL, pas le silence : une ligne trop
+    courte pour porter un montant était simplement sautée, et le bilan
+    d'ouverture se construisait alors sur une balance amputée — équilibrée,
+    donc indétectable en aval. Elle est maintenant refusée avec son numéro.
+    """
     bal: dict[str, float] = defaultdict(float)
     _entete, lignes = fec_io.lire_brut(fec_path)
-    for r in lignes:
+    rejets = []
+    for i, r in enumerate(lignes, start=2):     # ligne 1 = en-tête
+        if not any(x.strip() for x in r):
+            continue
         if len(r) < 13:
+            rejets.append(f"L.{i} ({len(r)} champs)")
             continue
         bal[r[4]] += fec_io.nombre(r[11]) - fec_io.nombre(r[12])
+    if rejets:
+        apercu = ", ".join(rejets[:5]) + ("…" if len(rejets) > 5 else "")
+        raise ValueError(
+            f"{len(rejets)} ligne(s) du FEC s'arrêtent avant la colonne "
+            f"Credit : {apercu}. La balance qu'on en tirerait serait "
+            "incomplète — et un bilan d'ouverture faux ne se voit plus "
+            "ensuite. Corrigez le fichier source, puis relancez.")
     return dict(bal)
 
 

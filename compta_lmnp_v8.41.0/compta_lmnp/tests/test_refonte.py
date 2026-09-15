@@ -73,7 +73,12 @@ def test_lire_brut_ne_filtre_rien(tmp_path):
     entete, lignes = fec_io.lire_brut(str(p))
     assert entete == fec_io.COLONNES
     assert ["court", "ligne"] in lignes          # rendue telle quelle
-    assert fec_io.lignes_nommees(str(p)) == []   # mais pas « exploitable »
+    # ... et une ligne inexploitable n'est plus escamotée : elle fait
+    # ÉCHOUER la lecture nommée, au lieu de disparaître d'une reprise qui
+    # se serait ensuite annoncée réussie (constat G-02).
+    with pytest.raises(ValueError, match="colonnes annoncées"):
+        fec_io.lignes_nommees(str(p))
+    assert fec_io.lignes_nommees(str(p), strict=False) == []
 
 
 # === 2. pages.py : présentation pure =======================================

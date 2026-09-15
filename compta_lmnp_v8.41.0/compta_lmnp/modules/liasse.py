@@ -306,9 +306,24 @@ def bilan_2033a(conn: sqlite3.Connection, annee: int) -> dict:
 
 # ── 2033-C : immobilisations & amortissements ────────────────────────────────
 
+def _amortissements_traces(conn: sqlite3.Connection, composant_id: int,
+                           annee: int) -> tuple[float | None, float | None]:
+    """(dotation, cumul_fin) enregistrés à la clôture de `annee`, ou (None,
+    None) si aucune trace — un exercice pas encore clôturé, ou antérieur à
+    la tenue de cette table."""
+    try:
+        r = conn.execute(
+            "SELECT dotation, cumul_fin FROM plan_amortissement "
+            "WHERE composant_id=? AND exercice_annee=?",
+            (composant_id, annee)).fetchone()
+    except sqlite3.OperationalError:
+        return None, None
+    return (None, None) if r is None else (float(r[0]), float(r[1]))
+
+
 def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
     rows = conn.execute(
-        "SELECT libelle, valeur_brute, duree_annees, date_mise_service, "
+        "SELECT id, libelle, valeur_brute, duree_annees, date_mise_service, "
         "compte_immo, amortissable, bien_id FROM composant "
         "ORDER BY id").fetchall()
     # Les composants d'un bien CÉDÉ sont sortis du bilan : les laisser dans
@@ -327,7 +342,7 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
         # Index positionnel et non nommé : selon l'appelant, la connexion
         # peut ne pas avoir de row_factory, et les lignes sont alors des
         # tuples nus. bien_id est la 7e colonne du SELECT ci-dessus.
-        rows = [x for x in rows if x[6] not in cedes]
+        rows = [x for x in rows if x[7] not in cedes]
 
     rub = {k: {"libelle": lib, "case_immo": ci, "case_amort": ca,
                "brut_debut": 0.0, "augmentations": 0.0, "brut_fin": 0.0,
@@ -335,8 +350,9 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
            for compte, (k, lib, ci, ca) in RUBRIQUES_2033C.items()}
     detail = []
 
-    for lib, vb, duree, dms, compte, amortissable, _bien in rows:
-        cle = RUBRIQUES_2033C.get(compte, ("autres_immo",))[0]
+    for cid, lib, vb, duree, dms, compte, amortissable, _bien in rows:
+        resolu = plan_immo.resoudre(compte)
+        cle = RUBRIQUES_2033C.get(resolu, ("autres_immo",))[0]
         r = rub[cle]
         annee_entree = int((dms or f"{annee}-01-01")[:4])
         if annee_entree < annee:
@@ -349,8 +365,21 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
 
         dot = cum_fin = 0.0
         if amortissable and duree:
-            dot, cum_fin, _ = amortissement.etat(vb, duree, dms, annee)
-            _, cum_deb, _ = amortissement.etat(vb, duree, dms, annee - 1)
+            # LA TRACE D'ABORD, le recalcul ensuite. `etat()` reconstruit le
+            # plan depuis la durée ACTUELLE du composant : modifier cette
+            # durée réécrivait donc le tableau d'un exercice déjà CLOS, dont
+            # les amortissements étaient pourtant arrêtés — la route
+            # annonçait « durée portée à 20 ans », et le 2033-C de l'exercice
+            # précédent passait de 1 200 € à 600 €, cependant que le bilan et
+            # le FEC, eux, ne bougeaient pas. La trace écrite à la clôture
+            # dans `plan_amortissement` dit ce qui a été réellement
+            # comptabilisé : c'est elle qui fait foi quand elle existe.
+            dot, cum_fin = _amortissements_traces(conn, cid, annee)
+            _, cum_deb = _amortissements_traces(conn, cid, annee - 1)
+            if dot is None or cum_fin is None:
+                dot, cum_fin, _ = amortissement.etat(vb, duree, dms, annee)
+            if cum_deb is None:
+                _, cum_deb, _ = amortissement.etat(vb, duree, dms, annee - 1)
             r["amort_debut"] += cum_deb
             r["dotation"] += dot
             r["amort_fin"] += cum_fin
@@ -386,26 +415,40 @@ def suivi_reports(conn: sqlite3.Connection, annee: int) -> dict:
             "FROM suivi_39c_bien WHERE exercice_annee=?", (annee,)).fetchone()[0]
     except sqlite3.OperationalError:
         sortie_39c = 0.0
-    try:
-        millesimes = conn.execute(
-            "SELECT annee_origine, montant_initial, solde, annee_expiration "
-            "FROM deficit_lmnp WHERE solde > 0 ORDER BY annee_origine").fetchall()
-    except sqlite3.OperationalError:
-        millesimes = []
-    # Un déficit LMNP s'impute sur les bénéfices de la MÊME activité pendant
-    # dix ans ; passé ce délai il est perdu. La clôture le purge bien, mais
-    # le suivi des reports, lui, comptait les millésimes périmés parmi les
-    # reports « disponibles » : le total affiché surestimait ce qui reste
-    # réellement imputable, et le déclarant pouvait bâtir un plan dessus.
-    # On les affiche toujours — leur disparition sans explication serait
-    # pire — mais MARQUÉS et hors du total.
-    deficits = [{"annee_origine": a, "montant_initial": round(m, 2),
-                 "solde": round(so, 2), "annee_expiration": e,
-                 "perime": e is not None and annee > e}
-                for a, m, so, e in millesimes]
+    import json
+    snapshot = None
+    if conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                    "AND name='suivi_deficits'").fetchone():
+        snapshot = conn.execute(
+            "SELECT details_json FROM suivi_deficits WHERE exercice_annee=?",
+            (annee,)).fetchone()
+    if snapshot is not None:
+        deficits = json.loads(snapshot[0])
+    else:
+        # L'historique d'avant migration ne peut pas être déduit du solde
+        # courant : refuser une réédition trompeuse, sans inventer de stocks.
+        clos = conn.execute("SELECT 1 FROM exercice WHERE annee>=? AND statut='clos'",
+                            (annee,)).fetchone()
+        if clos:
+            raise ValueError(
+                f"Historique des déficits indisponible pour {annee} : "
+                "exercice clos sans suivi par millésime. Utilisez les archives "
+                "de déclaration ou une sauvegarde antérieure à la clôture.")
+        deficits = [dict(annee_origine=a, montant_initial=round(m, 2),
+                         solde=round(so, 2), annee_expiration=e,
+                         solde_ouverture=round(so, 2), impute=0,
+                         perte_peremption=0)
+                    for a, m, so, e in conn.execute(
+                        "SELECT annee_origine, montant_initial, solde, annee_expiration "
+                        "FROM deficit_lmnp WHERE annee_origine<=? ORDER BY annee_origine, id",
+                        (annee,))]
+    for d in deficits:
+        d["perime"] = d["annee_expiration"] is not None and annee > d["annee_expiration"]
+    deficits = [d for d in deficits if d["solde"] or d["solde_ouverture"]
+                or d["perte_peremption"]]
     total_deficits = round(sum(d["solde"] for d in deficits
                                if not d["perime"]), 2)
-    total_perimes = round(sum(d["solde"] for d in deficits
+    total_perimes = round(sum(d["perte_peremption"] or d["solde"] for d in deficits
                               if d["perime"]), 2)
     import fiscal as _fiscal
     return {"suivi_39c": s39, "deficits": deficits,
@@ -430,55 +473,32 @@ def aide_2042c(conn: sqlite3.Connection, annee: int) -> dict:
     """Cases pré-calculées pour la 2042C-PRO (régime réel, cas général)."""
     b = resultat_2033b(conn, annee)
     rep = suivi_reports(conn, annee)
-    cf = _cloture_fiscale(conn, annee)
     rf = b["resultat_fiscal_lmnp"]
 
     # 5GA (année N-10) → 5GJ (année N-1) : déficits antérieurs non déduits.
     cases_lettres = ["5GA", "5GB", "5GC", "5GD", "5GE",
                      "5GF", "5GG", "5GH", "5GI", "5GJ"]
-    # Les déficits doivent être déclarés tels qu'ils étaient à l'OUVERTURE
-    # de l'exercice, et non après l'imputation faite par le logiciel.
-    #
-    # La 2042-C-PRO est construite ainsi : on y porte le bénéfice (5NA) et
-    # les déficits antérieurs restant à déduire (5GA→5GJ), et c'est
-    # l'ADMINISTRATION qui procède à l'imputation. En déclarant un solde
-    # déjà diminué de sa propre imputation, le logiciel la faisait faire
-    # DEUX FOIS : sur un bénéfice de 5 000 € et un déficit de 8 000 €, il
-    # annonçait 5NA = 5 000 (avant imputation) et 5GJ = 3 000 (après) —
-    # l'administration n'effaçait alors que 3 000 des 5 000, taxant 2 000 à
-    # tort et perdant définitivement le reliquat.
-    #
-    # On reconstitue donc le solde d'ouverture : solde de clôture + ce qui
-    # a été imputé pendant l'exercice.
-    # L'imputation est FIFO — du millésime le plus ancien au plus récent —
-    # et son TOTAL de l'exercice est enregistré à la clôture. On la
-    # rembobine donc dans le même ordre, sans avoir besoin d'une trace par
-    # millésime : on rend au plus ancien d'abord, jusqu'à épuisement.
-    reste_a_rendre = round(float(cf.get("impute_deficits") or 0.0), 2)
-    vivants = [d for d in rep["deficits"] if not d.get("perime")]
+    # Ouverture réellement enregistrée, regroupée par année d'origine.
     solde_par_origine = {}
-    for d in sorted(vivants, key=lambda x: x["annee_origine"]):
-        rendu = 0.0
-        if reste_a_rendre > 0.005:
-            # Un millésime intégralement consommé a un solde nul : il a
-            # absorbé au plus ce qu'il valait à l'ouverture, soit son
-            # montant initial.
-            capacite = round(d["montant_initial"] - d["solde"], 2)
-            rendu = min(reste_a_rendre, max(0.0, capacite))
-            reste_a_rendre = round(reste_a_rendre - rendu, 2)
-        solde_par_origine[d["annee_origine"]] = round(d["solde"] + rendu, 2)
-    # Les millésimes entièrement consommés AVANT cet exercice ne
-    # réapparaissent pas : leur solde et leur capacité sont nuls.
-    solde_par_origine = {a: m for a, m in solde_par_origine.items() if m > 0.5}
+    for d in rep["deficits"]:
+        if not d["perime"] and d["annee_origine"] < annee:
+            origine = d["annee_origine"]
+            solde_par_origine[origine] = round(
+                solde_par_origine.get(origine, 0) + d["solde_ouverture"], 2)
+    from decimal import Decimal, ROUND_HALF_UP
+
+    def euro(montant):
+        return int(Decimal(str(montant)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
     cases_deficits = []
     for i, lettre in enumerate(cases_lettres):
         origine = annee - 10 + i
         montant = solde_par_origine.get(origine)
-        if montant:
+        if montant is not None and euro(montant) > 0:
             cases_deficits.append({"case": lettre, "annee_origine": origine,
-                                   "montant": round(montant)})
-    return {"case_5NA": round(rf) if rf > TOL else None,
-            "case_5NY": round(-rf) if rf < -TOL else None,
+                                   "montant": euro(montant)})
+    return {"case_5NA": euro(rf) if rf > TOL else None,
+            "case_5NY": euro(-rf) if rf < -TOL else None,
             "cases_deficits_anterieurs": cases_deficits,
             "note": ("Montants indicatifs, arrondis à l'euro. À vérifier au "
                      "niveau du foyer fiscal, notamment en présence d'autres "

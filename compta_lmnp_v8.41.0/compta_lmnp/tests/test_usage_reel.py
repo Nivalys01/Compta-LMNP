@@ -1865,8 +1865,14 @@ def test_bien_cede_emporte_sa_part_du_report(tmp_path):
                   "compte_amort, amortissable) VALUES (?, 'c', 200000, 20, "
                   "'2020-01-01', '213150', '281315', 1)", (bid,))
     c.commit()
+    # Loyers VOLONTAIREMENT insuffisants pour les deux biens : depuis la
+    # passe I, le report se répartit selon l'insuffisance de chacun
+    # (dotation moins marge locative), et non plus au prorata des seules
+    # dotations. Un bien dont les loyers couvriraient sa dotation ne
+    # produirait aucun report — ce test porte sur la SORTIE de la part d'un
+    # bien cédé, il lui faut donc une part à emporter.
     for bid in (1, 2):
-        operations.saisir(c, type="loyer", montant=6000, periode="2026-01",
+        operations.saisir(c, type="loyer", montant=1000, periode="2026-01",
                           date_operation="2026-01-05", bien_id=bid)
     c.commit()
     cession.ceder_bien(c, bien_id=1, date_cession="2026-06-30",
@@ -2407,12 +2413,17 @@ def test_chaque_bien_cede_porte_sa_propre_dotation(tmp_path):
         c.execute("INSERT INTO bien (exploitant_id, libelle, "
                   "date_acquisition, prix_total, quote_part_terrain) "
                   "VALUES (1, ?, '2020-01-01', ?, 0)", (lib, vb))
-    for bid, vb, cpt in ((1, 50000, "281315"), (2, 150000, "281810"),
-                         (3, 400000, "281840")):
+    # Trois comptes d'amortissement distincts — c'est ce qui permet de
+    # vérifier l'attribution par bien. Chacun va donc avec SON compte
+    # d'immobilisation : depuis la passe H, un compte 28 étranger au compte
+    # d'immobilisation est refusé à la clôture (constat H-12).
+    for bid, vb, immo, cpt in ((1, 50000, "213150", "281315"),
+                               (2, 150000, "218100", "281810"),
+                               (3, 400000, "218400", "281840")):
         c.execute("INSERT INTO composant (bien_id, libelle, valeur_brute, "
                   "duree_annees, date_mise_service, compte_immo, "
                   "compte_amort, amortissable) VALUES (?, ?, ?, 25, "
-                  "'2020-01-01', '213150', ?, 1)", (bid, f"c{bid}", vb, cpt))
+                  "'2020-01-01', ?, ?, 1)", (bid, f"c{bid}", vb, immo, cpt))
     c.commit()
     for bid in (1, 2, 3):
         operations.saisir(c, type="loyer", montant=4000, periode="2026-01",

@@ -1,5 +1,274 @@
 # Journal des versions — Compta LMNP
 
+## 8.44.0 — 2026-09-15 (Passe I : l'article 39 C, son plafond et sa mémoire)
+Onze constats, dont deux critiques. Deux fils rouges, et ils se
+ressemblent : le logiciel identifiait des choses par une CHAÎNE au lieu de
+les identifier par ce qu'elles sont.
+
+**Les comptes, par égalité stricte.** Le plan livré tient sur six chiffres ;
+un cabinet en utilise sept, et la reprise d'un FEC les crée tels quels.
+Chaque égalité devenait alors une qualification fiscale manquée — sans
+qu'un seul total ne bouge, ce qui rendait le défaut parfaitement
+invisible. Une dotation arrivée en 6811200 n'était plus une dotation :
+elle tombait dans les charges ordinaires, et son excédent devenait un
+DÉFICIT LMNP, imputable sur les seuls bénéfices de même nature et périmé à
+dix ans, au lieu d'un report 39 C qui ne se périme jamais. Des honoraires
+comptables en 6226100 n'étaient plus exclus du plafond. Un produit de
+cession en 7750000 n'était plus neutralisé : il gonflait le plafond comme
+s'il s'agissait d'un loyer, et 4 000 € de revenu imposable apparaissaient
+là où il n'y en avait pas. Un compte se reconnaît désormais à sa RACINE
+PCG, dont les subdivisions héritent par construction.
+
+**Les biens, par le libellé de leurs composants.** Pour attribuer à un bien
+cédé sa part du report, le suivi retrouvait sa dotation de cession en
+comparant le libellé des lignes au libellé de ses composants. Deux
+logements meublés dont un composant s'appelle pareil — le cas le plus
+ordinaire qui soit — et chacun se voyait attribuer la dotation de l'autre :
+1 000 € de stock conservé disparaissaient pour un simple choix de mots. La
+référence de pièce porte maintenant l'identifiant du bien.
+
+**Le plafond se calcule sur les LOYERS acquis.** Tous les produits de
+classe 7 y entraient. Un produit financier de 1 000 € absorbait donc
+immédiatement 1 000 € d'amortissement au lieu de les faire reporter — et
+une déduction perdue ne revient jamais, là où un report attend
+indéfiniment. Les produits financiers, exceptionnels, les reprises et les
+transferts de charges sont écartés de cette base ; ils restent bien
+entendu des produits du résultat.
+
+**À qui appartient le report ?** La question n'est pas théorique : le
+report part DÉFINITIVEMENT avec le bien le jour où celui-ci est vendu. Il
+était réparti au prorata des dotations, si bien qu'un logement dont les
+loyers couvraient largement sa dotation en recevait quand même une part —
+laquelle disparaissait ensuite avec lui, au détriment du logement qui
+l'avait réellement produite. Le report se répartit désormais selon
+l'INSUFFISANCE de chaque bien : ce que sa dotation dépasse de sa marge
+locative. Faute d'opérations rattachées aux biens — un historique repris
+d'un FEC n'en a pas —, la répartition par dotations reste le repli.
+
+**Un stock sans propriétaire se dit, au lieu de partir au hasard.** Deux
+situations le produisaient en silence. Un dossier migré depuis une version
+qui ne ventilait pas : le stock global existait, le détail non, et tout
+était porté sur « le bien le plus ancien » — fût-il déjà CÉDÉ, auquel cas
+6 000 € sortaient du suivi dès la clôture suivante, dont 1 000 € produits
+par le seul bien encore actif. Un historique incomplet, ensuite : le détail
+le plus récent datait de 2024 quand le stock global venait de 2025, et
+3 000 € n'avaient tout simplement personne à qui appartenir. Le détail suit
+maintenant le millésime du stock global, ce qui manque est rattaché à un
+bien NON cédé pour que les deux suivis concordent toujours, et un contrôle
+annonce que cette affectation est un pis-aller à vérifier.
+
+**Une répartition ne rend plus de part négative.** L'ajustement du dernier
+centime portait sur la dernière part, à qui l'on donnait le reste : quand
+les arrondis précédents dépassaient déjà le total, ce reste était négatif —
+un mouvement de reprise de −0,01 € enregistré en base. La répartition se
+fait au plus fort reste, et l'écrêtage d'une utilisation au stock
+réellement détenu redistribue ce qu'il retire, au lieu de le perdre.
+
+**L'avertissement sur un retraitement manuel agit enfin avant la clôture.**
+Il ne lisait que les retraitements DÉJÀ enregistrés : il ne pouvait donc
+parler qu'une fois l'exercice figé, quand l'effet était produit. Or
+1 000 € saisis à la main majorent le plafond d'autant et font disparaître
+le report — sans que le résultat fiscal immédiat ne bouge, donc sans que
+rien ne se voie. La clôture consulte désormais ce contrôle avec la valeur
+soumise, et demande confirmation. Le retraitement manuel légitime — le
+fonds ALUR du calage — reste praticable.
+
+**Enfin, l'état archivable se réconcilie.** Sur un dossier mono-bien, le
+tableau imprimé du suivi 39 C affichait « ouverture 5 000 + reporté 1 200 −
+repris 0 = clôture 0 » : la ligne de SORTIE n'existait que dans le détail
+par bien, lequel n'est imprimé qu'à partir de deux logements. 6 200 € de
+mouvement sans explication dans un document destiné à être conservé.
+
+- 39 tests ajoutés (944 au total).
+
+## 8.43.0 — 2026-09-15 (Passe H : les amortissements par composants)
+Douze constats, dont deux critiques. Tous tiennent à la même confusion : le
+plan d'amortissement, recalculé à neuf depuis la durée ACTUELLE du
+composant, était appliqué comme s'il décrivait ce qui avait été
+comptabilisé. Une durée modifiée, une dotation saisie à la main ou un
+historique repris en à-nouveaux le démentent — et c'est de là que venaient
+le dépassement de la valeur brute, le double amortissement d'un exercice et
+la réécriture des tableaux d'un exercice déjà clos.
+
+Le principe est désormais écrit : **le plan est une cible, la comptabilité
+en est la mesure.** La dotation d'un exercice est ce qu'il faut écrire pour
+rejoindre le plan — jamais davantage que l'annuité qu'il prévoit, jamais
+au-delà de ce que le bien a coûté.
+
+**Un compte d'amortissement partagé désactivait tout plafonnement.** Le
+moteur raisonnait par composant, et renonçait dès qu'un compte servait à
+plusieurs — le cas, précisément, des trois postes de bâtiment de la
+ventilation indicative, tous sur le même 281315. Deux composants de 8 000 €
+dont la durée passait de cinq à huit ans recevaient ainsi 19 600 €
+d'amortissements pour 16 000 € de valeur brute, soit 3 600 € de charges
+excédentaires et une valeur nette comptable négative. Le raisonnement se
+tient maintenant par COMPTE, qui est ce que l'on peut observer, et le
+cumul d'un compte ne peut plus dépasser la somme des valeurs brutes qu'il
+amortit.
+
+**Une dotation déjà passée n'empêchait pas d'en générer une seconde.** La
+génération cherchait une pièce OD nommée « DAA » ; elle ne voyait ni une
+OD saisie à la main, ni des amortissements repris en à-nouveaux. Sur un
+exercice où 1 200 € avaient déjà été dotés, la clôture en ajoutait 1 200
+autres : le revenu imposable tombait à zéro au lieu de 600 €, avec 600 €
+de report 39 C indu. Sur un composant d'un an déjà doté de 12 000 €, le
+compte d'amortissement finissait à 24 000 € pour 12 000 € de brut. Le
+moteur lit désormais deux choses distinctes — ce que le plan prévoit pour
+l'exercice, et ce qu'il RESTE à y écrire — et ne confond plus les deux.
+
+**Un retard de cumul ne se rattrape pas tout seul, mais il se voit.** Le
+moteur ne majore jamais une annuité pour combler un retard : l'article
+39 B du CGI tient l'amortissement insuffisant pour irrégulièrement
+différé, donc définitivement perdu, et le déduire l'année suivante serait
+faux. En revanche l'écart ne pouvait pas rester muet. Un nouveau contrôle
+compare le cumul réellement comptabilisé à celui du plan : avertissement
+tant que des annuités restent à venir, BLOQUANT quand le plan est épuisé —
+ce qui arrivait après un raccourcissement de durée, 3 000 € de valeur
+nette sortant alors de tout programme de dotations sans un mot.
+
+**Une contre-passation était invisible, et son inverse était accusé à
+tort.** Le contrôle ne totalisait que les DÉBITS du compte de dotation :
+une DAA annulée par une écriture inverse passait pour intacte, tandis
+qu'une dotation erronée proprement annulée puis refaite était dénoncée
+comme un double amortissement. Le compte de charge se lit maintenant par
+son solde. Et le verrou anti-doublon regarde l'EFFET comptable plutôt que
+la seule présence de la pièce : une dotation contre-passée peut de nouveau
+être reprise, au lieu de bloquer l'exercice définitivement.
+
+**Modifier une durée réécrivait un exercice clos.** Le tableau 2033-C était
+reconstruit depuis la durée actuelle : passer de dix à vingt ans faisait
+tomber la dotation de 2026 — exercice CLOS — de 1 200 € à 600 €, cependant
+que le bilan et le FEC, eux, ne bougeaient pas. La trace écrite à la
+clôture existait ; elle n'était pas lue. Elle fait désormais foi.
+
+**Quatre gardes qui ne gardaient rien.** Une durée de −1 an était acceptée
+par la page Immobilisations : l'acquisition de 12 000 € était
+comptabilisée, aucune dotation n'était jamais générée, et le tableau
+affichait un amortissement négatif. Un bien sans AUCUN composant ne
+déclenchait aucune alerte — une liste vide ne pouvant pas être
+« incohérente » — alors que c'est le cas le plus incomplet qui soit. Un
+terrain portant par erreur un compte d'amortissement de mobilier recevait
+une dotation en bonne et due forme, la seule présence d'un compte 28 étant
+tenue pour suffisante. Et une quote-part de terrain saisie à ZÉRO était
+traitée comme une absence de saisie, la proposition retombant sur sa part
+indicative de 15 % — 15 000 € sortis de la base amortissable sur un prix
+de 100 000 €.
+
+**Les subdivisions d'un cabinet trouvent leur rubrique.** Les comptes du
+plan livré tiennent sur six chiffres, ceux d'un cabinet en ont souvent
+sept. La correspondance était établie par égalité stricte : 2181000, qui
+est une subdivision de 2181, tombait dans le repli « autres
+immobilisations » du 2033-C — 12 000 € de brut et 2 400 € d'amortissements
+dans la mauvaise rubrique, sans que le total général ne bouge d'un
+centime, donc sans qu'aucun contrôle de concordance puisse le voir. Le
+plan reconnaît maintenant les subdivisions par leur préfixe. Ce qu'il ne
+reconnaît pas — 2180000, compte générique qui ne dit pas la nature du
+composant — n'est pas deviné : c'est annoncé, et cela ne bloque pas la
+clôture d'un dossier repris.
+
+**Enfin, le plan d'amortissement vaut exactement la valeur brute.** Une
+annuité inférieure à un demi-centime — 0,24 € sur cinquante ans —
+s'arrondissait à zéro, la boucle n'avançait plus, le garde-fou anti-boucle
+la coupait, et la valeur n'était jamais amortie. À l'autre bout, le
+reliquat d'arrondi de 100 000,01 € créait une cinquante-et-unième annuité
+de 0,01 €. Le plan descend désormais au centime et sa dernière annuité
+solde le reste, sans qu'aucune des annuités calées sur les liasses réelles
+ne bouge.
+
+- 61 tests ajoutés (870 au total).
+
+## 8.42.0 — 2026-09-15 (Passe G : la régularité comptable et le FEC)
+Quinze constats, dont deux critiques. Leur fil rouge n'est pas qu'ils
+existaient, c'est qu'aucun ne produisait d'erreur : chacun rendait un
+verdict rassurant sur un travail qu'il n'avait pas fait. Tous sont traités.
+
+**Une reprise perdait des écritures en annonçant un succès.** Une ligne de
+FEC qui n'atteignait pas le nombre de colonnes attendu était écartée en
+silence par le lecteur, et l'import affichait ensuite « n écritures
+rejouées » comme un résultat normal. Un fichier dont on avait retiré deux
+colonnes VIDES en fin de ligne — ses montants tous présents — perdait ainsi
+des recettes entières, de façon parfaitement ÉQUILIBRÉE : aucun contrôle
+d'équilibre en aval ne pouvait les rattraper. La lecture nommée refuse
+maintenant le fichier en nommant les lignes en cause, et la balance de
+reprise fait de même. Perdre des données sans le dire n'est pas une
+tolérance.
+
+**Une cession s'enregistrait pour un prix qui n'était pas un nombre.**
+`nan < 0` est faux, comme toute comparaison avec nan : le prix passait le
+contrôle de négativité, puis `nan > 0` était faux à son tour et aucune
+écriture de produit n'était générée. La sortie d'actif, elle, se faisait
+quand même — composants sortis, date de cession posée, douze mille euros
+disparus de l'actif pour une demande qui aurait dû être rejetée. Le prix
+doit désormais être un montant fini, et le champ de formulaire ne livre
+plus « nan », « inf » ni « 1e400 » à la couche métier.
+
+**Le validateur approuvait des fichiers qu'il n'avait pas pu vérifier.**
+Quatre défauts se cumulaient. Il convertissait les montants avec un
+`float()` direct, qui accepte « NaN », « inf » et « 1e309 » — des valeurs
+qui neutralisent ensuite toute comparaison d'équilibre (nan ≠ nan,
+inf − inf = nan). Il agrégeait les écritures sur le seul numéro, si bien
+qu'un débit isolé dans un journal et un crédit isolé dans un autre se
+compensaient. Il bornait le jour des dates à 31 sans regarder le
+calendrier, et ne contrôlait du numéro de compte que la longueur. Le
+parseur de montants est désormais commun au lecteur et au validateur, et
+fermé : un montant est un nombre fini écrit en chiffres. L'agrégation
+porte sur le couple (journal, numéro). Les dates passent par le
+calendrier, jusque dans le nom de remise du fichier.
+
+**Et il rejetait des fichiers parfaitement conformes.** La barre verticale
+est un séparateur admis : elle était lue comme du texte, et le fichier
+tokenisé en une seule colonne. Le signe suffixé (« 800,00- ») était un
+« montant illisible ». Les dix-huit colonnes de l'arrêté sont les
+PREMIÈRES, pas un maximum : une dix-neuvième faisait rejeter le fichier
+dès l'en-tête, sans lire une ligne. EcritureNum est alphanumérique :
+« BQ0001 » rendait tout un FEC de cabinet non migrable. Les quatre formes
+sont maintenant lues. Quant aux ruptures de numérotation, elles passent en
+OBSERVATION — la notice DGFiP admet celles qu'explique la validation d'un
+brouillard — tandis que la numérotation que le logiciel PRODUIT, elle,
+reste contrôlée strictement, là où sa provenance est connue.
+
+**Un export taisait ce qu'il ne savait pas restituer.** Ses jointures
+internes faisaient disparaître du fichier toute ligne dont le compte ou le
+journal manquait au plan : l'export se terminait normalement, le validateur
+trouvait le fichier conforme, et huit cents euros présents en base
+n'étaient nulle part. L'export refuse désormais d'écrire un fichier qui ne
+rendrait pas l'intégralité de l'exercice, et un nouveau contrôle bloquant
+signale l'anomalie avant la clôture. Au passage, le fichier sort dans
+l'ordre chronologique : la numérotation suit l'ordre de saisie, et un loyer
+de mars saisi avant celui de janvier faisait reculer les dates du fichier.
+
+**Un rejeu ne rendait pas le fichier qu'on lui avait donné.**
+Identification auxiliaire, lettrage et devise revenaient vides au
+ré-export ; les dates de PREUVE — celle de la pièce, celle de la
+validation — étaient réécrites avec la date d'écriture. Ces champs sont
+maintenant conservés. Deux lignes datées de deux années différentes dans
+une même écriture étaient par ailleurs reprises sous l'année de la
+première, sans un mot : c'est refusé. Et lorsqu'un libellé de journal du
+plan livré l'emporte sur celui du fichier, la reprise le dit au lieu de le
+laisser tacite.
+
+**Trois défauts de moindre portée.** L'équilibre d'une écriture était
+vérifié sur la somme des montants bruts alors que l'insertion arrondit
+chaque ligne : un centime de déséquilibre durable pouvait s'inscrire, et
+aucun compte ne l'absorbait. La quote-part de terrain lue dans un acte
+était déplacée de treize euros par une absorption d'arrondi qui visait la
+plus grosse ligne — le terrain non amortissable, justement. Un FEC en
+ISO-8859-15, encodage que l'arrêté admet, voyait ses euros devenir des
+« ¤ » parce que l'ordre d'essai des jeux latins décidait seul.
+
+**Le code de retour du validateur autonome vaut désormais le verdict.** Il
+valait 0 quoi qu'il arrive : une automatisation pouvait archiver puis
+remettre un FEC déséquilibré au motif que le contrôle « s'était bien
+passé ». Le message affiché, lui, était explicite — c'est le contrat de
+commande qui manquait. 0 conforme, 1 erreur bloquante, 2 illisible.
+
+**Et les comptes de tiers d'exception sont typés correctement.** 409
+(fournisseurs débiteurs), 419 (clients créditeurs) et 425 (avances au
+personnel) portent le solde INVERSE de leur tranche : un avoir fournisseur
+était rangé avec les dettes, un trop-perçu de locataire avec les créances.
+
+- 65 tests ajoutés (809 au total).
+
 ## 8.41.0 — 2026-09-07 (Passe D : les trois derniers constats critiques)
 Les neuf constats critiques de la revue de la couche web sont désormais
 traités. Ces trois-là touchent tous à la DISPONIBILITÉ d'un dossier.

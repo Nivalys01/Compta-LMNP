@@ -57,11 +57,74 @@ SELECT
     l.idevise                         AS Idevise
 FROM ligne l
 JOIN ecriture e ON e.id = l.ecriture_id
-JOIN journal  j ON j.code = e.journal_code
-JOIN compte   c ON c.numero = l.compte_num
+LEFT JOIN journal  j ON j.code = e.journal_code
+LEFT JOIN compte   c ON c.numero = l.compte_num
 WHERE e.exercice_annee = ?
-ORDER BY e.ecriture_num, l.id
+ORDER BY e.ecriture_date, e.ecriture_num, l.id
 """
+# Deux choix, dans cette requête, tiennent à des défauts constatés :
+#
+# LEFT JOIN sur le journal et le compte. Les jointures internes faisaient
+# DISPARAÎTRE du fichier toute ligne dont le compte ou le journal manquait au
+# plan — l'export se terminait normalement, le validateur trouvait le fichier
+# conforme, et 800 € présents en base n'étaient nulle part. Un export ne doit
+# pas pouvoir taire ce qu'il ne sait pas restituer : la ligne sort désormais
+# avec un libellé vide, que le validateur signale, et `exporter()` refuse le
+# fichier (voir `_verifier_exhaustivite`).
+#
+# ORDER BY sur la DATE avant le numéro. La numérotation suit l'ordre de
+# SAISIE : un loyer de mars saisi avant celui de janvier sortait en tête du
+# fichier, dont la chronologie — dates d'écriture comme dates de validation —
+# reculait alors d'un bloc à l'autre. Rien ne l'interdit formellement, mais
+# c'est le premier motif de question d'un vérificateur, et l'ordre
+# chronologique ne coûte rien.
+
+
+def _verifier_exhaustivite(conn: sqlite3.Connection, annee: int,
+                           lignes: list[list[str]]) -> None:
+    """Refuse d'écrire un FEC qui ne rendrait pas ce que la base contient.
+
+    Un export silencieusement incomplet est plus dangereux qu'un export en
+    échec : il produit un fichier d'apparence normale, que le validateur
+    approuve, et dont personne ne peut deviner qu'il manque des écritures.
+    """
+    attendu = conn.execute(
+        "SELECT COUNT(*) FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
+        "WHERE e.exercice_annee = ?", (annee,)).fetchone()[0]
+    if len(lignes) != attendu:
+        raise ValueError(
+            f"Export interrompu : l'exercice {annee} compte {attendu} "
+            f"ligne(s) en base et {len(lignes)} seraient écrites. Le fichier "
+            "serait incomplet — il n'est pas produit.")
+    orphelines = conn.execute(
+        "SELECT DISTINCT l.compte_num FROM ligne l "
+        "JOIN ecriture e ON e.id = l.ecriture_id "
+        "LEFT JOIN compte c ON c.numero = l.compte_num "
+        "WHERE e.exercice_annee = ? AND c.numero IS NULL", (annee,)).fetchall()
+    if orphelines:
+        raise ValueError(
+            "Export interrompu : des écritures utilisent des comptes absents "
+            f"du plan — {', '.join(str(o[0]) for o in orphelines)}. Leur "
+            "libellé est obligatoire au FEC. Rétablissez ces comptes avant "
+            "d'exporter.")
+    sans_journal = conn.execute(
+        "SELECT DISTINCT e.journal_code FROM ecriture e "
+        "LEFT JOIN journal j ON j.code = e.journal_code "
+        "WHERE e.exercice_annee = ? AND j.code IS NULL", (annee,)).fetchall()
+    if sans_journal:
+        raise ValueError(
+            "Export interrompu : des écritures portent des journaux absents "
+            f"du référentiel — {', '.join(str(o[0]) for o in sans_journal)}.")
+    vides = conn.execute(
+        "SELECT e.ecriture_num FROM ecriture e "
+        "LEFT JOIN ligne l ON l.ecriture_id = e.id "
+        "WHERE e.exercice_annee = ? AND l.id IS NULL "
+        "ORDER BY e.ecriture_num", (annee,)).fetchall()
+    if vides:
+        raise ValueError(
+            "Export interrompu : écriture(s) sans aucune ligne — "
+            f"n° {', '.join(str(v[0]) for v in vides)}. Un en-tête sans ligne "
+            "est un trou dans la numérotation du FEC.")
 
 
 def lignes_fec(conn: sqlite3.Connection, annee: int) -> list[list[str]]:
@@ -84,8 +147,12 @@ def lignes_fec(conn: sqlite3.Connection, annee: int) -> list[list[str]]:
 
 
 def exporter(conn: sqlite3.Connection, annee: int, chemin: str) -> str:
-    """Écrit le FEC de l'exercice et renvoie le chemin produit."""
+    """Écrit le FEC de l'exercice et renvoie le chemin produit.
+
+    Lève ValueError plutôt que d'écrire un fichier qui ne restituerait pas
+    l'intégralité des écritures de l'exercice."""
     lignes = lignes_fec(conn, annee)
+    _verifier_exhaustivite(conn, annee, lignes)
     with open(chemin, "w", encoding="utf-8", newline="") as f:
         f.write("\t".join(COLONNES) + "\r\n")
         for lg in lignes:

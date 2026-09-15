@@ -19,7 +19,9 @@ import sqlite3
 
 import gabarits as _g
 import amortissement
+import fiscal
 import parametres
+import plan_immo
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -50,6 +52,50 @@ def c_equilibre_ecritures(conn, annee) -> list[Anomalie]:
         if abs((d or 0) - (c or 0)) > 0.005:
             out.append(Anomalie(BLOQUANT, "EQUILIBRE",
                                 f"Écriture {num} déséquilibrée : {d:.2f} ≠ {c:.2f}."))
+    return out
+
+
+def c_numerotation_fec(conn, annee) -> list[Anomalie]:
+    """BLOQUANT — numérotation continue et aucune écriture sans ligne.
+
+    La numérotation du FEC est celle que ce logiciel PRODUIT : elle lui
+    appartient, et il peut donc en exiger la continuité stricte — ce qu'un
+    validateur ne peut pas faire sur un fichier externe, où un trou peut
+    s'expliquer par la validation d'un brouillard.
+
+    Une écriture sans ligne compte comme un trou : elle occupe un numéro et
+    ne produira aucune ligne dans le fichier remis.
+    """
+    nums = [n for (n,) in conn.execute(
+        "SELECT ecriture_num FROM ecriture WHERE exercice_annee=? "
+        "ORDER BY ecriture_num", (annee,))]
+    out = []
+    if nums:
+        manquants = sorted(set(range(min(nums), max(nums) + 1)) - set(nums))
+        if manquants:
+            out.append(Anomalie(BLOQUANT, "NUMEROTATION",
+                                "Numérotation des écritures non continue : "
+                                f"n° {', '.join(map(str, manquants))} "
+                                "manquant(s) dans l'exercice."))
+    vides = [n for (n,) in conn.execute(
+        "SELECT e.ecriture_num FROM ecriture e "
+        "LEFT JOIN ligne l ON l.ecriture_id = e.id "
+        "WHERE e.exercice_annee=? AND l.id IS NULL "
+        "ORDER BY e.ecriture_num", (annee,))]
+    if vides:
+        out.append(Anomalie(BLOQUANT, "ECRITURE_VIDE",
+                            "Écriture(s) sans aucune ligne : "
+                            f"n° {', '.join(map(str, vides))}."))
+    orphelines = [c for (c,) in conn.execute(
+        "SELECT DISTINCT l.compte_num FROM ligne l "
+        "JOIN ecriture e ON e.id = l.ecriture_id "
+        "LEFT JOIN compte c ON c.numero = l.compte_num "
+        "WHERE e.exercice_annee=? AND c.numero IS NULL", (annee,))]
+    if orphelines:
+        out.append(Anomalie(BLOQUANT, "COMPTE_ABSENT",
+                            "Compte(s) utilisé(s) mais absent(s) du plan : "
+                            f"{', '.join(map(str, orphelines))}. Le FEC ne "
+                            "pourrait pas en donner le libellé."))
     return out
 
 
@@ -222,14 +268,28 @@ def c_duree_allongee(conn, annee) -> list[Anomalie]:
             "SELECT id FROM bien WHERE date_cession IS NOT NULL")}
     except sqlite3.OperationalError:
         cedes = set()
+    # Le raisonnement se tient par COMPTE d'amortissement : c'est lui qui
+    # est observable, et plusieurs composants peuvent le partager. On
+    # compare donc le cumul du compte à la somme des cumuls prévus par les
+    # composants qui l'alimentent — comparer composant par composant
+    # accuserait chacun du cumul de tous.
+    groupes: dict[str, list] = {}
     for cid, lib, vb, duree, dms, c_amort, bien_id in rows:
         if not duree or not c_amort or bien_id in cedes:
             continue
-        deja = _am._cumul_comptabilise(conn, cid, c_amort, annee)
-        if deja is None:                 # compte partagé : indécidable
+        groupes.setdefault(c_amort, []).append((lib, vb, duree, dms))
+    for c_amort, membres in groupes.items():
+        # Le cumul à l'OUVERTURE de l'exercice : celui de la clôture
+        # comprendrait la dotation de l'année, et tout exercice doté
+        # paraîtrait alors avoir vu sa durée allongée.
+        deja = _am.cumul_ouverture(conn, c_amort, annee)
+        if deja is None:                 # lecture impossible : indécidable
             continue
+        lib = " / ".join(x[0] for x in membres)
+        vb = sum(float(x[1]) for x in membres)
         try:
-            _, cumul_prevu, _ = _am.etat(vb, duree, dms, annee - 1)
+            cumul_prevu = round(sum(_am.etat(x[1], x[2], x[3], annee - 1)[1]
+                                    for x in membres), 2)
         except Exception:                # noqa: BLE001
             continue
         ecart = round(deja - cumul_prevu, 2)
@@ -251,7 +311,8 @@ def c_duree_allongee(conn, annee) -> list[Anomalie]:
     return out
 
 
-def c_retraitement_manuel_majore_le_plafond(conn, annee) -> list[Anomalie]:
+def c_retraitement_manuel_majore_le_plafond(conn, annee, *,
+                                           manuel_saisi=None) -> list[Anomalie]:
     """
     AVERTISSEMENT — un retraitement saisi à la main majore le plafond 39 C.
 
@@ -274,15 +335,24 @@ def c_retraitement_manuel_majore_le_plafond(conn, annee) -> list[Anomalie]:
     except sqlite3.OperationalError:
         return []
     total = float(r[0]) if r else 0.0
-    if total <= 0.5:
-        return []
     auto = 0.0
     try:
         import fiscal as _fiscal
         auto = round(_fiscal.retraitement_automatique(conn, annee), 2)
     except Exception:                            # noqa: BLE001
         return []
-    manuel = round(total - auto, 2)
+    # `manuel_saisi` : le montant EN COURS DE SOUMISSION, que la table
+    # `cloture_fiscale` ne contient pas encore. Le contrôle ne lisait que
+    # les retraitements DÉJÀ ENREGISTRÉS : il ne pouvait donc parler
+    # qu'après la clôture, sur un exercice déjà figé — l'avertissement
+    # arrivait une fois l'effet produit. La clôture le consulte maintenant
+    # avec la valeur soumise, avant de figer quoi que ce soit.
+    if manuel_saisi is not None:
+        manuel = round(float(manuel_saisi), 2)
+    else:
+        if total <= 0.5:
+            return []
+        manuel = round(total - auto, 2)
     if manuel <= 0.5:
         return []
     return [Anomalie(AVERTISSEMENT, "RETRAITEMENT_MANUEL_PLAFOND",
@@ -294,6 +364,62 @@ def c_retraitement_manuel_majore_le_plafond(conn, annee) -> list[Anomalie]:
             "charge de structure (honoraires comptables, CFE). Vérifiez ce "
             "point : dans le second cas, vous déduiriez plus "
             "d'amortissement que la loi ne l'autorise.")]
+
+
+def c_ventilation_39c_incomplete(conn, annee) -> list[Anomalie]:
+    """AVERTISSEMENT — le stock 39 C d'ouverture n'a pas de ventilation par
+    bien, ou celle-ci ne provient pas du même exercice que lui.
+
+    Le suivi par bien décide qui emporte quoi lors d'une cession : une part
+    attribuée par défaut sort ensuite définitivement avec un bien qui ne
+    l'a jamais produite. Deux situations le provoquaient en silence :
+
+      - un dossier MIGRÉ depuis une version qui ne ventilait pas : le stock
+        global existe, le détail non, et tout était porté sur le bien le
+        plus ancien — fût-il déjà cédé ;
+      - un historique INCOMPLET : le détail le plus récent datait de 2024
+        alors que le stock global venait de 2025, et l'écart entre les deux
+        n'avait tout simplement pas de propriétaire.
+
+    Le logiciel rattache désormais ce qui manque à un bien conservé, pour
+    que la somme des stocks locaux égale toujours le stock global. Mais
+    c'est un PIS-ALLER, et il doit se dire : seul l'utilisateur sait à quel
+    logement ce report historique se rapporte.
+    """
+    import fiscal as _fiscal
+    try:
+        global_ouv = round(_fiscal._stock_39c_ouverture(conn, annee), 2)
+    except sqlite3.Error:
+        return []
+    if global_ouv <= 0.5:
+        return []
+    source = _fiscal._annee_stock_ouverture(conn, annee)
+    _fiscal._table_39c_bien(conn)
+    detail = dict(conn.execute(
+        "SELECT bien_id, stock_cloture FROM suivi_39c_bien "
+        "WHERE exercice_annee=?", (source,))) if source is not None else {}
+    somme = round(sum(detail.values()), 2)
+    ecart = round(global_ouv - somme, 2)
+    if abs(ecart) <= 0.5:
+        return []
+    biens = conn.execute("SELECT COUNT(*) FROM bien").fetchone()[0]
+    if biens <= 1:
+        return []          # un seul bien : l'affectation ne fait pas de doute
+    if not detail:
+        motif = (f"aucune ventilation par bien n'existe pour {source}"
+                 if source is not None else
+                 "aucune ventilation par bien n'a jamais été enregistrée")
+    else:
+        motif = (f"la ventilation de {source} ne totalise que {somme:.2f} €")
+    return [Anomalie(AVERTISSEMENT, "VENTILATION_39C",
+            f"Stock 39 C d'ouverture de {global_ouv:.2f} € pour {annee}, mais "
+            f"{motif} : {ecart:.2f} € n'ont pas de logement désigné. Le "
+            "logiciel les rattache par défaut au premier bien NON CÉDÉ, "
+            "pour que la somme par bien reste égale au total — mais ce "
+            "n'est qu'un pis-aller. Ce report se perd définitivement avec "
+            "le bien auquel il est attaché le jour où celui-ci est vendu : "
+            "vérifiez cette affectation avant de céder un logement, à "
+            "partir de vos liasses des exercices antérieurs.")]
 
 
 def c_deficit_menace_par_le_39c(conn, annee) -> list[Anomalie]:
@@ -528,16 +654,43 @@ def c_dotation_vs_plan(conn, annee) -> list[Anomalie]:
     # plan théorique, qui exclut les composants sortis. La compter ici
     # garantissait un écart — donc un avertissement alarmant et faux à
     # CHAQUE cession, égal au montant de cette dotation.
+    # SUM(debit - credit), et non SUM(debit) : une dotation CONTRE-PASSÉE
+    # porte son montant au crédit de 681120. En ne totalisant que les
+    # débits, le contrôle voyait une dotation là où l'effet comptable était
+    # nul — et, symétriquement, accusait un double amortissement quand une
+    # dotation erronée avait été proprement annulée puis refaite : 24 000 €
+    # de débits pour un effet net de 12 000 €. Le compte de charge se lit
+    # par son SOLDE, dans un sens comme dans l'autre.
+    # Reconnaissance par RACINE et non par égalité : une dotation reprise
+    # d'un cabinet arrive en 6811200, et le contrôle ne la voyait pas.
     comptab = conn.execute(
-        "SELECT ROUND(SUM(l.debit),2) FROM ligne l "
+        "SELECT ROUND(SUM(l.debit - l.credit),2) FROM ligne l "
         "JOIN ecriture e ON e.id=l.ecriture_id "
-        "WHERE e.exercice_annee=? AND l.compte_num='681120' "
-        "AND COALESCE(l.libelle,'') NOT LIKE 'DAA cession%'", (annee,)
-    ).fetchone()[0] or 0.0
+        "WHERE e.exercice_annee=? AND l.compte_num LIKE ? "
+        "AND COALESCE(l.libelle,'') NOT LIKE 'DAA cession%'",
+        (annee, fiscal.PREFIXE_DOTATION + "%")).fetchone()[0] or 0.0
+    theorique_tot = round(sum(d["dotation"] for d in
+                              amortissement.dotations_exercice(conn, annee)), 2)
     if comptab < 0.005:
+        # Une dotation ramenée à zéro par une contre-passation n'est pas
+        # une absence de dotation : la pièce d'origine est toujours là, et
+        # la clôture la croira faite. Il faut le dire.
+        annulations = conn.execute(
+            "SELECT ROUND(SUM(l.credit),2) FROM ligne l "
+            "JOIN ecriture e ON e.id=l.ecriture_id "
+            "WHERE e.exercice_annee=? AND l.compte_num LIKE ?",
+            (annee, fiscal.PREFIXE_DOTATION + "%")).fetchone()[0] or 0.0
+        if annulations > 0.005:
+            return [Anomalie(AVERTISSEMENT, "DOTATION_ANNULEE",
+                    f"La dotation aux amortissements de {annee} a été "
+                    f"contre-passée : {annulations:.2f} € portés au crédit "
+                    f"de 681120 ramènent son effet à {comptab:.2f} €, alors "
+                    f"que le plan prévoit {theorique_tot:.2f} €. L'écriture "
+                    "d'origine subsiste et la clôture la tiendra pour "
+                    "faite : reprenez la dotation, ou supprimez aussi la "
+                    "pièce annulée.")]
         return []
-    theorique = round(sum(d["dotation"] for d in
-                          amortissement.dotations_exercice(conn, annee)), 2)
+    theorique = theorique_tot
     if abs(comptab - theorique) > 0.01:
         return [Anomalie(AVERTISSEMENT, "DOTATION_PLAN",
                 f"Dotation comptabilisée {comptab:.2f} € ≠ plan théorique "
@@ -546,17 +699,106 @@ def c_dotation_vs_plan(conn, annee) -> list[Anomalie]:
     return []
 
 
+def c_amortissement_vs_plan_cumul(conn, annee) -> list[Anomalie]:
+    """Écart entre le CUMUL réellement comptabilisé et celui du plan.
+
+    `DOTATION_PLAN` compare les dotations d'une ANNÉE ; il ne voit rien
+    quand l'écart s'est installé dans le cumul — une dotation omise lors
+    d'une clôture, ou un plan raccourci qui s'achève alors que les comptes
+    portent encore une valeur nette.
+
+    Or le moteur ne rattrape jamais de lui-même un cumul en retard, et
+    c'est délibéré : l'article 39 B du CGI tient l'amortissement
+    insuffisant pour IRRÉGULIÈREMENT DIFFÉRÉ, c'est-à-dire définitivement
+    perdu — le rattraper d'office déduirait l'année N une charge qui
+    n'était déductible qu'en N-1. L'écart doit donc se voir, et se
+    traiter.
+
+    Deux niveaux, selon ce qui peut encore arriver :
+      - le plan prévoit encore des annuités → AVERTISSEMENT ;
+      - le plan est épuisé → BLOQUANT : plus aucune dotation ne viendra,
+        la valeur nette restante sortirait de tout programme.
+    """
+    import amortissement as _am
+    try:
+        rows = conn.execute(
+            "SELECT id, libelle, valeur_brute, duree_annees, "
+            "date_mise_service, compte_amort, bien_id FROM composant "
+            "WHERE amortissable=1").fetchall()
+    except sqlite3.OperationalError:
+        return []
+    try:
+        cedes = {r[0] for r in conn.execute(
+            "SELECT id FROM bien WHERE date_cession IS NOT NULL")}
+    except sqlite3.OperationalError:
+        cedes = set()
+    groupes: dict[str, list] = {}
+    for cid, lib, vb, duree, dms, c_amort, bien_id in rows:
+        if not duree or not c_amort or bien_id in cedes:
+            continue
+        groupes.setdefault(c_amort, []).append((lib, vb, duree, dms))
+    # Tant que l'exercice est OUVERT, sa dotation reste à venir : la compter
+    # évite de signaler comme un retard ce qui n'est qu'une clôture pas
+    # encore faite. Une fois l'exercice clos, plus rien ne viendra, et
+    # l'écart devient un fait.
+    statut = conn.execute("SELECT statut FROM exercice WHERE annee=?",
+                          (annee,)).fetchone()
+    a_venir: dict[str, float] = {}
+    if not statut or statut[0] != "clos":
+        for d in _am.dotations_exercice(conn, annee, a_comptabiliser=True):
+            a_venir[d["compte_amort"]] = round(
+                a_venir.get(d["compte_amort"], 0.0) + d["dotation"], 2)
+    out = []
+    for c_amort, membres in groupes.items():
+        reel = _am._cumul_comptabilise(conn, c_amort, annee)
+        if reel is None and _am.ouverture_certaine([x[3] for x in membres],
+                                                   annee):
+            reel = 0.0              # rien ne précède la mise en service
+        if reel is None:            # historique inconnu : rien à conclure
+            continue
+        reel = round(reel + a_venir.get(c_amort, 0.0), 2)
+        brut = round(sum(float(x[1]) for x in membres), 2)
+        try:
+            prevu = round(min(sum(_am.etat(x[1], x[2], x[3], annee)[1]
+                                  for x in membres), brut), 2)
+            futur = round(sum(_am.etat(x[1], x[2], x[3], annee + 1)[0]
+                              for x in membres), 2)
+        except Exception:                # noqa: BLE001
+            continue
+        retard = round(prevu - reel, 2)
+        if retard <= max(5.0, 0.01 * brut):     # matérialité, comme la liasse
+            continue
+        lib = " / ".join(x[0] for x in membres)
+        commun = (f"« {lib} » : {reel:.2f} € d'amortissements sont "
+                  f"comptabilisés fin {annee}, contre {prevu:.2f} € au plan "
+                  f"({retard:.2f} € de retard). ")
+        if futur > 0.005:
+            out.append(Anomalie(AVERTISSEMENT, "AMORT_CUMUL", commun +
+                "L'article 39 B du CGI impose un amortissement minimum : "
+                "l'insuffisance constatée à la clôture est irrégulièrement "
+                "différée, donc perdue — le logiciel ne la rattrape pas de "
+                "lui-même dans les annuités à venir. Vérifiez la dotation "
+                "de cet exercice avant de clôturer."))
+        else:
+            out.append(Anomalie(BLOQUANT, "AMORT_CUMUL_FIN", commun +
+                "Le plan est ÉPUISÉ : plus aucune dotation ne sera "
+                "proposée, et cette valeur nette resterait au bilan sans "
+                "jamais être amortie. C'est la signature d'une durée "
+                "raccourcie après coup. Reprenez la durée du composant "
+                "pour qu'elle couvre la valeur restante, ou traitez ce "
+                "reliquat explicitement."))
+    return out
+
+
 def c_seuil_lmp(conn, annee) -> list[Anomalie]:
     """AVERTISSEMENT — recettes au-dessus du seuil LMP (règle versionnée) :
     le statut LMNP peut basculer, à vérifier au niveau du foyer."""
     seuil = parametres.valeur(conn, "seuil_lmp_recettes", annee, defaut=23000.0)
 
-    produits = [t for t, g in _g.tous(conn).items() if g["nature"] == "produit"]
-    ph = ",".join("?" * len(produits))
-    ca = conn.execute(
-        f"SELECT ROUND(COALESCE(SUM(montant),0),2) FROM operation "
-        f"WHERE exercice_annee=? AND type IN ({ph})", (annee, *produits)
-    ).fetchone()[0]
+    # Même assiette comptable pour les saisies et les FEC rejoués.
+    # Ne pas additionner les opérations aux écritures qui les représentent.
+    import fiscal
+    ca = fiscal.agregats(conn, annee)["loyers_acquis"]
     if ca > seuil:
         return [Anomalie(AVERTISSEMENT, "SEUIL_LMP",
                 f"Recettes {ca:.2f} € > seuil LMP {seuil:.0f} € (art. 155 IV CGI) : "
@@ -685,6 +927,20 @@ def c_ventilation_incoherente(conn, annee) -> list[Anomalie]:
             "SELECT COALESCE(SUM(valeur_brute),0) FROM composant "
             "WHERE bien_id=?", (bien_id,)).fetchone()[0]
         if not total:
+            # AUCUN composant. Le contrôle s'arrêtait ici — une liste vide
+            # ne pouvant pas être « incohérente » — et c'est précisément le
+            # cas le plus incomplet qui soit : la totalité du prix échappe
+            # à l'amortissement, le tableau des immobilisations est vide, et
+            # rien ne le dit avant la liasse. L'absence de donnée n'est pas
+            # une preuve de conformité.
+            out.append(Anomalie(BLOQUANT, "VENTILATION_ABSENTE",
+                       f"Bien « {lib} » : {prix:.2f} € d'acquisition et "
+                       "AUCUN composant. Rien ne peut donc être amorti, et "
+                       "le tableau des immobilisations restera vide alors "
+                       "que le bilan porte ce montant. Ventilez le prix "
+                       "dans la page Immobilisations — la proposition "
+                       "guidée le fait à partir du prix payé et de la "
+                       "quote-part de terrain."))
             continue
         manquant = round(prix - total, 2)
         if manquant <= 0.05 * prix:
@@ -710,16 +966,88 @@ def c_composant_non_amortissable(conn, annee) -> list[Anomalie]:
     pré-clôture doit le dire AVANT, en langage compréhensible.
     """
     del annee
-    mauvais = conn.execute(
-        "SELECT libelle, compte_immo FROM composant "
-        "WHERE amortissable=1 AND (compte_amort IS NULL OR compte_amort='')"
+    out = []
+    rows = conn.execute(
+        "SELECT libelle, compte_immo, compte_amort, duree_annees "
+        "FROM composant WHERE amortissable=1").fetchall()
+    for lib, cpt, c_amort, duree in rows:
+        if not (c_amort or "").strip():
+            out.append(Anomalie(BLOQUANT, "COMPOSANT_SANS_AMORT",
+                       f"Composant « {lib} » (compte {cpt}) : une durée "
+                       "d'amortissement est renseignée mais ce compte ne "
+                       "s'amortit pas — un terrain ne se déprécie pas. "
+                       "Mettez sa durée à 0 dans la page Immobilisations, "
+                       "sinon la clôture échouera."))
+            continue
+        # La PRÉSENCE d'un compte 28 était tenue pour suffisante. Un
+        # terrain porteur, par erreur de reprise ou par modification
+        # directe de la base, d'un compte d'amortissement de mobilier
+        # passait donc tous les contrôles, et la clôture lui générait une
+        # dotation en bonne et due forme. Ce qui décide n'est pas qu'un
+        # compte 28 soit renseigné, c'est ce que le PLAN dit du compte
+        # d'immobilisation.
+        attendu = plan_immo.compte_amortissement(cpt)
+        if plan_immo.amortissement_coherent(cpt, c_amort):
+            continue
+        if attendu is None:
+            out.append(Anomalie(BLOQUANT, "AMORT_INCOHERENT",
+                       f"Composant « {lib} » : le compte {cpt} n'est pas "
+                       f"amortissable au plan, et pourtant le compte "
+                       f"d'amortissement {c_amort} lui est attaché. La "
+                       "dotation qui en découlerait n'aurait aucune base. "
+                       "Mettez sa durée à 0, ou corrigez son compte "
+                       "d'immobilisation."))
+        elif c_amort != attendu:
+            out.append(Anomalie(BLOQUANT, "AMORT_INCOHERENT",
+                       f"Composant « {lib} » : compte d'immobilisation "
+                       f"{cpt}, dont le plan attend l'amortissement en "
+                       f"{attendu}, mais c'est {c_amort} qui est "
+                       "renseigné. Les amortissements iraient sur un poste "
+                       "étranger au bien, et le bilan comme le 2033-C les "
+                       "classeraient à tort."))
+    # ── H-07, variantes en base : une durée inexploitable ────────────────
+    # Un composant déclaré amortissable avec une durée 0 ou NULL ne produit
+    # aucun plan : le calcul lève `DivisionByZero` ou `InvalidOperation` en
+    # pleine clôture, après que les contrôles ont rendu une liste vide.
+    incoherents = conn.execute(
+        "SELECT libelle, duree_annees FROM composant "
+        "WHERE amortissable=1 AND (duree_annees IS NULL OR duree_annees <= 0)"
     ).fetchall()
-    return [Anomalie(BLOQUANT, "COMPOSANT_SANS_AMORT",
-            f"Composant « {lib} » (compte {cpt}) : une durée "
-            "d'amortissement est renseignée mais ce compte ne s'amortit "
-            "pas — un terrain ne se déprécie pas. Mettez sa durée à 0 dans "
-            "la page Immobilisations, sinon la clôture échouera.")
-            for lib, cpt in mauvais]
+    out += [Anomalie(BLOQUANT, "DUREE_INVALIDE",
+            f"Composant « {lib} » : déclaré amortissable avec une durée de "
+            f"{'aucune valeur' if duree is None else f'{duree} an(s)'}. "
+            "Aucun plan d'amortissement ne peut en être tiré, et la "
+            "clôture s'interromprait. Indiquez une durée en années, ou "
+            "déclarez le composant non amortissable.")
+            for lib, duree in incoherents]
+    return out
+
+
+def c_compte_immo_inconnu(conn, annee) -> list[Anomalie]:
+    """AVERTISSEMENT — compte d'immobilisation étranger au plan livré.
+
+    Un FEC de cabinet apporte ses propres comptes. Les subdivisions sont
+    désormais reconnues (2181000 relève de 218100), mais un compte
+    GÉNÉRIQUE comme 2180000 ne dit pas de quelle nature physique relève le
+    composant : le logiciel ne l'invente pas. Sans cette alerte, les
+    montants tombaient dans « Autres immobilisations corporelles » du
+    2033-C sans que rien ne le signale — les totaux concordant, aucun
+    contrôle de cohérence ne pouvait le détecter.
+    """
+    del annee
+    out = []
+    for lib, cpt, vb in conn.execute(
+            "SELECT libelle, compte_immo, valeur_brute FROM composant"):
+        if plan_immo.resoudre(cpt) is None:
+            out.append(Anomalie(AVERTISSEMENT, "COMPTE_IMMO_INCONNU",
+                       f"Composant « {lib} » : le compte {cpt} "
+                       f"({vb:.2f} €) ne correspond à aucun poste du plan "
+                       "d'immobilisations du logiciel. Il sera rangé dans "
+                       "« Autres immobilisations corporelles » du 2033-C, "
+                       "ce qui n'est probablement pas sa rubrique. "
+                       "Rattachez-le au compte qui décrit sa nature "
+                       "(terrain, construction, agencement, mobilier)."))
+    return out
 
 
 def c_teom_oubliee(conn, annee) -> list[Anomalie]:
@@ -750,6 +1078,7 @@ def c_teom_oubliee(conn, annee) -> list[Anomalie]:
 CONTROLES = [
     # structurels (bloquants)
     c_equilibre_ecritures,
+    c_numerotation_fec,
     c_dates_hors_exercice,
     c_compte_attente,
     c_montants_invalides,
@@ -766,13 +1095,16 @@ CONTROLES = [
     c_plausibilite_n1,
     c_postes_habituels_absents,
     c_deficit_menace_par_le_39c,
+    c_ventilation_39c_incomplete,
     c_retraitement_manuel_majore_le_plafond,
     c_duree_allongee,
     c_loyer_atypique,
     c_an_absents,
     c_dotation_vs_plan,
+    c_amortissement_vs_plan_cumul,
     c_amortissements_anterieurs,
     c_composant_non_amortissable,
+    c_compte_immo_inconnu,
     c_ventilation_incoherente,
     c_teom_oubliee,
     c_seuil_lmp,

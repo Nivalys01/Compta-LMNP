@@ -358,18 +358,31 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     rep = L["reports"]
     s39 = rep["suivi_39c"]
     E.append(Paragraph("Suivi des reports — article 39 C", st["h2"]))
-    E.append(_table([
+    # La SORTIE de stock d'un bien cédé manquait à ce tableau : seul le
+    # détail par bien la portait, et il n'est imprimé qu'à partir de deux
+    # biens. Sur un dossier mono-bien, l'état archivable affichait donc
+    # « ouverture 5 000 + reporté 1 200 − repris 0 = clôture 0 » — un
+    # tableau qui ne se réconcilie pas, et 6 200 € de mouvement sans
+    # explication. La ligne n'apparaît que lorsqu'il y a une sortie, pour
+    # ne pas encombrer le cas ordinaire.
+    sortie_39c = round(rep.get("sortie_39c") or 0.0, 2)
+    lignes_39c = [
         ["Rubrique", "Montant"],
         ["Stock d'ouverture", _eur(s39.get("stock_ouverture"))],
         ["Amortissements reportés cette année", _eur(s39.get("report_annee"))],
         ["Amortissements repris cette année", _eur(s39.get("utilisation_annee"))],
-        ["Stock à la clôture", _eur(s39.get("stock_cloture"))],
-    ], largeurs=[110 * mm, 60 * mm]))
+    ]
+    if sortie_39c:
+        lignes_39c.append(
+            ["Stock sorti avec un bien cédé (ligne G')", _eur(sortie_39c)])
+    lignes_39c.append(["Stock à la clôture", _eur(s39.get("stock_cloture"))])
+    E.append(_table(lignes_39c, largeurs=[110 * mm, 60 * mm]))
 
-    # Ventilation logement par logement — affichée dès
-    # que la comptabilité compte plusieurs biens.
+    # Ventilation logement par logement — affichée dès que la comptabilité
+    # compte plusieurs biens, ou qu'une sortie doit être expliquée même sur
+    # un bien unique.
     par_bien = rep.get("suivi_39c_par_bien") or []
-    if len(par_bien) > 1:
+    if len(par_bien) > 1 or (par_bien and sortie_39c):
         E.append(Paragraph("Suivi du stock 39 C, logement par logement",
                            st["h2"]))
         avec_sorties = any(v.get("sortie_bien") for v in par_bien)
@@ -407,6 +420,17 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
         E.append(t)
     else:
         E.append(Paragraph("Aucun déficit LMNP en stock.", st["normal"]))
+
+    if rep.get("total_deficits_perimes", 0):
+        E.append(Paragraph(
+            "Déficits perdus par péremption : "
+            + _eur(rep["total_deficits_perimes"]), st["normal"]))
+        for d in rep["deficits"]:
+            if d.get("perime") and (d.get("perte_peremption") or d["solde"]):
+                E.append(Paragraph(
+                    f"Millésime {d['annee_origine']} : "
+                    + _eur(d.get("perte_peremption") or d["solde"])
+                    + " perdus, exclus du stock disponible.", st["normal"]))
 
     # ── Aide 2042C-PRO ───────────────────────────────────────────────────
     aide = L["aide_2042c"]

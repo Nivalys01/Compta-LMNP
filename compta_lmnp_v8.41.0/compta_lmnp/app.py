@@ -9,6 +9,7 @@ Lancer : python app.py   puis ouvrir http://localhost:5000
 from __future__ import annotations
 import io
 import json
+import math
 import os
 import sqlite3
 import threading
@@ -99,12 +100,19 @@ def _form_int(nom: str, defaut=None):
 
 
 def _form_float(nom: str, defaut=None):
-    """Idem pour un décimal. Accepte la virgule française (« 795,50 »)."""
+    """Idem pour un décimal. Accepte la virgule française (« 795,50 »).
+
+    `float()` accepte aussi « nan », « inf » et « 1e400 » : trois mots que
+    n'importe qui peut taper dans un champ de montant, et qui traversaient
+    ensuite toutes les comparaisons de la couche métier sans jamais les
+    faire échouer. Ce ne sont pas des montants — ils sont traités comme une
+    saisie invalide, au même titre qu'un mot quelconque."""
     brut = (request.form.get(nom) or "").strip().replace(",", ".")
     try:
-        return float(brut)
+        valeur = float(brut)
     except (TypeError, ValueError):
         return defaut
+    return valeur if math.isfinite(valeur) else defaut
 
 
 # Verrou : le test d'appartenance et l'ajout sont DEUX opérations, et le
@@ -841,15 +849,14 @@ def creer_composant():
         bien_id  = _form_int("bien_id")
         if bien_id is None:
             raise ValueError("Bien non sélectionné.")
-        duree_s  = request.form.get("duree_annees","").strip()
-        duree    = int(duree_s) if duree_s and duree_s != "0" else None
+        duree    = amortissement.duree_valide(request.form.get("duree_annees", ""))
         amortissable = 1 if duree else 0
 
         cpt_immo = request.form["compte_immo"]
         # Résolution automatique du compte d'amortissement depuis le compte
-        # d'immobilisation.
-        amort_map = {num: amort for num, _, amort in COMPTES_IMMO}
-        cpt_amort = amort_map.get(cpt_immo) if amortissable else None
+        # d'immobilisation — par le plan, qui reconnaît aussi les
+        # subdivisions à sept chiffres d'un cabinet.
+        cpt_amort = plan_immo.compte_amortissement(cpt_immo) if amortissable else None
         # Un compte SANS contrepartie d'amortissement (le terrain) ne peut
         # pas porter de durée : le composant était accepté, puis la clôture
         # échouait sur « NOT NULL constraint failed: ligne.compte_num » —
@@ -1022,11 +1029,10 @@ def composant_duree(composant_id):
                          "WHERE id=?", (composant_id,)).fetchone()
         if c is None:
             raise ValueError("Composant introuvable.")
-        brut = request.form.get("duree_annees", "").strip()
-        duree = int(brut) if brut and brut != "0" else None
+        duree = amortissement.duree_valide(request.form.get("duree_annees", ""))
         amortissable = 1 if duree else 0
-        amort_map = {num: amort for num, _, amort in COMPTES_IMMO}
-        cpt_amort = amort_map.get(c["compte_immo"]) if amortissable else None
+        cpt_amort = (plan_immo.compte_amortissement(c["compte_immo"])
+                     if amortissable else None)
         if amortissable and not cpt_amort:
             raise ValueError(
                 f"Le compte {c['compte_immo']} ne s'amortit pas : seule la "
@@ -1230,6 +1236,22 @@ def cloturer():
             warn = (f"{len(bloq)} anomalie(s) bloquante(s) — cochez « Forcer » pour clôturer quand même.")
             conn.close()
             return redirect(url_for("cloture", annee=annee, warn=warn))
+
+        # Le retraitement saisi À L'INSTANT n'est encore nulle part en base :
+        # le contrôle qui en avertit ne pouvait donc parler qu'après la
+        # clôture, sur un exercice déjà figé — et une saisie malencontreuse
+        # faisait disparaître le report 39 C sans que rien ne l'ait annoncé.
+        # On le consulte avec la valeur soumise, AVANT de figer.
+        if retr and not forcer:
+            avert = controles.c_retraitement_manuel_majore_le_plafond(
+                conn, annee, manuel_saisi=retr)
+            if avert:
+                conn.close()
+                return redirect(url_for(
+                    "cloture", annee=annee,
+                    warn=avert[0].message
+                    + " Si c'est bien ce que vous voulez, cochez « Forcer » "
+                      "pour clôturer avec ce retraitement."))
 
         # J6 — pérennité : sauvegarde AVANT l'opération la plus lourde de
         # conséquences, archivage FEC + empreinte SHA-256 APRÈS (piste
@@ -1749,10 +1771,18 @@ def bien_ceder(bien_id):
     conn = _conn()
     try:
         annee = _annee_param(conn)
+        # Sentinelle None plutôt que -1 : un champ vide, un mot, « nan » ou
+        # « inf » sont TOUS des saisies invalides, et les annoncer comme un
+        # « prix négatif » envoyait l'utilisateur corriger un signe qu'il
+        # n'avait pas tapé.
+        prix = _form_float("prix_cession")
+        if prix is None:
+            raise ValueError("indiquez un prix de cession en euros "
+                             "(0 si la sortie se fait sans contrepartie).")
         r = cession.ceder_bien(
             conn, bien_id,
             date_cession=(request.form.get("date_cession") or "").strip(),
-            prix_cession=_form_float("prix_cession", -1))
+            prix_cession=prix)
         ok = (f"Cession de {r['bien']} enregistrée : dotation complémentaire "
               f"{r['dotation_complementaire']:.2f} €, VNC sortie "
               f"{r['vnc_sortie']:.2f} €, prix {r['prix_cession']:.2f} € "
@@ -2063,11 +2093,22 @@ def exercice_reprendre_fec():
                      (a, f"{a}-01-01", f"{a}-12-31"))
         res = rejeu_fec.rejouer(conn, chemin, a)
         conn.commit()
+        # Toute TRANSFORMATION du fichier source est annoncée. Une reprise
+        # qui se dit réussie sans dire ce qu'elle a changé laisse croire que
+        # le ré-export reproduira le fichier remis.
         ok = (f"Exercice {a} repris depuis le FEC : {res['ecritures']} "
               f"écritures rejouées, {len(res['comptes_crees'])} compte(s) "
               f"créé(s) depuis le fichier"
               + (f", {res['normalisees']} ligne(s) à montant négatif "
                  f"normalisée(s) par équivalence comptable" if res.get("normalisees") else "")
+              + (". Les écritures ont été RENUMÉROTÉES de 1 à "
+                 f"{res['ecritures']} (les numéros du fichier source se "
+                 "répétaient d'un journal à l'autre, ou n'étaient pas "
+                 "numériques) : conservez le FEC d'origine"
+                 if res.get("renumerotees") else "")
+              + (". Libellé(s) de journal conservé(s) depuis le plan du "
+                 f"logiciel — {'; '.join(res['journaux_renommes'])}"
+                 if res.get("journaux_renommes") else "")
               + ". Vérifiez la balance puis clôturez normalement.")
         return redirect(url_for("exercice_nouveau", annee=a, ok=ok))
     except Exception as exc:
