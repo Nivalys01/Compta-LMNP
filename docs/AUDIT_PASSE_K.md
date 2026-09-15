@@ -190,3 +190,11 @@ Un ajout **SQL direct** de loyer de 1 000 € après clôture reste possible : l
 | K-01 | Clôture rétroactive après un exercice déjà clos | Majeur | Revenu imposable mémorisé et déficit restant chacun supérieurs de 600 € au cycle chronologique |
 | K-02 | Reconstruction après suppression des seuls AN | Majeur | Affectation de 600 € doublée ; prochaine reprise déséquilibrée et refusée |
 | K-03 | Jonction annoncée exacte malgré la tolérance | Mineur | Deux écarts de 0,01 € masqués par une approbation « au centime » |
+
+**État du suivi :** les trois constats ont été corrigés en production le 16 septembre 2026 (version 8.46.0). Les preuves de `preuves_k/` sont conservées **telles qu'observées avant correction** : elles restent la référence du défaut, pas de l'état actuel du code. La non-régression est figée par `tests/test_passe_k.py` (18 tests), dont 9 échouent si l'on retire les correctifs — les 9 autres sont des contre-épreuves, qui doivent passer dans les deux états.
+
+Deux précisions sur le traitement retenu. K-01 est traité par un **refus**, et non par un recalcul des exercices postérieurs : ceux-ci sont scellés, leur FEC est archivé et leur liasse a pu être déclarée, de sorte que les rouvrir relèverait d'une décision de l'utilisateur et non du logiciel. Le message indique explicitement la sortie — restaurer une sauvegarde antérieure à la clôture du premier exercice postérieur, puis reprendre les clôtures dans l'ordre. La garde ne se déclenche que sur un exercice postérieur **clos** : en ouvrir un d'avance, geste ordinaire en début d'année, ne bloque rien.
+
+K-02 est traité en déplaçant la garde vers `_construire_an_depuis_balance`, point de passage unique des deux chemins de reprise, plutôt que de la dupliquer chez leurs appelants — la reprise depuis un FEC externe portait d'ailleurs sa propre garde, redondante et devenue morte, qui a été retirée. La fonction `reprise.reprise_deja_presente` nomme la moitié du lot qui subsiste, ce qui rend le message d'erreur exploitable par l'utilisateur.
+
+Pour K-03, le type de verdict `tolere` s'ajoute à `ok` et `ecart`. La page d'analyse le rend en orange, comme les autres observations non bloquantes, sans modification de la présentation : elle colorait déjà en vert le seul type `ok` et en rouge le seul type `ecart`.

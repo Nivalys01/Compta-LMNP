@@ -1,5 +1,53 @@
 # Journal des versions — Compta LMNP
 
+## 8.46.0 — 2026-09-16 (Passe K : clôture et continuité pluriannuelle)
+Trois constats, deux majeurs et un mineur. La clôture tient par ailleurs son
+contrat atomique : soixante-quatorze interruptions par SIGKILL réparties sur
+tous ses points d'écriture n'ont laissé aucune clôture partielle, et un seul
+commit est observé. Ce qui manquait était ailleurs — dans ce que le logiciel
+considère comme IRRÉVERSIBLE.
+
+**Un exercice ancien pouvait être clôturé après ses suivants.** La garde
+chronologique ne cherchait que les exercices antérieurs encore OUVERTS.
+Rien n'empêchait donc d'ajouter 2024 après coup et de le clore alors que
+2025 était déjà scellé. Or la clôture de 2025 a figé des stocks
+d'amortissements et de déficits calculés SANS 2024 : les 600 € de bénéfice
+déjà déclarés imposables auraient dû être absorbés par le déficit que l'on
+vient de créer, et le stock de déficits compte désormais 600 € de trop. Deux
+représentations incompatibles de la même imputation coexistaient, et rien
+ne les départageait. Le logiciel ne peut pas recalculer les exercices
+postérieurs — leur FEC est archivé, leur liasse a pu être déclarée — il
+refuse donc, en indiquant que le chemin passe par une sauvegarde antérieure
+et une reprise des clôtures dans l'ordre.
+
+**Supprimer la moitié d'une reprise permettait de la reconstruire, et de
+compter le résultat deux fois.** Une reprise d'à-nouveaux est un LOT :
+l'écriture AN et l'OD qui affecte le résultat. La garde ne regardait que le
+journal AN — supprimer manuellement cette seule écriture, sur un exercice
+ouvert, laissait l'OD d'affectation seule et rendait la reconstruction
+possible. Les 600 € de bénéfice se retrouvaient alors deux fois au crédit
+de 108000 et au débit de 120000. Chaque OD étant elle-même équilibrée, aucun
+contrôle d'équilibre ne pouvait le voir : le défaut ne se manifestait que
+bien plus tard, la reprise de l'année suivante butant sur un solde 120000
+résiduel que les comptes de bilan n'expliquaient pas. La garde regarde
+désormais les deux moitiés du lot, nomme celle qui subsiste, et vit au
+point de passage commun aux deux chemins de reprise — interne et depuis un
+FEC externe — plutôt que dans chacun de leurs appelants.
+
+**Une jonction tolérée était annoncée comme exacte.** Le contrôle qui
+vérifie que le bilan de clôture de N se retrouve à l'ouverture de N+1
+admet un écart d'un centime. Il concluait « les bilans se raccordent au
+centime » dès qu'aucun écart ne dépassait ce seuil — lequel vaut justement
+un centime : un décalage d'exactement 0,01 € sur deux comptes était donc
+approuvé sous un libellé qui prétendait le contraire. Une tolérance est un
+choix de contrôle légitime ; la présenter comme une égalité ne l'est pas.
+Trois verdicts sont maintenant distingués : raccord exact, écarts sous la
+tolérance — signalés, chiffrés, sans être traités comme une rupture — et
+rupture franche. Sur les fichiers de référence, les deux jonctions sont
+exactes.
+
+- 18 tests ajoutés (962 au total).
+
 ## 8.45.0 — 2026-09-15 (Passe J : la mémoire des déficits LMNP)
 Cinq constats, dont un critique. Le moteur respectait l'année limite et
 l'ordre FIFO ; ce qui manquait, c'était la MÉMOIRE — ce que le logiciel

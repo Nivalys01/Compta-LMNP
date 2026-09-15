@@ -799,6 +799,32 @@ def cloturer(conn: sqlite3.Connection, annee: int, *, autres_retraitements: floa
         raise ValueError(f"Clôturez d'abord l'exercice {anterieur[0]} : les "
                          "clôtures se font dans l'ordre chronologique (les "
                          "reports d'amortissements et de déficits en dépendent).")
+    # ... et l'ordre vaut AUSSI vers l'aval. La garde ci-dessus ne regardait
+    # que les exercices antérieurs encore OUVERTS : rien n'empêchait
+    # d'ajouter après coup un exercice ancien et de le clôturer alors que
+    # les suivants étaient déjà clos. Or leur clôture a figé des stocks
+    # d'ouverture calculés SANS ce déficit et SANS ce report : un bénéfice
+    # de 600 € déjà déclaré imposable en N+1 aurait dû être absorbé par le
+    # déficit que l'on vient de créer en N, et le stock de déficits compte
+    # désormais 600 € de trop. Deux représentations incompatibles de la
+    # même imputation coexistent, et rien ne les départage.
+    #
+    # Le logiciel ne peut pas recalculer les exercices postérieurs : ils
+    # sont scellés, leur FEC est archivé, et leur liasse a pu être
+    # déclarée. Il refuse donc, en disant ce qu'il faudrait faire.
+    posterieur = conn.execute(
+        "SELECT annee FROM exercice WHERE statut='clos' AND annee > ? "
+        "ORDER BY annee LIMIT 1", (annee,)).fetchone()
+    if posterieur:
+        raise ValueError(
+            f"L'exercice {posterieur[0]} est déjà clos : clôturer "
+            f"{annee} maintenant fausserait ses reports. Sa clôture a figé "
+            f"des stocks d'amortissements et de déficits calculés sans "
+            f"{annee} ; les y faire entrer après coup demanderait de "
+            f"reclôturer tous les exercices postérieurs, ce que leur "
+            "scellement interdit. Restaurez une sauvegarde antérieure à la "
+            f"clôture de {posterieur[0]}, puis reprenez les clôtures dans "
+            "l'ordre chronologique.")
 
     if generer_dotation:
         import amortissement

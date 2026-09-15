@@ -161,17 +161,41 @@ def controler_jonctions(fichiers: list[dict], tolerance: float = 0.01) -> list[d
                            "journal d'à-nouveaux : la jonction des bilans "
                            "ne peut pas être vérifiée."})
             continue
-        ecarts = []
+        # Deux catégories, et les confondre revenait à mentir : ce qui
+        # dépasse la tolérance, et ce qui ne la dépasse PAS tout en étant
+        # non nul. Le message annonçait « les bilans se raccordent au
+        # centime » dès qu'aucun écart ne dépassait le seuil — alors que le
+        # seuil vaut précisément un centime, et qu'un décalage d'un centime
+        # sur deux comptes était donc approuvé sous ce libellé. Une
+        # tolérance est un choix de contrôle légitime ; la présenter comme
+        # une égalité ne l'est pas.
+        ecarts, tolères = [], []
         for compte in sorted(set(avant) | set(apres)):
             d = round(apres.get(compte, 0.0) - avant.get(compte, 0.0), 2)
             if abs(d) > tolerance:
                 ecarts.append((compte, avant.get(compte, 0.0),
                                apres.get(compte, 0.0), d))
-        if not ecarts:
+            elif d:
+                tolères.append((compte, avant.get(compte, 0.0),
+                                apres.get(compte, 0.0), d))
+        if not ecarts and not tolères:
             obs.append({
                 "type": "ok",
                 "message": f"Jonction {prec['annee']} → {suiv['annee']} : "
-                           "les bilans se raccordent au centime."})
+                           "les bilans se raccordent exactement."})
+        elif not ecarts:
+            detail = " ; ".join(f"{c} : {a:.2f} → {b:.2f} ({d:+.2f})"
+                                for c, a, b, d in tolères[:6])
+            obs.append({
+                "type": "tolere", "ecarts_toleres": tolères,
+                "message": f"Jonction {prec['annee']} → {suiv['annee']} : "
+                           f"{len(tolères)} compte(s) ne se raccordent pas "
+                           f"exactement, mais l'écart reste sous la "
+                           f"tolérance de {tolerance:.2f} € et n'est pas "
+                           f"signalé comme une rupture. {detail}"
+                           + (" …" if len(tolères) > 6 else "")
+                           + " À vérifier tout de même si ces comptes "
+                             "doivent se raccorder au centime."})
         else:
             detail = " ; ".join(
                 f"{c} : {a:.2f} → {b:.2f} ({d:+.2f})"

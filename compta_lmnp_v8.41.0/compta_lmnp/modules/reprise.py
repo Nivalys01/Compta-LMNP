@@ -98,12 +98,6 @@ def construire_an_interne(conn: sqlite3.Connection, annee_cible: int) -> dict:
     if ex[0] != "clos":
         raise ValueError(f"L'exercice {annee_source} n'est pas clôturé : "
                          "clôturez-le avant d'ouvrir avec reprise des à-nouveaux.")
-    deja = conn.execute(
-        "SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? AND journal_code='AN'",
-        (annee_cible,)).fetchone()[0]
-    if deja:
-        raise ValueError(f"L'exercice {annee_cible} contient déjà des à-nouveaux.")
-
     bal = lire_balance_interne(conn, annee_source)
     resultat = -sum(v for n, v in bal.items() if n[0] in "67")
     nb = _construire_an_depuis_balance(conn, bal, annee_cible)
@@ -111,9 +105,58 @@ def construire_an_interne(conn: sqlite3.Connection, annee_cible: int) -> dict:
             "resultat_reporte": round(resultat, 2), "nb_comptes": nb}
 
 
+LIBELLE_AFFECTATION = "Affectation du résultat"
+
+
+def reprise_deja_presente(conn: sqlite3.Connection, annee_cible: int) -> str:
+    """Décrit la reprise déjà présente sur l'exercice, ou une chaîne vide.
+
+    Une reprise est un LOT : l'écriture d'à-nouveaux et l'OD d'affectation
+    du résultat qui la solde. La garde ne cherchait que le journal AN, si
+    bien qu'une suppression manuelle de la seule écriture AN — sur un
+    exercice ouvert, clés étrangères actives, ses lignes partant en
+    cascade — laissait l'OD d'affectation seule et rendait la reconstruction
+    possible : le résultat était alors affecté DEUX FOIS. Les 600 € de
+    bénéfice se retrouvaient au crédit de 108000 et au débit de 120000 en
+    double, chaque OD étant elle-même équilibrée, donc invisible à tout
+    contrôle d'équilibre. La reprise suivante butait ensuite sur un solde
+    120000 résiduel que les comptes de bilan repris n'expliquaient pas.
+
+    On regarde donc les deux moitiés du lot, et on nomme celle qui est là.
+    """
+    an = conn.execute(
+        "SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? "
+        "AND journal_code='AN'", (annee_cible,)).fetchone()[0]
+    affectation = conn.execute(
+        "SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? "
+        "AND journal_code='OD' AND libelle=?",
+        (annee_cible, LIBELLE_AFFECTATION)).fetchone()[0]
+    if an and affectation:
+        return "des à-nouveaux et leur affectation du résultat"
+    if an:
+        return ("des à-nouveaux dont l'OD d'affectation du résultat a "
+                "disparu")
+    if affectation:
+        return ("une OD d'affectation du résultat dont l'écriture "
+                "d'à-nouveaux a disparu")
+    return ""
+
+
 def _construire_an_depuis_balance(conn: sqlite3.Connection,
                                   bal: dict[str, float], annee_cible: int) -> int:
     """Mécanique commune : balance de clôture → écriture AN + OD d'affectation."""
+    # Point de passage UNIQUE des deux chemins de reprise (interne et depuis
+    # un FEC externe) : la garde vit ici, pour qu'aucun d'eux ne puisse
+    # reconstruire par-dessus une reprise déjà là, fût-elle à moitié
+    # supprimée.
+    presente = reprise_deja_presente(conn, annee_cible)
+    if presente:
+        raise ValueError(
+            f"L'exercice {annee_cible} contient déjà {presente}. Une reprise "
+            "forme un tout — l'écriture d'à-nouveaux et l'OD qui affecte le "
+            "résultat — et en reconstruire une moitié compterait le résultat "
+            "deux fois. Supprimez ce qu'il en reste, ou restaurez une "
+            "sauvegarde antérieure, avant de relancer la reprise.")
     date_ouv = f"{annee_cible}-01-01"
 
     # Comptes de bilan = classes 1 à 5, hors résultat 120000 traité à part.
@@ -134,19 +177,6 @@ def _construire_an_depuis_balance(conn: sqlite3.Connection,
 
     # Résultat comptable = -(somme nette des comptes de charges/produits).
     resultat = -sum(v for n, v in bal.items() if classe[n] in "67")
-
-    # Garde-fou : un second appel doublerait le bilan d'ouverture, en
-    # silence et de façon équilibrée — donc invisible. `construire_an_interne`
-    # vérifiait déjà ce point ; la reprise depuis un FEC externe, non.
-    deja = conn.execute(
-        "SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? "
-        "AND journal_code='AN'", (annee_cible,)).fetchone()[0]
-    if deja:
-        raise ValueError(
-            f"L'exercice {annee_cible} a déjà ses à-nouveaux "
-            f"({deja} écriture(s) au journal AN). Les reconstruire "
-            "doublerait le bilan d'ouverture. Supprimez d'abord l'exercice "
-            "si vous voulez recommencer la reprise.")
 
     # Les comptes du cabinet ne figurent pas au plan livré : on les crée
     # avant d'écrire, sinon l'insertion échoue sur une contrainte de clé

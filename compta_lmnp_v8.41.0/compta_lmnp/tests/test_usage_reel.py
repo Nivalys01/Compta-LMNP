@@ -1359,7 +1359,11 @@ def test_reprise_multi_rejoue_du_plus_ancien_au_plus_recent(tmp_path,
                      for f in envoi]}
     h = cl.post("/exercice/analyser-fec", data=data,
                 content_type="multipart/form-data").get_data(as_text=True)
-    assert "se raccordent au centime" in h      # jonctions vérifiées
+    # « exactement » et non plus « au centime » : depuis la passe K, le
+    # contrôle distingue une jonction sans le moindre écart d'une jonction
+    # dont les écarts restent sous la tolérance — laquelle vaut justement
+    # un centime. Sur les FEC de référence, les deux jonctions sont exactes.
+    assert "se raccordent exactement" in h      # jonctions vérifiées
     import re as _re
     jeton = _re.search(r'name="jeton" value="([0-9a-f]{32})"', h)
     assert jeton, "aucun jeton : l'analyse n'a rien proposé"
@@ -2014,8 +2018,11 @@ def test_a_nouveaux_reprennent_la_tresorerie(tmp_path):
         "JOIN ecriture e ON e.id = l.ecriture_id "
         "WHERE e.journal_code='AN'").fetchone()
     assert d == pytest.approx(cr)
-    # …et une seconde reprise doublerait le bilan : elle est refusée
-    with pytest.raises(ValueError, match="déjà ses à-nouveaux"):
+    # …et une seconde reprise doublerait le bilan : elle est refusée.
+    # Le message a changé en passe K : la garde ne regarde plus seulement
+    # le journal AN, mais le LOT complet (à-nouveaux + OD d'affectation),
+    # dont la suppression d'une moitié permettait la reconstruction.
+    with pytest.raises(ValueError, match="contient déjà"):
         reprise.construire_an(c, p, 2026)
     c.close()
 
