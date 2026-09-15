@@ -40,12 +40,24 @@ Il n'est pas arbitraire — chaque passe s'appuie sur ce que la précédente a
 
 ## Ce qui manque pour aller au bout
 
-- **Le CERFA 2042-C-PRO** — absent du dépôt. Sans lui, les cases `5NA` / `5NY`
-  de l'aide au report ne peuvent pas être vérifiées (passe J). Le
-  **2033-SD 2026** est à la racine du dépôt et suffit pour G, I, L et K.
 - **Une table de correspondance de plans comptables** : la case 243 « dont CFE
   et CVAE » reste vide sur un plan de cabinet, et aucun préfixe ne distingue la
   CET des autres impôts directs. C'est une limite connue, figée par un test.
+
+## Les formulaires de référence
+
+Les deux sont à la racine du dépôt, ignorés par git comme tout document de
+travail déposé là :
+
+| Fichier | Sert aux passes |
+|---|---|
+| `2033-sd_5394.pdf` — liasse 2033-A à G, millésime 2026 | G, I, J, K, L |
+| `2042_Cpro.pdf` — déclaration complémentaire, 8 pages | J |
+
+Le 2042-C-PRO a permis de confirmer que les cases émises par le logiciel
+existent bien — `5NA`, `5NY`, et `5GA` à `5GJ` pour les déficits antérieurs.
+Ce qui reste à vérifier en passe J n'est donc plus l'existence des cases mais
+**l'appariement case ↔ millésime**, que le formulaire imprime en clair.
 
 ## Ce qui est déjà couvert — ne pas resignaler
 

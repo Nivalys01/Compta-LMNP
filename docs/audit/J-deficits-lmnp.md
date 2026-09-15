@@ -11,12 +11,11 @@
 | `modules/liasse_pdf.py` | 447 |
 | `schema.sql` (table `deficit_lmnp`) | — |
 
-Utile, et **le second manque aujourd'hui sur disque** :
+Les deux formulaires sont à la racine du dépôt :
 
-- le CERFA **2033-B-SD 2026** (présent à la racine du dépôt) ;
-- le CERFA **2042-C-PRO** — absent : les cases `5NA` / `5NY` n'ont jamais pu
-  être vérifiées. Joins-le si tu veux que la passe aille jusqu'au report en
-  déclaration.
+- **2033-SD 2026** (`2033-sd_5394.pdf`) ;
+- **2042-C-PRO** (`2042_Cpro.pdf`) — section « REVENUS DES LOCATIONS MEUBLÉES
+  NON PROFESSIONNELLES », page 5.
 
 ---
 
@@ -98,11 +97,35 @@ ordinaire périme à dix ans.
   déficits. La 352 doit valoir **zéro** (choix assumé : le résultat LMNP est
   déclaré en 2031 bis). Que devient alors l'imputation des déficits — est-elle
   encore visible quelque part, ou disparaît-elle avec la mise à zéro ?
-- Aide au report 2042-C-PRO : cases `5NA` (bénéfice) et `5NY` (déficit), plus
-  les cases de déficits antérieurs. **Ces numéros n'ont jamais été vérifiés
-  contre le formulaire.** Si je te joins le 2042-C-PRO, confronte-les un par un
-  et dis lesquels sont faux. Sinon, signale-le en « non vérifiable » — ne les
-  valide pas de mémoire.
+- Aide au report 2042-C-PRO. Les trois familles de cases émises par
+  `liasse.aide_2042c` **existent bien** au formulaire, sous « Régime du
+  bénéfice réel » de la section location meublée non professionnelle — relevé
+  fait sur le PDF joint, pas de mémoire :
+
+  | Code | Libellé au formulaire |
+  |---|---|
+  | `5NA` | Revenus imposables cas général |
+  | `5NY` | Déficits cas général |
+  | `5GA` … `5GJ` | Déficits des années antérieures non encore déduits (dix cases) |
+
+  Ce qui reste à confronter, et c'est là que porte l'enjeu :
+
+  - **L'appariement case ↔ millésime.** Le code pose `origine = annee - 10 + i`,
+    soit `5GA` = N-10 … `5GJ` = N-1. Le formulaire imprime les années **en
+    clair** sous les cases : confronte-les une à une pour l'exercice visé. Un
+    décalage d'un rang fait déclarer un déficit sous le millésime du voisin, et
+    la péremption est calculée sur ce millésime.
+  - **Le déclarant.** Les colonnes `5Ox` et `5Px` visent le déclarant 2 et une
+    personne à charge. Le logiciel n'émet que la première colonne : est-ce dit
+    au déclarant, ou peut-il croire que le report est complet pour un couple ?
+  - **Les cases voisines à ne pas confondre** : `5NM` (revenus soumis aux
+    cotisations sociales par un organisme de sécurité sociale), `5WE` (déficits
+    relevant de ces organismes), `5NG`/`5NH`/`5NI` (régime **micro**). Le
+    logiciel peut-il produire un montant qui relèverait de l'une d'elles sans le
+    signaler — meublé de tourisme classé, chambre d'hôtes, affiliation SSI ?
+  - **La durée d'exercice** (`5CD`) et la **cession ou cessation** (`5CF`) :
+    servies par le logiciel, ou laissées au déclarant sans un mot ? Un exercice
+    de moins de douze mois change le calcul.
 
 ### Points d'attention nommés
 
@@ -111,8 +134,10 @@ ordinaire périme à dix ans.
   même chose.
 - Un déficit **reporté en arrière** (case 356) n'a pas de sens en LMNP : la case
   existe au formulaire, le logiciel la sert-il par erreur ?
-- Le seuil de passage en **LMP** (loueur professionnel) change le régime du
-  déficit, qui devient imputable sur le revenu global. Un contrôle
+- Le formulaire distingue explicitement les revenus **professionnels** (page 4,
+  cases `5KP` et suivantes) des **non professionnels** (page 5). Le seuil de
+  passage en **LMP** change donc de page ET de régime : le déficit devient
+  imputable sur le revenu global. Un contrôle
   `SEUIL_LMP` existe dans `controles.py` : sans ce fichier tu ne peux pas juger
   s'il protège réellement, mais signale si le moteur de déficits suppose le
   statut non professionnel **sans jamais le vérifier**.
