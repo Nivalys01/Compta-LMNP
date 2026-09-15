@@ -1,5 +1,62 @@
 # Journal des versions — Compta LMNP
 
+## 8.45.0 — 2026-09-15 (Passe J : la mémoire des déficits LMNP)
+Cinq constats, dont un critique. Le moteur respectait l'année limite et
+l'ordre FIFO ; ce qui manquait, c'était la MÉMOIRE — ce que le logiciel
+remet au déclarant, et ce qu'il sait encore en redire l'année suivante.
+
+**Un déficit entièrement consommé disparaissait de l'aide à la
+déclaration.** Le stock d'ouverture d'un millésime n'était reconstitué qu'à
+partir de son solde courant : lorsqu'un bénéfice l'absorbait en totalité,
+la ligne tombait à zéro et l'aide cessait de la voir. Elle proposait alors
+un bénéfice en 5NA sans la case de déficit antérieur qui l'accompagne —
+7 000 € de base avec 6 000 € de déduction omis dans un cas reproduit. Or
+l'imputation est une opération que l'administration refait : lui donner le
+bénéfice sans le déficit qui le compense, c'est déclarer imposable ce qui
+ne l'est pas. L'aide lit désormais les soldes réellement enregistrés à la
+clôture, millésimes épuisés compris, et additionne les lignes de même
+origine avant d'arrondir.
+
+**Une clôture ultérieure réécrivait la déclaration d'un exercice déjà
+clos.** La table des déficits ne conservait qu'un solde COURANT, pas les
+soldes par exercice. Rééditer la liasse 2025 après avoir clôturé 2026
+perdait donc les 3 000 € de déficit d'ouverture de 2025, et faisait
+apparaître dans son suivi un millésime 2027 qui n'existait pas encore. Les
+écritures closes n'étaient pas touchées — c'est le document reconstruit qui
+changeait, ce qui est pire : rien ne le signalait. Un instantané annuel
+conserve maintenant chaque millésime, son ouverture, son imputation, son
+solde final et sa perte par péremption ; les rééditions s'appuient sur lui,
+et ne voient plus l'avenir.
+
+**La perte par péremption s'effaçait du document imprimé.** Un déficit
+arrivé à expiration laissait sa ligne en base, mais le PDF ne disait plus
+ce qui avait été perdu : 1 200 € sans explication dans l'état archivé. Le
+montant initial ne suffit pas à le dire, puisqu'il ne distingue pas ce qui
+a été consommé de ce qui a expiré. La perte effective est donc enregistrée
+à part, et le PDF en donne le total et le détail par origine.
+
+**Le contrôle du seuil LMP ne voyait pas les recettes d'un FEC rejoué.** Il
+additionnait les opérations de SAISIE : un dossier repris depuis un fichier
+de cabinet franchissait le seuil sans l'avertissement prévu. Il lit
+maintenant les loyers acquis issus des écritures, via `fiscal.agregats`,
+sans cumuler les deux sources. Le franchissement reste un avertissement
+invitant à vérifier le second critère, que le logiciel ne connaît pas.
+
+**Enfin, les demi-euros s'arrondissaient dans le mauvais sens.** Python
+arrondit au pair : 100,50 € donnait 100 en case, et un déficit antérieur de
+0,50 € était purement éliminé par un filtre strict. Les cases emploient
+désormais `Decimal` et `ROUND_HALF_UP`, après regroupement par millésime.
+
+Une table `suivi_deficits` porte ces instantanés. Elle est créée à la
+première clôture d'un dossier ancien, sans commit intermédiaire : la
+clôture reste atomique. Aucun historique n'est INVENTÉ pour les exercices
+clos avant ce correctif — une réédition qui n'a pas d'instantané est
+refusée avec un message explicite renvoyant aux archives de déclaration ou
+à une sauvegarde antérieure, plutôt que de reconstruire un document
+plausible et faux.
+
+- 35 tests ajoutés (944 au total).
+
 ## 8.44.0 — 2026-09-15 (Passe I : l'article 39 C, son plafond et sa mémoire)
 Onze constats, dont deux critiques. Deux fils rouges, et ils se
 ressemblent : le logiciel identifiait des choses par une CHAÎNE au lieu de
@@ -79,7 +136,7 @@ repris 0 = clôture 0 » : la ligne de SORTIE n'existait que dans le détail
 par bien, lequel n'est imprimé qu'à partir de deux logements. 6 200 € de
 mouvement sans explication dans un document destiné à être conservé.
 
-- 39 tests ajoutés (944 au total).
+- 39 tests ajoutés (909 au total).
 
 ## 8.43.0 — 2026-09-15 (Passe H : les amortissements par composants)
 Douze constats, dont deux critiques. Tous tiennent à la même confusion : le
