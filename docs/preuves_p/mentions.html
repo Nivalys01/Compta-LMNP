@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<title>Quittance n° 00001</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 17cm; margin: 2cm auto;
+         color: #1a1a1a; line-height: 1.55; }
+  h1 { font-size: 1.35em; margin: 0 0 4px; }
+  .num { color: #555; margin-bottom: 26px; }
+  .parties { display: flex; justify-content: space-between; gap: 30px;
+             margin-bottom: 26px; }
+  .bloc { font-size: .95em; }
+  .bloc b { display: block; margin-bottom: 3px; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+  td, th { padding: 7px 10px; border-bottom: 1px solid #ddd; }
+  th { text-align: left; background: #f4f4f6; }
+  .droite { text-align: right; }
+  .total td { font-weight: bold; border-top: 2px solid #333; border-bottom: 0; }
+  .mentions { font-size: .82em; color: #555; margin-top: 30px;
+              border-top: 1px solid #ddd; padding-top: 12px; }
+  @media print { body { margin: 1.2cm; } .noprint { display: none; } }
+</style></head><body>
+<p class="noprint" style="text-align:right">
+  <button onclick="window.print()">Imprimer</button></p>
+
+
+
+<h1>Quittance de loyer</h1>
+<p class="num">N° 00001 — janvier 2026</p>
+
+<div class="parties">
+  <div class="bloc"><b>Bailleur</b>
+    Bailleur Alpha Fictif<br></div>
+  <div class="bloc"><b>Locataire</b>
+    Alpha &amp; &lt;script&gt;alert(1)&lt;/script&gt; Fictif<br>Logement Alpha Fictif</div>
+</div>
+
+<p>Je soussigné(e) <b>Bailleur Alpha Fictif</b>, bailleur du logement situé
+<b>Logement Alpha Fictif</b>, déclare avoir reçu de
+<b>Alpha &amp; &lt;script&gt;alert(1)&lt;/script&gt; Fictif</b> la somme de
+<b>800.00 €</b>, au titre du loyer et des charges de
+la période de <b>janvier 2026</b>, et lui en donne quittance,
+sous réserve de tous mes droits.</p>
+
+<table>
+  <tr><th>Désignation</th><th class="droite">Montant</th></tr>
+  <tr><td>Loyer hors charges</td>
+      <td class="droite">800.00 €</td></tr>
+  <tr><td>Provision pour charges</td>
+      <td class="droite">0.00 €</td></tr>
+  <tr class="total"><td>Total réglé</td>
+      <td class="droite">800.00 €</td></tr>
+</table>
+
+<p>
+Fait le 2026-09-15.</p>
+
+<p style="margin-top:38px">Signature du bailleur :</p>
+
+<p class="mentions">
+  La présente quittance annule tous les reçus qui auraient pu être établis
+  précédemment pour la même période. Elle distingue le loyer des charges,
+  conformément à l'article 21 de la loi n° 89-462 du 6 juillet 1989, qui
+  impose au bailleur de la transmettre gratuitement au locataire qui en
+  fait la demande.
+</p>
+</body></html>

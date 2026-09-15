@@ -1,0 +1,654 @@
+{
+  "environnement": {
+    "python": "3.14.6",
+    "sqlite": "3.51.2"
+  },
+  "lectures": [
+    {
+      "fonction": "quittances.assurer_schema",
+      "transaction_apres": false,
+      "commits": 1,
+      "commit_sql": 1,
+      "temoins": 1
+    },
+    {
+      "fonction": "quittances.locataires",
+      "transaction_apres": false,
+      "commits": 1,
+      "commit_sql": 1,
+      "temoins": 1
+    },
+    {
+      "fonction": "quittances.lister",
+      "transaction_apres": false,
+      "commits": 1,
+      "commit_sql": 1,
+      "temoins": 1
+    },
+    {
+      "fonction": "quittances.prochain_numero",
+      "transaction_apres": false,
+      "commits": 1,
+      "commit_sql": 1,
+      "temoins": 1
+    },
+    {
+      "fonction": "cession.assurer_schema",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "fiscal._table_39c_bien",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "operations.assurer_colonne_annulee",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "init_db.creer_index",
+      "transaction_apres": false,
+      "commits": 1,
+      "commit_sql": 1,
+      "temoins": 1
+    },
+    {
+      "fonction": "gabarits.assurer_table",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "parametres.assurer",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "veille_fiscale._table_meta",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "veille_fiscale.derniere_veille",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    },
+    {
+      "fonction": "veille_fiscale.veille_a_refaire",
+      "transaction_apres": true,
+      "commits": 0,
+      "commit_sql": 0,
+      "temoins": 0
+    }
+  ],
+  "lecture_loyer_durable": {
+    "operations": 1,
+    "montant": 800.0
+  },
+  "gabarits": [
+    [
+      "loyer",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "charges_locatives",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "forfait_charges",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "regularisation_charges",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "restitution_charges",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "indemnite_assurance",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "autres_produits",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "depot_garantie_recu",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "depot_garantie_restitue",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "emprunt_recu",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "emprunt_capital_rembourse",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "charge_copro",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "fonds_travaux_alur",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "telecom",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "energie",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "assurance",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "assurance_emprunteur",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "assurance_gli",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "maintenance",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "petit_equipement",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "electromenager",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "autres_equipements",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "fournitures",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "interets_emprunt",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "frais_dossier_emprunt",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "frais_bancaires",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "honoraires",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "gestion_locative",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "honoraires_juridiques",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "frais_acquisition",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "publicite_annonces",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "cotisations_pro",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "frais_postaux",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "carburant",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "peage_parking",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "deplacements",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "cfe",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "taxe_fonciere",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "teom",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "impot_local",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "autres_charges",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "attente_encaissement",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "attente_decaissement",
+      true,
+      1,
+      0,
+      0
+    ],
+    [
+      "audit_personnalise",
+      true,
+      1,
+      0,
+      0
+    ]
+  ],
+  "parametre_versionne": {
+    "commits": 0,
+    "temoins": 0,
+    "operations": 0
+  },
+  "appel_interrompu": {
+    "erreur": "Montant invalide : inf.",
+    "operations": 2,
+    "ecritures": 2,
+    "montant": 700.0
+  },
+  "cloture_commits": {
+    "commits": 1,
+    "statut": "clos"
+  },
+  "cloture_interrompue": {
+    "ecritures_avant": 1,
+    "ecritures_apres": 1,
+    "statut": "ouvert",
+    "suivi": 0
+  },
+  "clotures_paralleles": {
+    "retours": [
+      "L'exercice 2026 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits).",
+      "succès"
+    ],
+    "dotations": 1,
+    "statut": "clos"
+  },
+  "an_interruption": {
+    "avant_fermeture": 1,
+    "durable": 0
+  },
+  "cession_interruption": {
+    "avant_fermeture": 1,
+    "durable": 0
+  },
+  "migration_interrompue": {
+    "version": 2,
+    "comptes_cession": 2,
+    "sauvegardes": 1
+  },
+  "annulations_paralleles": {
+    "retours": [
+      {
+        "operation": 1,
+        "ecriture_annulation": 2,
+        "type": "loyer",
+        "montant": 800.0
+      },
+      {
+        "operation": 1,
+        "ecriture_annulation": 3,
+        "type": "loyer",
+        "montant": 800.0
+      }
+    ],
+    "ecritures": 3,
+    "loyers": -800.0
+  },
+  "quittances_collision": {
+    "retours": [
+      "UNIQUE constraint failed: quittance.numero",
+      {
+        "id": 1,
+        "numero": 1,
+        "periode": "2026-01",
+        "loyer": 800.0,
+        "charges": 0.0,
+        "total": 800.0,
+        "locataire": "Locataire fictif B"
+      }
+    ],
+    "nombre": 1,
+    "total": 800.0
+  },
+  "quittances_double": {
+    "retours": [
+      {
+        "id": 1,
+        "numero": 1,
+        "periode": "2026-01",
+        "loyer": 800.0,
+        "charges": 0.0,
+        "total": 800.0,
+        "locataire": "Locataire fictif A"
+      },
+      {
+        "id": 2,
+        "numero": 2,
+        "periode": "2026-01",
+        "loyer": 800.0,
+        "charges": 0.0,
+        "total": 800.0,
+        "locataire": "Locataire fictif B"
+      }
+    ],
+    "nombre": 2,
+    "total": 1600.0
+  },
+  "rejeu_interrompu": {
+    "ecritures": 0,
+    "transaction": false
+  },
+  "cinquieme_collision": {
+    "erreur": "UNIQUE constraint failed: ecriture.exercice_annee, ecriture.ecriture_num",
+    "tentatives": 5,
+    "transaction": true,
+    "ecritures": 1
+  },
+  "verrou": {
+    "busy_timeout_ms": 5000,
+    "resultat": {
+      "erreur": "database is locked",
+      "secondes": 5.0
+    }
+  },
+  "composant_web": {
+    "reponse": {
+      "annee": [
+        "2026"
+      ],
+      "err": [
+        "Date d'écriture invalide : '2026-02-30' (format attendu AAAA-MM-JJ)."
+      ]
+    },
+    "composants": 1,
+    "ecritures": 0,
+    "valeur": 12000.0
+  },
+  "ouverture_web": {
+    "reponse": {
+      "err": [
+        "L'exercice 2026 n'est pas clôturé : clôturez-le avant d'ouvrir avec reprise des à-nouveaux."
+      ]
+    },
+    "exercices": 2,
+    "ecritures": 0
+  },
+  "import_interrompu": {
+    "reponse": {
+      "err": [
+        "Import ANNULÉ à la ligne 7 sur 10 : Montant invalide : inf.\n\nAucune opération n'a été enregistrée — la base est exactement dans l'état où elle était. Corrigez la ligne fautive dans le relevé et relancez l'analyse."
+      ]
+    },
+    "operations": 0,
+    "journal_persistant": false
+  },
+  "import_nettoyage": {
+    "reponse": {
+      "err": [
+        "Import interrompu : suppression fictive refusée"
+      ]
+    },
+    "operations_apres_erreur": 10,
+    "reponse_relance": {
+      "ok": [
+        "Import terminé : 10 opération(s) enregistrée(s), 0 écartée(s)."
+      ]
+    },
+    "operations_apres_relance": 20,
+    "montant": 16000.0
+  },
+  "multi_fec": {
+    "reponse": {
+      "err": [
+        "Reprise interrompue : Écriture déséquilibrée : débit 800.00 € / crédit 801.00 €."
+      ]
+    },
+    "exercices": [
+      2024,
+      2026
+    ],
+    "ecritures": 2,
+    "source_temporaire": false
+  },
+  "journal_contenu": {
+    "identite_fictive_presente": true,
+    "montant_present": true
+  },
+  "restaurations_paralleles": {
+    "meme_copie_surete": true,
+    "avant": 2,
+    "apres": 1,
+    "copie_surete": 1
+  },
+  "ecriture_apres_cloture": {
+    "retour": {
+      "ecriture_id": 2,
+      "ecriture_num": 2
+    },
+    "exercice": [
+      "clos",
+      800.0
+    ],
+    "produits": 1600.0
+  },
+  "garde_migration_echec": {
+    "retour": null,
+    "version": 2,
+    "memorise": false
+  },
+  "arret_processus_cloture": {
+    "code": 77,
+    "ecritures": 1,
+    "suivi": 0,
+    "statut": "ouvert",
+    "integrite": "ok"
+  },
+  "saisies_paralleles": {
+    "numeros": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "ecritures": 20,
+    "operations": 20
+  },
+  "savepoint_ligne_invalide": {
+    "erreur": "FOREIGN KEY constraint failed",
+    "ecritures": 0,
+    "lignes": 0,
+    "temoins": 1
+  }
+}

@@ -1,0 +1,260 @@
+[
+  {
+    "fichier": "app.py",
+    "fonction": "immobilisations",
+    "ligne": 754,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "creer_exploitant",
+    "ligne": 796,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "creer_bien",
+    "ligne": 827,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "creer_composant",
+    "ligne": 875,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "immo_ventiler",
+    "ligne": 990,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "composant_duree",
+    "ligne": 1037,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "exercice_ouvrir",
+    "ligne": 1335,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "reglementation_compte",
+    "ligne": 1492,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "import_valider",
+    "ligne": 1921,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "exercice_reprendre_fec_multi",
+    "ligne": 2022,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "app.py",
+    "fonction": "exercice_reprendre_fec",
+    "ligne": 2065,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/amortissement.py",
+    "fonction": "generer_cloture",
+    "ligne": 361,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/audit_cycle.py",
+    "fonction": "_creer_dossier",
+    "ligne": 124,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/audit_cycle.py",
+    "fonction": "phase_2_detection",
+    "ligne": 312,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/audit_cycle.py",
+    "fonction": "phase_4_reprise_et_liasse",
+    "ligne": 417,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/cession.py",
+    "fonction": "ceder_bien",
+    "ligne": 168,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/ecritures.py",
+    "fonction": "inserer",
+    "ligne": 209,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/fiscal.py",
+    "fonction": "traiter_deficit",
+    "ligne": 199,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/fiscal.py",
+    "fonction": "cloturer",
+    "ligne": 555,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/gabarits.py",
+    "fonction": "assurer_table",
+    "ligne": 210,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/gabarits.py",
+    "fonction": "ajouter_personnalise",
+    "ligne": 233,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "_exec",
+    "ligne": 54,
+    "appel": "conn.executescript"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "init",
+    "ligne": 121,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "init",
+    "ligne": 138,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "init",
+    "ligne": 141,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "init",
+    "ligne": 163,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "_reconstituer_operations",
+    "ligne": 245,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "creer_index",
+    "ligne": 320,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/init_db.py",
+    "fonction": "marquer_version",
+    "ligne": 332,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/migrations.py",
+    "fonction": "migrer",
+    "ligne": 115,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/operations.py",
+    "fonction": "saisir",
+    "ligne": 95,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/operations.py",
+    "fonction": "annuler",
+    "ligne": 397,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/parametres.py",
+    "fonction": "assurer",
+    "ligne": 123,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/parametres.py",
+    "fonction": "definir",
+    "ligne": 174,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/pense_bete.py",
+    "fonction": "ecrire_notes",
+    "ligne": 344,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/quittances.py",
+    "fonction": "assurer_schema",
+    "ligne": 55,
+    "appel": "conn.executescript"
+  },
+  {
+    "fichier": "modules/quittances.py",
+    "fonction": "assurer_schema",
+    "ligne": 56,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/quittances.py",
+    "fonction": "ajouter_locataire",
+    "ligne": 99,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/quittances.py",
+    "fonction": "emettre",
+    "ligne": 263,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/rejeu_fec.py",
+    "fonction": "rejouer",
+    "ligne": 110,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/reprise.py",
+    "fonction": "_construire_an_depuis_balance",
+    "ligne": 162,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/reprise.py",
+    "fonction": "ouvrir_exercice",
+    "ligne": 184,
+    "appel": "conn.commit"
+  },
+  {
+    "fichier": "modules/veille_fiscale.py",
+    "fonction": "enregistrer_veille",
+    "ligne": 155,
+    "appel": "conn.commit"
+  }
+]

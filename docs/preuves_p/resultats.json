@@ -1,0 +1,260 @@
+{
+  "impaye": {
+    "auto": {
+      "erreur": "ValueError: Aucun encaissement trouvé pour 2026-01. Une quittance atteste d'un paiement REÇU : saisissez d'abord le loyer dans la page Saisie, ou indiquez les montants à la main."
+    },
+    "http": 302,
+    "message": "/quittances?ok=Quittance+n°+00001+émise+pour+Locataire+Alpha+Fictif+(2026-01)+:+880.00+€.",
+    "operations": 0,
+    "quittance": {
+      "id": 1,
+      "numero": 1,
+      "locataire_id": 1,
+      "periode": "2026-01",
+      "date_emission": "2026-09-15",
+      "date_paiement": null,
+      "loyer": 800.0,
+      "charges": 80.0,
+      "locataire": "Locataire Alpha Fictif",
+      "date_entree": "2026-01-01",
+      "date_sortie": null,
+      "bien_id": 1,
+      "bien": "Logement Alpha Fictif",
+      "bien_adresse": "Adresse logement fictive",
+      "bailleur": {
+        "nom": "Bailleur Alpha Fictif",
+        "adresse": "Adresse bailleur fictive"
+      },
+      "total": 880.0,
+      "periode_lettres": "janvier 2026",
+      "ecart_ecritures": {
+        "encaisse": 0.0,
+        "atteste": 880.0,
+        "message": "Cette quittance atteste 880.00 €, alors que les écritures de janvier 2026 n'en portent plus que 0.00 €. Un encaissement a probablement été annulé depuis l'émission. Une quittance remise ne se corrige pas : établissez-en une rectificative, ou réclamez la restitution de l'originale."
+      }
+    },
+    "attestation": true
+  },
+  "ventilation": {
+    "encaisse": {
+      "loyer": 800.0,
+      "charges": 80.0
+    },
+    "quittance": {
+      "id": 1,
+      "numero": 1,
+      "periode": "2026-01",
+      "loyer": 880.0,
+      "charges": 0.0,
+      "total": 880.0,
+      "locataire": "Locataire Alpha Fictif"
+    },
+    "alerte": null
+  },
+  "partiel": {
+    "premiere": {
+      "id": 1,
+      "numero": 1,
+      "periode": "2026-01",
+      "loyer": 400.0,
+      "charges": 0.0,
+      "total": 400.0,
+      "locataire": "Locataire Alpha Fictif"
+    },
+    "titre_quittance": true,
+    "alerte_apres_solde": null,
+    "solde": {
+      "erreur": "ValueError: Une quittance existe déjà pour Locataire Alpha Fictif en 2026-01 (n° 00001). Une quittance atteste d'un paiement : en émettre deux pour le même mois créerait deux preuves du même encaissement."
+    },
+    "total_encaisse": {
+      "loyer": 800.0,
+      "charges": 0.0
+    }
+  },
+  "colocation_parts": {
+    "premiere": {
+      "id": 1,
+      "numero": 1,
+      "periode": "2026-01",
+      "loyer": 400.0,
+      "charges": 0.0,
+      "total": 400.0,
+      "locataire": "Locataire Alpha Fictif"
+    },
+    "seconde": {
+      "erreur": "ValueError: Le logement a déjà été quittancé pour 2026-01 : quittance n° 00001 au nom de Locataire Alpha Fictif. Le montant est lu dans les écritures du LOGEMENT ; en émettre une seconde attesterait deux fois le même encaissement.\n\nEn colocation, indiquez le montant revenant à chacun dans les champs Loyer et Charges plutôt que de laisser le calcul automatique — la somme des quittances doit égaler ce qui a été encaissé."
+    },
+    "nombre": 1
+  },
+  "relocation": {
+    "premiere": {
+      "id": 1,
+      "numero": 1,
+      "periode": "2026-02",
+      "loyer": 800.0,
+      "charges": 0.0,
+      "total": 800.0,
+      "locataire": "Locataire Alpha Fictif"
+    },
+    "seconde": {
+      "erreur": "ValueError: Le logement a déjà été quittancé pour 2026-02 : quittance n° 00001 au nom de Locataire Alpha Fictif. Le montant est lu dans les écritures du LOGEMENT ; en émettre une seconde attesterait deux fois le même encaissement.\n\nEn colocation, indiquez le montant revenant à chacun dans les champs Loyer et Charges plutôt que de laisser le calcul automatique — la somme des quittances doit égaler ce qui a été encaissé."
+    },
+    "presence": [
+      true,
+      true
+    ]
+  },
+  "annulation": {
+    "nombre": 1,
+    "detail": {
+      "id": 1,
+      "numero": 1,
+      "locataire_id": 1,
+      "periode": "2026-01",
+      "date_emission": "2026-09-15",
+      "date_paiement": null,
+      "loyer": 800.0,
+      "charges": 0.0,
+      "locataire": "Locataire Alpha Fictif",
+      "date_entree": "2026-01-01",
+      "date_sortie": null,
+      "bien_id": 1,
+      "bien": "Logement Alpha Fictif",
+      "bien_adresse": "Adresse logement fictive",
+      "bailleur": {
+        "nom": "Bailleur Alpha Fictif",
+        "adresse": "Adresse bailleur fictive"
+      },
+      "total": 800.0,
+      "periode_lettres": "janvier 2026",
+      "ecart_ecritures": {
+        "encaisse": 0.0,
+        "atteste": 800.0,
+        "message": "Cette quittance atteste 800.00 €, alors que les écritures de janvier 2026 n'en portent plus que 0.00 €. Un encaissement a probablement été annulé depuis l'émission. Une quittance remise ne se corrige pas : établissez-en une rectificative, ou réclamez la restitution de l'originale."
+      }
+    },
+    "avertissement_html": true
+  },
+  "restauration_normale": {
+    "http": 200,
+    "refus_visible": true,
+    "compte_juste": true,
+    "nouvelle": {
+      "id": 4,
+      "numero": 4,
+      "periode": "2026-04",
+      "loyer": 800.0,
+      "charges": 0.0,
+      "total": 800.0,
+      "locataire": "Locataire Alpha Fictif"
+    },
+    "numeros": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "suppression_sql": {
+    "numero_reutilise": 4,
+    "ancien_total": 800.0,
+    "nouveau_total": 500.0
+  },
+  "compteur_illisible": {
+    "restauration": {
+      "retour": "<TEMP_FICTIF>/compteur-illisible/sauvegardes/compta-20260915-171406-avant-restauration.db"
+    },
+    "nouvelle": {
+      "id": 2,
+      "numero": 2,
+      "periode": "2026-03",
+      "loyer": 800.0,
+      "charges": 0.0,
+      "total": 800.0,
+      "locataire": "Locataire Alpha Fictif"
+    },
+    "nombre": 2
+  },
+  "identite_non_figee": {
+    "avant": "Locataire Alpha Fictif",
+    "apres": "Locataire Beta Fictif",
+    "adresse": "Autre adresse fictive",
+    "numero": 1,
+    "html_beta": true,
+    "apres_restauration": "Locataire Alpha Fictif"
+  },
+  "mentions_clos": {
+    "date_paiement": null,
+    "mention_paiement": false,
+    "libelle_utilise": true,
+    "echappe": true,
+    "injection": false,
+    "siren": false,
+    "ecritures_identiques": true,
+    "statut": "clos"
+  },
+  "recoupement_q01": {
+    "transaction_avant": true,
+    "transaction_apres": false,
+    "operations_apres_rollback": 1
+  },
+  "recoupement_q04_collision": {
+    "retours": [
+      {
+        "erreur": "IntegrityError: UNIQUE constraint failed: quittance.numero"
+      },
+      {
+        "retour": {
+          "id": 1,
+          "numero": 1,
+          "periode": "2026-01",
+          "loyer": 800.0,
+          "charges": 0.0,
+          "total": 800.0,
+          "locataire": "Locataire Beta Fictif"
+        }
+      }
+    ],
+    "nombre": 1,
+    "operations": 1
+  },
+  "donnees": {
+    "nom_table_dans_fec": false,
+    "nom_libelle_dans_fec": true,
+    "nom_dans_sauvegarde": "Locataire Traceur Fictif",
+    "nouveaux_fichiers_impression": [],
+    "nom_dans_pdf_liasse": false,
+    "nom_dans_erreur": true,
+    "fevrier_non_quittance_visible": false
+  },
+  "demo_locataire": {
+    "generation": {
+      "retour": "<TEMP_FICTIF>/outil/seed_demo.sql"
+    },
+    "sortie_existe": true,
+    "nom_locataire_conserve": true,
+    "promesse_absence": true
+  },
+  "demo_empreinte_connue": {
+    "refus": "ANONYMISATION INCOMPLÈTE — seed_demo.sql contient encore : ['terme interdit de publication']. Fichier supprimé.",
+    "fichier_supprime": true
+  },
+  "seed_client_present": {
+    "locataires": 0,
+    "quittances": 0
+  },
+  "environnement": {
+    "python": "3.14.6 (main, Jun 11 2026, 00:00:00) [GCC 16.1.1 20260515 (Red Hat 16.1.1-2)]",
+    "sqlite": "3.51.2",
+    "sha256": {
+      "modules/quittances.py": "5031c6cb91cc95ed6b3d16617b9c4c9a37e61f040d40b1f141e7bf074ea2d0cd",
+      "modules/operations.py": "a19c20f89ee3a2dd4074846a476f644f56ef76677b16235650974af9f1291895",
+      "modules/pages.py": "fd6c9b88b57f97ab6ac61b9476134193874a8d8a73ab199d5299a43eb7115b23",
+      "schema.sql": "4b3407b78b2e0c281fd8a6db81302d1a5c23cc79ed374db5f2175aff578b6dd2",
+      "app.py": "461f6c2939e30201308c0c6b405931fb840018b6a3be67342b2e9ec36ffda77c",
+      "modules/perennite.py": "07386ee31fceb96fd19f08c3c1be751138ac63409b016983466ca69cd6e63123",
+      "outils_demo.py": "04a09cf239de9eb5eb4e7a5af6b2c3829fdc3bee8f3ead3eb1bfed5c515ec967",
+      "verifier_depot.py": "64cba0a5516935e18e2c691bb623daf3d2415df0585fb3fbac6c608853c4d4c3"
+    }
+  }
+}

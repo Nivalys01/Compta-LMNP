@@ -1,0 +1,4195 @@
+{
+  "environnement": {
+    "python": "3.14.6 (main, Jun 11 2026, 00:00:00) [GCC 16.1.1 20260515 (Red Hat 16.1.1-2)]",
+    "sqlite": "3.51.2",
+    "sha256": {
+      "modules/fiscal.py": "a3337e8f4bce02b7fba3844cf0386aa9a21b2be9059eb47cf037d8bf8caa02a7",
+      "modules/liasse.py": "196c7b10bb4a46d1cf02064fdb6b91a0bc4045171d700c1859f3174fa8a1a192",
+      "modules/liasse_pdf.py": "4e9b6df38c2778316f7aec76440700812fe8834a205151cbee129a167c2e0f59",
+      "modules/controles.py": "fb5f941a7b67ac936f37f28d299eba35f0fadad866efd808c4b5044403518fa7",
+      "modules/parametres.py": "db7eb407033b31c25c4c879ade9a27ed35b51bc32378a3d55ef32e46da134b7a",
+      "schema.sql": "4b3407b78b2e0c281fd8a6db81302d1a5c23cc79ed374db5f2175aff578b6dd2"
+    }
+  },
+  "pivot_2024": {
+    "cloture": {
+      "agregats": {
+        "produits": 300.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 300.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 300.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 300.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 300.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 300.0,
+        "stock_deficits": 500.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2015,
+          "montant_initial": 800.0,
+          "solde": 500.0,
+          "annee_expiration": 2025
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 300.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2015,
+            "montant_initial": 800.0,
+            "solde": 500.0,
+            "annee_expiration": 2025,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 500.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 500.0
+      },
+      "aide": {
+        "case_5NA": 300,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GB",
+            "annee_origine": 2015,
+            "montant": 800
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 300.0,
+        "resultat_fiscal": 300.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 500.0,
+        "restant_total": 500.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 300.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 300.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 300.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 300.0,
+        "benefice_ou_perte_310": 300.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 300.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            300.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 300.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "pivot_2025": {
+    "cloture": {
+      "agregats": {
+        "produits": 300.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 300.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 300.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 300.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 300.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 300.0,
+        "stock_deficits": 500.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2015,
+          "montant_initial": 800.0,
+          "solde": 500.0,
+          "annee_expiration": 2025
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 300.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2015,
+            "montant_initial": 800.0,
+            "solde": 500.0,
+            "annee_expiration": 2025,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 500.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 500.0
+      },
+      "aide": {
+        "case_5NA": 300,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GA",
+            "annee_origine": 2015,
+            "montant": 800
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 300.0,
+        "resultat_fiscal": 300.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 500.0,
+        "restant_total": 500.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 300.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 300.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 300.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 300.0,
+        "benefice_ou_perte_310": 300.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 300.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            300.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 300.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "pivot_2026": {
+    "cloture": {
+      "agregats": {
+        "produits": 300.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 300.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 300.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 300.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 300.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 1,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 300.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2015,
+          "montant_initial": 800.0,
+          "solde": 0.0,
+          "annee_expiration": 2025
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 300.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "aide": {
+        "case_5NA": 300,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 300.0,
+        "resultat_fiscal": 300.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 300.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 0,
+        "restant_total": 0.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 300.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 300.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 300.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 300.0,
+        "benefice_ou_perte_310": 300.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 300.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            300.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 300.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "fifo_0": {
+    "cloture": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 6000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2017,
+          "montant_initial": 1000.0,
+          "solde": 1000.0,
+          "annee_expiration": 2027
+        },
+        {
+          "id": 2,
+          "annee_origine": 2019,
+          "montant_initial": 2000.0,
+          "solde": 2000.0,
+          "annee_expiration": 2029
+        },
+        {
+          "id": 3,
+          "annee_origine": 2024,
+          "montant_initial": 3000.0,
+          "solde": 3000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2017,
+            "montant_initial": 1000.0,
+            "solde": 1000.0,
+            "annee_expiration": 2027,
+            "perime": false
+          },
+          {
+            "annee_origine": 2019,
+            "montant_initial": 2000.0,
+            "solde": 2000.0,
+            "annee_expiration": 2029,
+            "perime": false
+          },
+          {
+            "annee_origine": 2024,
+            "montant_initial": 3000.0,
+            "solde": 3000.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 6000.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 6000.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GC",
+            "annee_origine": 2017,
+            "montant": 1000
+          },
+          {
+            "case": "5GE",
+            "annee_origine": 2019,
+            "montant": 2000
+          },
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 3000
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 0,
+        "resultat_fiscal": 0.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 6000.0,
+        "restant_total": 6000.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 0,
+        "autres_produits_230": 0,
+        "total_produits_232": 0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 0,
+        "benefice_ou_perte_310": 0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 0.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "fifo_2000": {
+    "cloture": {
+      "agregats": {
+        "produits": 2000.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 2000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 2000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 2000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 2000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 2000.0,
+        "stock_deficits": 4000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2017,
+          "montant_initial": 1000.0,
+          "solde": 0.0,
+          "annee_expiration": 2027
+        },
+        {
+          "id": 2,
+          "annee_origine": 2019,
+          "montant_initial": 2000.0,
+          "solde": 1000.0,
+          "annee_expiration": 2029
+        },
+        {
+          "id": 3,
+          "annee_origine": 2024,
+          "montant_initial": 3000.0,
+          "solde": 3000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 2000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2019,
+            "montant_initial": 2000.0,
+            "solde": 1000.0,
+            "annee_expiration": 2029,
+            "perime": false
+          },
+          {
+            "annee_origine": 2024,
+            "montant_initial": 3000.0,
+            "solde": 3000.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 4000.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 4000.0
+      },
+      "aide": {
+        "case_5NA": 2000,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GE",
+            "annee_origine": 2019,
+            "montant": 2000
+          },
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 3000
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 2000.0,
+        "resultat_fiscal": 2000.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 4000.0,
+        "restant_total": 4000.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 2000.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 2000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 2000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2000.0,
+        "benefice_ou_perte_310": 2000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 2000.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2000.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2000.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "fifo_7000": {
+    "cloture": {
+      "agregats": {
+        "produits": 7000.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 7000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 7000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 7000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 7000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 6000.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 1000.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2017,
+          "montant_initial": 1000.0,
+          "solde": 0.0,
+          "annee_expiration": 2027
+        },
+        {
+          "id": 2,
+          "annee_origine": 2019,
+          "montant_initial": 2000.0,
+          "solde": 0.0,
+          "annee_expiration": 2029
+        },
+        {
+          "id": 3,
+          "annee_origine": 2024,
+          "montant_initial": 3000.0,
+          "solde": 0.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 7000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "aide": {
+        "case_5NA": 7000,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 7000.0,
+        "resultat_fiscal": 7000.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 1000.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 0,
+        "restant_total": 0.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 7000.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 7000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 7000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 7000.0,
+        "benefice_ou_perte_310": 7000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 7000.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            7000.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 7000.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "fifo_0.03": {
+    "cloture": {
+      "agregats": {
+        "produits": 0.03,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0.03,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0.03
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.03,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.03,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.03,
+        "stock_deficits": 5999.97
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2017,
+          "montant_initial": 1000.0,
+          "solde": 999.97,
+          "annee_expiration": 2027
+        },
+        {
+          "id": 2,
+          "annee_origine": 2019,
+          "montant_initial": 2000.0,
+          "solde": 2000.0,
+          "annee_expiration": 2029
+        },
+        {
+          "id": 3,
+          "annee_origine": 2024,
+          "montant_initial": 3000.0,
+          "solde": 3000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.03,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2017,
+            "montant_initial": 1000.0,
+            "solde": 999.97,
+            "annee_expiration": 2027,
+            "perime": false
+          },
+          {
+            "annee_origine": 2019,
+            "montant_initial": 2000.0,
+            "solde": 2000.0,
+            "annee_expiration": 2029,
+            "perime": false
+          },
+          {
+            "annee_origine": 2024,
+            "montant_initial": 3000.0,
+            "solde": 3000.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 5999.97,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 5999.97
+      },
+      "aide": {
+        "case_5NA": 0,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GC",
+            "annee_origine": 2017,
+            "montant": 1000
+          },
+          {
+            "case": "5GE",
+            "annee_origine": 2019,
+            "montant": 2000
+          },
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 3000
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 0.03,
+        "resultat_fiscal": 0.03,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 5999.97,
+        "restant_total": 5999.97
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 0.03,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 0.03,
+        "autres_produits_230": 0,
+        "total_produits_232": 0.03,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 0.03,
+        "benefice_ou_perte_310": 0.03,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 0.03,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            0.03
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 0.03
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "fifo_centimes": {
+    "cloture": {
+      "agregats": {
+        "produits": 0.04,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0.04,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0.04
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.04,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.04,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.03,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 0.01
+    },
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2023,
+        "montant_initial": 0.01,
+        "solde": 0.0,
+        "annee_expiration": 2033
+      },
+      {
+        "id": 2,
+        "annee_origine": 2024,
+        "montant_initial": 0.02,
+        "solde": 0.0,
+        "annee_expiration": 2034
+      }
+    ]
+  },
+  "trace_peremption": {
+    "avant": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2014,
+          "montant_initial": 1200.0,
+          "solde": 1200.0,
+          "annee_expiration": 2024
+        },
+        {
+          "id": 2,
+          "annee_origine": 2024,
+          "montant_initial": 800.0,
+          "solde": 800.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2014,
+            "montant_initial": 1200.0,
+            "solde": 1200.0,
+            "annee_expiration": 2024,
+            "perime": true
+          },
+          {
+            "annee_origine": 2024,
+            "montant_initial": 800.0,
+            "solde": 800.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [],
+        "total_deficits": 800.0,
+        "total_deficits_perimes": 1200.0,
+        "sortie_39c": 0.0,
+        "total_restant": 800.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 800
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 0,
+        "resultat_fiscal": 0.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 800.0,
+        "restant_total": 800.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 0,
+        "autres_produits_230": 0,
+        "total_produits_232": 0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 0,
+        "benefice_ou_perte_310": 0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 0.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "pdf_avant": {
+      "fichier": "peremption_avant.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice NON clôturé — chiffres provisoires\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                       0,00 €\n\n   Résultat fiscal LMNP                                                                                                 0,00 €\n\n   Déficit LMNP généré                                                                                                  0,00 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                            800,00 €\n\n   Total des reports disponibles                                                                                     800,00 €\n\n\n 2031-SD — Récapitulation\n   Rubrique\n                                                                                          E                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)\n                                                                                IR                                      0,00 €\n\n\n 2033-A — Bilan simplifié\n   Actif\n\n   Immobilisations corporelles — brut (case 028)\n                                                              SO                                                     Montant\n\n                                                                                                                        0,00 €\n\n   Amortissements (case 030)\n\n   Immobilisations corporelles — net\n\n   Total actif net (case 112)\n                                                    VI                                                                  0,00 €\n\n                                                                                                                        0,00 €\n\n                                                                                                                        0,00 €\n\n   Passif                                   O                                                                        Montant\n\n\n\n                         PR\n   Capital individuel (case 120)\n\n   Résultat de l'exercice (case 136)\n\n   Total capitaux propres (case 142)\n                                                                                                                        0,00 €\n\n                                                                                                                        0,00 €\n\n                                                                                                                        0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                      0,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                         0,00 €\n\n   Autres charges externes (case 242)                                                                                   0,00 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n   Total des charges d'exploitation (case 264)                                                                          0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Résultat d'exploitation (case 270)                                                                                                 0,00 €\n\n   Produits financiers (case 280)                                                                                                     0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                                0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                                  0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                      0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                       0,00 €\n\n   Réintégrations / déductions                                                                                                      Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                                  0,00 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                          0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début         Augment.          Brut fin Amort. début             Dotation     Amort. fin\n\n   Terrains (cases 420 / 510)                         0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Constructions (cases 430 /\n   520)                                               0,00 €          0,00 €           0,00 €     E    0,00 €            0,00 €       0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                               0,00 €          0,00 €\n                                                                                   IR  0,00 €          0,00 €            0,00 €       0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)\n   Totaux\n                                                      0,00 €\n\n                                                      0,00 €\n                                                                  SO  0,00 €\n\n                                                                      0,00 €\n                                                                                       0,00 €\n\n                                                                                       0,00 €\n                                                                                                       0,00 €\n\n                                                                                                       0,00 €\n                                                                                                                         0,00 €\n\n                                                                                                                         0,00 €\n                                                                                                                                      0,00 €\n\n                                                                                                                                      0,00 €\n\n\n Détail par composant\n   Composant\n                                                        VI Valeur brute        Durée             Dotation          Cumul fin         VNC fin\n\n\n Suivi des reports — article 39 C           O\n   Rubrique\n\n   Stock d'ouverture\n                         PR\n   Amortissements reportés cette année\n                                                                                                                                    Montant\n\n                                                                                                                                      0,00 €\n\n                                                                                                                                      0,00 €\n\n   Amortissements repris cette année                                                                                                  0,00 €\n\n   Stock à la clôture                                                                                                                 0,00 €\n\n\n Déficits LMNP par millésime\n   Origine                                          Montant initial                               Solde     Expire fin\n\n   2014                                                 1 200,00 €                         1 200,00 €       2024 — périmé\n\n   2024                                                   800,00 €                              800,00 €    2034\n\n   Total                                                                                        800,00 €\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                             Montant\n\n   5GJ — déficit 2024 non encore déduit                                                                                             800,00 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                        Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            0.00 €\n\n\n\n\n                                                                                             E\n                                                                                 IR\n                                                              SO\n                                                    VI\n                                            O\n                         PR\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                    Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    },
+    "cloture": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 1,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 800.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "apres": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2014,
+          "montant_initial": 1200.0,
+          "solde": 0.0,
+          "annee_expiration": 2024
+        },
+        {
+          "id": 2,
+          "annee_origine": 2024,
+          "montant_initial": 800.0,
+          "solde": 800.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2024,
+            "montant_initial": 800.0,
+            "solde": 800.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 800.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 800.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 800
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 0,
+        "resultat_fiscal": 0.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 800.0,
+        "restant_total": 800.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 0,
+        "autres_produits_230": 0,
+        "total_produits_232": 0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 0,
+        "benefice_ou_perte_310": 0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 0.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "pdf_apres": {
+      "fichier": "peremption_apres.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice clos\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                       0,00 €\n\n   Résultat fiscal LMNP                                                                                                 0,00 €\n\n   Déficit LMNP généré                                                                                                  0,00 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                            800,00 €\n\n   Total des reports disponibles                                                                                     800,00 €\n\n\n 2031-SD — Récapitulation\n   Rubrique                                                                                                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)                                                            0,00 €\n\n\n 2033-A — Bilan simplifié\n   Actif                                                                                                             Montant\n\n   Immobilisations corporelles — brut (case 028)                                                                        0,00 €\n\n   Amortissements (case 030)                                                                                            0,00 €\n\n   Immobilisations corporelles — net                                                                                    0,00 €\n\n   Total actif net (case 112)                                                                                           0,00 €\n\n   Passif                                                                                                            Montant\n\n   Capital individuel (case 120)                                                                                        0,00 €\n\n   Résultat de l'exercice (case 136)                                                                                    0,00 €\n\n   Total capitaux propres (case 142)                                                                                    0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                      0,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                         0,00 €\n\n   Autres charges externes (case 242)                                                                                   0,00 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n   Total des charges d'exploitation (case 264)                                                                          0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Résultat d'exploitation (case 270)                                                                                                 0,00 €\n\n   Produits financiers (case 280)                                                                                                     0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                                0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                                  0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                      0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                       0,00 €\n\n   Réintégrations / déductions                                                                                                      Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                                  0,00 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                          0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début         Augment.          Brut fin Amort. début             Dotation     Amort. fin\n\n   Terrains (cases 420 / 510)                         0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Constructions (cases 430 /\n   520)                                               0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                               0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)                      0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Totaux                                             0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n\n Détail par composant\n   Composant                                               Valeur brute        Durée             Dotation          Cumul fin         VNC fin\n\n\n Suivi des reports — article 39 C\n   Rubrique                                                                                                                         Montant\n\n   Stock d'ouverture                                                                                                                  0,00 €\n\n   Amortissements reportés cette année                                                                                                0,00 €\n\n   Amortissements repris cette année                                                                                                  0,00 €\n\n   Stock à la clôture                                                                                                                 0,00 €\n\n\n Déficits LMNP par millésime\n   Origine                                          Montant initial                               Solde     Expire fin\n\n   2024                                                   800,00 €                              800,00 €    2034\n\n   Total                                                                                        800,00 €\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                             Montant\n\n   5GJ — déficit 2024 non encore déduit                                                                                             800,00 €\n\n Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                        Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            0.00 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                  Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    }
+  },
+  "restitution_500": {
+    "cloture": {
+      "agregats": {
+        "produits": 500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 500.0,
+        "stock_deficits": 500.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 1000.0,
+          "solde": 500.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 500.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2024,
+            "montant_initial": 1000.0,
+            "solde": 500.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 500.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 500.0
+      },
+      "aide": {
+        "case_5NA": 500,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 1000
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 500.0,
+        "resultat_fiscal": 500.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 500.0,
+        "restant_total": 500.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 500.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 500.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 500.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 500.0,
+        "benefice_ou_perte_310": 500.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 500.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            500.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 500.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "restitution_1000": {
+    "cloture": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 1000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 1000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 1000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 1000.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 1000.0,
+          "solde": 0.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 1000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "aide": {
+        "case_5NA": 1000,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": 1000.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 0,
+        "restant_total": 0.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 1000.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 1000.0,
+        "benefice_ou_perte_310": 1000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 1000.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            1000.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 1000.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "pdf": {
+      "fichier": "deficit_epuise.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice clos\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                  1 000,00 €\n\n   Résultat fiscal LMNP                                                                                            1 000,00 €\n\n   Déficit LMNP généré                                                                                                  0,00 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                               0,00 €\n\n   Total des reports disponibles                                                                                        0,00 €\n\n\n 2031-SD — Récapitulation\n   Rubrique                                                                                                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)                                                            0,00 €\n\n   BIC non professionnel — bénéfice (cadre 7a)                                                                     1 000,00 €\n\n\n 2033-A — Bilan simplifié\n   Actif                                                                                                             Montant\n\n   Immobilisations corporelles — brut (case 028)                                                                        0,00 €\n\n   Amortissements (case 030)                                                                                            0,00 €\n\n   Immobilisations corporelles — net                                                                                    0,00 €\n\n   Total actif net (case 112)                                                                                           0,00 €\n\n   Passif                                                                                                            Montant\n\n   Capital individuel (case 120)                                                                                   -1 000,00 €\n\n   Résultat de l'exercice (case 136)                                                                               1 000,00 €\n\n   Total capitaux propres (case 142)                                                                                    0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                 1 000,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                    1 000,00 €\n\n   Autres charges externes (case 242)                                                                                   0,00 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Total des charges d'exploitation (case 264)                                                                                     0,00 €\n\n   Résultat d'exploitation (case 270)                                                                                          1 000,00 €\n\n   Produits financiers (case 280)                                                                                                  0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                             0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                               0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                   0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                1 000,00 €\n\n   Réintégrations / déductions                                                                                                   Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                               0,00 €\n\n   Déduction — Résultat LMNP non soumis aux contributions sociales (case 350)                                                  1 000,00 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                       0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début     Augment.            Brut fin Amort. début         Dotation       Amort. fin\n\n   Terrains (cases 420 / 510)                       0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Constructions (cases 430 /\n   520)                                             0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                             0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)                    0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Totaux                                           0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n\n Détail par composant\n   Composant                                            Valeur brute      Durée             Dotation       Cumul fin             VNC fin\n\n\n Suivi des reports — article 39 C\n   Rubrique                                                                                                                      Montant\n\n   Stock d'ouverture                                                                                                               0,00 €\n\n   Amortissements reportés cette année                                                                                             0,00 €\n\n   Amortissements repris cette année                                                                                               0,00 €\n\n   Stock à la clôture                                                                                                              0,00 €\n\n\n Déficits LMNP par millésime\n Aucun déficit LMNP en stock.\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                          Montant\n\n   5NA — bénéfice location meublée non professionnelle                                                                         1 000,00 €\n\n Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                     Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            1000.00 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                  Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    }
+  },
+  "restitution_1500": {
+    "cloture": {
+      "agregats": {
+        "produits": 1500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 1500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 1500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 1000.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 500.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 1000.0,
+          "solde": 0.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 1500.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "aide": {
+        "case_5NA": 1500,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1500.0,
+        "resultat_fiscal": 1500.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 500.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 0,
+        "restant_total": 0.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 1500.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 1500.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1500.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 1500.0,
+        "benefice_ou_perte_310": 1500.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 1500.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            1500.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 1500.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "restitution_tout_epuise": {
+    "cloture": {
+      "agregats": {
+        "produits": 5000.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 5000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 5000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 5000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 5000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 2000.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 3000.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2020,
+          "montant_initial": 1000.0,
+          "solde": 0.0,
+          "annee_expiration": 2030
+        },
+        {
+          "id": 2,
+          "annee_origine": 2024,
+          "montant_initial": 2000.0,
+          "solde": 0.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 5000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "aide": {
+        "case_5NA": 5000,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 5000.0,
+        "resultat_fiscal": 5000.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 3000.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 0,
+        "restant_total": 0.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 5000.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 5000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 5000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 5000.0,
+        "benefice_ou_perte_310": 5000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 5000.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            5000.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 5000.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "restitution_mauvais_millesime": {
+    "cloture": {
+      "agregats": {
+        "produits": 500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 500.0,
+        "stock_deficits": 1000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2020,
+          "montant_initial": 1000.0,
+          "solde": 0.0,
+          "annee_expiration": 2030
+        },
+        {
+          "id": 2,
+          "annee_origine": 2024,
+          "montant_initial": 2000.0,
+          "solde": 1000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 500.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2024,
+            "montant_initial": 2000.0,
+            "solde": 1000.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 1000.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 1000.0
+      },
+      "aide": {
+        "case_5NA": 500,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 1500
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 500.0,
+        "resultat_fiscal": 500.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 1000.0,
+        "restant_total": 1000.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 500.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 500.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 500.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 500.0,
+        "benefice_ou_perte_310": 500.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 500.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            500.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 500.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "ancienne_declaration": {
+    "avant": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 3000.0,
+          "solde": 2000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 1000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2024,
+            "montant_initial": 3000.0,
+            "solde": 2000.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 2000.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 2000.0
+      },
+      "aide": {
+        "case_5NA": 1000,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 3000
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": 1000.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 2000.0,
+        "restant_total": 2000.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 1000.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 1000.0,
+        "benefice_ou_perte_310": 1000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 1000.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            1000.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 1000.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "apres": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 3000.0,
+          "solde": 0.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 1000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "aide": {
+        "case_5NA": 1000,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": 1000.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 0,
+        "restant_total": 0.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": 1000.0,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 1000.0,
+        "benefice_ou_perte_310": 1000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 1000.0,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            1000.0
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 1000.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "pdf_avant": {
+      "fichier": "historique_avant.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice clos\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                  1 000,00 €\n\n   Résultat fiscal LMNP                                                                                            1 000,00 €\n\n   Déficit LMNP généré                                                                                                  0,00 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                          2 000,00 €\n\n   Total des reports disponibles                                                                                   2 000,00 €\n\n\n 2031-SD — Récapitulation\n   Rubrique                                                                                                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)                                                            0,00 €\n\n   BIC non professionnel — bénéfice (cadre 7a)                                                                     1 000,00 €\n\n\n 2033-A — Bilan simplifié\n   Actif                                                                                                             Montant\n\n   Immobilisations corporelles — brut (case 028)                                                                        0,00 €\n\n   Amortissements (case 030)                                                                                            0,00 €\n\n   Immobilisations corporelles — net                                                                                    0,00 €\n\n   Total actif net (case 112)                                                                                           0,00 €\n\n   Passif                                                                                                            Montant\n\n   Capital individuel (case 120)                                                                                   -1 000,00 €\n\n   Résultat de l'exercice (case 136)                                                                               1 000,00 €\n\n   Total capitaux propres (case 142)                                                                                    0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                 1 000,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                    1 000,00 €\n\n   Autres charges externes (case 242)                                                                                   0,00 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Total des charges d'exploitation (case 264)                                                                                       0,00 €\n\n   Résultat d'exploitation (case 270)                                                                                            1 000,00 €\n\n   Produits financiers (case 280)                                                                                                    0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                               0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                                 0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                     0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                  1 000,00 €\n\n   Réintégrations / déductions                                                                                                     Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                                 0,00 €\n\n   Déduction — Résultat LMNP non soumis aux contributions sociales (case 350)                                                    1 000,00 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                         0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début         Augment.          Brut fin Amort. début            Dotation     Amort. fin\n\n   Terrains (cases 420 / 510)                         0,00 €          0,00 €           0,00 €         0,00 €            0,00 €       0,00 €\n\n   Constructions (cases 430 /\n   520)                                               0,00 €          0,00 €           0,00 €         0,00 €            0,00 €       0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                               0,00 €          0,00 €           0,00 €         0,00 €            0,00 €       0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)                      0,00 €          0,00 €           0,00 €         0,00 €            0,00 €       0,00 €\n\n   Totaux                                             0,00 €          0,00 €           0,00 €         0,00 €            0,00 €       0,00 €\n\n\n Détail par composant\n   Composant                                               Valeur brute        Durée            Dotation          Cumul fin         VNC fin\n\n\n Suivi des reports — article 39 C\n   Rubrique                                                                                                                        Montant\n\n   Stock d'ouverture                                                                                                                 0,00 €\n\n   Amortissements reportés cette année                                                                                               0,00 €\n\n   Amortissements repris cette année                                                                                                 0,00 €\n\n   Stock à la clôture                                                                                                                0,00 €\n\n\n Déficits LMNP par millésime\n   Origine                                          Montant initial                              Solde     Expire fin\n\n   2024                                                 3 000,00 €                         2 000,00 €      2034\n\n   Total                                                                                   2 000,00 €\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                            Montant\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                       Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   5NA — bénéfice location meublée non professionnelle                                                                         1 000,00 €\n\n   5GJ — déficit 2024 non encore déduit                                                                                        3 000,00 €\n\n Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            1000.00 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                     Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    },
+    "pdf_apres": {
+      "fichier": "historique_apres.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice clos\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                  1 000,00 €\n\n   Résultat fiscal LMNP                                                                                            1 000,00 €\n\n   Déficit LMNP généré                                                                                                  0,00 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                               0,00 €\n\n   Total des reports disponibles                                                                                        0,00 €\n\n\n 2031-SD — Récapitulation\n   Rubrique                                                                                                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)                                                            0,00 €\n\n   BIC non professionnel — bénéfice (cadre 7a)                                                                     1 000,00 €\n\n\n 2033-A — Bilan simplifié\n   Actif                                                                                                             Montant\n\n   Immobilisations corporelles — brut (case 028)                                                                        0,00 €\n\n   Amortissements (case 030)                                                                                            0,00 €\n\n   Immobilisations corporelles — net                                                                                    0,00 €\n\n   Total actif net (case 112)                                                                                           0,00 €\n\n   Passif                                                                                                            Montant\n\n   Capital individuel (case 120)                                                                                   -1 000,00 €\n\n   Résultat de l'exercice (case 136)                                                                               1 000,00 €\n\n   Total capitaux propres (case 142)                                                                                    0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                 1 000,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                    1 000,00 €\n\n   Autres charges externes (case 242)                                                                                   0,00 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Total des charges d'exploitation (case 264)                                                                                     0,00 €\n\n   Résultat d'exploitation (case 270)                                                                                          1 000,00 €\n\n   Produits financiers (case 280)                                                                                                  0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                             0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                               0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                   0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                1 000,00 €\n\n   Réintégrations / déductions                                                                                                   Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                               0,00 €\n\n   Déduction — Résultat LMNP non soumis aux contributions sociales (case 350)                                                  1 000,00 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                       0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début     Augment.            Brut fin Amort. début         Dotation       Amort. fin\n\n   Terrains (cases 420 / 510)                       0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Constructions (cases 430 /\n   520)                                             0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                             0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)                    0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n   Totaux                                           0,00 €       0,00 €            0,00 €         0,00 €          0,00 €          0,00 €\n\n\n Détail par composant\n   Composant                                            Valeur brute      Durée             Dotation       Cumul fin             VNC fin\n\n\n Suivi des reports — article 39 C\n   Rubrique                                                                                                                      Montant\n\n   Stock d'ouverture                                                                                                               0,00 €\n\n   Amortissements reportés cette année                                                                                             0,00 €\n\n   Amortissements repris cette année                                                                                               0,00 €\n\n   Stock à la clôture                                                                                                              0,00 €\n\n\n Déficits LMNP par millésime\n Aucun déficit LMNP en stock.\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                          Montant\n\n   5NA — bénéfice location meublée non professionnelle                                                                         1 000,00 €\n\n Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                     Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            1000.00 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                  Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    }
+  },
+  "deficit_futur_dans_ancien_suivi": {
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2024,
+        "montant_initial": 3000.0,
+        "solde": 0.0,
+        "annee_expiration": 2034
+      },
+      {
+        "id": 2,
+        "annee_origine": 2027,
+        "montant_initial": 700.0,
+        "solde": 700.0,
+        "annee_expiration": 2037
+      }
+    ],
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 1000.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [
+        {
+          "annee_origine": 2027,
+          "montant_initial": 700.0,
+          "solde": 700.0,
+          "annee_expiration": 2037,
+          "perime": false
+        }
+      ],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 0.0,
+          "report_bien": 0.0,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 700.0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 700.0
+    },
+    "aide": {
+      "case_5NA": 1000,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    },
+    "page": {
+      "ca_ht": 1000.0,
+      "resultat_fiscal": 1000.0,
+      "deficit_lmnp": 0.0,
+      "revenu_imposable": 0.0,
+      "restant_39c": 0.0,
+      "restant_deficits": 700.0,
+      "restant_total": 700.0
+    },
+    "f2031": {
+      "resultat_fiscal_1": 0.0,
+      "bic_non_pro_7a_benefice": 1000.0,
+      "bic_non_pro_7b_deficit": null
+    },
+    "f2033b": {
+      "produits_218": 1000.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 1000.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0,
+      "dotations_254": 0,
+      "total_charges_264": 0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 1000.0,
+      "benefice_ou_perte_310": 1000.0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 1000.0,
+      "deductions_detail": [
+        [
+          "Résultat LMNP non soumis aux contributions sociales",
+          1000.0
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 1000.0
+    },
+    "controles": [],
+    "conforme": true
+  },
+  "cases_dix_millesimes": {
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2015,
+          "montant_initial": 100.0,
+          "solde": 100.0,
+          "annee_expiration": 2025
+        },
+        {
+          "id": 2,
+          "annee_origine": 2016,
+          "montant_initial": 200.0,
+          "solde": 200.0,
+          "annee_expiration": 2026
+        },
+        {
+          "id": 3,
+          "annee_origine": 2017,
+          "montant_initial": 300.0,
+          "solde": 300.0,
+          "annee_expiration": 2027
+        },
+        {
+          "id": 4,
+          "annee_origine": 2018,
+          "montant_initial": 400.0,
+          "solde": 400.0,
+          "annee_expiration": 2028
+        },
+        {
+          "id": 5,
+          "annee_origine": 2019,
+          "montant_initial": 500.0,
+          "solde": 500.0,
+          "annee_expiration": 2029
+        },
+        {
+          "id": 6,
+          "annee_origine": 2020,
+          "montant_initial": 600.0,
+          "solde": 600.0,
+          "annee_expiration": 2030
+        },
+        {
+          "id": 7,
+          "annee_origine": 2021,
+          "montant_initial": 700.0,
+          "solde": 700.0,
+          "annee_expiration": 2031
+        },
+        {
+          "id": 8,
+          "annee_origine": 2022,
+          "montant_initial": 800.0,
+          "solde": 800.0,
+          "annee_expiration": 2032
+        },
+        {
+          "id": 9,
+          "annee_origine": 2023,
+          "montant_initial": 900.0,
+          "solde": 900.0,
+          "annee_expiration": 2033
+        },
+        {
+          "id": 10,
+          "annee_origine": 2024,
+          "montant_initial": 1000.0,
+          "solde": 1000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2015,
+            "montant_initial": 100.0,
+            "solde": 100.0,
+            "annee_expiration": 2025,
+            "perime": false
+          },
+          {
+            "annee_origine": 2016,
+            "montant_initial": 200.0,
+            "solde": 200.0,
+            "annee_expiration": 2026,
+            "perime": false
+          },
+          {
+            "annee_origine": 2017,
+            "montant_initial": 300.0,
+            "solde": 300.0,
+            "annee_expiration": 2027,
+            "perime": false
+          },
+          {
+            "annee_origine": 2018,
+            "montant_initial": 400.0,
+            "solde": 400.0,
+            "annee_expiration": 2028,
+            "perime": false
+          },
+          {
+            "annee_origine": 2019,
+            "montant_initial": 500.0,
+            "solde": 500.0,
+            "annee_expiration": 2029,
+            "perime": false
+          },
+          {
+            "annee_origine": 2020,
+            "montant_initial": 600.0,
+            "solde": 600.0,
+            "annee_expiration": 2030,
+            "perime": false
+          },
+          {
+            "annee_origine": 2021,
+            "montant_initial": 700.0,
+            "solde": 700.0,
+            "annee_expiration": 2031,
+            "perime": false
+          },
+          {
+            "annee_origine": 2022,
+            "montant_initial": 800.0,
+            "solde": 800.0,
+            "annee_expiration": 2032,
+            "perime": false
+          },
+          {
+            "annee_origine": 2023,
+            "montant_initial": 900.0,
+            "solde": 900.0,
+            "annee_expiration": 2033,
+            "perime": false
+          },
+          {
+            "annee_origine": 2024,
+            "montant_initial": 1000.0,
+            "solde": 1000.0,
+            "annee_expiration": 2034,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 5500.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 5500.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [
+          {
+            "case": "5GA",
+            "annee_origine": 2015,
+            "montant": 100
+          },
+          {
+            "case": "5GB",
+            "annee_origine": 2016,
+            "montant": 200
+          },
+          {
+            "case": "5GC",
+            "annee_origine": 2017,
+            "montant": 300
+          },
+          {
+            "case": "5GD",
+            "annee_origine": 2018,
+            "montant": 400
+          },
+          {
+            "case": "5GE",
+            "annee_origine": 2019,
+            "montant": 500
+          },
+          {
+            "case": "5GF",
+            "annee_origine": 2020,
+            "montant": 600
+          },
+          {
+            "case": "5GG",
+            "annee_origine": 2021,
+            "montant": 700
+          },
+          {
+            "case": "5GH",
+            "annee_origine": 2022,
+            "montant": 800
+          },
+          {
+            "case": "5GI",
+            "annee_origine": 2023,
+            "montant": 900
+          },
+          {
+            "case": "5GJ",
+            "annee_origine": 2024,
+            "montant": 1000
+          }
+        ],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 0,
+        "resultat_fiscal": 0.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 5500.0,
+        "restant_total": 5500.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 0,
+        "autres_produits_230": 0,
+        "total_produits_232": 0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0,
+        "dotations_254": 0,
+        "total_charges_264": 0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 0,
+        "benefice_ou_perte_310": 0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 0.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "pdf": {
+      "fichier": "dix_millesimes.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice clos\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                       0,00 €\n\n   Résultat fiscal LMNP                                                                                                 0,00 €\n\n   Déficit LMNP généré                                                                                                  0,00 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                          5 500,00 €\n\n   Total des reports disponibles                                                                                   5 500,00 €\n\n\n 2031-SD — Récapitulation\n   Rubrique                                                                                                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)                                                            0,00 €\n\n\n 2033-A — Bilan simplifié\n   Actif                                                                                                             Montant\n\n   Immobilisations corporelles — brut (case 028)                                                                        0,00 €\n\n   Amortissements (case 030)                                                                                            0,00 €\n\n   Immobilisations corporelles — net                                                                                    0,00 €\n\n   Total actif net (case 112)                                                                                           0,00 €\n\n   Passif                                                                                                            Montant\n\n   Capital individuel (case 120)                                                                                        0,00 €\n\n   Résultat de l'exercice (case 136)                                                                                    0,00 €\n\n   Total capitaux propres (case 142)                                                                                    0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                      0,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                         0,00 €\n\n   Autres charges externes (case 242)                                                                                   0,00 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n   Total des charges d'exploitation (case 264)                                                                          0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Résultat d'exploitation (case 270)                                                                                                 0,00 €\n\n   Produits financiers (case 280)                                                                                                     0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                                0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                                  0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                      0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                       0,00 €\n\n   Réintégrations / déductions                                                                                                      Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                                  0,00 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                          0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début         Augment.          Brut fin Amort. début             Dotation     Amort. fin\n\n   Terrains (cases 420 / 510)                         0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Constructions (cases 430 /\n   520)                                               0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                               0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)                      0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Totaux                                             0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n\n Détail par composant\n   Composant                                               Valeur brute        Durée             Dotation          Cumul fin         VNC fin\n\n\n Suivi des reports — article 39 C\n   Rubrique                                                                                                                         Montant\n\n   Stock d'ouverture                                                                                                                  0,00 €\n\n   Amortissements reportés cette année                                                                                                0,00 €\n\n   Amortissements repris cette année                                                                                                  0,00 €\n\n   Stock à la clôture                                                                                                                 0,00 €\n\n\n Déficits LMNP par millésime\n   Origine                                          Montant initial                               Solde     Expire fin\n\n   2015                                                   100,00 €                              100,00 €    2025\n\n   2016                                                   200,00 €                              200,00 €    2026\n\n   2017                                                   300,00 €                              300,00 €    2027\n\n   2018                                                   400,00 €                              400,00 €    2028\n\n   2019                                                   500,00 €                              500,00 €    2029\n\n   2020                                                   600,00 €                              600,00 €    2030\n\n   2021                                                   700,00 €                              700,00 €    2031\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                        Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   2022                                              800,00 €                              800,00 €    2032\n\n   2023                                              900,00 €                              900,00 €    2033\n\n   2024                                             1 000,00 €                            1 000,00 €   2034\n\n   Total                                                                                  5 500,00 €\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                          Montant\n\n   5GA — déficit 2015 non encore déduit                                                                                          100,00 €\n\n   5GB — déficit 2016 non encore déduit                                                                                          200,00 €\n\n   5GC — déficit 2017 non encore déduit                                                                                          300,00 €\n\n   5GD — déficit 2018 non encore déduit                                                                                          400,00 €\n\n   5GE — déficit 2019 non encore déduit                                                                                          500,00 €\n\n   5GF — déficit 2020 non encore déduit                                                                                          600,00 €\n\n   5GG — déficit 2021 non encore déduit                                                                                          700,00 €\n\n   5GH — déficit 2022 non encore déduit                                                                                          800,00 €\n\n   5GI — déficit 2023 non encore déduit                                                                                          900,00 €\n\n   5GJ — déficit 2024 non encore déduit                                                                                        1 000,00 €\n\n Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            0.00 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                     Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    }
+  },
+  "creation_ordinaire": {
+    "cloture": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 1300.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 1300.0,
+        "dotation": 0,
+        "resultat_comptable": -300.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -300.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -300.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -300.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 300.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 300.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2025,
+          "montant_initial": 300.0,
+          "solde": 300.0,
+          "annee_expiration": 2035
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": -300.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2025,
+            "montant_initial": 300.0,
+            "solde": 300.0,
+            "annee_expiration": 2035,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 300.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 300.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": 300,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": -300.0,
+        "deficit_lmnp": 300.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 300.0,
+        "restant_total": 300.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": 300.0
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 1300.0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 0,
+        "total_charges_264": 1300.0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": -300.0,
+        "benefice_ou_perte_310": -300.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 300.0,
+        "reintegrations_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            300.0
+          ]
+        ],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": -300.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "creation_amortissement": {
+    "cloture": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 1200.0,
+        "resultat_comptable": -200.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 1200.0,
+        "plafond_deductible": 1000.0,
+        "report_annee": 200.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 200.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 1000.0,
+          "dotation_exercice": 1200.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 200.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 200.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 1200.0,
+            "report_bien": 200.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 200.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 200.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": null,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": 0.0,
+        "deficit_lmnp": 0.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 200.0,
+        "restant_deficits": 0,
+        "restant_total": 200.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": null
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 1200.0,
+        "total_charges_264": 1200.0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": -200.0,
+        "benefice_ou_perte_310": -200.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 200.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 0.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "creation_mixte": {
+    "cloture": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 1300.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 1300.0,
+        "dotation": 1200.0,
+        "resultat_comptable": -1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -300.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 1200.0,
+        "plafond_deductible": -300.0,
+        "report_annee": 1200.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1200.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -300.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 300.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 300.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2025,
+          "montant_initial": 300.0,
+          "solde": 300.0,
+          "annee_expiration": 2035
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": -300.0,
+          "dotation_exercice": 1200.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 1200.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 1200.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2025,
+            "montant_initial": 300.0,
+            "solde": 300.0,
+            "annee_expiration": 2035,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 1200.0,
+            "report_bien": 1200.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 1200.0
+          }
+        ],
+        "total_deficits": 300.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 1500.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": 300,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": -300.0,
+        "deficit_lmnp": 300.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 1200.0,
+        "restant_deficits": 300.0,
+        "restant_total": 1500.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": 300.0
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 1300.0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 1200.0,
+        "total_charges_264": 2500.0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": -1500.0,
+        "benefice_ou_perte_310": -1500.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 1200.0,
+        "reintegration_divers_330": 300.0,
+        "reintegrations_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            300.0
+          ]
+        ],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": -300.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "creation_alur": {
+    "cloture": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 1500.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 1500.0,
+        "dotation": 0,
+        "resultat_comptable": -500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -300.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -300.0,
+      "autres_retraitements": 200.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 300.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 300.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2025,
+          "montant_initial": 300.0,
+          "solde": 300.0,
+          "annee_expiration": 2035
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": -300.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2025,
+            "montant_initial": 300.0,
+            "solde": 300.0,
+            "annee_expiration": 2035,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 300.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 300.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": 300,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 1000.0,
+        "resultat_fiscal": -300.0,
+        "deficit_lmnp": 300.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 300.0,
+        "restant_total": 300.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": 300.0
+      },
+      "f2033b": {
+        "produits_218": 1000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 1000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 1500.0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 0,
+        "total_charges_264": 1500.0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": -500.0,
+        "benefice_ou_perte_310": -500.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 500.0,
+        "reintegrations_detail": [
+          [
+            "Retraitements divers (ex. fonds travaux ALUR)",
+            200.0
+          ],
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            300.0
+          ]
+        ],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": -300.0
+      },
+      "controles": [],
+      "conforme": true
+    }
+  },
+  "double_cloture": {
+    "premiere": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 600.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 600.0,
+        "dotation": 0,
+        "resultat_comptable": -600.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -600.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -600.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -600.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 600.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 600.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "seconde": {
+      "erreur": "ValueError: L'exercice 2025 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits)."
+    },
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2025,
+        "montant_initial": 600.0,
+        "solde": 600.0,
+        "annee_expiration": 2035
+      }
+    ]
+  },
+  "restauration_recloture": {
+    "premiere": [
+      {
+        "id": 1,
+        "annee_origine": 2025,
+        "montant_initial": 600.0,
+        "solde": 600.0,
+        "annee_expiration": 2035
+      }
+    ],
+    "apres_restauration": [],
+    "recloture": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 600.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 600.0,
+        "dotation": 0,
+        "resultat_comptable": -600.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -600.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -600.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -600.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 600.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 600.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2025,
+        "montant_initial": 600.0,
+        "solde": 600.0,
+        "annee_expiration": 2035
+      }
+    ]
+  },
+  "clotures_concurrentes": {
+    "retours": [
+      {
+        "retour": {
+          "agregats": {
+            "produits": 0,
+            "charges_hors_daa": 600.0,
+            "charges_hors_plafond": 0,
+            "charges_afferentes": 600.0,
+            "dotation": 0,
+            "resultat_comptable": -600.0,
+            "produits_cession": 0,
+            "vnc_cession": 0,
+            "plafond_39c": -600.0
+          },
+          "suivi_39c": {
+            "stock_ouverture": 0.0,
+            "dotation_exercice": 0,
+            "plafond_deductible": -600.0,
+            "report_annee": 0.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 0.0,
+            "sorties_39c": 0.0
+          },
+          "resultat_fiscal": -600.0,
+          "autres_retraitements": 0.0,
+          "deficits": {
+            "perimes": 0,
+            "deficit_cree": 600.0,
+            "impute_sur_benefice": 0.0,
+            "stock_deficits": 600.0
+          },
+          "revenu_imposable": 0.0
+        }
+      },
+      {
+        "erreur": "ValueError: L'exercice 2025 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits)."
+      }
+    ],
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2025,
+        "montant_initial": 600.0,
+        "solde": 600.0,
+        "annee_expiration": 2035
+      }
+    ]
+  },
+  "double_appel_isole": [
+    {
+      "id": 1,
+      "annee_origine": 2025,
+      "montant_initial": 600.0,
+      "solde": 600.0,
+      "annee_expiration": 2035
+    },
+    {
+      "id": 2,
+      "annee_origine": 2025,
+      "montant_initial": 600.0,
+      "solde": 600.0,
+      "annee_expiration": 2035
+    }
+  ],
+  "cloture_interrompue": {
+    "retour": {
+      "erreur": "RuntimeError: Interruption fictive après imputation"
+    },
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2024,
+        "montant_initial": 1000.0,
+        "solde": 1000.0,
+        "annee_expiration": 2034
+      }
+    ],
+    "statut": "ouvert",
+    "suivi": 0
+  },
+  "moteur_commit_false": {
+    "transaction": true,
+    "lignes": [],
+    "temoins": 0
+  },
+  "seuil_lmp_import_False": {
+    "controles_avant": [
+      "SEUIL_LMP"
+    ],
+    "cloture": {
+      "agregats": {
+        "produits": 30000.0,
+        "charges_hors_daa": 35000.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 35000.0,
+        "dotation": 0,
+        "resultat_comptable": -5000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -5000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -5000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -5000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 5000.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 5000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2025,
+          "montant_initial": 5000.0,
+          "solde": 5000.0,
+          "annee_expiration": 2035
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": -5000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2025,
+            "montant_initial": 5000.0,
+            "solde": 5000.0,
+            "annee_expiration": 2035,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 5000.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 5000.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": 5000,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 30000.0,
+        "resultat_fiscal": -5000.0,
+        "deficit_lmnp": 5000.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 5000.0,
+        "restant_total": 5000.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": 5000.0
+      },
+      "f2033b": {
+        "produits_218": 30000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 30000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 35000.0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 0,
+        "total_charges_264": 35000.0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": -5000.0,
+        "benefice_ou_perte_310": -5000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 5000.0,
+        "reintegrations_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            5000.0
+          ]
+        ],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": -5000.0
+      },
+      "controles": [
+        {
+          "code": "SEUIL_LMP",
+          "niveau": "AVERTISSEMENT",
+          "message": "Recettes 30000.00 € > seuil LMP 23000 € (art. 155 IV CGI) : vérifier le critère de prépondérance au niveau du foyer — le statut LMP changerait le régime des déficits et plus-values."
+        }
+      ],
+      "conforme": true
+    },
+    "operations": 1
+  },
+  "seuil_lmp_import_True": {
+    "controles_avant": [],
+    "cloture": {
+      "agregats": {
+        "produits": 30000.0,
+        "charges_hors_daa": 35000.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 35000.0,
+        "dotation": 0,
+        "resultat_comptable": -5000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -5000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -5000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -5000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 5000.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 5000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "lignes": [
+        {
+          "id": 1,
+          "annee_origine": 2025,
+          "montant_initial": 5000.0,
+          "solde": 5000.0,
+          "annee_expiration": 2035
+        }
+      ],
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": -5000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [
+          {
+            "annee_origine": 2025,
+            "montant_initial": 5000.0,
+            "solde": 5000.0,
+            "annee_expiration": 2035,
+            "perime": false
+          }
+        ],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 0.0,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 5000.0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 5000.0
+      },
+      "aide": {
+        "case_5NA": null,
+        "case_5NY": 5000,
+        "cases_deficits_anterieurs": [],
+        "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+      },
+      "page": {
+        "ca_ht": 30000.0,
+        "resultat_fiscal": -5000.0,
+        "deficit_lmnp": 5000.0,
+        "revenu_imposable": 0.0,
+        "restant_39c": 0.0,
+        "restant_deficits": 5000.0,
+        "restant_total": 5000.0
+      },
+      "f2031": {
+        "resultat_fiscal_1": 0.0,
+        "bic_non_pro_7a_benefice": null,
+        "bic_non_pro_7b_deficit": 5000.0
+      },
+      "f2033b": {
+        "produits_218": 30000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 30000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 35000.0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 0,
+        "total_charges_264": 35000.0,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": -5000.0,
+        "benefice_ou_perte_310": -5000.0,
+        "charges_exceptionnelles_300": 0,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 5000.0,
+        "reintegrations_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            5000.0
+          ]
+        ],
+        "deductions_350": 0,
+        "deductions_detail": [],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": -5000.0
+      },
+      "controles": [],
+      "conforme": true
+    },
+    "operations": 0
+  },
+  "parametre_versionne": [
+    {
+      "id": 1,
+      "annee_origine": 2025,
+      "montant_initial": 100.0,
+      "solde": 100.0,
+      "annee_expiration": 2035
+    },
+    {
+      "id": 2,
+      "annee_origine": 2026,
+      "montant_initial": 200.0,
+      "solde": 200.0,
+      "annee_expiration": 2038
+    }
+  ],
+  "dix_ans_normal": {
+    "rejeu": {
+      "ecritures": 3,
+      "normalisees": 0,
+      "comptes_crees": [],
+      "renumerotees": false
+    },
+    "creation": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 2000.0,
+        "resultat_comptable": -1000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 2000.0,
+        "plafond_deductible": 1000.0,
+        "report_annee": 1000.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1000.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "pivot": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 1000.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1000.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "apres_dix_ans": {
+      "agregats": {
+        "produits": 1500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 1000.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 1500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 1000.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 500.0
+    },
+    "lignes": []
+  },
+  "dix_ans_dotation7": {
+    "rejeu": {
+      "ecritures": 3,
+      "normalisees": 0,
+      "comptes_crees": [
+        "6811200"
+      ],
+      "renumerotees": false
+    },
+    "creation": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 2000.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 2000.0,
+        "dotation": 0,
+        "resultat_comptable": -1000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -1000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -1000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 1000.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 1000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "pivot": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 1000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "apres_dix_ans": {
+      "agregats": {
+        "produits": 1500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 1500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 1500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 1,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 1500.0
+    },
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2025,
+        "montant_initial": 1000.0,
+        "solde": 0.0,
+        "annee_expiration": 2035
+      }
+    ]
+  },
+  "dix_ans_honoraires6": {
+    "rejeu": {
+      "ecritures": 4,
+      "normalisees": 0,
+      "comptes_crees": [],
+      "renumerotees": false
+    },
+    "creation": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 500.0,
+        "charges_hors_plafond": 500.0,
+        "charges_afferentes": 0.0,
+        "dotation": 2000.0,
+        "resultat_comptable": -1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 2000.0,
+        "plafond_deductible": 1000.0,
+        "report_annee": 1000.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1000.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 500.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 500.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "pivot": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 1000.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1000.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 500.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "apres_dix_ans": {
+      "agregats": {
+        "produits": 1500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 1000.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 1500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 1000.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 500.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 1,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0.0
+      },
+      "revenu_imposable": 500.0
+    },
+    "lignes": [
+      {
+        "id": 1,
+        "annee_origine": 2025,
+        "montant_initial": 500.0,
+        "solde": 0.0,
+        "annee_expiration": 2035
+      }
+    ]
+  },
+  "dix_ans_honoraires7": {
+    "rejeu": {
+      "ecritures": 4,
+      "normalisees": 0,
+      "comptes_crees": [
+        "6226100"
+      ],
+      "renumerotees": false
+    },
+    "creation": {
+      "agregats": {
+        "produits": 1000.0,
+        "charges_hors_daa": 500.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 500.0,
+        "dotation": 2000.0,
+        "resultat_comptable": -1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 2000.0,
+        "plafond_deductible": 500.0,
+        "report_annee": 1500.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1500.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "pivot": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 1500.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1500.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "apres_dix_ans": {
+      "agregats": {
+        "produits": 1500.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 1500.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1500.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 1500.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 1500.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 1500.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "lignes": []
+  },
+  "arrondi_benefice_100.49": {
+    "montant": 100.49,
+    "aide": {
+      "case_5NA": 100,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_benefice_100.5": {
+    "montant": 100.5,
+    "aide": {
+      "case_5NA": 100,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_benefice_100.51": {
+    "montant": 100.51,
+    "aide": {
+      "case_5NA": 101,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_benefice_101.5": {
+    "montant": 101.5,
+    "aide": {
+      "case_5NA": 102,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_benefice_0.5": {
+    "montant": 0.5,
+    "aide": {
+      "case_5NA": 0,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_deficit_100.49": {
+    "montant": 100.49,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": 100,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_deficit_100.5": {
+    "montant": 100.5,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": 100,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    },
+    "pdf": {
+      "fichier": "arrondi_deficit.pdf",
+      "texte": "                        Liasse fiscale LMNP — exercice 2025\n Exploitant fictif · Adresse fictive — exercice clos\n\n Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases\n officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.\n\n   Chiffres clés                                                                                                     Montant\n\n   Recettes de l'exercice (CA HT)                                                                                       0,00 €\n\n   Résultat fiscal LMNP                                                                                             -100,50 €\n\n   Déficit LMNP généré                                                                                               100,50 €\n\n   Revenu imposable (2042C-PRO)                                                                                         0,00 €\n\n   Amortissements en report (art. 39 C)                                                                                 0,00 €\n\n   Déficits LMNP en stock                                                                                            100,50 €\n\n   Total des reports disponibles                                                                                     100,50 €\n\n\n 2031-SD — Récapitulation\n   Rubrique                                                                                                          Montant\n\n   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)                                                            0,00 €\n\n   BIC non professionnel — déficit (cadre 7b)                                                                        100,50 €\n\n\n 2033-A — Bilan simplifié\n   Actif                                                                                                             Montant\n\n   Immobilisations corporelles — brut (case 028)                                                                        0,00 €\n\n   Amortissements (case 030)                                                                                            0,00 €\n\n   Immobilisations corporelles — net                                                                                    0,00 €\n\n   Total actif net (case 112)                                                                                           0,00 €\n\n   Passif                                                                                                            Montant\n\n   Capital individuel (case 120)                                                                                     100,50 €\n\n   Résultat de l'exercice (case 136)                                                                                -100,50 €\n\n   Total capitaux propres (case 142)                                                                                    0,00 €\n\n   Total passif (case 180)                                                                                              0,00 €\n\n\n 2033-B — Compte de résultat simplifié\n   Rubrique                                                                                                          Montant\n\n   Production vendue — services, loyers (case 218)                                                                      0,00 €\n\n   Autres produits (case 230)                                                                                           0,00 €\n\n   Total des produits d'exploitation (case 232)                                                                         0,00 €\n\n   Autres charges externes (case 242)                                                                                100,50 €\n\n   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €\n\n   Rémunérations du personnel (case 250)                                                                                0,00 €\n\n   Autres charges (case 262)                                                                                            0,00 €\n\n   Dotations aux amortissements (case 254)                                                                              0,00 €\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   Total des charges d'exploitation (case 264)                                                                                      100,50 €\n\n   Résultat d'exploitation (case 270)                                                                                              -100,50 €\n\n   Produits financiers (case 280)                                                                                                     0,00 €\n\n   Charges financières — intérêts d'emprunt (case 294)                                                                                0,00 €\n\n   Produits exceptionnels — dont cessions (case 290)                                                                                  0,00 €\n\n   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                      0,00 €\n\n   Bénéfice ou perte (case 310)                                                                                                    -100,50 €\n\n   Réintégrations / déductions                                                                                                      Montant\n\n   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                                  0,00 €\n\n   Réintégration — Résultat LMNP non soumis aux contributions sociales (case 330)                                                   100,50 €\n\n   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                          0,00 €\n\n\n 2033-C — Immobilisations et amortissements\n   Rubrique                                   Brut début         Augment.          Brut fin Amort. début             Dotation     Amort. fin\n\n   Terrains (cases 420 / 510)                         0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Constructions (cases 430 /\n   520)                                               0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Installations générales,\n   agencements (cases 450 /\n   540)                                               0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Autres immobilisations\n   corporelles (cases 470 / 560)                      0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n   Totaux                                             0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €\n\n\n Détail par composant\n   Composant                                               Valeur brute        Durée             Dotation          Cumul fin         VNC fin\n\n\n Suivi des reports — article 39 C\n   Rubrique                                                                                                                         Montant\n\n   Stock d'ouverture                                                                                                                  0,00 €\n\n   Amortissements reportés cette année                                                                                                0,00 €\n\n   Amortissements repris cette année                                                                                                  0,00 €\n\n   Stock à la clôture                                                                                                                 0,00 €\n\n\n Déficits LMNP par millésime\n   Origine                                          Montant initial                               Solde     Expire fin\n\n   2025                                                   100,50 €                              100,50 €    2035\n\n   Total                                                                                        100,50 €\n\n\n Aide au report — 2042C-PRO\n   Case                                                                                                                             Montant\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                        Page 2\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f   5NY — déficit location meublée non professionnelle                                                                            100,00 €\n\n Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.\n\n\n Contrôles de cohérence internes\n   Contrôle                                                           Résultat            Détail\n\n   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €\n\n   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré\n   en 2031 bis)                                                       conforme            0.00 €\n\n   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €\n\n   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €\n\n   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            -100.50 €\n\n\n\n\nCompta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                     Page 3\nCompta LMNP v8.41.0 — édité le 15/09/2026 à 14:23\n\f"
+    }
+  },
+  "arrondi_deficit_100.51": {
+    "montant": 100.51,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": 101,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_deficit_101.5": {
+    "montant": 101.5,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": 102,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_deficit_0.5": {
+    "montant": 0.5,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": 0,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_anterieur_100.49": {
+    "montant": 100.49,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [
+        {
+          "case": "5GJ",
+          "annee_origine": 2024,
+          "montant": 100
+        }
+      ],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_anterieur_100.5": {
+    "montant": 100.5,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [
+        {
+          "case": "5GJ",
+          "annee_origine": 2024,
+          "montant": 100
+        }
+      ],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_anterieur_100.51": {
+    "montant": 100.51,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [
+        {
+          "case": "5GJ",
+          "annee_origine": 2024,
+          "montant": 101
+        }
+      ],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_anterieur_101.5": {
+    "montant": 101.5,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [
+        {
+          "case": "5GJ",
+          "annee_origine": 2024,
+          "montant": 102
+        }
+      ],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  },
+  "arrondi_anterieur_0.5": {
+    "montant": 0.5,
+    "aide": {
+      "case_5NA": null,
+      "case_5NY": null,
+      "cases_deficits_anterieurs": [],
+      "note": "Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée."
+    }
+  }
+}

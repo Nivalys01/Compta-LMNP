@@ -1,0 +1,223 @@
+                        Liasse fiscale LMNP — exercice 2025
+ Exploitant fictif · Adresse fictive — exercice NON clôturé — chiffres provisoires
+
+ Ce document est un état de travail fidèle aux montants calculés — pas un fac-similé des formulaires CERFA. Les numéros de cases
+ officiels y figurent pour permettre le report champ à champ dans la télédéclaration, ou par l'expert-comptable.
+
+   Chiffres clés                                                                                                     Montant
+
+   Recettes de l'exercice (CA HT)                                                                                       0,00 €
+
+   Résultat fiscal LMNP                                                                                                 0,00 €
+
+   Déficit LMNP généré                                                                                                  0,00 €
+
+   Revenu imposable (2042C-PRO)                                                                                         0,00 €
+
+   Amortissements en report (art. 39 C)                                                                                 0,00 €
+
+   Déficits LMNP en stock                                                                                            800,00 €
+
+   Total des reports disponibles                                                                                     800,00 €
+
+
+ 2031-SD — Récapitulation
+   Rubrique
+                                                                                          E                          Montant
+
+   Résultat fiscal (ligne 1 — activité exclue, cf. 2031 bis)
+                                                                                IR                                      0,00 €
+
+
+ 2033-A — Bilan simplifié
+   Actif
+
+   Immobilisations corporelles — brut (case 028)
+                                                              SO                                                     Montant
+
+                                                                                                                        0,00 €
+
+   Amortissements (case 030)
+
+   Immobilisations corporelles — net
+
+   Total actif net (case 112)
+                                                    VI                                                                  0,00 €
+
+                                                                                                                        0,00 €
+
+                                                                                                                        0,00 €
+
+   Passif                                   O                                                                        Montant
+
+
+
+                         PR
+   Capital individuel (case 120)
+
+   Résultat de l'exercice (case 136)
+
+   Total capitaux propres (case 142)
+                                                                                                                        0,00 €
+
+                                                                                                                        0,00 €
+
+                                                                                                                        0,00 €
+
+   Total passif (case 180)                                                                                              0,00 €
+
+
+ 2033-B — Compte de résultat simplifié
+   Rubrique                                                                                                          Montant
+
+   Production vendue — services, loyers (case 218)                                                                      0,00 €
+
+   Autres produits (case 230)                                                                                           0,00 €
+
+   Total des produits d'exploitation (case 232)                                                                         0,00 €
+
+   Autres charges externes (case 242)                                                                                   0,00 €
+
+   Impôts et taxes (case 244) — dont CFE et CVAE 0,00 €                                                                 0,00 €
+
+   Rémunérations du personnel (case 250)                                                                                0,00 €
+
+   Autres charges (case 262)                                                                                            0,00 €
+
+   Dotations aux amortissements (case 254)                                                                              0,00 €
+
+   Total des charges d'exploitation (case 264)                                                                          0,00 €
+
+
+
+Compta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                          Page 1
+Compta LMNP v8.41.0 — édité le 15/09/2026 à 14:23
+   Résultat d'exploitation (case 270)                                                                                                 0,00 €
+
+   Produits financiers (case 280)                                                                                                     0,00 €
+
+   Charges financières — intérêts d'emprunt (case 294)                                                                                0,00 €
+
+   Produits exceptionnels — dont cessions (case 290)                                                                                  0,00 €
+
+   Charges exceptionnelles (case 300) — dont valeur comptable des éléments cédés                                                      0,00 €
+
+   Bénéfice ou perte (case 310)                                                                                                       0,00 €
+
+   Réintégrations / déductions                                                                                                      Montant
+
+   Réintégration — amortissements excédentaires art. 39 C (case 318)                                                                  0,00 €
+
+   Résultat fiscal ligne 352 (doit valoir 0 — activité déclarée en 2031 bis)                                                          0,00 €
+
+
+ 2033-C — Immobilisations et amortissements
+   Rubrique                                   Brut début         Augment.          Brut fin Amort. début             Dotation     Amort. fin
+
+   Terrains (cases 420 / 510)                         0,00 €          0,00 €           0,00 €          0,00 €            0,00 €       0,00 €
+
+   Constructions (cases 430 /
+   520)                                               0,00 €          0,00 €           0,00 €     E    0,00 €            0,00 €       0,00 €
+
+   Installations générales,
+   agencements (cases 450 /
+   540)                                               0,00 €          0,00 €
+                                                                                   IR  0,00 €          0,00 €            0,00 €       0,00 €
+
+   Autres immobilisations
+   corporelles (cases 470 / 560)
+   Totaux
+                                                      0,00 €
+
+                                                      0,00 €
+                                                                  SO  0,00 €
+
+                                                                      0,00 €
+                                                                                       0,00 €
+
+                                                                                       0,00 €
+                                                                                                       0,00 €
+
+                                                                                                       0,00 €
+                                                                                                                         0,00 €
+
+                                                                                                                         0,00 €
+                                                                                                                                      0,00 €
+
+                                                                                                                                      0,00 €
+
+
+ Détail par composant
+   Composant
+                                                        VI Valeur brute        Durée             Dotation          Cumul fin         VNC fin
+
+
+ Suivi des reports — article 39 C           O
+   Rubrique
+
+   Stock d'ouverture
+                         PR
+   Amortissements reportés cette année
+                                                                                                                                    Montant
+
+                                                                                                                                      0,00 €
+
+                                                                                                                                      0,00 €
+
+   Amortissements repris cette année                                                                                                  0,00 €
+
+   Stock à la clôture                                                                                                                 0,00 €
+
+
+ Déficits LMNP par millésime
+   Origine                                          Montant initial                               Solde     Expire fin
+
+   2014                                                 1 200,00 €                         1 200,00 €       2024 — périmé
+
+   2024                                                   800,00 €                              800,00 €    2034
+
+   Total                                                                                        800,00 €
+
+
+ Aide au report — 2042C-PRO
+   Case                                                                                                                             Montant
+
+   5GJ — déficit 2024 non encore déduit                                                                                             800,00 €
+
+
+
+
+Compta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                        Page 2
+Compta LMNP v8.41.0 — édité le 15/09/2026 à 14:23
+ Montants indicatifs, arrondis à l'euro. À vérifier au niveau du foyer fiscal, notamment en présence d'autres activités de location meublée.
+
+
+ Contrôles de cohérence internes
+   Contrôle                                                           Résultat            Détail
+
+   Bilan équilibré (actif net = capitaux propres)                     conforme            actif 0.00 € / passif 0.00 €
+
+   2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré
+   en 2031 bis)                                                       conforme            0.00 €
+
+   2033-C : total brut fin = somme des valeurs brutes                 conforme            0.00 € / 0.00 €
+
+   2033-C : amortissements fin = case 030 du bilan                    conforme            0.00 € / 0.00 €
+
+   Résultat fiscal 2033-B = résultat fiscal de clôture                conforme            0.00 €
+
+
+
+
+                                                                                             E
+                                                                                 IR
+                                                              SO
+                                                    VI
+                                            O
+                         PR
+
+
+
+Compta LMNP — état de travail à faire valider par un expert-comptable avant tout dépôt.                                                    Page 3
+Compta LMNP v8.41.0 — édité le 15/09/2026 à 14:23
+

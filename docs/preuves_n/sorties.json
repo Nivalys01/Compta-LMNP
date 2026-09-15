@@ -1,0 +1,324 @@
+{
+  "juillet": {
+    "1999": 500,
+    "2025": 500.0,
+    "2026": 1000.0,
+    "2029": 1000.0
+  },
+  "operation_fevrier": {
+    "controle": [],
+    "import": 1000.0
+  },
+  "desordre": [
+    [
+      500.0,
+      "2000-01-01",
+      "2024-12-31"
+    ],
+    [
+      700.0,
+      "2025-01-01",
+      null
+    ],
+    [
+      1000.0,
+      "2026-07-01",
+      null
+    ]
+  ],
+  "fin_septembre": {
+    "2026": 1000.0,
+    "2027": 700.0
+  },
+  "trou": 500,
+  "table_vide": {
+    "valeur": 500.0,
+    "regles_apres": 5,
+    "messages": "",
+    "warnings": 0
+  },
+  "regles_perdues": {
+    "avant": [
+      "IMMOBILISABLE"
+    ],
+    "apres": [],
+    "valeur_recreee": 500.0
+  },
+  "seuil_-1": {
+    "lu": -1.0,
+    "controle": [
+      "IMMOBILISABLE"
+    ]
+  },
+  "seuil_0": {
+    "lu": 0.0,
+    "controle": [
+      "IMMOBILISABLE"
+    ]
+  },
+  "seuil_10000000": {
+    "lu": 10000000.0,
+    "controle": []
+  },
+  "duree_zero": {
+    "avant": [
+      [
+        2026,
+        1200.0,
+        2026
+      ]
+    ],
+    "2027": {
+      "perimes": 1,
+      "deficit_cree": null,
+      "impute_sur_benefice": 0.0,
+      "stock_deficits": 0.0
+    }
+  },
+  "lmp": {
+    "controle": [
+      "SEUIL_LMP"
+    ],
+    "rappel": []
+  },
+  "clos": {
+    "liasse_identique": true,
+    "rf_avant": 1600.0,
+    "rf_apres": 1600.0,
+    "controle_avant": [
+      "IMMOBILISABLE"
+    ],
+    "controle_apres": []
+  },
+  "veille_absente": true,
+  "veille_illisible": {
+    "a_refaire": true,
+    "rappels": [
+      "Veille fiscale à faire"
+    ]
+  },
+  "veille_2099-01-01": {
+    "a_refaire": false,
+    "rappels": []
+  },
+  "veille_2028-01-01": {
+    "a_refaire": true,
+    "rappels": [
+      "Veille fiscale à faire"
+    ]
+  },
+  "veille_panne": [
+    "Frais d'acquisition : rien d'enregistré",
+    "Aucun mobilier immobilisé"
+  ],
+  "calendrier": {
+    "verifie_le": "13 août 2026",
+    "faits": [
+      {
+        "titre": "Facturation électronique : une échéance vous concerne au 1er septembre 2026",
+        "resume": "Contrairement à une idée répandue, la réforme touche AUSSI les loueurs meublés dont les loyers sont exonérés de TVA.",
+        "detail": "La ligne de partage n'est pas l'exonération, mais l'ASSUJETTISSEMENT. Vos loyers d'habitation sont exonérés de TVA (CGI art. 261 D), mais votre activité reste assujettie dès lors qu'elle est immatriculée et dispose d'un SIREN. La fiche officielle de la DGFiP est explicite : les bailleurs exonérés n'ont pas d'obligation d'ÉMISSION, mais « en réception, bien qu'exonérés, ils restent assujettis à la TVA et devront recevoir des factures électroniques, sous réserve de disposer également d'un numéro SIREN ».\n\nCe que cela implique concrètement :\n• RÉCEPTION — au 1er septembre 2026, vous devez être en mesure de recevoir les factures de vos fournisseurs professionnels (artisans, assureur, syndic, comptable) au format électronique, via une plateforme agréée. Il suffit de choisir une plateforme et d'y référencer votre SIREN.\n• ÉMISSION — elle ne vous concerne PAS si vos loyers sont exonérés. Une quittance de loyer n'est pas une facture. L'obligation d'émission vise les loueurs redevables de la TVA (para-hôtellerie, résidences de services), au 1er septembre 2027 pour les petites et moyennes entreprises.\n\nLa liste officielle des plateformes agréées est publiée sur impots.gouv.fr. Aucune n'est imposée : le choix vous appartient, et méfiez-vous des messages qui présentent une plateforme particulière comme obligatoire.",
+        "sources": [
+          "DGFiP — fiche « Facturation électronique : je suis un loueur en meublé » (version octobre 2025)",
+          "CGI, art. 261 D (exonération de TVA des loyers d'habitation)",
+          "CGI, art. 289 bis (e-invoicing) et 290 (e-reporting)",
+          "Ordonnance n° 2021-1190 du 15 septembre 2021"
+        ]
+      }
+    ],
+    "echeances": [
+      {
+        "quand": "2e jour ouvré après le 1er mai (+15 j en ligne)",
+        "quoi": "Déclaration de résultats 2031-SD et tableaux 2033",
+        "ou": "impots.gouv.fr — espace PROFESSIONNEL"
+      },
+      {
+        "quand": "mai-juin, selon le département",
+        "quoi": "Déclaration de revenus 2042-C-PRO (report du résultat)",
+        "ou": "impots.gouv.fr — espace PARTICULIER"
+      },
+      {
+        "quand": "1er septembre 2026",
+        "quoi": "Être en mesure de RECEVOIR des factures électroniques",
+        "ou": "plateforme agréée de votre choix (liste sur impots.gouv.fr)"
+      },
+      {
+        "quand": "15 octobre (prélèvement : 20 octobre)",
+        "quoi": "Taxe foncière",
+        "ou": "impots.gouv.fr — espace particulier"
+      },
+      {
+        "quand": "15 décembre",
+        "quoi": "Cotisation foncière des entreprises (CFE)",
+        "ou": "impots.gouv.fr — espace PROFESSIONNEL"
+      },
+      {
+        "quand": "1er septembre 2027",
+        "quoi": "Émission de factures électroniques — SEULEMENT si vous êtes redevable de la TVA (para-hôtellerie, résidences de services)",
+        "ou": "votre plateforme agréée"
+      }
+    ]
+  },
+  "transaction_assurer": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_valeur": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_historique": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_assurer_table": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction__personnalises": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_tous": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_par_groupe": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_derniere_veille": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_veille_a_refaire": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_lire_notes": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_rappels": {
+    "transaction_apres": true,
+    "operations_apres_rollback": 0
+  },
+  "transaction_ajouter_personnalise": {
+    "transaction_apres": false,
+    "operations_apres_rollback": 1
+  },
+  "refus_loyer": {
+    "erreur": "ValueError: La clé 'loyer' existe déjà dans les gabarits standard."
+  },
+  "refus_absent": {
+    "erreur": "ValueError: Compte 999999 absent du plan de comptes — créez-le d'abord (menu Réglementation)."
+  },
+  "refus_nature": {
+    "erreur": "IntegrityError: CHECK constraint failed: nature IN ('produit','charge')"
+  },
+  "collision_inactive": {
+    "erreur": "IntegrityError: UNIQUE constraint failed: gabarit_personnalise.cle"
+  },
+  "suppression_compte": {
+    "erreur": "IntegrityError: FOREIGN KEY constraint failed"
+  },
+  "classe_164000": {
+    "agregats": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    },
+    "attente": []
+  },
+  "classe_472000": {
+    "agregats": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    },
+    "attente": [
+      "COMPTE_ATTENTE"
+    ]
+  },
+  "corpus_regles_manquantes": [
+    "retraitement_alur_auto"
+  ],
+  "duree_versionnee": [
+    [
+      2025,
+      2035
+    ],
+    [
+      2026,
+      2038
+    ]
+  ],
+  "meme_date": {
+    "lu": 900.0,
+    "versions": 1
+  },
+  "deux_saisies": 0,
+  "actualites_2029": {
+    "date_simulee": "2029-09-15",
+    "echeances": [
+      {
+        "quand": "2e jour ouvré après le 1er mai (+15 j en ligne)",
+        "quoi": "Déclaration de résultats 2031-SD et tableaux 2033",
+        "ou": "impots.gouv.fr — espace PROFESSIONNEL"
+      },
+      {
+        "quand": "mai-juin, selon le département",
+        "quoi": "Déclaration de revenus 2042-C-PRO (report du résultat)",
+        "ou": "impots.gouv.fr — espace PARTICULIER"
+      },
+      {
+        "quand": "1er septembre 2026",
+        "quoi": "Être en mesure de RECEVOIR des factures électroniques",
+        "ou": "plateforme agréée de votre choix (liste sur impots.gouv.fr)"
+      },
+      {
+        "quand": "15 octobre (prélèvement : 20 octobre)",
+        "quoi": "Taxe foncière",
+        "ou": "impots.gouv.fr — espace particulier"
+      },
+      {
+        "quand": "15 décembre",
+        "quoi": "Cotisation foncière des entreprises (CFE)",
+        "ou": "impots.gouv.fr — espace PROFESSIONNEL"
+      },
+      {
+        "quand": "1er septembre 2027",
+        "quoi": "Émission de factures électroniques — SEULEMENT si vous êtes redevable de la TVA (para-hôtellerie, résidences de services)",
+        "ou": "votre plateforme agréée"
+      }
+    ]
+  },
+  "prompt_couverture": {
+    "alur": false,
+    "prelevements": true,
+    "date_exercice": true
+  },
+  "import_regle_inaccessible": {
+    "lecture_directe": {
+      "erreur": "DatabaseError: access to regle_fiscale.cle is prohibited"
+    },
+    "normal": "attente_decaissement",
+    "panne": "petit_equipement",
+    "resultat_comptable": -400.0,
+    "controle_apres_retablissement": [
+      "IMMOBILISABLE"
+    ]
+  }
+}

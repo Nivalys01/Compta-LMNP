@@ -1,0 +1,3840 @@
+{
+  "prix_15000": {
+    "cession": {
+      "bien": "Bien fictif",
+      "dotation_complementaire": 595.07,
+      "valeur_brute_sortie": 12000.0,
+      "vnc_sortie": 11404.93,
+      "prix_cession": 15000.0,
+      "pv_comptable": 3595.07
+    },
+    "ouvert": {
+      "ag": {
+        "produits": 18000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": 6000.0,
+        "produits_cession": 15000.0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "b": {
+        "produits_218": 3000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 3000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 15000.0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 595.07,
+        "total_charges_264": 595.07,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2404.93,
+        "benefice_ou_perte_310": 6000.0,
+        "charges_exceptionnelles_300": 11404.93,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 6000.0,
+        "deductions_detail": [
+          [
+            "Produit de cession (régime des particuliers)",
+            3595.07
+          ],
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2404.93
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2404.93
+      },
+      "a": {
+        "immo_corporelles_brut_028": 0.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 0.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": -6000.0,
+        "resultat_exercice_136": 6000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "immo": {
+        "rubriques": [
+          {
+            "libelle": "Terrains",
+            "case_immo": "420",
+            "case_amort": "510",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Constructions",
+            "case_immo": "430",
+            "case_amort": "520",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Installations générales, agencements",
+            "case_immo": "450",
+            "case_amort": "540",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Autres immobilisations corporelles",
+            "case_immo": "470",
+            "case_amort": "560",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          }
+        ],
+        "totaux": {
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        "detail_composants": []
+      },
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "0.00 € / 0.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "0.00 € / -0.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "2404.93 €"
+        }
+      ],
+      "conforme": true,
+      "soldes": {
+        "108000": 6000.0,
+        "213150": 0.0,
+        "281315": 0.0,
+        "675000": 11404.93,
+        "681120": 595.07,
+        "708810": -3000.0,
+        "775000": -15000.0
+      },
+      "ecritures": [
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 3000.0,
+          "credit": 3000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "DAA-CESSION",
+          "debit": 595.07,
+          "credit": 595.07
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 15000.0,
+          "credit": 15000.0
+        }
+      ]
+    },
+    "cloture": {
+      "agregats": {
+        "produits": 18000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": 6000.0,
+        "produits_cession": 15000.0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 595.07,
+        "plafond_deductible": 3000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 2404.93,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 2404.93
+    },
+    "clos": {
+      "ag": {
+        "produits": 18000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": 6000.0,
+        "produits_cession": 15000.0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "b": {
+        "produits_218": 3000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 3000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 15000.0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 595.07,
+        "total_charges_264": 595.07,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2404.93,
+        "benefice_ou_perte_310": 6000.0,
+        "charges_exceptionnelles_300": 11404.93,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 0,
+        "reintegrations_detail": [],
+        "deductions_350": 6000.0,
+        "deductions_detail": [
+          [
+            "Produit de cession (régime des particuliers)",
+            3595.07
+          ],
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2404.93
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2404.93
+      },
+      "a": {
+        "immo_corporelles_brut_028": 0.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 0.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": -6000.0,
+        "resultat_exercice_136": 6000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "immo": {
+        "rubriques": [
+          {
+            "libelle": "Terrains",
+            "case_immo": "420",
+            "case_amort": "510",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Constructions",
+            "case_immo": "430",
+            "case_amort": "520",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Installations générales, agencements",
+            "case_immo": "450",
+            "case_amort": "540",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Autres immobilisations corporelles",
+            "case_immo": "470",
+            "case_amort": "560",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          }
+        ],
+        "totaux": {
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        "detail_composants": []
+      },
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 3000.0,
+          "dotation_exercice": 595.07,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 595.07,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "0.00 € / 0.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "0.00 € / -0.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "2404.93 €"
+        }
+      ],
+      "conforme": true,
+      "soldes": {
+        "108000": 6000.0,
+        "213150": 0.0,
+        "281315": 0.0,
+        "675000": 11404.93,
+        "681120": 595.07,
+        "708810": -3000.0,
+        "775000": -15000.0
+      },
+      "ecritures": [
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 3000.0,
+          "credit": 3000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "DAA-CESSION",
+          "debit": 595.07,
+          "credit": 595.07
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 15000.0,
+          "credit": 15000.0
+        }
+      ]
+    }
+  },
+  "pdf": {
+    "fichier": "cession.pdf",
+    "notaire": false,
+    "2048": false,
+    "cadre_III": false
+  },
+  "rappels": [
+    {
+      "niveau": "important",
+      "titre": "Formalités pour « Bien fictif » (acquis en 2026)",
+      "detail": "Un nouveau bien mis en location meublée doit être déclaré dans les 15 jours du début d'activité via le guichet unique de l'INPI (début ou extension d'activité — l'équivalent de l'ancien P0i/P2P2i) ; déposez aussi la déclaration initiale de CFE (1447-C) avant le 31 décembre. Si ce bien devient celui qui rapporte le plus, l'adresse d'activité (page Immobilisations) doit être mise à jour en conséquence."
+    },
+    {
+      "niveau": "important",
+      "titre": "Cession de « Bien fictif » (2026-06-30) — démarches",
+      "detail": "La plus-value relève du régime des PARTICULIERS : calculée et déclarée par le notaire (2048-IMM) lors de la vente — depuis 2025, les amortissements déduits sont réintégrés dans son calcul. Le stock 39 C attaché au bien est définitivement perdu (ligne G' de l'état SUIV39C, suivi automatiquement). Si c'était votre DERNIER bien loué : déclarez la cessation d'activité au guichet INPI dans les 30 jours et déposez la liasse de cessation dans les 60 jours ; sinon, mettez à jour l'adresse d'activité si nécessaire."
+    },
+    {
+      "niveau": "a_prevoir",
+      "titre": "Veille fiscale à faire",
+      "detail": "Aucune veille n'a encore été déclarée. Une loi de finances par an peut modifier un seuil, la durée de report des déficits ou le traitement d'une cession — ce logiciel applique les règles telles qu'elles y sont enregistrées. Le menu « Veille fiscale » fournit le corpus des textes et une question type à poser à une IA."
+    },
+    {
+      "niveau": "info",
+      "titre": "Frais d'acquisition : rien d'enregistré",
+      "detail": "Aucun composant ne correspond à des frais de notaire, droits de mutation ou commission d'agence. C'est l'oubli le plus coûteux de la première année : selon l'option retenue, ces frais se déduisent l'année de l'acquisition ou s'amortissent avec le bien. S'ils ont déjà été traités ailleurs, ignorez ce rappel."
+    },
+    {
+      "niveau": "info",
+      "titre": "Aucun mobilier immobilisé",
+      "detail": "La location meublée suppose un mobilier suffisant, qui s'amortit sur une durée plus courte que le bâti. Aucun composant de mobilier ou d'électroménager n'est enregistré : soit il a été passé en charge (à vérifier), soit il reste à saisir dans la page Immobilisations."
+    }
+  ],
+  "mutation_sql_apres_cloture": {
+    "ag": {
+      "produits": 19000.0,
+      "charges_hors_daa": 11404.93,
+      "charges_hors_plafond": 11404.93,
+      "charges_afferentes": 0.0,
+      "dotation": 595.07,
+      "resultat_comptable": 7000.0,
+      "produits_cession": 16000.0,
+      "vnc_cession": 11404.93,
+      "plafond_39c": 3000.0
+    },
+    "b": {
+      "produits_218": 3000.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 3000.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 16000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 595.07,
+      "total_charges_264": 595.07,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 2404.93,
+      "benefice_ou_perte_310": 7000.0,
+      "charges_exceptionnelles_300": 11404.93,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 7000.0,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          4595.07
+        ],
+        [
+          "Résultat LMNP non soumis aux contributions sociales",
+          2404.93
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 2404.93
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": -0.0,
+      "immo_corporelles_net": 0.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": 0.0,
+      "capital_individuel_120": -7000.0,
+      "resultat_exercice_136": 7000.0,
+      "total_capitaux_142": 0.0,
+      "total_passif_180": 0.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 3000.0,
+        "dotation_exercice": 595.07,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 595.07,
+          "report_bien": 0.0,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / -0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "2404.93 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": 7000.0,
+      "213150": 0.0,
+      "281315": 0.0,
+      "675000": 11404.93,
+      "681120": 595.07,
+      "708810": -3000.0,
+      "775000": -16000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 3000.0,
+        "credit": 3000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 595.07,
+        "credit": 595.07
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 16000.0,
+        "credit": 16000.0
+      }
+    ]
+  },
+  "prix_5000": {
+    "cession": {
+      "bien": "Bien fictif",
+      "dotation_complementaire": 595.07,
+      "valeur_brute_sortie": 12000.0,
+      "vnc_sortie": 11404.93,
+      "prix_cession": 5000.0,
+      "pv_comptable": -6404.93
+    },
+    "ouvert": {
+      "ag": {
+        "produits": 8000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": -4000.0,
+        "produits_cession": 5000.0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "b": {
+        "produits_218": 3000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 3000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 5000.0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 595.07,
+        "total_charges_264": 595.07,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2404.93,
+        "benefice_ou_perte_310": -4000.0,
+        "charges_exceptionnelles_300": 11404.93,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 6404.93,
+        "reintegrations_detail": [
+          [
+            "Valeur comptable des éléments cédés (régime des particuliers)",
+            6404.93
+          ]
+        ],
+        "deductions_350": 2404.93,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2404.93
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2404.93
+      },
+      "a": {
+        "immo_corporelles_brut_028": 0.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 0.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": 4000.0,
+        "resultat_exercice_136": -4000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "immo": {
+        "rubriques": [
+          {
+            "libelle": "Terrains",
+            "case_immo": "420",
+            "case_amort": "510",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Constructions",
+            "case_immo": "430",
+            "case_amort": "520",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Installations générales, agencements",
+            "case_immo": "450",
+            "case_amort": "540",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Autres immobilisations corporelles",
+            "case_immo": "470",
+            "case_amort": "560",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          }
+        ],
+        "totaux": {
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        "detail_composants": []
+      },
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "0.00 € / 0.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "0.00 € / -0.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "2404.93 €"
+        }
+      ],
+      "conforme": true,
+      "soldes": {
+        "108000": -4000.0,
+        "213150": 0.0,
+        "281315": 0.0,
+        "675000": 11404.93,
+        "681120": 595.07,
+        "708810": -3000.0,
+        "775000": -5000.0
+      },
+      "ecritures": [
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 3000.0,
+          "credit": 3000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "DAA-CESSION",
+          "debit": 595.07,
+          "credit": 595.07
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 5000.0,
+          "credit": 5000.0
+        }
+      ]
+    },
+    "cloture": {
+      "agregats": {
+        "produits": 8000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": -4000.0,
+        "produits_cession": 5000.0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 595.07,
+        "plafond_deductible": 3000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 2404.93,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 2404.93
+    },
+    "clos": {
+      "ag": {
+        "produits": 8000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": -4000.0,
+        "produits_cession": 5000.0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "b": {
+        "produits_218": 3000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 3000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 5000.0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 595.07,
+        "total_charges_264": 595.07,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2404.93,
+        "benefice_ou_perte_310": -4000.0,
+        "charges_exceptionnelles_300": 11404.93,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 6404.93,
+        "reintegrations_detail": [
+          [
+            "Valeur comptable des éléments cédés (régime des particuliers)",
+            6404.93
+          ]
+        ],
+        "deductions_350": 2404.93,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2404.93
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2404.93
+      },
+      "a": {
+        "immo_corporelles_brut_028": 0.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 0.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": 4000.0,
+        "resultat_exercice_136": -4000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "immo": {
+        "rubriques": [
+          {
+            "libelle": "Terrains",
+            "case_immo": "420",
+            "case_amort": "510",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Constructions",
+            "case_immo": "430",
+            "case_amort": "520",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Installations générales, agencements",
+            "case_immo": "450",
+            "case_amort": "540",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Autres immobilisations corporelles",
+            "case_immo": "470",
+            "case_amort": "560",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          }
+        ],
+        "totaux": {
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        "detail_composants": []
+      },
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 3000.0,
+          "dotation_exercice": 595.07,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 595.07,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "0.00 € / 0.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "0.00 € / -0.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "2404.93 €"
+        }
+      ],
+      "conforme": true,
+      "soldes": {
+        "108000": -4000.0,
+        "213150": 0.0,
+        "281315": 0.0,
+        "675000": 11404.93,
+        "681120": 595.07,
+        "708810": -3000.0,
+        "775000": -5000.0
+      },
+      "ecritures": [
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 3000.0,
+          "credit": 3000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "DAA-CESSION",
+          "debit": 595.07,
+          "credit": 595.07
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 5000.0,
+          "credit": 5000.0
+        }
+      ]
+    }
+  },
+  "prix_0": {
+    "cession": {
+      "bien": "Bien fictif",
+      "dotation_complementaire": 595.07,
+      "valeur_brute_sortie": 12000.0,
+      "vnc_sortie": 11404.93,
+      "prix_cession": 0.0,
+      "pv_comptable": -11404.93
+    },
+    "ouvert": {
+      "ag": {
+        "produits": 3000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": -9000.0,
+        "produits_cession": 0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "b": {
+        "produits_218": 3000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 3000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 595.07,
+        "total_charges_264": 595.07,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2404.93,
+        "benefice_ou_perte_310": -9000.0,
+        "charges_exceptionnelles_300": 11404.93,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 11404.93,
+        "reintegrations_detail": [
+          [
+            "Valeur comptable des éléments cédés (régime des particuliers)",
+            11404.93
+          ]
+        ],
+        "deductions_350": 2404.93,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2404.93
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2404.93
+      },
+      "a": {
+        "immo_corporelles_brut_028": 0.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 0.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": 9000.0,
+        "resultat_exercice_136": -9000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "immo": {
+        "rubriques": [
+          {
+            "libelle": "Terrains",
+            "case_immo": "420",
+            "case_amort": "510",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Constructions",
+            "case_immo": "430",
+            "case_amort": "520",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Installations générales, agencements",
+            "case_immo": "450",
+            "case_amort": "540",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Autres immobilisations corporelles",
+            "case_immo": "470",
+            "case_amort": "560",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          }
+        ],
+        "totaux": {
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        "detail_composants": []
+      },
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "0.00 € / 0.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "0.00 € / -0.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "2404.93 €"
+        }
+      ],
+      "conforme": true,
+      "soldes": {
+        "108000": -9000.0,
+        "213150": 0.0,
+        "281315": 0.0,
+        "675000": 11404.93,
+        "681120": 595.07,
+        "708810": -3000.0
+      },
+      "ecritures": [
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 3000.0,
+          "credit": 3000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "DAA-CESSION",
+          "debit": 595.07,
+          "credit": 595.07
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 12000.0,
+          "credit": 12000.0
+        }
+      ]
+    },
+    "cloture": {
+      "agregats": {
+        "produits": 3000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": -9000.0,
+        "produits_cession": 0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 595.07,
+        "plafond_deductible": 3000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 2404.93,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 2404.93
+    },
+    "clos": {
+      "ag": {
+        "produits": 3000.0,
+        "charges_hors_daa": 11404.93,
+        "charges_hors_plafond": 11404.93,
+        "charges_afferentes": 0.0,
+        "dotation": 595.07,
+        "resultat_comptable": -9000.0,
+        "produits_cession": 0,
+        "vnc_cession": 11404.93,
+        "plafond_39c": 3000.0
+      },
+      "b": {
+        "produits_218": 3000.0,
+        "autres_produits_230": 0,
+        "total_produits_232": 3000.0,
+        "produits_financiers_280": 0,
+        "produits_exceptionnels_290": 0,
+        "charges_externes_242": 0,
+        "impots_244": 0,
+        "dont_cfe_243": 0.0,
+        "personnel_250": 0,
+        "autres_charges_262": 0.0,
+        "dotations_254": 595.07,
+        "total_charges_264": 595.07,
+        "charges_financieres_294": 0,
+        "resultat_exploitation_270": 2404.93,
+        "benefice_ou_perte_310": -9000.0,
+        "charges_exceptionnelles_300": 11404.93,
+        "reintegration_amort_318": 0.0,
+        "reintegration_divers_330": 11404.93,
+        "reintegrations_detail": [
+          [
+            "Valeur comptable des éléments cédés (régime des particuliers)",
+            11404.93
+          ]
+        ],
+        "deductions_350": 2404.93,
+        "deductions_detail": [
+          [
+            "Résultat LMNP non soumis aux contributions sociales",
+            2404.93
+          ]
+        ],
+        "resultat_fiscal_352": 0.0,
+        "resultat_fiscal_370": 0.0,
+        "resultat_fiscal_lmnp": 2404.93
+      },
+      "a": {
+        "immo_corporelles_brut_028": 0.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 0.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": 9000.0,
+        "resultat_exercice_136": -9000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "immo": {
+        "rubriques": [
+          {
+            "libelle": "Terrains",
+            "case_immo": "420",
+            "case_amort": "510",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Constructions",
+            "case_immo": "430",
+            "case_amort": "520",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Installations générales, agencements",
+            "case_immo": "450",
+            "case_amort": "540",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          },
+          {
+            "libelle": "Autres immobilisations corporelles",
+            "case_immo": "470",
+            "case_amort": "560",
+            "brut_debut": 0.0,
+            "augmentations": 0.0,
+            "brut_fin": 0.0,
+            "amort_debut": 0.0,
+            "dotation": 0.0,
+            "amort_fin": 0.0
+          }
+        ],
+        "totaux": {
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        "detail_composants": []
+      },
+      "reports": {
+        "suivi_39c": {
+          "plafond_deductible": 3000.0,
+          "dotation_exercice": 595.07,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        "deficits": [],
+        "suivi_39c_par_bien": [
+          {
+            "bien_id": 1,
+            "libelle": "Bien fictif",
+            "stock_ouverture": 0.0,
+            "dotation_bien": 595.07,
+            "report_bien": 0.0,
+            "utilisation_bien": 0.0,
+            "sortie_bien": 0.0,
+            "stock_cloture": 0.0
+          }
+        ],
+        "total_deficits": 0,
+        "total_deficits_perimes": 0,
+        "sortie_39c": 0.0,
+        "total_restant": 0.0
+      },
+      "controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "0.00 € / 0.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "0.00 € / -0.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "2404.93 €"
+        }
+      ],
+      "conforme": true,
+      "soldes": {
+        "108000": -9000.0,
+        "213150": 0.0,
+        "281315": 0.0,
+        "675000": 11404.93,
+        "681120": 595.07,
+        "708810": -3000.0
+      },
+      "ecritures": [
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 12000.0,
+          "credit": 12000.0
+        },
+        {
+          "ecriture_date": "2026-01-01",
+          "exercice_annee": 2026,
+          "piece_ref": "FICTIF",
+          "debit": 3000.0,
+          "credit": 3000.0
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "DAA-CESSION",
+          "debit": 595.07,
+          "credit": 595.07
+        },
+        {
+          "ecriture_date": "2026-06-30",
+          "exercice_annee": 2026,
+          "piece_ref": "CESSION",
+          "debit": 12000.0,
+          "credit": 12000.0
+        }
+      ]
+    }
+  },
+  "cycle_avant": {
+    "ag": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    },
+    "b": {
+      "produits_218": 0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0,
+      "dotations_254": 0,
+      "total_charges_264": 0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 0,
+      "benefice_ou_perte_310": 0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 12000.0,
+      "amortissements_030": 1200.0,
+      "immo_corporelles_net": 10800.0,
+      "total_actif_110": 12000.0,
+      "total_actif_net_112": 10800.0,
+      "capital_individuel_120": 10800.0,
+      "resultat_exercice_136": 0,
+      "total_capitaux_142": 10800.0,
+      "total_passif_180": 10800.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 12000.0,
+          "augmentations": 0.0,
+          "brut_fin": 12000.0,
+          "amort_debut": 1200.0,
+          "dotation": 1200.0,
+          "amort_fin": 2400.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 12000.0,
+        "augmentations": 0.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 1200.0,
+        "dotation": 1200.0,
+        "amort_fin": 2400.0
+      },
+      "detail_composants": [
+        {
+          "libelle": "Composant fictif",
+          "valeur_brute": 12000.0,
+          "duree": 10,
+          "dotation": 1200.0,
+          "cumul_fin": 2400.0,
+          "vnc_fin": 9600.0
+        }
+      ]
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 10800.00 € / passif 10800.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "12000.00 € / 12000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "2400.00 € / 1200.00 € — écart de 1200.00 €, soit la dotation de l'exercice, qui sera comptabilisée à la clôture. Rien à corriger."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": -10800.0,
+      "120000": 0.0,
+      "213150": 12000.0,
+      "281315": -1200.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2025-01-01",
+        "exercice_annee": 2025,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2025-12-31",
+        "exercice_annee": 2025,
+        "piece_ref": "DAA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "NA",
+        "debit": 13200.0,
+        "credit": 13200.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "NA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      }
+    ]
+  },
+  "cycle_cession": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 595.07,
+    "valeur_brute_sortie": 12000.0,
+    "vnc_sortie": 10204.93,
+    "prix_cession": 15000.0,
+    "pv_comptable": 4795.07
+  },
+  "cycle_2026": {
+    "ag": {
+      "produits": 15000.0,
+      "charges_hors_daa": 10204.93,
+      "charges_hors_plafond": 10204.93,
+      "charges_afferentes": 0.0,
+      "dotation": 595.07,
+      "resultat_comptable": 4200.0,
+      "produits_cession": 15000.0,
+      "vnc_cession": 10204.93,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 15000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 595.07,
+      "total_charges_264": 595.07,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -595.07,
+      "benefice_ou_perte_310": 4200.0,
+      "charges_exceptionnelles_300": 10204.93,
+      "reintegration_amort_318": 595.07,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 4795.07,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          4795.07
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": -0.0,
+      "immo_corporelles_net": 0.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": 0.0,
+      "capital_individuel_120": -4200.0,
+      "resultat_exercice_136": 4200.0,
+      "total_capitaux_142": 0.0,
+      "total_passif_180": 0.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 595.07,
+        "stock_ouverture": 1200.0,
+        "report_annee": 595.07,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 1200.0,
+          "dotation_bien": 595.07,
+          "report_bien": 595.07,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 1795.07,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 1795.07,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / -0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": 4200.0,
+      "120000": 0.0,
+      "213150": 0.0,
+      "281315": -0.0,
+      "675000": 10204.93,
+      "681120": 595.07,
+      "775000": -15000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2025-01-01",
+        "exercice_annee": 2025,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2025-12-31",
+        "exercice_annee": 2025,
+        "piece_ref": "DAA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "NA",
+        "debit": 13200.0,
+        "credit": 13200.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "NA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 595.07,
+        "credit": 595.07
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      }
+    ]
+  },
+  "cycle_pdf": {
+    "fichier": "cycle.pdf",
+    "notaire": false,
+    "2048": false,
+    "cadre_III": false
+  },
+  "cycle_dotations_2027": [],
+  "cycle_2027": {
+    "ag": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    },
+    "b": {
+      "produits_218": 0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0,
+      "dotations_254": 0,
+      "total_charges_264": 0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 0,
+      "benefice_ou_perte_310": 0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0,
+      "amortissements_030": 0,
+      "immo_corporelles_net": 0,
+      "total_actif_110": 0,
+      "total_actif_net_112": 0,
+      "capital_individuel_120": 0,
+      "resultat_exercice_136": 0,
+      "total_capitaux_142": 0,
+      "total_passif_180": 0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 0.0,
+          "report_bien": 0.0,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": 0.0,
+      "120000": 0.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2025-01-01",
+        "exercice_annee": 2025,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2025-12-31",
+        "exercice_annee": 2025,
+        "piece_ref": "DAA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "NA",
+        "debit": 13200.0,
+        "credit": 13200.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "NA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 595.07,
+        "credit": 595.07
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      },
+      {
+        "ecriture_date": "2027-01-01",
+        "exercice_annee": 2027,
+        "piece_ref": "NA",
+        "debit": 4200.0,
+        "credit": 4200.0
+      },
+      {
+        "ecriture_date": "2027-01-01",
+        "exercice_annee": 2027,
+        "piece_ref": "NA",
+        "debit": 4200.0,
+        "credit": 4200.0
+      }
+    ]
+  },
+  "cumul_rejeu": {
+    "ecritures": 1,
+    "normalisees": 0,
+    "comptes_crees": [],
+    "renumerotees": false
+  },
+  "cumul_repris_avant": {
+    "ag": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    },
+    "b": {
+      "produits_218": 0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0,
+      "dotations_254": 0,
+      "total_charges_264": 0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 0,
+      "benefice_ou_perte_310": 0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 12000.0,
+      "amortissements_030": 3000.0,
+      "immo_corporelles_net": 9000.0,
+      "total_actif_110": 12000.0,
+      "total_actif_net_112": 9000.0,
+      "capital_individuel_120": 9000.0,
+      "resultat_exercice_136": 0,
+      "total_capitaux_142": 9000.0,
+      "total_passif_180": 9000.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 12000.0,
+          "augmentations": 0.0,
+          "brut_fin": 12000.0,
+          "amort_debut": 1200.0,
+          "dotation": 1200.0,
+          "amort_fin": 2400.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 12000.0,
+        "augmentations": 0.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 1200.0,
+        "dotation": 1200.0,
+        "amort_fin": 2400.0
+      },
+      "detail_composants": [
+        {
+          "libelle": "Composant fictif",
+          "valeur_brute": 12000.0,
+          "duree": 10,
+          "dotation": 1200.0,
+          "cumul_fin": 2400.0,
+          "vnc_fin": 9600.0
+        }
+      ]
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 9000.00 € / passif 9000.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "12000.00 € / 12000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": false,
+        "detail": "2400.00 € / 3000.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": false,
+    "soldes": {
+      "108000": -9000.0,
+      "213150": 12000.0,
+      "281315": -3000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      }
+    ]
+  },
+  "cumul_repris_cession": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 595.07,
+    "valeur_brute_sortie": 12000.0,
+    "vnc_sortie": 10204.93,
+    "prix_cession": 15000.0,
+    "pv_comptable": 4795.07
+  },
+  "cumul_repris_apres": {
+    "ag": {
+      "produits": 15000.0,
+      "charges_hors_daa": 10204.93,
+      "charges_hors_plafond": 10204.93,
+      "charges_afferentes": 0.0,
+      "dotation": 595.07,
+      "resultat_comptable": 4200.0,
+      "produits_cession": 15000.0,
+      "vnc_cession": 10204.93,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 15000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 595.07,
+      "total_charges_264": 595.07,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -595.07,
+      "benefice_ou_perte_310": 4200.0,
+      "charges_exceptionnelles_300": 10204.93,
+      "reintegration_amort_318": 595.07,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 4795.07,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          4795.07
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": 1800.0,
+      "immo_corporelles_net": -1800.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": -1800.0,
+      "capital_individuel_120": -6000.0,
+      "resultat_exercice_136": 4200.0,
+      "total_capitaux_142": -1800.0,
+      "total_passif_180": -1800.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 595.07,
+        "stock_ouverture": 0.0,
+        "report_annee": 595.07,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 595.07,
+          "report_bien": 595.07,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 595.07,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 595.07,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif -1800.00 € / passif -1800.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": false,
+        "detail": "0.00 € / 1800.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": false,
+    "soldes": {
+      "108000": 6000.0,
+      "213150": 0.0,
+      "281315": -1800.0,
+      "675000": 10204.93,
+      "681120": 595.07,
+      "775000": -15000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 595.07,
+        "credit": 595.07
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      }
+    ]
+  },
+  "2026-01-01": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 3.29,
+    "valeur_brute_sortie": 12000.0,
+    "vnc_sortie": 11996.71,
+    "prix_cession": 15000.0,
+    "pv_comptable": 3003.29
+  },
+  "2026-01-01_etat": {
+    "ag": {
+      "produits": 15000.0,
+      "charges_hors_daa": 11996.71,
+      "charges_hors_plafond": 11996.71,
+      "charges_afferentes": 0.0,
+      "dotation": 3.29,
+      "resultat_comptable": 3000.0,
+      "produits_cession": 15000.0,
+      "vnc_cession": 11996.71,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 15000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 3.29,
+      "total_charges_264": 3.29,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -3.29,
+      "benefice_ou_perte_310": 3000.0,
+      "charges_exceptionnelles_300": 11996.71,
+      "reintegration_amort_318": 3.29,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 3003.29,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          3003.29
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": -0.0,
+      "immo_corporelles_net": 0.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": 0.0,
+      "capital_individuel_120": -3000.0,
+      "resultat_exercice_136": 3000.0,
+      "total_capitaux_142": 0.0,
+      "total_passif_180": 0.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 3.29,
+        "stock_ouverture": 0.0,
+        "report_annee": 3.29,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 3.29,
+          "report_bien": 3.29,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 3.29,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 3.29,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / -0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": 3000.0,
+      "213150": 0.0,
+      "281315": 0.0,
+      "675000": 11996.71,
+      "681120": 3.29,
+      "775000": -15000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 3.29,
+        "credit": 3.29
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      }
+    ]
+  },
+  "2026-12-31": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 1200.0,
+    "valeur_brute_sortie": 12000.0,
+    "vnc_sortie": 10800.0,
+    "prix_cession": 15000.0,
+    "pv_comptable": 4200.0
+  },
+  "2026-12-31_etat": {
+    "ag": {
+      "produits": 15000.0,
+      "charges_hors_daa": 10800.0,
+      "charges_hors_plafond": 10800.0,
+      "charges_afferentes": 0.0,
+      "dotation": 1200.0,
+      "resultat_comptable": 3000.0,
+      "produits_cession": 15000.0,
+      "vnc_cession": 10800.0,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 15000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 1200.0,
+      "total_charges_264": 1200.0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -1200.0,
+      "benefice_ou_perte_310": 3000.0,
+      "charges_exceptionnelles_300": 10800.0,
+      "reintegration_amort_318": 1200.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 4200.0,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          4200.0
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": -0.0,
+      "immo_corporelles_net": 0.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": 0.0,
+      "capital_individuel_120": -3000.0,
+      "resultat_exercice_136": 3000.0,
+      "total_capitaux_142": 0.0,
+      "total_passif_180": 0.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 1200.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 1200.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 1200.0,
+          "report_bien": 1200.0,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 1200.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 1200.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / -0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": 3000.0,
+      "213150": 0.0,
+      "281315": 0.0,
+      "675000": 10800.0,
+      "681120": 1200.0,
+      "775000": -15000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      }
+    ]
+  },
+  "avant_acquisition": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 0.0,
+    "valeur_brute_sortie": 12000.0,
+    "vnc_sortie": 12000.0,
+    "prix_cession": 15000.0,
+    "pv_comptable": 3000.0
+  },
+  "avant_acquisition_etat": {
+    "ag": {
+      "produits": 15000.0,
+      "charges_hors_daa": 12000.0,
+      "charges_hors_plafond": 12000.0,
+      "charges_afferentes": 0.0,
+      "dotation": 0,
+      "resultat_comptable": 3000.0,
+      "produits_cession": 15000.0,
+      "vnc_cession": 12000.0,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 15000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 0,
+      "total_charges_264": 0.0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 0.0,
+      "benefice_ou_perte_310": 3000.0,
+      "charges_exceptionnelles_300": 12000.0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 0,
+      "reintegrations_detail": [],
+      "deductions_350": 3000.0,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          3000.0
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": 0,
+      "immo_corporelles_net": 0.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": 0.0,
+      "capital_individuel_120": -3000.0,
+      "resultat_exercice_136": 3000.0,
+      "total_capitaux_142": 0.0,
+      "total_passif_180": 0.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "soldes": {
+      "108000": 3000.0,
+      "213150": 0.0,
+      "675000": 12000.0,
+      "775000": -15000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-07-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      }
+    ]
+  },
+  "refus_clos": {
+    "erreur": "L'exercice 2026 est clos : aucune écriture ne peut plus y être ajoutée.",
+    "ecritures_avant_apres": [
+      2,
+      2
+    ]
+  },
+  "sans_comptes": {
+    "comptes": [],
+    "ag": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    }
+  },
+  "prorata": {
+    "2026-09-30_2026-07-01": [
+      302.47,
+      0.0
+    ],
+    "2024-02-29_2024-01-01": [
+      197.26,
+      0.0
+    ],
+    "2026-12-31_2025-07-01": [
+      5950.68,
+      6049.32
+    ]
+  },
+  "dotation_deja_presente": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 1200.0,
+    "valeur_brute_sortie": 12000.0,
+    "vnc_sortie": 10800.0,
+    "prix_cession": 15000.0,
+    "pv_comptable": 4200.0
+  },
+  "dotation_deja_presente_etat": {
+    "ag": {
+      "produits": 15000.0,
+      "charges_hors_daa": 10800.0,
+      "charges_hors_plafond": 10800.0,
+      "charges_afferentes": 0.0,
+      "dotation": 2400.0,
+      "resultat_comptable": 1800.0,
+      "produits_cession": 15000.0,
+      "vnc_cession": 10800.0,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 15000.0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 2400.0,
+      "total_charges_264": 2400.0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -2400.0,
+      "benefice_ou_perte_310": 1800.0,
+      "charges_exceptionnelles_300": 10800.0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 2400.0,
+      "reintegrations_detail": [
+        [
+          "Résultat LMNP non soumis aux contributions sociales",
+          2400.0
+        ]
+      ],
+      "deductions_350": 4200.0,
+      "deductions_detail": [
+        [
+          "Produit de cession (régime des particuliers)",
+          4200.0
+        ]
+      ],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": -2400.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 0.0,
+      "amortissements_030": 1200.0,
+      "immo_corporelles_net": -1200.0,
+      "total_actif_110": 0.0,
+      "total_actif_net_112": -1200.0,
+      "capital_individuel_120": -3000.0,
+      "resultat_exercice_136": 1800.0,
+      "total_capitaux_142": -1200.0,
+      "total_passif_180": -1200.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "detail_composants": []
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 0.0
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif -1200.00 € / passif -1200.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": false,
+        "detail": "0.00 € / 1200.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "-2400.00 €"
+      }
+    ],
+    "conforme": false,
+    "soldes": {
+      "108000": 3000.0,
+      "213150": 0.0,
+      "281315": -1200.0,
+      "675000": 10800.0,
+      "681120": 2400.0,
+      "775000": -15000.0
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 1200.0,
+        "credit": 1200.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "CESSION",
+        "debit": 15000.0,
+        "credit": 15000.0
+      }
+    ]
+  },
+  "panne": {
+    "erreur": "Panne fictive sortie",
+    "avant": 1,
+    "avant_rollback": 2,
+    "apres_rollback": 1
+  },
+  "partiel_sql": {
+    "ag": {
+      "produits": 0,
+      "charges_hors_daa": 11404.93,
+      "charges_hors_plafond": 11404.93,
+      "charges_afferentes": 0.0,
+      "dotation": 1195.07,
+      "resultat_comptable": -12600.0,
+      "produits_cession": 0,
+      "vnc_cession": 11404.93,
+      "plafond_39c": 0.0
+    },
+    "b": {
+      "produits_218": 0,
+      "autres_produits_230": 0,
+      "total_produits_232": 0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 1195.07,
+      "total_charges_264": 1195.07,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -1195.07,
+      "benefice_ou_perte_310": -12600.0,
+      "charges_exceptionnelles_300": 11404.93,
+      "reintegration_amort_318": 1195.07,
+      "reintegration_divers_330": 11404.93,
+      "reintegrations_detail": [
+        [
+          "Valeur comptable des éléments cédés (régime des particuliers)",
+          11404.93
+        ]
+      ],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "a": {
+      "immo_corporelles_brut_028": 6000.0,
+      "amortissements_030": 600.0,
+      "immo_corporelles_net": 5400.0,
+      "total_actif_110": 6000.0,
+      "total_actif_net_112": 5400.0,
+      "capital_individuel_120": 18000.0,
+      "resultat_exercice_136": -12600.0,
+      "total_capitaux_142": 5400.0,
+      "total_passif_180": 5400.0,
+      "equilibre": true
+    },
+    "immo": {
+      "rubriques": [
+        {
+          "libelle": "Terrains",
+          "case_immo": "420",
+          "case_amort": "510",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Constructions",
+          "case_immo": "430",
+          "case_amort": "520",
+          "brut_debut": 0.0,
+          "augmentations": 18000.0,
+          "brut_fin": 18000.0,
+          "amort_debut": 0.0,
+          "dotation": 1800.0,
+          "amort_fin": 1800.0
+        },
+        {
+          "libelle": "Installations générales, agencements",
+          "case_immo": "450",
+          "case_amort": "540",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        },
+        {
+          "libelle": "Autres immobilisations corporelles",
+          "case_immo": "470",
+          "case_amort": "560",
+          "brut_debut": 0.0,
+          "augmentations": 0.0,
+          "brut_fin": 0.0,
+          "amort_debut": 0.0,
+          "dotation": 0.0,
+          "amort_fin": 0.0
+        }
+      ],
+      "totaux": {
+        "brut_debut": 0.0,
+        "augmentations": 18000.0,
+        "brut_fin": 18000.0,
+        "amort_debut": 0.0,
+        "dotation": 1800.0,
+        "amort_fin": 1800.0
+      },
+      "detail_composants": [
+        {
+          "libelle": "Composant fictif",
+          "valeur_brute": 12000.0,
+          "duree": 10,
+          "dotation": 1200.0,
+          "cumul_fin": 1200.0,
+          "vnc_fin": 10800.0
+        },
+        {
+          "libelle": "Composant conservé fictif",
+          "valeur_brute": 6000.0,
+          "duree": 10,
+          "dotation": 600.0,
+          "cumul_fin": 600.0,
+          "vnc_fin": 5400.0
+        }
+      ]
+    },
+    "reports": {
+      "suivi_39c": {
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 1195.07,
+        "stock_ouverture": 0.0,
+        "report_annee": 1195.07,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 1195.07
+      },
+      "deficits": [],
+      "suivi_39c_par_bien": [
+        {
+          "bien_id": 1,
+          "libelle": "Bien fictif",
+          "stock_ouverture": 0.0,
+          "dotation_bien": 600.0,
+          "report_bien": 1195.07,
+          "utilisation_bien": 0.0,
+          "sortie_bien": 0.0,
+          "stock_cloture": 1195.07
+        }
+      ],
+      "total_deficits": 0,
+      "total_deficits_perimes": 0,
+      "sortie_39c": 0.0,
+      "total_restant": 1195.07
+    },
+    "controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 5400.00 € / passif 5400.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": false,
+        "detail": "18000.00 € / 6000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": false,
+        "detail": "1800.00 € / 600.00 € — écart de 1200.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": false,
+    "soldes": {
+      "108000": -18000.0,
+      "213150": 6000.0,
+      "281315": -600.0,
+      "675000": 11404.93,
+      "681120": 1195.07
+    },
+    "ecritures": [
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-01-01",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 6000.0,
+        "credit": 6000.0
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA-CESSION",
+        "debit": 595.07,
+        "credit": 595.07
+      },
+      {
+        "ecriture_date": "2026-06-30",
+        "exercice_annee": 2026,
+        "piece_ref": "FICTIF",
+        "debit": 12000.0,
+        "credit": 12000.0
+      },
+      {
+        "ecriture_date": "2026-12-31",
+        "exercice_annee": 2026,
+        "piece_ref": "DAA",
+        "debit": 600.0,
+        "credit": 600.0
+      }
+    ]
+  },
+  "partiel_puis_total": {
+    "bien": "Bien fictif",
+    "dotation_complementaire": 1.64,
+    "valeur_brute_sortie": 6000.0,
+    "vnc_sortie": 5398.36,
+    "prix_cession": 6000.0,
+    "pv_comptable": 601.64
+  },
+  "dates_sortie_preservees": [
+    {
+      "id": 1,
+      "date_sortie": "2026-06-30"
+    },
+    {
+      "id": 2,
+      "date_sortie": "2027-01-01"
+    }
+  ],
+  "sources": {
+    "modules/cession.py": "325a5fc08ba98f30fb92c95aa56d4e67ec79e2c08d5fe66ed05c8f51c367e01e",
+    "modules/fiscal.py": "a3337e8f4bce02b7fba3844cf0386aa9a21b2be9059eb47cf037d8bf8caa02a7",
+    "modules/liasse.py": "196c7b10bb4a46d1cf02064fdb6b91a0bc4045171d700c1859f3174fa8a1a192",
+    "modules/amortissement.py": "5ac93d8e3d18c9f96daebda5693ee0721fa80fc263d678a1f86096fa5f4f7b60",
+    "modules/liasse_pdf.py": "4e9b6df38c2778316f7aec76440700812fe8834a205151cbee129a167c2e0f59",
+    "modules/pense_bete.py": "e15e47985a4ac9229b861eaeae77432f9089147d164d2c5e494180958304ae72",
+    "schema.sql": "4b3407b78b2e0c281fd8a6db81302d1a5c23cc79ed374db5f2175aff578b6dd2"
+  }
+}

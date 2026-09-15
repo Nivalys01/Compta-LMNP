@@ -1,0 +1,5199 @@
+{
+  "environnement": {
+    "python": "3.14.6 (main, Jun 11 2026, 00:00:00) [GCC 16.1.1 20260515 (Red Hat 16.1.1-2)]",
+    "sqlite": "3.51.2",
+    "sha256": {
+      "modules/amortissement.py": "5ac93d8e3d18c9f96daebda5693ee0721fa80fc263d678a1f86096fa5f4f7b60",
+      "modules/controles.py": "fb5f941a7b67ac936f37f28d299eba35f0fadad866efd808c4b5044403518fa7",
+      "modules/operations.py": "a19c20f89ee3a2dd4074846a476f644f56ef76677b16235650974af9f1291895",
+      "modules/liasse.py": "196c7b10bb4a46d1cf02064fdb6b91a0bc4045171d700c1859f3174fa8a1a192",
+      "modules/plan_immo.py": "472461580656a4c3a5839af33cb3fbdf065423fdffdf2b42604fed39e242941c",
+      "app.py": "461f6c2939e30201308c0c6b405931fb840018b6a3be67342b2e9ec36ffda77c",
+      "schema.sql": "4b3407b78b2e0c281fd8a6db81302d1a5c23cc79ed374db5f2175aff578b6dd2"
+    }
+  },
+  "plans_cibles": {
+    "1299.87/15/2026-06-17": {
+      "plan": [
+        [
+          2026,
+          47.01
+        ],
+        [
+          2027,
+          86.66
+        ],
+        [
+          2028,
+          86.66
+        ],
+        [
+          2029,
+          86.66
+        ],
+        [
+          2030,
+          86.66
+        ],
+        [
+          2031,
+          86.66
+        ],
+        [
+          2032,
+          86.66
+        ],
+        [
+          2033,
+          86.66
+        ],
+        [
+          2034,
+          86.66
+        ],
+        [
+          2035,
+          86.66
+        ],
+        [
+          2036,
+          86.66
+        ],
+        [
+          2037,
+          86.66
+        ],
+        [
+          2038,
+          86.66
+        ],
+        [
+          2039,
+          86.66
+        ],
+        [
+          2040,
+          86.66
+        ],
+        [
+          2041,
+          39.62
+        ]
+      ],
+      "total_decimal": "1299.87",
+      "total_float": 1299.87
+    },
+    "1299.87/15/2026-12-31": {
+      "plan": [
+        [
+          2026,
+          0.24
+        ],
+        [
+          2027,
+          86.66
+        ],
+        [
+          2028,
+          86.66
+        ],
+        [
+          2029,
+          86.66
+        ],
+        [
+          2030,
+          86.66
+        ],
+        [
+          2031,
+          86.66
+        ],
+        [
+          2032,
+          86.66
+        ],
+        [
+          2033,
+          86.66
+        ],
+        [
+          2034,
+          86.66
+        ],
+        [
+          2035,
+          86.66
+        ],
+        [
+          2036,
+          86.66
+        ],
+        [
+          2037,
+          86.66
+        ],
+        [
+          2038,
+          86.66
+        ],
+        [
+          2039,
+          86.66
+        ],
+        [
+          2040,
+          86.66
+        ],
+        [
+          2041,
+          86.39
+        ]
+      ],
+      "total_decimal": "1299.87",
+      "total_float": 1299.87
+    },
+    "1299.87/1/2026-12-31": {
+      "plan": [
+        [
+          2026,
+          3.56
+        ],
+        [
+          2027,
+          1296.31
+        ]
+      ],
+      "total_decimal": "1299.87",
+      "total_float": 1299.87
+    },
+    "365/1/2024-07-01": {
+      "plan": [
+        [
+          2024,
+          184.0
+        ],
+        [
+          2025,
+          181.0
+        ]
+      ],
+      "total_decimal": "365.0",
+      "total_float": 365.0
+    },
+    "0.01/50/2026-01-01": {
+      "plan": [
+        [
+          2026,
+          0.0
+        ],
+        [
+          2027,
+          0.0
+        ],
+        [
+          2028,
+          0.0
+        ],
+        [
+          2029,
+          0.0
+        ],
+        [
+          2030,
+          0.0
+        ],
+        [
+          2031,
+          0.0
+        ],
+        [
+          2032,
+          0.0
+        ],
+        [
+          2033,
+          0.0
+        ],
+        [
+          2034,
+          0.0
+        ],
+        [
+          2035,
+          0.0
+        ],
+        [
+          2036,
+          0.0
+        ],
+        [
+          2037,
+          0.0
+        ],
+        [
+          2038,
+          0.0
+        ],
+        [
+          2039,
+          0.0
+        ],
+        [
+          2040,
+          0.0
+        ],
+        [
+          2041,
+          0.0
+        ],
+        [
+          2042,
+          0.0
+        ],
+        [
+          2043,
+          0.0
+        ],
+        [
+          2044,
+          0.0
+        ],
+        [
+          2045,
+          0.0
+        ],
+        [
+          2046,
+          0.0
+        ],
+        [
+          2047,
+          0.0
+        ],
+        [
+          2048,
+          0.0
+        ],
+        [
+          2049,
+          0.0
+        ],
+        [
+          2050,
+          0.0
+        ],
+        [
+          2051,
+          0.0
+        ],
+        [
+          2052,
+          0.0
+        ],
+        [
+          2053,
+          0.0
+        ],
+        [
+          2054,
+          0.0
+        ],
+        [
+          2055,
+          0.0
+        ],
+        [
+          2056,
+          0.0
+        ],
+        [
+          2057,
+          0.0
+        ],
+        [
+          2058,
+          0.0
+        ],
+        [
+          2059,
+          0.0
+        ],
+        [
+          2060,
+          0.0
+        ],
+        [
+          2061,
+          0.0
+        ],
+        [
+          2062,
+          0.0
+        ],
+        [
+          2063,
+          0.0
+        ],
+        [
+          2064,
+          0.0
+        ],
+        [
+          2065,
+          0.0
+        ],
+        [
+          2066,
+          0.0
+        ],
+        [
+          2067,
+          0.0
+        ],
+        [
+          2068,
+          0.0
+        ],
+        [
+          2069,
+          0.0
+        ],
+        [
+          2070,
+          0.0
+        ],
+        [
+          2071,
+          0.0
+        ],
+        [
+          2072,
+          0.0
+        ],
+        [
+          2073,
+          0.0
+        ],
+        [
+          2074,
+          0.0
+        ],
+        [
+          2075,
+          0.0
+        ],
+        [
+          2076,
+          0.0
+        ],
+        [
+          2077,
+          0.0
+        ],
+        [
+          2078,
+          0.0
+        ]
+      ],
+      "total_decimal": "0.0",
+      "total_float": 0.0
+    },
+    "0.01/3/2026-12-31": {
+      "plan": [
+        [
+          2026,
+          0.0
+        ],
+        [
+          2027,
+          0.0
+        ],
+        [
+          2028,
+          0.0
+        ],
+        [
+          2029,
+          0.0
+        ],
+        [
+          2030,
+          0.0
+        ],
+        [
+          2031,
+          0.0
+        ]
+      ],
+      "total_decimal": "0.0",
+      "total_float": 0.0
+    },
+    "1/50/2026-01-01": {
+      "plan": [
+        [
+          2026,
+          0.02
+        ],
+        [
+          2027,
+          0.02
+        ],
+        [
+          2028,
+          0.02
+        ],
+        [
+          2029,
+          0.02
+        ],
+        [
+          2030,
+          0.02
+        ],
+        [
+          2031,
+          0.02
+        ],
+        [
+          2032,
+          0.02
+        ],
+        [
+          2033,
+          0.02
+        ],
+        [
+          2034,
+          0.02
+        ],
+        [
+          2035,
+          0.02
+        ],
+        [
+          2036,
+          0.02
+        ],
+        [
+          2037,
+          0.02
+        ],
+        [
+          2038,
+          0.02
+        ],
+        [
+          2039,
+          0.02
+        ],
+        [
+          2040,
+          0.02
+        ],
+        [
+          2041,
+          0.02
+        ],
+        [
+          2042,
+          0.02
+        ],
+        [
+          2043,
+          0.02
+        ],
+        [
+          2044,
+          0.02
+        ],
+        [
+          2045,
+          0.02
+        ],
+        [
+          2046,
+          0.02
+        ],
+        [
+          2047,
+          0.02
+        ],
+        [
+          2048,
+          0.02
+        ],
+        [
+          2049,
+          0.02
+        ],
+        [
+          2050,
+          0.02
+        ],
+        [
+          2051,
+          0.02
+        ],
+        [
+          2052,
+          0.02
+        ],
+        [
+          2053,
+          0.02
+        ],
+        [
+          2054,
+          0.02
+        ],
+        [
+          2055,
+          0.02
+        ],
+        [
+          2056,
+          0.02
+        ],
+        [
+          2057,
+          0.02
+        ],
+        [
+          2058,
+          0.02
+        ],
+        [
+          2059,
+          0.02
+        ],
+        [
+          2060,
+          0.02
+        ],
+        [
+          2061,
+          0.02
+        ],
+        [
+          2062,
+          0.02
+        ],
+        [
+          2063,
+          0.02
+        ],
+        [
+          2064,
+          0.02
+        ],
+        [
+          2065,
+          0.02
+        ],
+        [
+          2066,
+          0.02
+        ],
+        [
+          2067,
+          0.02
+        ],
+        [
+          2068,
+          0.02
+        ],
+        [
+          2069,
+          0.02
+        ],
+        [
+          2070,
+          0.02
+        ],
+        [
+          2071,
+          0.02
+        ],
+        [
+          2072,
+          0.02
+        ],
+        [
+          2073,
+          0.02
+        ],
+        [
+          2074,
+          0.02
+        ],
+        [
+          2075,
+          0.02
+        ]
+      ],
+      "total_decimal": "1.00",
+      "total_float": 1.0
+    }
+  },
+  "matrice_plans": {
+    "cas": 21930,
+    "erreurs": []
+  },
+  "durees_invalides_plan": {
+    "0": {
+      "erreur": "DivisionByZero: [<class 'decimal.DivisionByZero'>]"
+    },
+    "-1": {
+      "retour": [
+        [
+          2026,
+          -12000.0
+        ],
+        [
+          2027,
+          -12000.0
+        ]
+      ]
+    },
+    "-10": {
+      "retour": [
+        [
+          2026,
+          -1200.0
+        ]
+      ]
+    },
+    "None": {
+      "erreur": "InvalidOperation: [<class 'decimal.ConversionSyntax'>]"
+    }
+  },
+  "prorata": {
+    "non_bissextile": [
+      "0.5041095890410958904109589041",
+      "0.4986301369863013698630136986"
+    ],
+    "bissextile": [
+      "0.5041095890410958904109589041",
+      "0.4958904109589041095890410959"
+    ]
+  },
+  "double_generation": {
+    "premier": {
+      "ecriture_id": 2,
+      "ecriture_num": 2,
+      "total": 1200.0,
+      "nb_composants": 1
+    },
+    "second": {
+      "erreur": "ValueError: Dotation aux amortissements déjà générée pour 2026 (écriture OD n°2)."
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0,
+      "281840": -1200.0,
+      "681120": 1200.0
+    }
+  },
+  "generation_rollback": {
+    "transaction": true,
+    "avant": 1,
+    "apres": 1,
+    "plans": 0
+  },
+  "base_duree_0": {
+    "dotation": {
+      "erreur": "DivisionByZero: [<class 'decimal.DivisionByZero'>]"
+    },
+    "controles": {
+      "retour": []
+    },
+    "cloture": {
+      "erreur": "DivisionByZero: [<class 'decimal.DivisionByZero'>]"
+    },
+    "ecritures": 0
+  },
+  "base_duree_-1": {
+    "dotation": {
+      "retour": []
+    },
+    "controles": {
+      "retour": []
+    },
+    "cloture": {
+      "retour": {
+        "agregats": {
+          "produits": 0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 0,
+          "resultat_comptable": 0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 0,
+          "plafond_deductible": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 0.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 0.0
+      }
+    },
+    "ecritures": 0
+  },
+  "base_duree_None": {
+    "dotation": {
+      "erreur": "InvalidOperation: [<class 'decimal.ConversionSyntax'>]"
+    },
+    "controles": {
+      "retour": []
+    },
+    "cloture": {
+      "erreur": "InvalidOperation: [<class 'decimal.ConversionSyntax'>]"
+    },
+    "ecritures": 0
+  },
+  "terrain_0_None": {
+    "controles": [],
+    "cloture": {
+      "retour": {
+        "ecriture_id": null,
+        "total": 0.0,
+        "nb_composants": 0
+      }
+    },
+    "solde": {}
+  },
+  "terrain_1_None": {
+    "controles": [
+      "Anomalie(niveau='BLOQUANT', code='COMPOSANT_SANS_AMORT', message=\"Composant « Composant fictif » (compte 211550) : une durée d'amortissement est renseignée mais ce compte ne s'amortit pas — un terrain ne se déprécie pas. Mettez sa durée à 0 dans la page Immobilisations, sinon la clôture échouera.\")"
+    ],
+    "cloture": {
+      "erreur": "ValueError: Clôture impossible : le(s) composant(s) « Composant fictif » ont une durée d'amortissement mais aucun compte d'amortissement — c'est le cas d'un terrain, qui ne s'amortit pas. Corrigez-les dans la page Immobilisations (durée à 0), puis relancez la clôture."
+    },
+    "solde": {}
+  },
+  "terrain_1_281840": {
+    "controles": [],
+    "cloture": {
+      "retour": {
+        "ecriture_id": 1,
+        "ecriture_num": 1,
+        "total": 1200.0,
+        "nb_composants": 1
+      }
+    },
+    "solde": {
+      "281840": -1200.0,
+      "681120": 1200.0
+    }
+  },
+  "omission_2026-01-01": {
+    "avant": [],
+    "apres": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 0,
+        "immo_corporelles_net": 12000.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 12000.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": 0,
+        "total_capitaux_142": 12000.0,
+        "total_passif_180": 12000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 1200.0,
+        "amort_fin": 1200.0
+      },
+      "plans": [],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 12000.00 € / passif 12000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "1200.00 € / 0.00 € — écart de 1200.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "suivant": {
+      "dotations": [
+        {
+          "composant_id": 1,
+          "libelle": "Composant fictif",
+          "compte_amort": "281840",
+          "bien_id": 1,
+          "dotation": 1200.0,
+          "cumul_fin": 2400.0,
+          "vnc_fin": 9600.0
+        }
+      ],
+      "controles": [
+        {
+          "code": "AMORT_ANTERIEURS",
+          "niveau": "AVERTISSEMENT",
+          "message": "1200.00 € d'amortissements déjà courus avant 2027 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+        }
+      ],
+      "manquants": {
+        "total": 1200.0,
+        "par_compte": {
+          "281840": 1200.0
+        },
+        "detail": [
+          {
+            "composant": "Composant fictif",
+            "compte": "281840",
+            "cumul_ouverture": 1200.0
+          }
+        ]
+      }
+    },
+    "reprise": {
+      "retour": {
+        "total": 1200.0,
+        "par_compte": {
+          "281840": 1200.0
+        },
+        "ecriture_num": 3
+      }
+    },
+    "solde_apres_reprise": {
+      "108000": -10800.0,
+      "120000": 0.0,
+      "218400": 12000.0,
+      "281840": -1200.0
+    }
+  },
+  "omission_2026-12-31": {
+    "avant": [],
+    "apres": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 0,
+        "immo_corporelles_net": 12000.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 12000.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": 0,
+        "total_capitaux_142": 12000.0,
+        "total_passif_180": 12000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 3.29,
+        "amort_fin": 3.29
+      },
+      "plans": [],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 12000.00 € / passif 12000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "3.29 € / 0.00 € — écart de 3.29 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "suivant": {
+      "dotations": [
+        {
+          "composant_id": 1,
+          "libelle": "Composant fictif",
+          "compte_amort": "281840",
+          "bien_id": 1,
+          "dotation": 1200.0,
+          "cumul_fin": 1203.29,
+          "vnc_fin": 10796.71
+        }
+      ],
+      "controles": [],
+      "manquants": {
+        "total": 0.0,
+        "par_compte": {},
+        "detail": [
+          {
+            "composant": "Composant fictif",
+            "compte": "281840",
+            "cumul_ouverture": 3.29
+          }
+        ]
+      }
+    },
+    "reprise": {
+      "erreur": "ValueError: Aucun amortissement antérieur à reprendre : le bilan est déjà cohérent avec le plan."
+    },
+    "solde_apres_reprise": {
+      "108000": -12000.0,
+      "120000": 0.0,
+      "218400": 12000.0
+    }
+  },
+  "precedent_ouvert": {
+    "dotation_proposee": [
+      {
+        "composant_id": 1,
+        "libelle": "Composant fictif",
+        "compte_amort": "281840",
+        "bien_id": 1,
+        "dotation": 1200.0,
+        "cumul_fin": 2400.0,
+        "vnc_fin": 9600.0
+      }
+    ],
+    "cloture": {
+      "erreur": "ValueError: Clôturez d'abord l'exercice 2026 : les clôtures se font dans l'ordre chronologique (les reports d'amortissements et de déficits en dépendent)."
+    },
+    "ecritures_2027": 0
+  },
+  "manuel_resultat_fiscal": {
+    "controles_avant": [],
+    "cloture": {
+      "agregats": {
+        "produits": 1800.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 2400.0,
+        "resultat_comptable": -600.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1800.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 2400.0,
+        "plafond_deductible": 1800.0,
+        "report_annee": 600.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 600.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 1800.0,
+          "dotation_exercice": 2400.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 600.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 600.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 2400.0,
+        "immo_corporelles_net": 9600.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 9600.0,
+        "capital_individuel_120": 10200.0,
+        "resultat_exercice_136": -600.0,
+        "total_capitaux_142": 9600.0,
+        "total_passif_180": 9600.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 1200.0,
+        "amort_fin": 1200.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 1200.0,
+          "cumul_fin": 1200.0,
+          "vnc_fin": 10800.0
+        }
+      ],
+      "controles": [
+        {
+          "code": "DOTATION_PLAN",
+          "niveau": "AVERTISSEMENT",
+          "message": "Dotation comptabilisée 2400.00 € ≠ plan théorique 1200.00 € — dotation en double ou composant modifié après clôture ?"
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 9600.00 € / passif 9600.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "1200.00 € / 2400.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    }
+  },
+  "manuel_False": {
+    "avant": {
+      "suivi_39c": [],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 12000.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": -12000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 12000.0,
+        "amort_fin": 12000.0
+      },
+      "plans": [],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "-12000.00 €"
+        }
+      ]
+    },
+    "apres": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 24000.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 24000.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 24000.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 24000.0,
+        "immo_corporelles_net": -12000.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": -12000.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": -24000.0,
+        "total_capitaux_142": -12000.0,
+        "total_passif_180": -12000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 12000.0,
+        "amort_fin": 12000.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 12000.0,
+          "cumul_fin": 12000.0,
+          "vnc_fin": 0.0
+        }
+      ],
+      "controles": [
+        {
+          "code": "DOTATION_PLAN",
+          "niveau": "AVERTISSEMENT",
+          "message": "Dotation comptabilisée 24000.00 € ≠ plan théorique 12000.00 € — dotation en double ou composant modifié après clôture ?"
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif -12000.00 € / passif -12000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "12000.00 € / 24000.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0,
+      "281840": -24000.0,
+      "681120": 24000.0
+    }
+  },
+  "manuel_True": {
+    "avant": {
+      "suivi_39c": [],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 12000.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 12000.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": 0.0,
+        "total_capitaux_142": 12000.0,
+        "total_passif_180": 12000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 12000.0,
+        "amort_fin": 12000.0
+      },
+      "plans": [],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 12000.00 € / passif 12000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "12000.00 € / -0.00 € — écart de 12000.00 €, soit la dotation de l'exercice, qui sera comptabilisée à la clôture. Rien à corriger."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "apres": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 12000.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 12000.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 12000.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 12000.0,
+        "immo_corporelles_net": 0.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 0.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": -12000.0,
+        "total_capitaux_142": 0.0,
+        "total_passif_180": 0.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 12000.0,
+        "amort_fin": 12000.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 12000.0,
+          "cumul_fin": 12000.0,
+          "vnc_fin": 0.0
+        }
+      ],
+      "controles": [
+        {
+          "code": "DOTATION_PLAN",
+          "niveau": "AVERTISSEMENT",
+          "message": "Dotation comptabilisée 24000.00 € ≠ plan théorique 12000.00 € — dotation en double ou composant modifié après clôture ?"
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 0.00 € / passif 0.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0,
+      "281840": -12000.0,
+      "681120": 12000.0
+    }
+  },
+  "daa_annulee": {
+    "etat": {
+      "suivi_39c": [],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": -0.0,
+        "immo_corporelles_net": 12000.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 12000.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": 0.0,
+        "total_capitaux_142": 12000.0,
+        "total_passif_180": 12000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 1200.0,
+        "amort_fin": 1200.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 1200.0,
+          "cumul_fin": 1200.0,
+          "vnc_fin": 10800.0
+        }
+      ],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 12000.00 € / passif 12000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "1200.00 € / -0.00 € — écart de 1200.00 €, dont 0.00 € de dotation à venir et 1200.00 € qui ne se résorberont pas seuls : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel (page Immobilisations, « Reprendre les amortissements antérieurs »)."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "seconde": {
+      "erreur": "ValueError: Dotation aux amortissements déjà générée pour 2026 (écriture OD n°2)."
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0,
+      "281840": 0.0,
+      "681120": 0.0
+    }
+  },
+  "duree_allongee_partage_False": {
+    "controles_initiaux": [
+      {
+        "code": "DUREE_ALLONGEE",
+        "niveau": "AVERTISSEMENT",
+        "message": "« Composant fictif » : 4800.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 3000.00 € à l'ouverture de 2029 (+1800.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+      },
+      {
+        "code": "AMORT_ANTERIEURS",
+        "niveau": "AVERTISSEMENT",
+        "message": "-1800.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+      },
+      {
+        "code": "VENTILATION_INCOMPLETE",
+        "niveau": "AVERTISSEMENT",
+        "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+      }
+    ],
+    "exercices": [
+      {
+        "annee": 2029,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 4000.0,
+            "vnc_fin": 4000.0
+          }
+        ],
+        "solde": {
+          "108000": -3200.0,
+          "120000": 0.0,
+          "218400": 8000.0,
+          "281840": -5800.0,
+          "681120": 1000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2029,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 1000.0,
+              "stock_ouverture": 4800.0,
+              "report_annee": 1000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 5800.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 8000.0,
+            "amortissements_030": 5800.0,
+            "immo_corporelles_net": 2200.0,
+            "total_actif_110": 8000.0,
+            "total_actif_net_112": 2200.0,
+            "capital_individuel_120": 3200.0,
+            "resultat_exercice_136": -1000.0,
+            "total_capitaux_142": 2200.0,
+            "total_passif_180": 2200.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 8000.0,
+            "augmentations": 0.0,
+            "brut_fin": 8000.0,
+            "amort_debut": 3000.0,
+            "dotation": 1000.0,
+            "amort_fin": 4000.0
+          },
+          "plans": [
+            {
+              "id": 4,
+              "composant_id": 1,
+              "exercice_annee": 2029,
+              "dotation": 1000.0,
+              "cumul_fin": 4000.0,
+              "vnc_fin": 4000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "DUREE_ALLONGEE",
+              "niveau": "AVERTISSEMENT",
+              "message": "« Composant fictif » : 4800.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 3000.00 € à l'ouverture de 2029 (+1800.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+            },
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-1800.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            },
+            {
+              "code": "VENTILATION_INCOMPLETE",
+              "niveau": "AVERTISSEMENT",
+              "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 2200.00 € / passif 2200.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "8000.00 € / 8000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "4000.00 € / 5800.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2030,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 5000.0,
+            "vnc_fin": 3000.0
+          }
+        ],
+        "solde": {
+          "108000": -2200.0,
+          "120000": 0.0,
+          "218400": 8000.0,
+          "281840": -6800.0,
+          "681120": 1000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2030,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 1000.0,
+              "stock_ouverture": 5800.0,
+              "report_annee": 1000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 6800.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 8000.0,
+            "amortissements_030": 6800.0,
+            "immo_corporelles_net": 1200.0,
+            "total_actif_110": 8000.0,
+            "total_actif_net_112": 1200.0,
+            "capital_individuel_120": 2200.0,
+            "resultat_exercice_136": -1000.0,
+            "total_capitaux_142": 1200.0,
+            "total_passif_180": 1200.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 8000.0,
+            "augmentations": 0.0,
+            "brut_fin": 8000.0,
+            "amort_debut": 4000.0,
+            "dotation": 1000.0,
+            "amort_fin": 5000.0
+          },
+          "plans": [
+            {
+              "id": 5,
+              "composant_id": 1,
+              "exercice_annee": 2030,
+              "dotation": 1000.0,
+              "cumul_fin": 5000.0,
+              "vnc_fin": 3000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "DUREE_ALLONGEE",
+              "niveau": "AVERTISSEMENT",
+              "message": "« Composant fictif » : 5800.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 4000.00 € à l'ouverture de 2030 (+1800.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+            },
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-1800.00 € d'amortissements déjà courus avant 2030 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            },
+            {
+              "code": "VENTILATION_INCOMPLETE",
+              "niveau": "AVERTISSEMENT",
+              "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 1200.00 € / passif 1200.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "8000.00 € / 8000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "5000.00 € / 6800.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2031,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 6000.0,
+            "vnc_fin": 2000.0
+          }
+        ],
+        "solde": {
+          "108000": -1200.0,
+          "120000": 0.0,
+          "218400": 8000.0,
+          "281840": -7800.0,
+          "681120": 1000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2031,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 1000.0,
+              "stock_ouverture": 6800.0,
+              "report_annee": 1000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 7800.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 8000.0,
+            "amortissements_030": 7800.0,
+            "immo_corporelles_net": 200.0,
+            "total_actif_110": 8000.0,
+            "total_actif_net_112": 200.0,
+            "capital_individuel_120": 1200.0,
+            "resultat_exercice_136": -1000.0,
+            "total_capitaux_142": 200.0,
+            "total_passif_180": 200.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 8000.0,
+            "augmentations": 0.0,
+            "brut_fin": 8000.0,
+            "amort_debut": 5000.0,
+            "dotation": 1000.0,
+            "amort_fin": 6000.0
+          },
+          "plans": [
+            {
+              "id": 6,
+              "composant_id": 1,
+              "exercice_annee": 2031,
+              "dotation": 1000.0,
+              "cumul_fin": 6000.0,
+              "vnc_fin": 2000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "DUREE_ALLONGEE",
+              "niveau": "AVERTISSEMENT",
+              "message": "« Composant fictif » : 6800.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 5000.00 € à l'ouverture de 2031 (+1800.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+            },
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-1800.00 € d'amortissements déjà courus avant 2031 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            },
+            {
+              "code": "VENTILATION_INCOMPLETE",
+              "niveau": "AVERTISSEMENT",
+              "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 200.00 € / passif 200.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "8000.00 € / 8000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "6000.00 € / 7800.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2032,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 200.0,
+            "cumul_fin": 8000.0,
+            "vnc_fin": 0.0
+          }
+        ],
+        "solde": {
+          "108000": -200.0,
+          "120000": 0.0,
+          "218400": 8000.0,
+          "281840": -8000.0,
+          "681120": 200.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2032,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 200.0,
+              "stock_ouverture": 7800.0,
+              "report_annee": 200.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 8000.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 8000.0,
+            "amortissements_030": 8000.0,
+            "immo_corporelles_net": 0.0,
+            "total_actif_110": 8000.0,
+            "total_actif_net_112": 0.0,
+            "capital_individuel_120": 200.0,
+            "resultat_exercice_136": -200.0,
+            "total_capitaux_142": 0.0,
+            "total_passif_180": 0.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 8000.0,
+            "augmentations": 0.0,
+            "brut_fin": 8000.0,
+            "amort_debut": 6000.0,
+            "dotation": 1000.0,
+            "amort_fin": 7000.0
+          },
+          "plans": [
+            {
+              "id": 7,
+              "composant_id": 1,
+              "exercice_annee": 2032,
+              "dotation": 200.0,
+              "cumul_fin": 8000.0,
+              "vnc_fin": 0.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "DUREE_ALLONGEE",
+              "niveau": "AVERTISSEMENT",
+              "message": "« Composant fictif » : 7800.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 6000.00 € à l'ouverture de 2032 (+1800.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+            },
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-1800.00 € d'amortissements déjà courus avant 2032 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            },
+            {
+              "code": "VENTILATION_INCOMPLETE",
+              "niveau": "AVERTISSEMENT",
+              "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 0.00 € / passif 0.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "8000.00 € / 8000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "7000.00 € / 8000.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2033,
+        "dotations": [],
+        "solde": {
+          "108000": 0.0,
+          "120000": 0.0,
+          "218400": 8000.0,
+          "281840": -8000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2033,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 0.0,
+              "stock_ouverture": 8000.0,
+              "report_annee": 0.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 8000.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 8000.0,
+            "amortissements_030": 8000.0,
+            "immo_corporelles_net": 0.0,
+            "total_actif_110": 8000.0,
+            "total_actif_net_112": 0.0,
+            "capital_individuel_120": 0.0,
+            "resultat_exercice_136": 0,
+            "total_capitaux_142": 0.0,
+            "total_passif_180": 0.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 8000.0,
+            "augmentations": 0.0,
+            "brut_fin": 8000.0,
+            "amort_debut": 7000.0,
+            "dotation": 1000.0,
+            "amort_fin": 8000.0
+          },
+          "plans": [],
+          "controles": [
+            {
+              "code": "DUREE_ALLONGEE",
+              "niveau": "AVERTISSEMENT",
+              "message": "« Composant fictif » : 8000.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 7000.00 € à l'ouverture de 2033 (+1000.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+            },
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-1000.00 € d'amortissements déjà courus avant 2033 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            },
+            {
+              "code": "VENTILATION_INCOMPLETE",
+              "niveau": "AVERTISSEMENT",
+              "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 0.00 € / passif 0.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "8000.00 € / 8000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": true,
+              "detail": "8000.00 € / 8000.00 €"
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "duree_allongee_partage_True": {
+    "controles_initiaux": [
+      {
+        "code": "AMORT_ANTERIEURS",
+        "niveau": "AVERTISSEMENT",
+        "message": "-3600.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif, Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+      }
+    ],
+    "exercices": [
+      {
+        "annee": 2029,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 4000.0,
+            "vnc_fin": 4000.0
+          },
+          {
+            "composant_id": 2,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 4000.0,
+            "vnc_fin": 4000.0
+          }
+        ],
+        "solde": {
+          "108000": -6400.0,
+          "120000": 0.0,
+          "218400": 16000.0,
+          "281840": -11600.0,
+          "681120": 2000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2029,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 2000.0,
+              "stock_ouverture": 9600.0,
+              "report_annee": 2000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 11600.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 16000.0,
+            "amortissements_030": 11600.0,
+            "immo_corporelles_net": 4400.0,
+            "total_actif_110": 16000.0,
+            "total_actif_net_112": 4400.0,
+            "capital_individuel_120": 6400.0,
+            "resultat_exercice_136": -2000.0,
+            "total_capitaux_142": 4400.0,
+            "total_passif_180": 4400.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 16000.0,
+            "augmentations": 0.0,
+            "brut_fin": 16000.0,
+            "amort_debut": 6000.0,
+            "dotation": 2000.0,
+            "amort_fin": 8000.0
+          },
+          "plans": [
+            {
+              "id": 7,
+              "composant_id": 1,
+              "exercice_annee": 2029,
+              "dotation": 1000.0,
+              "cumul_fin": 4000.0,
+              "vnc_fin": 4000.0
+            },
+            {
+              "id": 8,
+              "composant_id": 2,
+              "exercice_annee": 2029,
+              "dotation": 1000.0,
+              "cumul_fin": 4000.0,
+              "vnc_fin": 4000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-3600.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif, Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 4400.00 € / passif 4400.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "16000.00 € / 16000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "8000.00 € / 11600.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2030,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 5000.0,
+            "vnc_fin": 3000.0
+          },
+          {
+            "composant_id": 2,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 5000.0,
+            "vnc_fin": 3000.0
+          }
+        ],
+        "solde": {
+          "108000": -4400.0,
+          "120000": 0.0,
+          "218400": 16000.0,
+          "281840": -13600.0,
+          "681120": 2000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2030,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 2000.0,
+              "stock_ouverture": 11600.0,
+              "report_annee": 2000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 13600.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 16000.0,
+            "amortissements_030": 13600.0,
+            "immo_corporelles_net": 2400.0,
+            "total_actif_110": 16000.0,
+            "total_actif_net_112": 2400.0,
+            "capital_individuel_120": 4400.0,
+            "resultat_exercice_136": -2000.0,
+            "total_capitaux_142": 2400.0,
+            "total_passif_180": 2400.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 16000.0,
+            "augmentations": 0.0,
+            "brut_fin": 16000.0,
+            "amort_debut": 8000.0,
+            "dotation": 2000.0,
+            "amort_fin": 10000.0
+          },
+          "plans": [
+            {
+              "id": 9,
+              "composant_id": 1,
+              "exercice_annee": 2030,
+              "dotation": 1000.0,
+              "cumul_fin": 5000.0,
+              "vnc_fin": 3000.0
+            },
+            {
+              "id": 10,
+              "composant_id": 2,
+              "exercice_annee": 2030,
+              "dotation": 1000.0,
+              "cumul_fin": 5000.0,
+              "vnc_fin": 3000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-3600.00 € d'amortissements déjà courus avant 2030 ne sont pas comptabilisés (Composant fictif, Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 2400.00 € / passif 2400.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "16000.00 € / 16000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "10000.00 € / 13600.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2031,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 6000.0,
+            "vnc_fin": 2000.0
+          },
+          {
+            "composant_id": 2,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 6000.0,
+            "vnc_fin": 2000.0
+          }
+        ],
+        "solde": {
+          "108000": -2400.0,
+          "120000": 0.0,
+          "218400": 16000.0,
+          "281840": -15600.0,
+          "681120": 2000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2031,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 2000.0,
+              "stock_ouverture": 13600.0,
+              "report_annee": 2000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 15600.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 16000.0,
+            "amortissements_030": 15600.0,
+            "immo_corporelles_net": 400.0,
+            "total_actif_110": 16000.0,
+            "total_actif_net_112": 400.0,
+            "capital_individuel_120": 2400.0,
+            "resultat_exercice_136": -2000.0,
+            "total_capitaux_142": 400.0,
+            "total_passif_180": 400.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 16000.0,
+            "augmentations": 0.0,
+            "brut_fin": 16000.0,
+            "amort_debut": 10000.0,
+            "dotation": 2000.0,
+            "amort_fin": 12000.0
+          },
+          "plans": [
+            {
+              "id": 11,
+              "composant_id": 1,
+              "exercice_annee": 2031,
+              "dotation": 1000.0,
+              "cumul_fin": 6000.0,
+              "vnc_fin": 2000.0
+            },
+            {
+              "id": 12,
+              "composant_id": 2,
+              "exercice_annee": 2031,
+              "dotation": 1000.0,
+              "cumul_fin": 6000.0,
+              "vnc_fin": 2000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-3600.00 € d'amortissements déjà courus avant 2031 ne sont pas comptabilisés (Composant fictif, Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif 400.00 € / passif 400.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "16000.00 € / 16000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "12000.00 € / 15600.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2032,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 7000.0,
+            "vnc_fin": 1000.0
+          },
+          {
+            "composant_id": 2,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 7000.0,
+            "vnc_fin": 1000.0
+          }
+        ],
+        "solde": {
+          "108000": -400.0,
+          "120000": 0.0,
+          "218400": 16000.0,
+          "281840": -17600.0,
+          "681120": 2000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2032,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 2000.0,
+              "stock_ouverture": 15600.0,
+              "report_annee": 2000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 17600.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 16000.0,
+            "amortissements_030": 17600.0,
+            "immo_corporelles_net": -1600.0,
+            "total_actif_110": 16000.0,
+            "total_actif_net_112": -1600.0,
+            "capital_individuel_120": 400.0,
+            "resultat_exercice_136": -2000.0,
+            "total_capitaux_142": -1600.0,
+            "total_passif_180": -1600.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 16000.0,
+            "augmentations": 0.0,
+            "brut_fin": 16000.0,
+            "amort_debut": 12000.0,
+            "dotation": 2000.0,
+            "amort_fin": 14000.0
+          },
+          "plans": [
+            {
+              "id": 13,
+              "composant_id": 1,
+              "exercice_annee": 2032,
+              "dotation": 1000.0,
+              "cumul_fin": 7000.0,
+              "vnc_fin": 1000.0
+            },
+            {
+              "id": 14,
+              "composant_id": 2,
+              "exercice_annee": 2032,
+              "dotation": 1000.0,
+              "cumul_fin": 7000.0,
+              "vnc_fin": 1000.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-3600.00 € d'amortissements déjà courus avant 2032 ne sont pas comptabilisés (Composant fictif, Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif -1600.00 € / passif -1600.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "16000.00 € / 16000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "14000.00 € / 17600.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      },
+      {
+        "annee": 2033,
+        "dotations": [
+          {
+            "composant_id": 1,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 8000.0,
+            "vnc_fin": 0.0
+          },
+          {
+            "composant_id": 2,
+            "libelle": "Composant fictif",
+            "compte_amort": "281840",
+            "bien_id": 1,
+            "dotation": 1000.0,
+            "cumul_fin": 8000.0,
+            "vnc_fin": 0.0
+          }
+        ],
+        "solde": {
+          "108000": 1600.0,
+          "120000": 0.0,
+          "218400": 16000.0,
+          "281840": -19600.0,
+          "681120": 2000.0
+        },
+        "etat": {
+          "suivi_39c": [
+            {
+              "exercice_annee": 2033,
+              "plafond_deductible": 0.0,
+              "dotation_exercice": 2000.0,
+              "stock_ouverture": 17600.0,
+              "report_annee": 2000.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 19600.0
+            }
+          ],
+          "bilan": {
+            "immo_corporelles_brut_028": 16000.0,
+            "amortissements_030": 19600.0,
+            "immo_corporelles_net": -3600.0,
+            "total_actif_110": 16000.0,
+            "total_actif_net_112": -3600.0,
+            "capital_individuel_120": -1600.0,
+            "resultat_exercice_136": -2000.0,
+            "total_capitaux_142": -3600.0,
+            "total_passif_180": -3600.0,
+            "equilibre": true
+          },
+          "tableau": {
+            "brut_debut": 16000.0,
+            "augmentations": 0.0,
+            "brut_fin": 16000.0,
+            "amort_debut": 14000.0,
+            "dotation": 2000.0,
+            "amort_fin": 16000.0
+          },
+          "plans": [
+            {
+              "id": 15,
+              "composant_id": 1,
+              "exercice_annee": 2033,
+              "dotation": 1000.0,
+              "cumul_fin": 8000.0,
+              "vnc_fin": 0.0
+            },
+            {
+              "id": 16,
+              "composant_id": 2,
+              "exercice_annee": 2033,
+              "dotation": 1000.0,
+              "cumul_fin": 8000.0,
+              "vnc_fin": 0.0
+            }
+          ],
+          "controles": [
+            {
+              "code": "AMORT_ANTERIEURS",
+              "niveau": "AVERTISSEMENT",
+              "message": "-3600.00 € d'amortissements déjà courus avant 2033 ne sont pas comptabilisés (Composant fictif, Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+            }
+          ],
+          "liasse_controles": [
+            {
+              "nom": "Bilan équilibré (actif net = capitaux propres)",
+              "ok": true,
+              "detail": "actif -3600.00 € / passif -3600.00 €"
+            },
+            {
+              "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+              "ok": true,
+              "detail": "0.00 €"
+            },
+            {
+              "nom": "2033-C : total brut fin = somme des valeurs brutes",
+              "ok": true,
+              "detail": "16000.00 € / 16000.00 €"
+            },
+            {
+              "nom": "2033-C : amortissements fin = case 030 du bilan",
+              "ok": false,
+              "detail": "16000.00 € / 19600.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+            },
+            {
+              "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+              "ok": true,
+              "detail": "0.00 €"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "raccourcie": {
+    "dotation": [
+      {
+        "composant_id": 1,
+        "libelle": "Composant fictif",
+        "compte_amort": "281840",
+        "bien_id": 1,
+        "dotation": 2000.0,
+        "cumul_fin": 8000.0,
+        "vnc_fin": 0.0
+      }
+    ],
+    "etat": {
+      "suivi_39c": [],
+      "bilan": {
+        "immo_corporelles_brut_028": 8000.0,
+        "amortissements_030": 3000.0,
+        "immo_corporelles_net": 5000.0,
+        "total_actif_110": 8000.0,
+        "total_actif_net_112": 5000.0,
+        "capital_individuel_120": 5000.0,
+        "resultat_exercice_136": 0,
+        "total_capitaux_142": 5000.0,
+        "total_passif_180": 5000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 8000.0,
+        "augmentations": 0.0,
+        "brut_fin": 8000.0,
+        "amort_debut": 6000.0,
+        "dotation": 2000.0,
+        "amort_fin": 8000.0
+      },
+      "plans": [],
+      "controles": [
+        {
+          "code": "AMORT_ANTERIEURS",
+          "niveau": "AVERTISSEMENT",
+          "message": "3000.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+        },
+        {
+          "code": "VENTILATION_INCOMPLETE",
+          "niveau": "AVERTISSEMENT",
+          "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 5000.00 € / passif 5000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "8000.00 € / 8000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "8000.00 € / 3000.00 € — écart de 5000.00 €, dont 2000.00 € de dotation à venir et 3000.00 € qui ne se résorberont pas seuls : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel (page Immobilisations, « Reprendre les amortissements antérieurs »)."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    }
+  },
+  "valeur_corrigee": {
+    "dotation": [],
+    "etat": {
+      "suivi_39c": [],
+      "bilan": {
+        "immo_corporelles_brut_028": 8000.0,
+        "amortissements_030": 3000.0,
+        "immo_corporelles_net": 5000.0,
+        "total_actif_110": 8000.0,
+        "total_actif_net_112": 5000.0,
+        "capital_individuel_120": 5000.0,
+        "resultat_exercice_136": 0,
+        "total_capitaux_142": 5000.0,
+        "total_passif_180": 5000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 2000.0,
+        "augmentations": 0.0,
+        "brut_fin": 2000.0,
+        "amort_debut": 750.0,
+        "dotation": 250.0,
+        "amort_fin": 1000.0
+      },
+      "plans": [],
+      "controles": [
+        {
+          "code": "DUREE_ALLONGEE",
+          "niveau": "AVERTISSEMENT",
+          "message": "« Composant fictif » : 3000.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 750.00 € à l'ouverture de 2029 (+2250.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+        },
+        {
+          "code": "AMORT_ANTERIEURS",
+          "niveau": "AVERTISSEMENT",
+          "message": "-2250.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+        },
+        {
+          "code": "VENTILATION_INCOMPLETE",
+          "niveau": "AVERTISSEMENT",
+          "message": "Bien « Bien fictif » : la somme des composants (2000.00 €) reste inférieure de 10000.00 € (83.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 5000.00 € / passif 5000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": false,
+          "detail": "2000.00 € / 8000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "1000.00 € / 3000.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    }
+  },
+  "quote_parts": {
+    "7,35": {
+      "normalisation": [
+        0.0735,
+        "quote-part lue comme 7.35 %, soit 0.0735)"
+      ],
+      "lignes": [
+        {
+          "cle": "terrain",
+          "libelle": "Terrain",
+          "categorie": "Terrain",
+          "part": 0.0735,
+          "duree": 0,
+          "compte_immo": "211550",
+          "note": "Jamais amortissable. Sa quote-part figure souvent dans l'acte ou peut s'estimer d'après les valeurs foncières locales.",
+          "montant": 7350.0
+        },
+        {
+          "cle": "gros_oeuvre",
+          "libelle": "Gros œuvre / structure",
+          "categorie": "Bâtiment",
+          "part": 0.4905,
+          "duree": 50,
+          "compte_immo": "213150",
+          "note": "Murs, planchers, charpente : la part la plus longue à amortir.",
+          "montant": 49050.0
+        },
+        {
+          "cle": "facade",
+          "libelle": "Façade / étanchéité / toiture",
+          "categorie": "Bâtiment",
+          "part": 0.109,
+          "duree": 25,
+          "compte_immo": "213150",
+          "note": "Enveloppe du bâtiment, renouvelée plus souvent que la structure.",
+          "montant": 10900.0
+        },
+        {
+          "cle": "installations",
+          "libelle": "Installations techniques",
+          "categorie": "Bâtiment",
+          "part": 0.1635,
+          "duree": 20,
+          "compte_immo": "213150",
+          "note": "Chauffage, électricité, plomberie, ventilation.",
+          "montant": 16350.0
+        },
+        {
+          "cle": "agencements",
+          "libelle": "Agencements intérieurs",
+          "categorie": "Agencement",
+          "part": 0.109,
+          "duree": 15,
+          "compte_immo": "218100",
+          "note": "Cloisons, revêtements, cuisine intégrée, salle de bains.",
+          "montant": 10900.0
+        },
+        {
+          "cle": "mobilier",
+          "libelle": "Mobilier et électroménager",
+          "categorie": "Mobilier",
+          "part": 0.0545,
+          "duree": 8,
+          "compte_immo": "218400",
+          "note": "Ce qui fait le « meublé ». Durée courte : 5 à 10 ans selon la nature. À isoler du bâti, sans quoi il s'amortit sur des décennies au lieu de quelques années.",
+          "montant": 5450.0
+        }
+      ]
+    },
+    "0.0735": {
+      "normalisation": [
+        0.0735,
+        ""
+      ],
+      "lignes": [
+        {
+          "cle": "terrain",
+          "libelle": "Terrain",
+          "categorie": "Terrain",
+          "part": 0.0735,
+          "duree": 0,
+          "compte_immo": "211550",
+          "note": "Jamais amortissable. Sa quote-part figure souvent dans l'acte ou peut s'estimer d'après les valeurs foncières locales.",
+          "montant": 7350.0
+        },
+        {
+          "cle": "gros_oeuvre",
+          "libelle": "Gros œuvre / structure",
+          "categorie": "Bâtiment",
+          "part": 0.4905,
+          "duree": 50,
+          "compte_immo": "213150",
+          "note": "Murs, planchers, charpente : la part la plus longue à amortir.",
+          "montant": 49050.0
+        },
+        {
+          "cle": "facade",
+          "libelle": "Façade / étanchéité / toiture",
+          "categorie": "Bâtiment",
+          "part": 0.109,
+          "duree": 25,
+          "compte_immo": "213150",
+          "note": "Enveloppe du bâtiment, renouvelée plus souvent que la structure.",
+          "montant": 10900.0
+        },
+        {
+          "cle": "installations",
+          "libelle": "Installations techniques",
+          "categorie": "Bâtiment",
+          "part": 0.1635,
+          "duree": 20,
+          "compte_immo": "213150",
+          "note": "Chauffage, électricité, plomberie, ventilation.",
+          "montant": 16350.0
+        },
+        {
+          "cle": "agencements",
+          "libelle": "Agencements intérieurs",
+          "categorie": "Agencement",
+          "part": 0.109,
+          "duree": 15,
+          "compte_immo": "218100",
+          "note": "Cloisons, revêtements, cuisine intégrée, salle de bains.",
+          "montant": 10900.0
+        },
+        {
+          "cle": "mobilier",
+          "libelle": "Mobilier et électroménager",
+          "categorie": "Mobilier",
+          "part": 0.0545,
+          "duree": 8,
+          "compte_immo": "218400",
+          "note": "Ce qui fait le « meublé ». Durée courte : 5 à 10 ans selon la nature. À isoler du bâti, sans quoi il s'amortit sur des décennies au lieu de quelques années.",
+          "montant": 5450.0
+        }
+      ]
+    },
+    "1.0": {
+      "normalisation": [
+        1.0,
+        ""
+      ],
+      "lignes": [
+        {
+          "cle": "terrain",
+          "libelle": "Terrain",
+          "categorie": "Terrain",
+          "part": 1.0,
+          "duree": 0,
+          "compte_immo": "211550",
+          "note": "Jamais amortissable. Sa quote-part figure souvent dans l'acte ou peut s'estimer d'après les valeurs foncières locales.",
+          "montant": 100000.0
+        },
+        {
+          "cle": "gros_oeuvre",
+          "libelle": "Gros œuvre / structure",
+          "categorie": "Bâtiment",
+          "part": 0.0,
+          "duree": 50,
+          "compte_immo": "213150",
+          "note": "Murs, planchers, charpente : la part la plus longue à amortir.",
+          "montant": 0.0
+        },
+        {
+          "cle": "facade",
+          "libelle": "Façade / étanchéité / toiture",
+          "categorie": "Bâtiment",
+          "part": 0.0,
+          "duree": 25,
+          "compte_immo": "213150",
+          "note": "Enveloppe du bâtiment, renouvelée plus souvent que la structure.",
+          "montant": 0.0
+        },
+        {
+          "cle": "installations",
+          "libelle": "Installations techniques",
+          "categorie": "Bâtiment",
+          "part": 0.0,
+          "duree": 20,
+          "compte_immo": "213150",
+          "note": "Chauffage, électricité, plomberie, ventilation.",
+          "montant": 0.0
+        },
+        {
+          "cle": "agencements",
+          "libelle": "Agencements intérieurs",
+          "categorie": "Agencement",
+          "part": 0.0,
+          "duree": 15,
+          "compte_immo": "218100",
+          "note": "Cloisons, revêtements, cuisine intégrée, salle de bains.",
+          "montant": 0.0
+        },
+        {
+          "cle": "mobilier",
+          "libelle": "Mobilier et électroménager",
+          "categorie": "Mobilier",
+          "part": 0.0,
+          "duree": 8,
+          "compte_immo": "218400",
+          "note": "Ce qui fait le « meublé ». Durée courte : 5 à 10 ans selon la nature. À isoler du bâti, sans quoi il s'amortit sur des décennies au lieu de quelques années.",
+          "montant": 0.0
+        }
+      ]
+    },
+    "0": {
+      "normalisation": [
+        0.0,
+        "quote-part lue comme 0 %, soit 0)"
+      ],
+      "lignes": [
+        {
+          "cle": "terrain",
+          "libelle": "Terrain",
+          "categorie": "Terrain",
+          "part": 0.15,
+          "duree": 0,
+          "compte_immo": "211550",
+          "note": "Jamais amortissable. Sa quote-part figure souvent dans l'acte ou peut s'estimer d'après les valeurs foncières locales.",
+          "montant": 15000.0
+        },
+        {
+          "cle": "gros_oeuvre",
+          "libelle": "Gros œuvre / structure",
+          "categorie": "Bâtiment",
+          "part": 0.45,
+          "duree": 50,
+          "compte_immo": "213150",
+          "note": "Murs, planchers, charpente : la part la plus longue à amortir.",
+          "montant": 45000.0
+        },
+        {
+          "cle": "facade",
+          "libelle": "Façade / étanchéité / toiture",
+          "categorie": "Bâtiment",
+          "part": 0.1,
+          "duree": 25,
+          "compte_immo": "213150",
+          "note": "Enveloppe du bâtiment, renouvelée plus souvent que la structure.",
+          "montant": 10000.0
+        },
+        {
+          "cle": "installations",
+          "libelle": "Installations techniques",
+          "categorie": "Bâtiment",
+          "part": 0.15,
+          "duree": 20,
+          "compte_immo": "213150",
+          "note": "Chauffage, électricité, plomberie, ventilation.",
+          "montant": 15000.0
+        },
+        {
+          "cle": "agencements",
+          "libelle": "Agencements intérieurs",
+          "categorie": "Agencement",
+          "part": 0.1,
+          "duree": 15,
+          "compte_immo": "218100",
+          "note": "Cloisons, revêtements, cuisine intégrée, salle de bains.",
+          "montant": 10000.0
+        },
+        {
+          "cle": "mobilier",
+          "libelle": "Mobilier et électroménager",
+          "categorie": "Mobilier",
+          "part": 0.05,
+          "duree": 8,
+          "compte_immo": "218400",
+          "note": "Ce qui fait le « meublé ». Durée courte : 5 à 10 ans selon la nature. À isoler du bâti, sans quoi il s'amortit sur des décennies au lieu de quelques années.",
+          "montant": 5000.0
+        }
+      ]
+    },
+    "None": {
+      "normalisation": [
+        null,
+        ""
+      ],
+      "lignes": [
+        {
+          "cle": "terrain",
+          "libelle": "Terrain",
+          "categorie": "Terrain",
+          "part": 0.15,
+          "duree": 0,
+          "compte_immo": "211550",
+          "note": "Jamais amortissable. Sa quote-part figure souvent dans l'acte ou peut s'estimer d'après les valeurs foncières locales.",
+          "montant": 15000.0
+        },
+        {
+          "cle": "gros_oeuvre",
+          "libelle": "Gros œuvre / structure",
+          "categorie": "Bâtiment",
+          "part": 0.45,
+          "duree": 50,
+          "compte_immo": "213150",
+          "note": "Murs, planchers, charpente : la part la plus longue à amortir.",
+          "montant": 45000.0
+        },
+        {
+          "cle": "facade",
+          "libelle": "Façade / étanchéité / toiture",
+          "categorie": "Bâtiment",
+          "part": 0.1,
+          "duree": 25,
+          "compte_immo": "213150",
+          "note": "Enveloppe du bâtiment, renouvelée plus souvent que la structure.",
+          "montant": 10000.0
+        },
+        {
+          "cle": "installations",
+          "libelle": "Installations techniques",
+          "categorie": "Bâtiment",
+          "part": 0.15,
+          "duree": 20,
+          "compte_immo": "213150",
+          "note": "Chauffage, électricité, plomberie, ventilation.",
+          "montant": 15000.0
+        },
+        {
+          "cle": "agencements",
+          "libelle": "Agencements intérieurs",
+          "categorie": "Agencement",
+          "part": 0.1,
+          "duree": 15,
+          "compte_immo": "218100",
+          "note": "Cloisons, revêtements, cuisine intégrée, salle de bains.",
+          "montant": 10000.0
+        },
+        {
+          "cle": "mobilier",
+          "libelle": "Mobilier et électroménager",
+          "categorie": "Mobilier",
+          "part": 0.05,
+          "duree": 8,
+          "compte_immo": "218400",
+          "note": "Ce qui fait le « meublé ». Durée courte : 5 à 10 ans selon la nature. À isoler du bâti, sans quoi il s'amortit sur des décennies au lieu de quelques années.",
+          "montant": 5000.0
+        }
+      ]
+    }
+  },
+  "ventilation_0": {
+    "controles": [],
+    "dotation": [],
+    "liasse": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 12000.00 € / passif 12000.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": false,
+        "detail": "0.00 € / 12000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ]
+  },
+  "ventilation_1000": {
+    "controles": [
+      {
+        "code": "VENTILATION_INCOMPLETE",
+        "niveau": "AVERTISSEMENT",
+        "message": "Bien « Bien fictif » : la somme des composants (1000.00 €) reste inférieure de 11000.00 € (91.7 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+      }
+    ],
+    "dotation": [
+      {
+        "composant_id": 1,
+        "libelle": "Composant fictif",
+        "compte_amort": "281840",
+        "bien_id": 1,
+        "dotation": 100.0,
+        "cumul_fin": 100.0,
+        "vnc_fin": 900.0
+      }
+    ],
+    "liasse": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 12000.00 € / passif 12000.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": false,
+        "detail": "1000.00 € / 12000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "100.00 € / 0.00 € — écart de 100.00 €, soit la dotation de l'exercice, qui sera comptabilisée à la clôture. Rien à corriger."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ]
+  },
+  "ventilation_11400": {
+    "controles": [],
+    "dotation": [
+      {
+        "composant_id": 1,
+        "libelle": "Composant fictif",
+        "compte_amort": "281840",
+        "bien_id": 1,
+        "dotation": 1140.0,
+        "cumul_fin": 1140.0,
+        "vnc_fin": 10260.0
+      }
+    ],
+    "liasse": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 12000.00 € / passif 12000.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": false,
+        "detail": "11400.00 € / 12000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "1140.00 € / 0.00 € — écart de 1140.00 €, soit la dotation de l'exercice, qui sera comptabilisée à la clôture. Rien à corriger."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ]
+  },
+  "ventilation_12000": {
+    "controles": [],
+    "dotation": [
+      {
+        "composant_id": 1,
+        "libelle": "Composant fictif",
+        "compte_amort": "281840",
+        "bien_id": 1,
+        "dotation": 1200.0,
+        "cumul_fin": 1200.0,
+        "vnc_fin": 10800.0
+      }
+    ],
+    "liasse": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 12000.00 € / passif 12000.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "12000.00 € / 12000.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "1200.00 € / 0.00 € — écart de 1200.00 €, soit la dotation de l'exercice, qui sera comptabilisée à la clôture. Rien à corriger."
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ]
+  },
+  "fec_sans_composants": {
+    "rejeu": {
+      "ecritures": 1,
+      "normalisees": 0,
+      "comptes_crees": [
+        "2180000",
+        "2181000",
+        "2818000",
+        "2818100"
+      ],
+      "renumerotees": false
+    },
+    "etat": {
+      "suivi_39c": [],
+      "bilan": {
+        "immo_corporelles_brut_028": 20000.0,
+        "amortissements_030": 2000.0,
+        "immo_corporelles_net": 18000.0,
+        "total_actif_110": 20000.0,
+        "total_actif_net_112": 18000.0,
+        "capital_individuel_120": 18000.0,
+        "resultat_exercice_136": 0,
+        "total_capitaux_142": 18000.0,
+        "total_passif_180": 18000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      "plans": [],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 18000.00 € / passif 18000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": false,
+          "detail": "0.00 € / 20000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "0.00 € / 2000.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "menu": [
+      [
+        "211550",
+        "Terrain",
+        null
+      ],
+      [
+        "213150",
+        "Bâtiment",
+        "281315"
+      ],
+      [
+        "218100",
+        "Installation / agencement",
+        "281810"
+      ],
+      [
+        "218400",
+        "Mobilier",
+        "281840"
+      ]
+    ]
+  },
+  "fec_avec_composants": {
+    "etat": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 2000.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 2000.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 2000.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 20000.0,
+        "amortissements_030": 4000.0,
+        "immo_corporelles_net": 16000.0,
+        "total_actif_110": 20000.0,
+        "total_actif_net_112": 16000.0,
+        "capital_individuel_120": 18000.0,
+        "resultat_exercice_136": -2000.0,
+        "total_capitaux_142": 16000.0,
+        "total_passif_180": 16000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 20000.0,
+        "augmentations": 0.0,
+        "brut_fin": 20000.0,
+        "amort_debut": 2000.0,
+        "dotation": 2000.0,
+        "amort_fin": 4000.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 800.0,
+          "cumul_fin": 1600.0,
+          "vnc_fin": 6400.0
+        },
+        {
+          "id": 2,
+          "composant_id": 2,
+          "exercice_annee": 2026,
+          "dotation": 1200.0,
+          "cumul_fin": 2400.0,
+          "vnc_fin": 9600.0
+        }
+      ],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 16000.00 € / passif 16000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "20000.00 € / 20000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "4000.00 € / 4000.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "rubriques": [
+      {
+        "libelle": "Terrains",
+        "case_immo": "420",
+        "case_amort": "510",
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      {
+        "libelle": "Constructions",
+        "case_immo": "430",
+        "case_amort": "520",
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      {
+        "libelle": "Installations générales, agencements",
+        "case_immo": "450",
+        "case_amort": "540",
+        "brut_debut": 0.0,
+        "augmentations": 0.0,
+        "brut_fin": 0.0,
+        "amort_debut": 0.0,
+        "dotation": 0.0,
+        "amort_fin": 0.0
+      },
+      {
+        "libelle": "Autres immobilisations corporelles",
+        "case_immo": "470",
+        "case_amort": "560",
+        "brut_debut": 20000.0,
+        "augmentations": 0.0,
+        "brut_fin": 20000.0,
+        "amort_debut": 2000.0,
+        "dotation": 2000.0,
+        "amort_fin": 4000.0
+      }
+    ],
+    "solde": {
+      "108000": -18000.0,
+      "2180000": 8000.0,
+      "2181000": 12000.0,
+      "2818000": -1600.0,
+      "2818100": -2400.0,
+      "681120": 2000.0
+    },
+    "cumul": 0.0
+  },
+  "web_creation_duree_-1": {
+    "reponse": {
+      "annee": [
+        "2026"
+      ],
+      "ok": [
+        "Composant « Composant fictif » ajouté. Écriture d'acquisition n°1 générée sur 2026."
+      ]
+    },
+    "composants": [
+      {
+        "id": 1,
+        "bien_id": 1,
+        "code_immo": null,
+        "libelle": "Composant fictif",
+        "categorie": "",
+        "valeur_brute": 12000.0,
+        "duree_annees": -1,
+        "date_mise_service": "2026-01-01",
+        "compte_immo": "218400",
+        "compte_amort": "281840",
+        "amortissable": 1
+      }
+    ],
+    "dotation": {
+      "retour": []
+    },
+    "cloture": {
+      "retour": {
+        "agregats": {
+          "produits": 0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 0,
+          "resultat_comptable": 0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 0,
+          "plafond_deductible": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 0.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 0.0
+      }
+    },
+    "tableau": {
+      "brut_debut": 0.0,
+      "augmentations": 12000.0,
+      "brut_fin": 12000.0,
+      "amort_debut": 0.0,
+      "dotation": -12000.0,
+      "amort_fin": -12000.0
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0
+    }
+  },
+  "web_creation_duree_0": {
+    "reponse": {
+      "annee": [
+        "2026"
+      ],
+      "ok": [
+        "Composant « Composant fictif » ajouté. Écriture d'acquisition n°1 générée sur 2026."
+      ]
+    },
+    "composants": [
+      {
+        "id": 1,
+        "bien_id": 1,
+        "code_immo": null,
+        "libelle": "Composant fictif",
+        "categorie": "",
+        "valeur_brute": 12000.0,
+        "duree_annees": null,
+        "date_mise_service": "2026-01-01",
+        "compte_immo": "218400",
+        "compte_amort": null,
+        "amortissable": 0
+      }
+    ],
+    "dotation": {
+      "retour": []
+    },
+    "cloture": {
+      "retour": {
+        "agregats": {
+          "produits": 0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 0,
+          "resultat_comptable": 0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 0,
+          "plafond_deductible": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 0.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 0.0
+      }
+    },
+    "tableau": {
+      "brut_debut": 0.0,
+      "augmentations": 12000.0,
+      "brut_fin": 12000.0,
+      "amort_debut": 0.0,
+      "dotation": 0.0,
+      "amort_fin": 0.0
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0
+    }
+  },
+  "web_creation_duree_": {
+    "reponse": {
+      "annee": [
+        "2026"
+      ],
+      "ok": [
+        "Composant « Composant fictif » ajouté. Écriture d'acquisition n°1 générée sur 2026."
+      ]
+    },
+    "composants": [
+      {
+        "id": 1,
+        "bien_id": 1,
+        "code_immo": null,
+        "libelle": "Composant fictif",
+        "categorie": "",
+        "valeur_brute": 12000.0,
+        "duree_annees": null,
+        "date_mise_service": "2026-01-01",
+        "compte_immo": "218400",
+        "compte_amort": null,
+        "amortissable": 0
+      }
+    ],
+    "dotation": {
+      "retour": []
+    },
+    "cloture": {
+      "retour": {
+        "agregats": {
+          "produits": 0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 0,
+          "resultat_comptable": 0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 0,
+          "plafond_deductible": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 0.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 0.0
+      }
+    },
+    "tableau": {
+      "brut_debut": 0.0,
+      "augmentations": 12000.0,
+      "brut_fin": 12000.0,
+      "amort_debut": 0.0,
+      "dotation": 0.0,
+      "amort_fin": 0.0
+    },
+    "solde": {
+      "108000": -12000.0,
+      "218400": 12000.0
+    }
+  },
+  "web_modification_clos": {
+    "reponse": {
+      "annee": [
+        "2026"
+      ],
+      "ok": [
+        "Composant « Composant fictif » : durée portée à 20 ans."
+      ]
+    },
+    "avant": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 1200.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 1200.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 1200.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 1200.0,
+        "immo_corporelles_net": 10800.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 10800.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": -1200.0,
+        "total_capitaux_142": 10800.0,
+        "total_passif_180": 10800.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 1200.0,
+        "amort_fin": 1200.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 1200.0,
+          "cumul_fin": 1200.0,
+          "vnc_fin": 10800.0
+        }
+      ],
+      "controles": [],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 10800.00 € / passif 10800.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": true,
+          "detail": "1200.00 € / 1200.00 €"
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "apres": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 1200.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 1200.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 1200.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 1200.0,
+        "immo_corporelles_net": 10800.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 10800.0,
+        "capital_individuel_120": 12000.0,
+        "resultat_exercice_136": -1200.0,
+        "total_capitaux_142": 10800.0,
+        "total_passif_180": 10800.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 0.0,
+        "augmentations": 12000.0,
+        "brut_fin": 12000.0,
+        "amort_debut": 0.0,
+        "dotation": 600.0,
+        "amort_fin": 600.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 1200.0,
+          "cumul_fin": 1200.0,
+          "vnc_fin": 10800.0
+        }
+      ],
+      "controles": [
+        {
+          "code": "DOTATION_PLAN",
+          "niveau": "AVERTISSEMENT",
+          "message": "Dotation comptabilisée 1200.00 € ≠ plan théorique 600.00 € — dotation en double ou composant modifié après clôture ?"
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif 10800.00 € / passif 10800.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "12000.00 € / 12000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "600.00 € / 1200.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    }
+  },
+  "an_premier_exercice": {
+    "cumul_lu": 0.0,
+    "etat": {
+      "suivi_39c": [
+        {
+          "exercice_annee": 2026,
+          "plafond_deductible": 0.0,
+          "dotation_exercice": 1000.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 1000.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 1000.0
+        }
+      ],
+      "bilan": {
+        "immo_corporelles_brut_028": 8000.0,
+        "amortissements_030": 9000.0,
+        "immo_corporelles_net": -1000.0,
+        "total_actif_110": 8000.0,
+        "total_actif_net_112": -1000.0,
+        "capital_individuel_120": 0.0,
+        "resultat_exercice_136": -1000.0,
+        "total_capitaux_142": -1000.0,
+        "total_passif_180": -1000.0,
+        "equilibre": true
+      },
+      "tableau": {
+        "brut_debut": 8000.0,
+        "augmentations": 0.0,
+        "brut_fin": 8000.0,
+        "amort_debut": 1000.0,
+        "dotation": 1000.0,
+        "amort_fin": 2000.0
+      },
+      "plans": [
+        {
+          "id": 1,
+          "composant_id": 1,
+          "exercice_annee": 2026,
+          "dotation": 1000.0,
+          "cumul_fin": 2000.0,
+          "vnc_fin": 6000.0
+        }
+      ],
+      "controles": [
+        {
+          "code": "AMORT_ANTERIEURS",
+          "niveau": "AVERTISSEMENT",
+          "message": "-7000.00 € d'amortissements déjà courus avant 2026 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+        },
+        {
+          "code": "VENTILATION_INCOMPLETE",
+          "niveau": "AVERTISSEMENT",
+          "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+        }
+      ],
+      "liasse_controles": [
+        {
+          "nom": "Bilan équilibré (actif net = capitaux propres)",
+          "ok": true,
+          "detail": "actif -1000.00 € / passif -1000.00 €"
+        },
+        {
+          "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+          "ok": true,
+          "detail": "0.00 €"
+        },
+        {
+          "nom": "2033-C : total brut fin = somme des valeurs brutes",
+          "ok": true,
+          "detail": "8000.00 € / 8000.00 €"
+        },
+        {
+          "nom": "2033-C : amortissements fin = case 030 du bilan",
+          "ok": false,
+          "detail": "2000.00 € / 9000.00 € — le bilan porte plus d'amortissements que le plan : vérifiez les dotations saisies à la main."
+        },
+        {
+          "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+          "ok": true,
+          "detail": "0.00 €"
+        }
+      ]
+    },
+    "solde": {
+      "108000": 0.0,
+      "218400": 8000.0,
+      "281840": -9000.0,
+      "681120": 1000.0
+    }
+  },
+  "raccourcie_fin_plan": [
+    {
+      "annee": 2029,
+      "dotations": [
+        {
+          "composant_id": 1,
+          "libelle": "Composant fictif",
+          "compte_amort": "281840",
+          "bien_id": 1,
+          "dotation": 2000.0,
+          "cumul_fin": 8000.0,
+          "vnc_fin": 0.0
+        }
+      ],
+      "solde": {
+        "108000": -5000.0,
+        "120000": 0.0,
+        "218400": 8000.0,
+        "281840": -5000.0,
+        "681120": 2000.0
+      },
+      "etat": {
+        "suivi_39c": [
+          {
+            "exercice_annee": 2029,
+            "plafond_deductible": 0.0,
+            "dotation_exercice": 2000.0,
+            "stock_ouverture": 3000.0,
+            "report_annee": 2000.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 5000.0
+          }
+        ],
+        "bilan": {
+          "immo_corporelles_brut_028": 8000.0,
+          "amortissements_030": 5000.0,
+          "immo_corporelles_net": 3000.0,
+          "total_actif_110": 8000.0,
+          "total_actif_net_112": 3000.0,
+          "capital_individuel_120": 5000.0,
+          "resultat_exercice_136": -2000.0,
+          "total_capitaux_142": 3000.0,
+          "total_passif_180": 3000.0,
+          "equilibre": true
+        },
+        "tableau": {
+          "brut_debut": 8000.0,
+          "augmentations": 0.0,
+          "brut_fin": 8000.0,
+          "amort_debut": 6000.0,
+          "dotation": 2000.0,
+          "amort_fin": 8000.0
+        },
+        "plans": [
+          {
+            "id": 4,
+            "composant_id": 1,
+            "exercice_annee": 2029,
+            "dotation": 2000.0,
+            "cumul_fin": 8000.0,
+            "vnc_fin": 0.0
+          }
+        ],
+        "controles": [
+          {
+            "code": "AMORT_ANTERIEURS",
+            "niveau": "AVERTISSEMENT",
+            "message": "3000.00 € d'amortissements déjà courus avant 2029 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+          },
+          {
+            "code": "VENTILATION_INCOMPLETE",
+            "niveau": "AVERTISSEMENT",
+            "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+          }
+        ],
+        "liasse_controles": [
+          {
+            "nom": "Bilan équilibré (actif net = capitaux propres)",
+            "ok": true,
+            "detail": "actif 3000.00 € / passif 3000.00 €"
+          },
+          {
+            "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+            "ok": true,
+            "detail": "0.00 €"
+          },
+          {
+            "nom": "2033-C : total brut fin = somme des valeurs brutes",
+            "ok": true,
+            "detail": "8000.00 € / 8000.00 €"
+          },
+          {
+            "nom": "2033-C : amortissements fin = case 030 du bilan",
+            "ok": false,
+            "detail": "8000.00 € / 5000.00 € — écart de 3000.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+          },
+          {
+            "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+            "ok": true,
+            "detail": "0.00 €"
+          }
+        ]
+      }
+    },
+    {
+      "annee": 2030,
+      "dotations": [],
+      "solde": {
+        "108000": -3000.0,
+        "120000": 0.0,
+        "218400": 8000.0,
+        "281840": -5000.0
+      },
+      "etat": {
+        "suivi_39c": [
+          {
+            "exercice_annee": 2030,
+            "plafond_deductible": 0.0,
+            "dotation_exercice": 0.0,
+            "stock_ouverture": 5000.0,
+            "report_annee": 0.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 5000.0
+          }
+        ],
+        "bilan": {
+          "immo_corporelles_brut_028": 8000.0,
+          "amortissements_030": 5000.0,
+          "immo_corporelles_net": 3000.0,
+          "total_actif_110": 8000.0,
+          "total_actif_net_112": 3000.0,
+          "capital_individuel_120": 3000.0,
+          "resultat_exercice_136": 0,
+          "total_capitaux_142": 3000.0,
+          "total_passif_180": 3000.0,
+          "equilibre": true
+        },
+        "tableau": {
+          "brut_debut": 8000.0,
+          "augmentations": 0.0,
+          "brut_fin": 8000.0,
+          "amort_debut": 8000.0,
+          "dotation": 0.0,
+          "amort_fin": 8000.0
+        },
+        "plans": [],
+        "controles": [
+          {
+            "code": "AMORT_ANTERIEURS",
+            "niveau": "AVERTISSEMENT",
+            "message": "3000.00 € d'amortissements déjà courus avant 2030 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+          },
+          {
+            "code": "VENTILATION_INCOMPLETE",
+            "niveau": "AVERTISSEMENT",
+            "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+          }
+        ],
+        "liasse_controles": [
+          {
+            "nom": "Bilan équilibré (actif net = capitaux propres)",
+            "ok": true,
+            "detail": "actif 3000.00 € / passif 3000.00 €"
+          },
+          {
+            "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+            "ok": true,
+            "detail": "0.00 €"
+          },
+          {
+            "nom": "2033-C : total brut fin = somme des valeurs brutes",
+            "ok": true,
+            "detail": "8000.00 € / 8000.00 €"
+          },
+          {
+            "nom": "2033-C : amortissements fin = case 030 du bilan",
+            "ok": false,
+            "detail": "8000.00 € / 5000.00 € — écart de 3000.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+          },
+          {
+            "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+            "ok": true,
+            "detail": "0.00 €"
+          }
+        ]
+      }
+    },
+    {
+      "annee": 2031,
+      "dotations": [],
+      "solde": {
+        "108000": -3000.0,
+        "120000": 0.0,
+        "218400": 8000.0,
+        "281840": -5000.0
+      },
+      "etat": {
+        "suivi_39c": [
+          {
+            "exercice_annee": 2031,
+            "plafond_deductible": 0.0,
+            "dotation_exercice": 0.0,
+            "stock_ouverture": 5000.0,
+            "report_annee": 0.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 5000.0
+          }
+        ],
+        "bilan": {
+          "immo_corporelles_brut_028": 8000.0,
+          "amortissements_030": 5000.0,
+          "immo_corporelles_net": 3000.0,
+          "total_actif_110": 8000.0,
+          "total_actif_net_112": 3000.0,
+          "capital_individuel_120": 3000.0,
+          "resultat_exercice_136": 0,
+          "total_capitaux_142": 3000.0,
+          "total_passif_180": 3000.0,
+          "equilibre": true
+        },
+        "tableau": {
+          "brut_debut": 8000.0,
+          "augmentations": 0.0,
+          "brut_fin": 8000.0,
+          "amort_debut": 8000.0,
+          "dotation": 0.0,
+          "amort_fin": 8000.0
+        },
+        "plans": [],
+        "controles": [
+          {
+            "code": "AMORT_ANTERIEURS",
+            "niveau": "AVERTISSEMENT",
+            "message": "3000.00 € d'amortissements déjà courus avant 2031 ne sont pas comptabilisés (Composant fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+          },
+          {
+            "code": "VENTILATION_INCOMPLETE",
+            "niveau": "AVERTISSEMENT",
+            "message": "Bien « Bien fictif » : la somme des composants (8000.00 €) reste inférieure de 4000.00 € (33.3 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+          }
+        ],
+        "liasse_controles": [
+          {
+            "nom": "Bilan équilibré (actif net = capitaux propres)",
+            "ok": true,
+            "detail": "actif 3000.00 € / passif 3000.00 €"
+          },
+          {
+            "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+            "ok": true,
+            "detail": "0.00 €"
+          },
+          {
+            "nom": "2033-C : total brut fin = somme des valeurs brutes",
+            "ok": true,
+            "detail": "8000.00 € / 8000.00 €"
+          },
+          {
+            "nom": "2033-C : amortissements fin = case 030 du bilan",
+            "ok": false,
+            "detail": "8000.00 € / 5000.00 € — écart de 3000.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+          },
+          {
+            "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+            "ok": true,
+            "detail": "0.00 €"
+          }
+        ]
+      }
+    }
+  ],
+  "arrondi_cumul_normal": {
+    "suivi_39c": [
+      {
+        "exercice_annee": 2026,
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 86.66,
+        "stock_ouverture": 0.0,
+        "report_annee": 86.66,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 86.66
+      }
+    ],
+    "bilan": {
+      "immo_corporelles_brut_028": 1299.87,
+      "amortissements_030": 86.66,
+      "immo_corporelles_net": 1213.21,
+      "total_actif_110": 1299.87,
+      "total_actif_net_112": 1213.21,
+      "capital_individuel_120": 1299.87,
+      "resultat_exercice_136": -86.66,
+      "total_capitaux_142": 1213.21,
+      "total_passif_180": 1213.21,
+      "equilibre": true
+    },
+    "tableau": {
+      "brut_debut": 0.0,
+      "augmentations": 1299.87,
+      "brut_fin": 1299.87,
+      "amort_debut": 0.0,
+      "dotation": 86.66,
+      "amort_fin": 86.66
+    },
+    "plans": [
+      {
+        "id": 1,
+        "composant_id": 1,
+        "exercice_annee": 2026,
+        "dotation": 86.66,
+        "cumul_fin": 86.66,
+        "vnc_fin": 1213.21
+      }
+    ],
+    "controles": [
+      {
+        "code": "VENTILATION_INCOMPLETE",
+        "niveau": "AVERTISSEMENT",
+        "message": "Bien « Bien fictif » : la somme des composants (1299.87 €) reste inférieure de 10700.13 € (89.2 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+      }
+    ],
+    "liasse_controles": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 1213.21 € / passif 1213.21 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "1299.87 € / 1299.87 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "86.66 € / 86.66 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ]
+  },
+  "plan_residuel_0.24": {
+    "nb": 53,
+    "premier": [
+      2026,
+      0.0
+    ],
+    "dernier": [
+      2078,
+      0.0
+    ],
+    "somme": "0.0"
+  },
+  "plan_residuel_100000.01": {
+    "nb": 51,
+    "premier": [
+      2026,
+      2000.0
+    ],
+    "dernier": [
+      2076,
+      0.01
+    ],
+    "somme": "100000.01"
+  },
+  "interruption_plan": {
+    "retour": {
+      "erreur": "IntegrityError: interruption fictive"
+    },
+    "transaction_avant_rollback": true,
+    "ecritures": 1,
+    "lignes": 2,
+    "plans": 0
+  },
+  "lecture_cumul_indisponible": {
+    "cumul": null,
+    "dotations": {
+      "retour": [
+        {
+          "composant_id": 1,
+          "libelle": "Composant fictif",
+          "compte_amort": "281840",
+          "bien_id": 1,
+          "dotation": 1200.0,
+          "cumul_fin": 1200.0,
+          "vnc_fin": 10800.0
+        }
+      ]
+    },
+    "controle_anterieurs": [],
+    "controle_complet": {
+      "erreur": "OperationalError: no such table: ecriture"
+    }
+  },
+  "contrat_gabarits": [
+    {
+      "type": "loyer",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "charges_locatives",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "forfait_charges",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "regularisation_charges",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "restitution_charges",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "indemnite_assurance",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "autres_produits",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "depot_garantie_recu",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "depot_garantie_restitue",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "emprunt_recu",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "emprunt_capital_rembourse",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "charge_copro",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "fonds_travaux_alur",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "telecom",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "energie",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "assurance",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "assurance_emprunteur",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "assurance_gli",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "maintenance",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "petit_equipement",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "electromenager",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "autres_equipements",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "fournitures",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "interets_emprunt",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_dossier_emprunt",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_bancaires",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "honoraires",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "gestion_locative",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "honoraires_juridiques",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_acquisition",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "publicite_annonces",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "cotisations_pro",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_postaux",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "carburant",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "peage_parking",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "deplacements",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "cfe",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "taxe_fonciere",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "teom",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "impot_local",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "autres_charges",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "attente_encaissement",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "attente_decaissement",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "audit_fictif",
+      "transaction": true,
+      "commits": 1,
+      "transactions_aux_commits": [
+        false
+      ],
+      "operations": 0,
+      "ecritures": 0
+    }
+  ],
+  "contrat_gabarits_transaction_englobante": [
+    {
+      "type": "loyer",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "charges_locatives",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "forfait_charges",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "regularisation_charges",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "restitution_charges",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "indemnite_assurance",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "autres_produits",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "depot_garantie_recu",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "depot_garantie_restitue",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "emprunt_recu",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "emprunt_capital_rembourse",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "charge_copro",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "fonds_travaux_alur",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "telecom",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "energie",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "assurance",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "assurance_emprunteur",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "assurance_gli",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "maintenance",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "petit_equipement",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "electromenager",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "autres_equipements",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "fournitures",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "interets_emprunt",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_dossier_emprunt",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_bancaires",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "honoraires",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "gestion_locative",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "honoraires_juridiques",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_acquisition",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "publicite_annonces",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "cotisations_pro",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "frais_postaux",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "carburant",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "peage_parking",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "deplacements",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "cfe",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "taxe_fonciere",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "teom",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "impot_local",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "autres_charges",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "attente_encaissement",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "attente_decaissement",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    },
+    {
+      "type": "audit_fictif",
+      "transaction": true,
+      "commits": 0,
+      "temoins": 0,
+      "operations": 0,
+      "ecritures": 0
+    }
+  ],
+  "cloture_commits": {
+    "commits": 1,
+    "dotation": 1200.0,
+    "seconde": {
+      "erreur": "ValueError: L'exercice 2026 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits)."
+    },
+    "ecritures": 2
+  },
+  "raccourcie_reprise_suggeree": {
+    "avant": {
+      "108000": -5000.0,
+      "120000": 0.0,
+      "218400": 8000.0,
+      "281840": -3000.0
+    },
+    "reprise": {
+      "total": 3000.0,
+      "par_compte": {
+        "281840": 3000.0
+      },
+      "ecriture_num": 3
+    },
+    "apres": {
+      "108000": -2000.0,
+      "120000": 0.0,
+      "218400": 8000.0,
+      "281840": -6000.0
+    }
+  },
+  "terrain_saisie_refusee": {
+    "reponse": {
+      "annee": [
+        "2026"
+      ],
+      "err": [
+        "« Terrain » n'est pas amortissable : laissez la durée à 0. Le terrain ne se déprécie pas — c'est d'ailleurs pour cela qu'il faut isoler sa quote-part du reste du prix. Si vous vouliez amortir du bâti, choisissez « Bâtiment »."
+      ]
+    },
+    "composants": 0,
+    "ecritures": 0
+  },
+  "renvoi_G12": {
+    "terrain": 73130.01,
+    "total": 100000.01
+  }
+}

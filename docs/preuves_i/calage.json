@@ -1,0 +1,8 @@
+{
+  "mode": "assertions existantes executees directement, sans pytest",
+  "source_sha256": "3047346ae131ddf96c481bc2916bb02719dda5c376dfc2d38a302e287631d218",
+  "reussites": 5,
+  "exercices_verifies": 3,
+  "valeurs_privees_conservees": false,
+  "code_sortie": 0
+}

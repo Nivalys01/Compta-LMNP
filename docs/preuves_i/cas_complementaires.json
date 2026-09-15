@@ -1,0 +1,79 @@
+{
+  "cle_marges": {
+    "suivi": {
+      "stock_ouverture": 0.0,
+      "dotation_exercice": 4000.0,
+      "plafond_deductible": 1500.0,
+      "report_annee": 2500.0,
+      "utilisation_annee": 0.0,
+      "stock_cloture": 2000.0,
+      "sorties_39c": 500.0
+    },
+    "biens": [
+      {
+        "bien_id": 1,
+        "libelle": "Bien fictif 1",
+        "stock_ouverture": 0.0,
+        "dotation_bien": 1000.0,
+        "report_bien": 500.0,
+        "utilisation_bien": 0.0,
+        "sortie_bien": 500.0,
+        "stock_cloture": 0.0
+      },
+      {
+        "bien_id": 2,
+        "libelle": "Bien fictif 2",
+        "stock_ouverture": 0.0,
+        "dotation_bien": 3000.0,
+        "report_bien": 2000.0,
+        "utilisation_bien": 0.0,
+        "sortie_bien": 0.0,
+        "stock_cloture": 2000.0
+      }
+    ],
+    "controles": [
+      "VENTILATION_INCOMPLETE"
+    ]
+  },
+  "honoraires": {
+    "suivi": {
+      "stock_ouverture": 0.0,
+      "dotation_exercice": 4000.0,
+      "plafond_deductible": 3000.0,
+      "report_annee": 1000.0,
+      "utilisation_annee": 0.0,
+      "stock_cloture": 800.0,
+      "sorties_39c": 200.0
+    },
+    "biens": [
+      {
+        "bien_id": 1,
+        "libelle": "Bien fictif 1",
+        "stock_ouverture": 0.0,
+        "dotation_bien": 1000.0,
+        "report_bien": 200.0,
+        "utilisation_bien": 0.0,
+        "sortie_bien": 200.0,
+        "stock_cloture": 0.0
+      },
+      {
+        "bien_id": 2,
+        "libelle": "Bien fictif 2",
+        "stock_ouverture": 0.0,
+        "dotation_bien": 3000.0,
+        "report_bien": 800.0,
+        "utilisation_bien": 0.0,
+        "sortie_bien": 0.0,
+        "stock_cloture": 800.0
+      }
+    ],
+    "controles": [
+      "VENTILATION_INCOMPLETE",
+      "POSTE_HABITUEL_ABSENT",
+      "POSTE_HABITUEL_ABSENT",
+      "POSTE_HABITUEL_ABSENT",
+      "POSTE_HABITUEL_ABSENT",
+      "POSTE_HABITUEL_ABSENT"
+    ]
+  }
+}

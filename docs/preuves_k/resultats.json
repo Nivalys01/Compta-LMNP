@@ -1,0 +1,2677 @@
+{
+  "environnement": {
+    "python": "3.14.6 (main, Jun 11 2026, 00:00:00) [GCC 16.1.1 20260515 (Red Hat 16.1.1-2)]",
+    "sqlite": "3.51.2",
+    "sha256": {
+      "modules/fiscal.py": "a3337e8f4bce02b7fba3844cf0386aa9a21b2be9059eb47cf037d8bf8caa02a7",
+      "modules/reprise.py": "c5a3c5058e5974080b543c10e1fdd06f0a76419a603b6db2c79f48475ec19857",
+      "modules/rejeu_fec.py": "ee725a7f4bebb9c3fe16eaaf84c8b5b48f676accee5f8843936ad2202a718c7d",
+      "modules/migration_fec.py": "652af12094d4e44b953886d3c1dfdc0b5594c2e900bb9d788623de6a1f4c4b80",
+      "modules/ecritures.py": "ae67675296e8c5e64627522d48da1cfd69ad0b627b43ff067448cc6491b323e6",
+      "modules/liasse.py": "196c7b10bb4a46d1cf02064fdb6b91a0bc4045171d700c1859f3174fa8a1a192",
+      "schema.sql": "4b3407b78b2e0c281fd8a6db81302d1a5c23cc79ed374db5f2175aff578b6dd2",
+      "app.py": "461f6c2939e30201308c0c6b405931fb840018b6a3be67342b2e9ec36ffda77c",
+      "cli.py": "2752dab5eb91bdb9e6278c1bf80f4effffc3a81634a7b020befceb1c0a273cf7"
+    }
+  },
+  "sigkill_tous_points": {
+    "creation_deficit": {
+      "commits": 1,
+      "trace": [
+        {
+          "point": 1,
+          "etape": "SQL BEGIN IMMEDIATE",
+          "transaction": true
+        },
+        {
+          "point": 2,
+          "etape": "avant generer_cloture",
+          "transaction": true
+        },
+        {
+          "point": 3,
+          "etape": "SQL SAVEPOINT ecr_inserer",
+          "transaction": true
+        },
+        {
+          "point": 4,
+          "etape": "SQL INSERT INTO ecriture (journal_code, ecriture_num, ecriture_date, exercice_annee, piece_ref, piece_date, libelle, valid_date) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 5,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 6,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 7,
+          "etape": "SQL RELEASE SAVEPOINT ecr_inserer",
+          "transaction": true
+        },
+        {
+          "point": 8,
+          "etape": "SQL INSERT OR REPLACE INTO plan_amortissement (composant_id, exercice_annee, dotation, cumul_fin, vnc_fin) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 9,
+          "etape": "apres generer_cloture",
+          "transaction": true
+        },
+        {
+          "point": 10,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS compte_hors_plafond_39c (numero TEXT PRIMARY KEY REFERENCES compte(numero))",
+          "transaction": true
+        },
+        {
+          "point": 11,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true
+        },
+        {
+          "point": 12,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true
+        },
+        {
+          "point": 13,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true
+        },
+        {
+          "point": 14,
+          "etape": "avant _calcul_fiscal",
+          "transaction": true
+        },
+        {
+          "point": 15,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true
+        },
+        {
+          "point": 16,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 17,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 18,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 19,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 20,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 21,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS gabarit_personnalise ( cle TEXT PRIMARY KEY, libelle TEXT NOT NULL, compte_num TEXT NOT NULL REFERENCES compte(numero), nature TEXT NOT NULL CHECK (nature IN ('produit','charge')), periodicite TEXT NOT NULL DEFAULT 'variable' CHECK (periodicite IN ('mensuel','annuel','variable')), retraitement TEXT, actif INTEGER NOT NULL DEFAULT 1)",
+          "transaction": true
+        },
+        {
+          "point": 22,
+          "etape": "apres _calcul_fiscal",
+          "transaction": true
+        },
+        {
+          "point": 23,
+          "etape": "avant _ventiler_39c_par_bien",
+          "transaction": true
+        },
+        {
+          "point": 24,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS suivi_39c_bien ( exercice_annee INTEGER NOT NULL REFERENCES exercice(annee), bien_id INTEGER NOT NULL REFERENCES bien(id), stock_ouverture REAL NOT NULL DEFAULT 0, dotation_bien REAL NOT NULL DEFAULT 0, report_bien REAL NOT NULL DEFAULT 0, utilisation_bien REAL NOT NULL DEFAULT 0, sortie_bien REAL NOT NULL DEFAULT 0, stock_cloture REAL NOT NULL DEFAULT 0, PRIMARY KEY (exercice_annee, bien_id))",
+          "transaction": true
+        },
+        {
+          "point": 25,
+          "etape": "SQL DELETE FROM suivi_39c_bien WHERE exercice_annee=?",
+          "transaction": true
+        },
+        {
+          "point": 26,
+          "etape": "SQL INSERT INTO suivi_39c_bien (exercice_annee, bien_id, stock_ouverture, dotation_bien, report_bien, utilisation_bien, sortie_bien, stock_cloture) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 27,
+          "etape": "apres _ventiler_39c_par_bien",
+          "transaction": true
+        },
+        {
+          "point": 28,
+          "etape": "SQL INSERT OR REPLACE INTO suivi_39c (exercice_annee, plafond_deductible, dotation_exercice, stock_ouverture, report_annee, utilisation_annee, stock_cloture) VALUES (?,?,?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 29,
+          "etape": "avant traiter_deficit",
+          "transaction": true
+        },
+        {
+          "point": 30,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true
+        },
+        {
+          "point": 31,
+          "etape": "SQL INSERT INTO deficit_lmnp (annee_origine, montant_initial, solde, annee_expiration) VALUES (?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 32,
+          "etape": "apres traiter_deficit",
+          "transaction": true
+        },
+        {
+          "point": 33,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS cloture_fiscale ( exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee), retraitements REAL NOT NULL DEFAULT 0, impute_deficits REAL NOT NULL DEFAULT 0, deficit_cree REAL, revenu_imposable REAL NOT NULL DEFAULT 0)",
+          "transaction": true
+        },
+        {
+          "point": 34,
+          "etape": "SQL INSERT OR REPLACE INTO cloture_fiscale (exercice_annee, retraitements, impute_deficits, deficit_cree, revenu_imposable) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 35,
+          "etape": "SQL UPDATE exercice SET statut='clos', resultat_comptable=?, resultat_fiscal=? WHERE annee=?",
+          "transaction": true
+        },
+        {
+          "point": 36,
+          "etape": "avant commit",
+          "transaction": true
+        },
+        {
+          "point": 37,
+          "etape": "apres commit",
+          "transaction": false
+        }
+      ],
+      "coupures": [
+        {
+          "point": 1,
+          "etape": "SQL BEGIN IMMEDIATE",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 2,
+          "etape": "avant generer_cloture",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 3,
+          "etape": "SQL SAVEPOINT ecr_inserer",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 4,
+          "etape": "SQL INSERT INTO ecriture (journal_code, ecriture_num, ecriture_date, exercice_annee, piece_ref, piece_date, libelle, valid_date) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 5,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 6,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 7,
+          "etape": "SQL RELEASE SAVEPOINT ecr_inserer",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 8,
+          "etape": "SQL INSERT OR REPLACE INTO plan_amortissement (composant_id, exercice_annee, dotation, cumul_fin, vnc_fin) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 9,
+          "etape": "apres generer_cloture",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 10,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS compte_hors_plafond_39c (numero TEXT PRIMARY KEY REFERENCES compte(numero))",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 11,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 12,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 13,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 14,
+          "etape": "avant _calcul_fiscal",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 15,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 16,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 17,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 18,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 19,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 20,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 21,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS gabarit_personnalise ( cle TEXT PRIMARY KEY, libelle TEXT NOT NULL, compte_num TEXT NOT NULL REFERENCES compte(numero), nature TEXT NOT NULL CHECK (nature IN ('produit','charge')), periodicite TEXT NOT NULL DEFAULT 'variable' CHECK (periodicite IN ('mensuel','annuel','variable')), retraitement TEXT, actif INTEGER NOT NULL DEFAULT 1)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 22,
+          "etape": "apres _calcul_fiscal",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 23,
+          "etape": "avant _ventiler_39c_par_bien",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 24,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS suivi_39c_bien ( exercice_annee INTEGER NOT NULL REFERENCES exercice(annee), bien_id INTEGER NOT NULL REFERENCES bien(id), stock_ouverture REAL NOT NULL DEFAULT 0, dotation_bien REAL NOT NULL DEFAULT 0, report_bien REAL NOT NULL DEFAULT 0, utilisation_bien REAL NOT NULL DEFAULT 0, sortie_bien REAL NOT NULL DEFAULT 0, stock_cloture REAL NOT NULL DEFAULT 0, PRIMARY KEY (exercice_annee, bien_id))",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 25,
+          "etape": "SQL DELETE FROM suivi_39c_bien WHERE exercice_annee=?",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 26,
+          "etape": "SQL INSERT INTO suivi_39c_bien (exercice_annee, bien_id, stock_ouverture, dotation_bien, report_bien, utilisation_bien, sortie_bien, stock_cloture) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 27,
+          "etape": "apres _ventiler_39c_par_bien",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 28,
+          "etape": "SQL INSERT OR REPLACE INTO suivi_39c (exercice_annee, plafond_deductible, dotation_exercice, stock_ouverture, report_annee, utilisation_annee, stock_cloture) VALUES (?,?,?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 29,
+          "etape": "avant traiter_deficit",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 30,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 31,
+          "etape": "SQL INSERT INTO deficit_lmnp (annee_origine, montant_initial, solde, annee_expiration) VALUES (?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 32,
+          "etape": "apres traiter_deficit",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 33,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS cloture_fiscale ( exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee), retraitements REAL NOT NULL DEFAULT 0, impute_deficits REAL NOT NULL DEFAULT 0, deficit_cree REAL, revenu_imposable REAL NOT NULL DEFAULT 0)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 34,
+          "etape": "SQL INSERT OR REPLACE INTO cloture_fiscale (exercice_annee, retraitements, impute_deficits, deficit_cree, revenu_imposable) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 35,
+          "etape": "SQL UPDATE exercice SET statut='clos', resultat_comptable=?, resultat_fiscal=? WHERE annee=?",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 36,
+          "etape": "avant commit",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 37,
+          "etape": "apres commit",
+          "transaction": false,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "clos",
+          "identique": true,
+          "relance": {
+            "erreur": "ValueError: L'exercice 2025 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits)."
+          }
+        }
+      ]
+    },
+    "imputation_deficit": {
+      "commits": 1,
+      "trace": [
+        {
+          "point": 1,
+          "etape": "SQL BEGIN IMMEDIATE",
+          "transaction": true
+        },
+        {
+          "point": 2,
+          "etape": "avant generer_cloture",
+          "transaction": true
+        },
+        {
+          "point": 3,
+          "etape": "SQL SAVEPOINT ecr_inserer",
+          "transaction": true
+        },
+        {
+          "point": 4,
+          "etape": "SQL INSERT INTO ecriture (journal_code, ecriture_num, ecriture_date, exercice_annee, piece_ref, piece_date, libelle, valid_date) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 5,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 6,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 7,
+          "etape": "SQL RELEASE SAVEPOINT ecr_inserer",
+          "transaction": true
+        },
+        {
+          "point": 8,
+          "etape": "SQL INSERT OR REPLACE INTO plan_amortissement (composant_id, exercice_annee, dotation, cumul_fin, vnc_fin) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 9,
+          "etape": "apres generer_cloture",
+          "transaction": true
+        },
+        {
+          "point": 10,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS compte_hors_plafond_39c (numero TEXT PRIMARY KEY REFERENCES compte(numero))",
+          "transaction": true
+        },
+        {
+          "point": 11,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true
+        },
+        {
+          "point": 12,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true
+        },
+        {
+          "point": 13,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true
+        },
+        {
+          "point": 14,
+          "etape": "avant _calcul_fiscal",
+          "transaction": true
+        },
+        {
+          "point": 15,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true
+        },
+        {
+          "point": 16,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 17,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 18,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 19,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 20,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 21,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS gabarit_personnalise ( cle TEXT PRIMARY KEY, libelle TEXT NOT NULL, compte_num TEXT NOT NULL REFERENCES compte(numero), nature TEXT NOT NULL CHECK (nature IN ('produit','charge')), periodicite TEXT NOT NULL DEFAULT 'variable' CHECK (periodicite IN ('mensuel','annuel','variable')), retraitement TEXT, actif INTEGER NOT NULL DEFAULT 1)",
+          "transaction": true
+        },
+        {
+          "point": 22,
+          "etape": "apres _calcul_fiscal",
+          "transaction": true
+        },
+        {
+          "point": 23,
+          "etape": "avant _ventiler_39c_par_bien",
+          "transaction": true
+        },
+        {
+          "point": 24,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS suivi_39c_bien ( exercice_annee INTEGER NOT NULL REFERENCES exercice(annee), bien_id INTEGER NOT NULL REFERENCES bien(id), stock_ouverture REAL NOT NULL DEFAULT 0, dotation_bien REAL NOT NULL DEFAULT 0, report_bien REAL NOT NULL DEFAULT 0, utilisation_bien REAL NOT NULL DEFAULT 0, sortie_bien REAL NOT NULL DEFAULT 0, stock_cloture REAL NOT NULL DEFAULT 0, PRIMARY KEY (exercice_annee, bien_id))",
+          "transaction": true
+        },
+        {
+          "point": 25,
+          "etape": "SQL DELETE FROM suivi_39c_bien WHERE exercice_annee=?",
+          "transaction": true
+        },
+        {
+          "point": 26,
+          "etape": "SQL INSERT INTO suivi_39c_bien (exercice_annee, bien_id, stock_ouverture, dotation_bien, report_bien, utilisation_bien, sortie_bien, stock_cloture) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 27,
+          "etape": "apres _ventiler_39c_par_bien",
+          "transaction": true
+        },
+        {
+          "point": 28,
+          "etape": "SQL INSERT OR REPLACE INTO suivi_39c (exercice_annee, plafond_deductible, dotation_exercice, stock_ouverture, report_annee, utilisation_annee, stock_cloture) VALUES (?,?,?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 29,
+          "etape": "avant traiter_deficit",
+          "transaction": true
+        },
+        {
+          "point": 30,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true
+        },
+        {
+          "point": 31,
+          "etape": "SQL UPDATE deficit_lmnp SET solde=ROUND(solde-?,2) WHERE id=?",
+          "transaction": true
+        },
+        {
+          "point": 32,
+          "etape": "apres traiter_deficit",
+          "transaction": true
+        },
+        {
+          "point": 33,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS cloture_fiscale ( exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee), retraitements REAL NOT NULL DEFAULT 0, impute_deficits REAL NOT NULL DEFAULT 0, deficit_cree REAL, revenu_imposable REAL NOT NULL DEFAULT 0)",
+          "transaction": true
+        },
+        {
+          "point": 34,
+          "etape": "SQL INSERT OR REPLACE INTO cloture_fiscale (exercice_annee, retraitements, impute_deficits, deficit_cree, revenu_imposable) VALUES (?,?,?,?,?)",
+          "transaction": true
+        },
+        {
+          "point": 35,
+          "etape": "SQL UPDATE exercice SET statut='clos', resultat_comptable=?, resultat_fiscal=? WHERE annee=?",
+          "transaction": true
+        },
+        {
+          "point": 36,
+          "etape": "avant commit",
+          "transaction": true
+        },
+        {
+          "point": 37,
+          "etape": "apres commit",
+          "transaction": false
+        }
+      ],
+      "coupures": [
+        {
+          "point": 1,
+          "etape": "SQL BEGIN IMMEDIATE",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 2,
+          "etape": "avant generer_cloture",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 3,
+          "etape": "SQL SAVEPOINT ecr_inserer",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 4,
+          "etape": "SQL INSERT INTO ecriture (journal_code, ecriture_num, ecriture_date, exercice_annee, piece_ref, piece_date, libelle, valid_date) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 5,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 6,
+          "etape": "SQL INSERT INTO ligne (ecriture_id, compte_num, libelle, debit, credit) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 7,
+          "etape": "SQL RELEASE SAVEPOINT ecr_inserer",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 8,
+          "etape": "SQL INSERT OR REPLACE INTO plan_amortissement (composant_id, exercice_annee, dotation, cumul_fin, vnc_fin) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 9,
+          "etape": "apres generer_cloture",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 10,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS compte_hors_plafond_39c (numero TEXT PRIMARY KEY REFERENCES compte(numero))",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 11,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 12,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 13,
+          "etape": "SQL INSERT OR IGNORE INTO compte_hors_plafond_39c SELECT ? WHERE EXISTS (SELECT 1 FROM compte WHERE numero=?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 14,
+          "etape": "avant _calcul_fiscal",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 15,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 16,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 17,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 18,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 19,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 20,
+          "etape": "SQL INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 21,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS gabarit_personnalise ( cle TEXT PRIMARY KEY, libelle TEXT NOT NULL, compte_num TEXT NOT NULL REFERENCES compte(numero), nature TEXT NOT NULL CHECK (nature IN ('produit','charge')), periodicite TEXT NOT NULL DEFAULT 'variable' CHECK (periodicite IN ('mensuel','annuel','variable')), retraitement TEXT, actif INTEGER NOT NULL DEFAULT 1)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 22,
+          "etape": "apres _calcul_fiscal",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 23,
+          "etape": "avant _ventiler_39c_par_bien",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 24,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS suivi_39c_bien ( exercice_annee INTEGER NOT NULL REFERENCES exercice(annee), bien_id INTEGER NOT NULL REFERENCES bien(id), stock_ouverture REAL NOT NULL DEFAULT 0, dotation_bien REAL NOT NULL DEFAULT 0, report_bien REAL NOT NULL DEFAULT 0, utilisation_bien REAL NOT NULL DEFAULT 0, sortie_bien REAL NOT NULL DEFAULT 0, stock_cloture REAL NOT NULL DEFAULT 0, PRIMARY KEY (exercice_annee, bien_id))",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 25,
+          "etape": "SQL DELETE FROM suivi_39c_bien WHERE exercice_annee=?",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 26,
+          "etape": "SQL INSERT INTO suivi_39c_bien (exercice_annee, bien_id, stock_ouverture, dotation_bien, report_bien, utilisation_bien, sortie_bien, stock_cloture) VALUES (?,?,?,?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 27,
+          "etape": "apres _ventiler_39c_par_bien",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 28,
+          "etape": "SQL INSERT OR REPLACE INTO suivi_39c (exercice_annee, plafond_deductible, dotation_exercice, stock_ouverture, report_annee, utilisation_annee, stock_cloture) VALUES (?,?,?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 29,
+          "etape": "avant traiter_deficit",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 30,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS regle_fiscale ( id INTEGER PRIMARY KEY, cle TEXT NOT NULL, valeur REAL NOT NULL, date_debut TEXT NOT NULL, date_fin TEXT, reference TEXT NOT NULL DEFAULT '', commentaire TEXT NOT NULL DEFAULT '')",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 31,
+          "etape": "SQL UPDATE deficit_lmnp SET solde=ROUND(solde-?,2) WHERE id=?",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 32,
+          "etape": "apres traiter_deficit",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 33,
+          "etape": "SQL CREATE TABLE IF NOT EXISTS cloture_fiscale ( exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee), retraitements REAL NOT NULL DEFAULT 0, impute_deficits REAL NOT NULL DEFAULT 0, deficit_cree REAL, revenu_imposable REAL NOT NULL DEFAULT 0)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 34,
+          "etape": "SQL INSERT OR REPLACE INTO cloture_fiscale (exercice_annee, retraitements, impute_deficits, deficit_cree, revenu_imposable) VALUES (?,?,?,?,?)",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 35,
+          "etape": "SQL UPDATE exercice SET statut='clos', resultat_comptable=?, resultat_fiscal=? WHERE annee=?",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 36,
+          "etape": "avant commit",
+          "transaction": true,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "initial",
+          "identique": true,
+          "relance_identique": true
+        },
+        {
+          "point": 37,
+          "etape": "apres commit",
+          "transaction": false,
+          "code": -9,
+          "integrite": "ok",
+          "etat_attendu": "clos",
+          "identique": true,
+          "relance": {
+            "erreur": "ValueError: L'exercice 2025 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits)."
+          }
+        }
+      ]
+    }
+  },
+  "cloture_anterieure_apres_suivante": {
+    "cloture_2025": {
+      "agregats": {
+        "produits": 600.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 600.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 600.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 600.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 600.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 600.0
+    },
+    "cloture_2024": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 1000.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 1000.0,
+        "dotation": 0,
+        "resultat_comptable": -1000.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": -1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": -1000.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": -1000.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": 1000.0,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 1000.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat_2025": {
+      "exercice": {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": 600.0,
+        "resultat_fiscal": 600.0
+      },
+      "balance": {
+        "108000": -11400.0,
+        "218400": 12000.0,
+        "708810": -600.0
+      },
+      "ecritures": 2,
+      "lignes": 4,
+      "deficits": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 1000.0,
+          "solde": 1000.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "suivi": [
+        {
+          "exercice_annee": 2024,
+          "plafond_deductible": -1000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 600.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2024,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": 1000.0,
+          "revenu_imposable": 0.0
+        },
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 600.0
+        }
+      ],
+      "controles": [
+        "AN_ABSENTS"
+      ],
+      "rc_liasse": 600.0,
+      "rf_liasse": 600.0,
+      "conforme": false
+    },
+    "ordre_chronologique": {
+      "agregats": {
+        "produits": 600.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 600.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 600.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 600.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 600.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 600.0,
+        "stock_deficits": 400.0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat_chronologique": {
+      "exercice": {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": 600.0,
+        "resultat_fiscal": 600.0
+      },
+      "balance": {
+        "108000": -11400.0,
+        "120000": 0.0,
+        "218400": 12000.0,
+        "708810": -600.0
+      },
+      "ecritures": 4,
+      "lignes": 8,
+      "deficits": [
+        {
+          "id": 1,
+          "annee_origine": 2024,
+          "montant_initial": 1000.0,
+          "solde": 400.0,
+          "annee_expiration": 2034
+        }
+      ],
+      "suivi": [
+        {
+          "exercice_annee": 2024,
+          "plafond_deductible": -1000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        },
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 600.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2024,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": 1000.0,
+          "revenu_imposable": 0.0
+        },
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 600.0,
+          "deficit_cree": null,
+          "revenu_imposable": 0.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": 600.0,
+      "rf_liasse": 600.0,
+      "conforme": false
+    }
+  },
+  "exercice_vide_2025": {
+    "cloture": {
+      "retour": {
+        "agregats": {
+          "produits": 0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 0,
+          "resultat_comptable": 0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 0,
+          "plafond_deductible": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 0.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 0.0
+      }
+    },
+    "ouverture_suivante": {
+      "erreur": "ValueError: Écriture sans ligne."
+    },
+    "exercices": [
+      {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": 0.0,
+        "resultat_fiscal": 0.0
+      },
+      {
+        "annee": 2026,
+        "date_debut": "2026-01-01",
+        "date_fin": "2026-12-31",
+        "statut": "ouvert",
+        "resultat_comptable": null,
+        "resultat_fiscal": null
+      }
+    ],
+    "controles": [
+      "AN_ABSENTS"
+    ]
+  },
+  "exercice_vide_2040": {
+    "cloture": {
+      "retour": {
+        "agregats": {
+          "produits": 0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 0,
+          "resultat_comptable": 0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 0,
+          "plafond_deductible": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 0.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 0.0
+      }
+    },
+    "ouverture_suivante": {
+      "erreur": "ValueError: Écriture sans ligne."
+    },
+    "exercices": [
+      {
+        "annee": 2040,
+        "date_debut": "2040-01-01",
+        "date_fin": "2040-12-31",
+        "statut": "clos",
+        "resultat_comptable": 0.0,
+        "resultat_fiscal": 0.0
+      },
+      {
+        "annee": 2041,
+        "date_debut": "2041-01-01",
+        "date_fin": "2041-12-31",
+        "statut": "ouvert",
+        "resultat_comptable": null,
+        "resultat_fiscal": null
+      }
+    ],
+    "controles": [
+      "AN_ABSENTS"
+    ]
+  },
+  "suppression_an_reconstruction": {
+    "avant": {
+      "exercice": {
+        "annee": 2026,
+        "date_debut": "2026-01-01",
+        "date_fin": "2026-12-31",
+        "statut": "ouvert",
+        "resultat_comptable": null,
+        "resultat_fiscal": null
+      },
+      "balance": {
+        "108000": -12000.0,
+        "120000": 0.0,
+        "218400": 12000.0
+      },
+      "ecritures": 2,
+      "lignes": 5,
+      "deficits": [],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 600.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 600.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": 0,
+      "rf_liasse": 0.0,
+      "conforme": false
+    },
+    "second_refuse": {
+      "erreur": "ValueError: L'exercice 2026 contient déjà des à-nouveaux."
+    },
+    "reconstruction": {
+      "annee_source": 2025,
+      "resultat_reporte": 600.0,
+      "nb_comptes": 2
+    },
+    "apres": {
+      "exercice": {
+        "annee": 2026,
+        "date_debut": "2026-01-01",
+        "date_fin": "2026-12-31",
+        "statut": "ouvert",
+        "resultat_comptable": null,
+        "resultat_fiscal": null
+      },
+      "balance": {
+        "108000": -12600.0,
+        "120000": 600.0,
+        "218400": 12000.0
+      },
+      "ecritures": 3,
+      "lignes": 7,
+      "deficits": [],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 600.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 600.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": 0,
+      "rf_liasse": 0.0,
+      "conforme": false
+    },
+    "affectations": 2,
+    "ouverture_2027": {
+      "erreur": "ValueError: Écriture déséquilibrée : débit 12000.00 € / crédit 12600.00 €."
+    }
+  },
+  "ouverture_sans_an": {
+    "exercice": {
+      "annee": 2026,
+      "date_debut": "2026-01-01",
+      "date_fin": "2026-12-31",
+      "statut": "ouvert",
+      "resultat_comptable": null,
+      "resultat_fiscal": null
+    },
+    "balance": {},
+    "ecritures": 0,
+    "lignes": 0,
+    "deficits": [],
+    "suivi": [
+      {
+        "exercice_annee": 2025,
+        "plafond_deductible": 0.0,
+        "dotation_exercice": 0.0,
+        "stock_ouverture": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0
+      }
+    ],
+    "cloture": [
+      {
+        "exercice_annee": 2025,
+        "retraitements": 0.0,
+        "impute_deficits": 0.0,
+        "deficit_cree": null,
+        "revenu_imposable": 0.0
+      }
+    ],
+    "controles": [
+      "AN_ABSENTS"
+    ],
+    "rc_liasse": 0,
+    "rf_liasse": 0.0,
+    "conforme": true
+  },
+  "jonction_un_centime": {
+    "avant": {
+      "218400": 12000.0,
+      "108000": -12300.0,
+      "281840": -1200.0
+    },
+    "apres": {
+      "108000": -12300.01,
+      "218400": 12000.01,
+      "281840": -1200.0
+    },
+    "controle": [
+      {
+        "type": "ok",
+        "message": "Jonction 2024 → 2025 : les bilans se raccordent au centime."
+      }
+    ],
+    "controle_sans_tolerance": [
+      {
+        "type": "ecart",
+        "ecarts": [
+          [
+            "108000",
+            -12300.0,
+            -12300.01,
+            -0.01
+          ],
+          [
+            "218400",
+            12000.0,
+            12000.01,
+            0.01
+          ]
+        ],
+        "message": "Jonction 2024 → 2025 : 2 compte(s) ne se raccordent pas. 108000 : -12300.00 → -12300.01 (-0.01) ; 218400 : 12000.00 → 12000.01 (+0.01) Cela arrive quand une écriture a été ajoutée après coup dans l'exercice précédent, ou quand le fichier n'est pas la version définitive."
+      }
+    ]
+  },
+  "trois_exercices": {
+    "natif": {
+      "2024": {
+        "cloture": {
+          "agregats": {
+            "produits": 1000.0,
+            "charges_hors_daa": 1300.0,
+            "charges_hors_plafond": 0,
+            "charges_afferentes": 1300.0,
+            "dotation": 1200.0,
+            "resultat_comptable": -1500.0,
+            "produits_cession": 0,
+            "vnc_cession": 0,
+            "plafond_39c": -300.0
+          },
+          "suivi_39c": {
+            "stock_ouverture": 0.0,
+            "dotation_exercice": 1200.0,
+            "plafond_deductible": -300.0,
+            "report_annee": 1200.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 1200.0,
+            "sorties_39c": 0.0
+          },
+          "resultat_fiscal": -300.0,
+          "autres_retraitements": 0.0,
+          "deficits": {
+            "perimes": 0,
+            "deficit_cree": 300.0,
+            "impute_sur_benefice": 0.0,
+            "stock_deficits": 300.0
+          },
+          "revenu_imposable": 0.0
+        },
+        "balance": {
+          "108000": -12300.0,
+          "218400": 12000.0,
+          "281840": -1200.0,
+          "615200": 1300.0,
+          "681120": 1200.0,
+          "708810": -1000.0
+        }
+      },
+      "2025": {
+        "cloture": {
+          "agregats": {
+            "produits": 2400.0,
+            "charges_hors_daa": 200.0,
+            "charges_hors_plafond": 0,
+            "charges_afferentes": 200.0,
+            "dotation": 1200.0,
+            "resultat_comptable": 1000.0,
+            "produits_cession": 0,
+            "vnc_cession": 0,
+            "plafond_39c": 2200.0
+          },
+          "suivi_39c": {
+            "stock_ouverture": 1200.0,
+            "dotation_exercice": 1200.0,
+            "plafond_deductible": 2200.0,
+            "report_annee": 0.0,
+            "utilisation_annee": 1000.0,
+            "stock_cloture": 200.0,
+            "sorties_39c": 0.0
+          },
+          "resultat_fiscal": 0.0,
+          "autres_retraitements": 0.0,
+          "deficits": {
+            "perimes": 0,
+            "deficit_cree": null,
+            "impute_sur_benefice": 0.0,
+            "stock_deficits": 300.0
+          },
+          "revenu_imposable": 0.0
+        },
+        "balance": {
+          "108000": -8600.0,
+          "120000": 0.0,
+          "218400": 12000.0,
+          "281840": -2400.0,
+          "615200": 200.0,
+          "681120": 1200.0,
+          "708810": -2400.0
+        }
+      },
+      "2026": {
+        "cloture": {
+          "agregats": {
+            "produits": 4000.0,
+            "charges_hors_daa": 200.0,
+            "charges_hors_plafond": 0,
+            "charges_afferentes": 200.0,
+            "dotation": 1200.0,
+            "resultat_comptable": 2600.0,
+            "produits_cession": 0,
+            "vnc_cession": 0,
+            "plafond_39c": 3800.0
+          },
+          "suivi_39c": {
+            "stock_ouverture": 200.0,
+            "dotation_exercice": 1200.0,
+            "plafond_deductible": 3800.0,
+            "report_annee": 0.0,
+            "utilisation_annee": 200.0,
+            "stock_cloture": 0.0,
+            "sorties_39c": 0.0
+          },
+          "resultat_fiscal": 2400.0,
+          "autres_retraitements": 0.0,
+          "deficits": {
+            "perimes": 0,
+            "deficit_cree": null,
+            "impute_sur_benefice": 300.0,
+            "stock_deficits": 0.0
+          },
+          "revenu_imposable": 2100.0
+        },
+        "balance": {
+          "108000": -5800.0,
+          "120000": 0.0,
+          "218400": 12000.0,
+          "281840": -3600.0,
+          "615200": 200.0,
+          "681120": 1200.0,
+          "708810": -4000.0
+        }
+      }
+    },
+    "rejeux": {
+      "False": {
+        "2024": {
+          "rejeu": {
+            "ecritures": 4,
+            "normalisees": 0,
+            "comptes_crees": [],
+            "renumerotees": false
+          },
+          "cloture": {
+            "agregats": {
+              "produits": 1000.0,
+              "charges_hors_daa": 1300.0,
+              "charges_hors_plafond": 0,
+              "charges_afferentes": 1300.0,
+              "dotation": 1200.0,
+              "resultat_comptable": -1500.0,
+              "produits_cession": 0,
+              "vnc_cession": 0,
+              "plafond_39c": -300.0
+            },
+            "suivi_39c": {
+              "stock_ouverture": 0.0,
+              "dotation_exercice": 1200.0,
+              "plafond_deductible": -300.0,
+              "report_annee": 1200.0,
+              "utilisation_annee": 0.0,
+              "stock_cloture": 1200.0,
+              "sorties_39c": 0.0
+            },
+            "resultat_fiscal": -300.0,
+            "autres_retraitements": 0.0,
+            "deficits": {
+              "perimes": 0,
+              "deficit_cree": 300.0,
+              "impute_sur_benefice": 0.0,
+              "stock_deficits": 300.0
+            },
+            "revenu_imposable": 0.0
+          },
+          "balance": {
+            "108000": -12300.0,
+            "218400": 12000.0,
+            "281840": -1200.0,
+            "615200": 1300.0,
+            "681120": 1200.0,
+            "708810": -1000.0
+          },
+          "balance_identique": true,
+          "fiscal_identique": true
+        },
+        "2025": {
+          "rejeu": {
+            "ecritures": 5,
+            "normalisees": 0,
+            "comptes_crees": [],
+            "renumerotees": false
+          },
+          "cloture": {
+            "agregats": {
+              "produits": 2400.0,
+              "charges_hors_daa": 200.0,
+              "charges_hors_plafond": 0,
+              "charges_afferentes": 200.0,
+              "dotation": 1200.0,
+              "resultat_comptable": 1000.0,
+              "produits_cession": 0,
+              "vnc_cession": 0,
+              "plafond_39c": 2200.0
+            },
+            "suivi_39c": {
+              "stock_ouverture": 1200.0,
+              "dotation_exercice": 1200.0,
+              "plafond_deductible": 2200.0,
+              "report_annee": 0.0,
+              "utilisation_annee": 1000.0,
+              "stock_cloture": 200.0,
+              "sorties_39c": 0.0
+            },
+            "resultat_fiscal": 0.0,
+            "autres_retraitements": 0.0,
+            "deficits": {
+              "perimes": 0,
+              "deficit_cree": null,
+              "impute_sur_benefice": 0.0,
+              "stock_deficits": 300.0
+            },
+            "revenu_imposable": 0.0
+          },
+          "balance": {
+            "108000": -8600.0,
+            "120000": 0.0,
+            "218400": 12000.0,
+            "281840": -2400.0,
+            "615200": 200.0,
+            "681120": 1200.0,
+            "708810": -2400.0
+          },
+          "balance_identique": true,
+          "fiscal_identique": true
+        },
+        "2026": {
+          "rejeu": {
+            "ecritures": 5,
+            "normalisees": 0,
+            "comptes_crees": [],
+            "renumerotees": false
+          },
+          "cloture": {
+            "agregats": {
+              "produits": 4000.0,
+              "charges_hors_daa": 200.0,
+              "charges_hors_plafond": 0,
+              "charges_afferentes": 200.0,
+              "dotation": 1200.0,
+              "resultat_comptable": 2600.0,
+              "produits_cession": 0,
+              "vnc_cession": 0,
+              "plafond_39c": 3800.0
+            },
+            "suivi_39c": {
+              "stock_ouverture": 200.0,
+              "dotation_exercice": 1200.0,
+              "plafond_deductible": 3800.0,
+              "report_annee": 0.0,
+              "utilisation_annee": 200.0,
+              "stock_cloture": 0.0,
+              "sorties_39c": 0.0
+            },
+            "resultat_fiscal": 2400.0,
+            "autres_retraitements": 0.0,
+            "deficits": {
+              "perimes": 0,
+              "deficit_cree": null,
+              "impute_sur_benefice": 300.0,
+              "stock_deficits": 0.0
+            },
+            "revenu_imposable": 2100.0
+          },
+          "balance": {
+            "108000": -5800.0,
+            "120000": 0.0,
+            "218400": 12000.0,
+            "281840": -3600.0,
+            "615200": 200.0,
+            "681120": 1200.0,
+            "708810": -4000.0
+          },
+          "balance_identique": true,
+          "fiscal_identique": true
+        }
+      },
+      "True": {
+        "2024": {
+          "rejeu": {
+            "ecritures": 4,
+            "normalisees": 0,
+            "comptes_crees": [],
+            "renumerotees": false
+          },
+          "erreur": "ValueError: Dotation aux amortissements déjà générée pour 2024 (écriture OD n°4)."
+        }
+      }
+    },
+    "jonctions": [
+      {
+        "type": "ok",
+        "message": "Jonction 2024 → 2025 : les bilans se raccordent au centime."
+      },
+      {
+        "type": "ok",
+        "message": "Jonction 2025 → 2026 : les bilans se raccordent au centime."
+      }
+    ]
+  },
+  "comptes_externes": {
+    "rejeu": {
+      "ecritures": 5,
+      "normalisees": 0,
+      "comptes_crees": [
+        "3100000",
+        "4010000",
+        "4110000",
+        "5120000",
+        "6450000",
+        "6580000",
+        "6811000",
+        "6950000"
+      ],
+      "renumerotees": false
+    },
+    "rc_fiscal": -4000.0,
+    "rc_liasse": -4000.0,
+    "ouverture": {
+      "exercice": {
+        "annee": 2026,
+        "date_debut": "2026-01-01",
+        "date_fin": "2026-12-31",
+        "statut": "ouvert",
+        "resultat_comptable": null,
+        "resultat_fiscal": null
+      },
+      "balance": {
+        "108000": -200.0,
+        "120000": 0.0,
+        "3100000": 100.0,
+        "4010000": -400.0,
+        "4110000": 200.0,
+        "5120000": 300.0
+      },
+      "ecritures": 2,
+      "lignes": 8,
+      "deficits": [
+        {
+          "id": 1,
+          "annee_origine": 2025,
+          "montant_initial": 4000.0,
+          "solde": 4000.0,
+          "annee_expiration": 2035
+        }
+      ],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": -4000.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": 4000.0,
+          "revenu_imposable": 0.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": 0,
+      "rf_liasse": 0.0,
+      "conforme": true
+    },
+    "equilibre": [
+      8600.0,
+      8600.0
+    ]
+  },
+  "an_un_centime": {
+    "balance": {
+      "108000": -0.01,
+      "120000": 0.0,
+      "218400": 0.01
+    },
+    "equilibre": [
+      0.01,
+      0.01
+    ]
+  },
+  "an_desequilibre_refuse": {
+    "retour": {
+      "erreur": "ValueError: Écriture déséquilibrée : débit 800.00 € / crédit 799.00 €."
+    },
+    "appels_controle_equilibre": 0,
+    "ecritures": 0
+  },
+  "dates_an-janvier": {
+    "annee_detectee": 2025,
+    "rejeu": {
+      "retour": {
+        "ecritures": 2,
+        "normalisees": 0,
+        "comptes_crees": [],
+        "renumerotees": false
+      }
+    },
+    "ecritures": 2
+  },
+  "dates_an-decembre": {
+    "annee_detectee": 2024,
+    "rejeu": {
+      "erreur": "ValueError: La date d'écriture (2024-12-31) est hors de l'exercice 2025 : une écriture doit être datée dans son propre exercice (cohérence FEC)."
+    },
+    "ecritures": 0
+  },
+  "rejeu_interrompu": {
+    "erreur": {
+      "erreur": "RuntimeError: Interruption fictive au troisième lot"
+    },
+    "restantes": 0,
+    "relance": {
+      "ecritures": 3,
+      "normalisees": 0,
+      "comptes_crees": [],
+      "renumerotees": false
+    },
+    "final": 3
+  },
+  "parite_web_cli": {
+    "cli_code": 0,
+    "cli_sortie": "Dossier : DOSSIER_FICTIF/cli/compta.db\nSauvegarde : DOSSIER_FICTIF/cli/sauvegardes/compta-20260915-150033-avant-cloture.db\nFEC archivé : DOSSIER_FICTIF/cli/archives/FEC2025-cloture-20260915-150033.txt\n  empreinte SHA-256 : 59ed6f39ac5a6567… (consignée dans manifeste.csv)\nClôture 2025 :\n  Produits 1000.00 | Charges 1300.00 | Dotation 1200.00\n  Résultat comptable : -1500.00\n  Report 39C : +1200.00 / -0.00 -> stock 1200.00\n  Résultat fiscal    : -300.00\n  Déficits LMNP : stock 300.00 (déficit créé 300.00)\n",
+    "cli_erreur": "",
+    "web_code": 302,
+    "web_message": {
+      "annee": [
+        "2025"
+      ],
+      "ok": [
+        "Exercice 2025 clôturé. Résultat comptable : -1500.00 € | Résultat fiscal : -300.00 € | Dotation : 1200.00 € | FEC archivé : FEC2025-cloture-20260915-150034.txt"
+      ]
+    },
+    "bases_identiques": true,
+    "etats": {
+      "web": {
+        "exercice": {
+          "annee": 2025,
+          "date_debut": "2025-01-01",
+          "date_fin": "2025-12-31",
+          "statut": "clos",
+          "resultat_comptable": -1500.0,
+          "resultat_fiscal": -300.0
+        },
+        "balance": {
+          "108000": -12300.0,
+          "218400": 12000.0,
+          "281840": -1200.0,
+          "615200": 1300.0,
+          "681120": 1200.0,
+          "708810": -1000.0
+        },
+        "ecritures": 4,
+        "lignes": 8,
+        "deficits": [
+          {
+            "id": 1,
+            "annee_origine": 2025,
+            "montant_initial": 300.0,
+            "solde": 300.0,
+            "annee_expiration": 2035
+          }
+        ],
+        "suivi": [
+          {
+            "exercice_annee": 2025,
+            "plafond_deductible": -300.0,
+            "dotation_exercice": 1200.0,
+            "stock_ouverture": 0.0,
+            "report_annee": 1200.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 1200.0
+          }
+        ],
+        "cloture": [
+          {
+            "exercice_annee": 2025,
+            "retraitements": 0.0,
+            "impute_deficits": 0.0,
+            "deficit_cree": 300.0,
+            "revenu_imposable": 0.0
+          }
+        ],
+        "controles": [],
+        "rc_liasse": -1500.0,
+        "rf_liasse": -300.0,
+        "conforme": true
+      },
+      "cli": {
+        "exercice": {
+          "annee": 2025,
+          "date_debut": "2025-01-01",
+          "date_fin": "2025-12-31",
+          "statut": "clos",
+          "resultat_comptable": -1500.0,
+          "resultat_fiscal": -300.0
+        },
+        "balance": {
+          "108000": -12300.0,
+          "218400": 12000.0,
+          "281840": -1200.0,
+          "615200": 1300.0,
+          "681120": 1200.0,
+          "708810": -1000.0
+        },
+        "ecritures": 4,
+        "lignes": 8,
+        "deficits": [
+          {
+            "id": 1,
+            "annee_origine": 2025,
+            "montant_initial": 300.0,
+            "solde": 300.0,
+            "annee_expiration": 2035
+          }
+        ],
+        "suivi": [
+          {
+            "exercice_annee": 2025,
+            "plafond_deductible": -300.0,
+            "dotation_exercice": 1200.0,
+            "stock_ouverture": 0.0,
+            "report_annee": 1200.0,
+            "utilisation_annee": 0.0,
+            "stock_cloture": 1200.0
+          }
+        ],
+        "cloture": [
+          {
+            "exercice_annee": 2025,
+            "retraitements": 0.0,
+            "impute_deficits": 0.0,
+            "deficit_cree": 300.0,
+            "revenu_imposable": 0.0
+          }
+        ],
+        "controles": [],
+        "rc_liasse": -1500.0,
+        "rf_liasse": -300.0,
+        "conforme": true
+      }
+    },
+    "fichiers": {
+      "web": {
+        "archives/manifeste.csv": "ab6a7232d11262db28e251d1bdb1b9cd3a163b568c6069bc9735208a72260f93",
+        "archives/FEC2025-cloture-20260915-150034.txt": "59ed6f39ac5a6567d14babd732331fd0bef325afee3654beae83e956d1c87562",
+        "sauvegardes/compta-20260915-150034-avant-cloture.db": "da19f4f2ca58f37a1cdfff528ba396039a7f60814a3e7efd96d0b8909ad252e0"
+      },
+      "cli": {
+        "archives/manifeste.csv": "4e2a242240769c7950e4fdf4e27bb04f899963a80a9a0e7b7f4f6ece397de7b5",
+        "archives/FEC2025-cloture-20260915-150033.txt": "59ed6f39ac5a6567d14babd732331fd0bef325afee3654beae83e956d1c87562",
+        "sauvegardes/compta-20260915-150033-avant-cloture.db": "b99903b1220d70e5e2f4d96d4467923c1c56ba289eb9f00c68e0819651ff80a2"
+      }
+    },
+    "differences_sauvegardes": {
+      "regle_fiscale": {
+        "web": [],
+        "cli": null
+      }
+    }
+  },
+  "archive_web_refusee": {
+    "message": {
+      "annee": [
+        "2025"
+      ],
+      "warn": [
+        "Exercice 2025 clôturé. Résultat comptable : 600.00 € | Résultat fiscal : 600.00 € | Dotation : 0.00 € | ATTENTION : l'exercice EST clôturé, mais le FEC n'a pas pu être archivé (Archive fictive inaccessible). La piste d'audit manque — exportez le FEC 2025 à la main depuis la page Archives."
+      ]
+    },
+    "etat": {
+      "exercice": {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": 600.0,
+        "resultat_fiscal": 600.0
+      },
+      "balance": {
+        "108000": 600.0,
+        "708810": -600.0
+      },
+      "ecritures": 1,
+      "lignes": 2,
+      "deficits": [],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 600.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 600.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": 600.0,
+      "rf_liasse": 600.0,
+      "conforme": true
+    }
+  },
+  "archive_cli_refusee": {
+    "retour": {
+      "retour": null
+    },
+    "sortie": "Sauvegarde : DOSSIER_FICTIF/sauvegardes/base-23/base-23-20260915-150034-avant-cloture.db\n\nATTENTION : l'exercice 2025 EST clôturé, mais le FEC n'a pas pu être archivé (Archive fictive inaccessible).\n  La piste d'audit manque : exportez le FEC à la main avec « exporter-fec ».\nClôture 2025 :\n  Produits 600.00 | Charges 0.00 | Dotation 0.00\n  Résultat comptable : 600.00\n  Report 39C : +0.00 / -0.00 -> stock 0.00\n  Résultat fiscal    : 600.00\n  Déficits LMNP : stock 0.00\n",
+    "etat": {
+      "exercice": {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": 600.0,
+        "resultat_fiscal": 600.0
+      },
+      "balance": {
+        "108000": 600.0,
+        "708810": -600.0
+      },
+      "ecritures": 1,
+      "lignes": 2,
+      "deficits": [],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 600.0,
+          "dotation_exercice": 0.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 0.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 600.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": 600.0,
+      "rf_liasse": 600.0,
+      "conforme": true
+    }
+  },
+  "fermeture_et_retraitements_figes": {
+    "cloture": {
+      "agregats": {
+        "produits": 1200.0,
+        "charges_hors_daa": 200.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 200.0,
+        "dotation": 1200.0,
+        "resultat_comptable": -200.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 1200.0,
+        "plafond_deductible": 1200.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 200.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "tentatives": {
+      "insertion": {
+        "erreur": "ValueError: L'exercice 2025 est clos : aucune écriture ne peut plus y être ajoutée."
+      },
+      "annulation": {
+        "erreur": "ValueError: L'exercice 2025 est clos : passez une régularisation sur l'exercice ouvert, ou restaurez la sauvegarde d'avant clôture (page Dossiers)."
+      },
+      "cession": {
+        "erreur": "ValueError: L'exercice 2025 est clos : aucune écriture ne peut plus y être ajoutée."
+      },
+      "reprise_an": {
+        "erreur": "ValueError: L'exercice 2025 est clos : aucune écriture ne peut plus y être ajoutée."
+      },
+      "double_cloture": {
+        "erreur": "ValueError: L'exercice 2025 est déjà clos — clôture refusée (elle dupliquerait la dotation et l'imputation des déficits)."
+      }
+    },
+    "etat_inchange": false,
+    "donnees_comptables_inchangees": false,
+    "differences": {
+      "bien": {
+        "avant": [
+          [
+            1,
+            1,
+            "Bien fictif",
+            null,
+            null,
+            12000.0,
+            null
+          ]
+        ],
+        "apres": [
+          [
+            1,
+            1,
+            "Bien fictif",
+            null,
+            null,
+            12000.0,
+            null,
+            null
+          ]
+        ]
+      },
+      "composant": {
+        "avant": [
+          [
+            1,
+            1,
+            null,
+            "Composant fictif",
+            null,
+            12000.0,
+            10,
+            "2025-01-01",
+            "218400",
+            "281840",
+            1
+          ]
+        ],
+        "apres": [
+          [
+            1,
+            1,
+            null,
+            "Composant fictif",
+            null,
+            12000.0,
+            10,
+            "2025-01-01",
+            "218400",
+            "281840",
+            1,
+            null
+          ]
+        ]
+      }
+    },
+    "liasse_avant": {
+      "produits_218": 1200.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 1200.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 200.0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 1200.0,
+      "total_charges_264": 1400.0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -200.0,
+      "benefice_ou_perte_310": -200.0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 200.0,
+      "reintegrations_detail": [
+        [
+          "Retraitements divers (ex. fonds travaux ALUR)",
+          200.0
+        ]
+      ],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    },
+    "liasse_apres_parametre": {
+      "produits_218": 1200.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 1200.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 200.0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 1200.0,
+      "total_charges_264": 1400.0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": -200.0,
+      "benefice_ou_perte_310": -200.0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 200.0,
+      "reintegrations_detail": [
+        [
+          "Retraitements divers (ex. fonds travaux ALUR)",
+          200.0
+        ]
+      ],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 0.0,
+      "resultat_fiscal_370": 0.0,
+      "resultat_fiscal_lmnp": 0.0
+    }
+  },
+  "ajout_sql_apres_cloture": {
+    "etat": {
+      "exercice": {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": -200.0,
+        "resultat_fiscal": 0.0
+      },
+      "balance": {
+        "108000": -10000.0,
+        "218400": 12000.0,
+        "281840": -1200.0,
+        "614100": 200.0,
+        "681120": 1200.0,
+        "708810": -2200.0
+      },
+      "ecritures": 5,
+      "lignes": 10,
+      "deficits": [],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 1200.0,
+          "dotation_exercice": 1200.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 200.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 0.0
+        }
+      ],
+      "controles": [
+        "RETRAITEMENT_MANUEL_PLAFOND"
+      ],
+      "rc_liasse": 800.0,
+      "rf_liasse": 0.0,
+      "conforme": false
+    },
+    "tableau": {
+      "produits_218": 2200.0,
+      "autres_produits_230": 0,
+      "total_produits_232": 2200.0,
+      "produits_financiers_280": 0,
+      "produits_exceptionnels_290": 0,
+      "charges_externes_242": 200.0,
+      "impots_244": 0,
+      "dont_cfe_243": 0.0,
+      "personnel_250": 0,
+      "autres_charges_262": 0.0,
+      "dotations_254": 1200.0,
+      "total_charges_264": 1400.0,
+      "charges_financieres_294": 0,
+      "resultat_exploitation_270": 800.0,
+      "benefice_ou_perte_310": 800.0,
+      "charges_exceptionnelles_300": 0,
+      "reintegration_amort_318": 0.0,
+      "reintegration_divers_330": 200.0,
+      "reintegrations_detail": [
+        [
+          "Retraitements divers (ex. fonds travaux ALUR)",
+          200.0
+        ]
+      ],
+      "deductions_350": 0,
+      "deductions_detail": [],
+      "resultat_fiscal_352": 1000.0,
+      "resultat_fiscal_370": 1000.0,
+      "resultat_fiscal_lmnp": 0.0
+    }
+  },
+  "restaurer_et_recloturer": {
+    "cloture": {
+      "agregats": {
+        "produits": 1200.0,
+        "charges_hors_daa": 200.0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 200.0,
+        "dotation": 1200.0,
+        "resultat_comptable": -200.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 1000.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 1200.0,
+        "plafond_deductible": 1200.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 200.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "etat": {
+      "exercice": {
+        "annee": 2025,
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "statut": "clos",
+        "resultat_comptable": -200.0,
+        "resultat_fiscal": 0.0
+      },
+      "balance": {
+        "108000": -11000.0,
+        "218400": 12000.0,
+        "281840": -1200.0,
+        "614100": 200.0,
+        "681120": 1200.0,
+        "708810": -1200.0
+      },
+      "ecritures": 4,
+      "lignes": 8,
+      "deficits": [],
+      "suivi": [
+        {
+          "exercice_annee": 2025,
+          "plafond_deductible": 1200.0,
+          "dotation_exercice": 1200.0,
+          "stock_ouverture": 0.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0
+        }
+      ],
+      "cloture": [
+        {
+          "exercice_annee": 2025,
+          "retraitements": 200.0,
+          "impute_deficits": 0.0,
+          "deficit_cree": null,
+          "revenu_imposable": 0.0
+        }
+      ],
+      "controles": [],
+      "rc_liasse": -200.0,
+      "rf_liasse": 0.0,
+      "conforme": true
+    }
+  },
+  "migration_schema_exercice_clos": {
+    "avant": 2,
+    "apres": 7,
+    "fec_identique": true,
+    "statut": "clos"
+  }
+}

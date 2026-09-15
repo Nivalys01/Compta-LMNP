@@ -1,0 +1,323 @@
+{
+  "wal": {
+    "wal_present": true,
+    "copie": {
+      "operations": 2,
+      "montant": 1600.0,
+      "version": 7,
+      "integrite": "ok"
+    },
+    "transaction_source": true
+  },
+  "quotidienne_vide": {
+    "retour": null,
+    "copies": [
+      [
+        "compta-20260915-000000-demarrage.db",
+        0
+      ]
+    ]
+  },
+  "sauvegarde_corrompue": {
+    "appel": {
+      "retour": "<TEMP_FICTIF>/index/sauvegardes/compta-20260915-165257-manuel.db"
+    },
+    "verdict_copie": {
+      "exception": "DatabaseError",
+      "message": "malformed database schema (idx_ligne_compte) - invalid rootpage"
+    }
+  },
+  "rotation": {
+    "total": 34,
+    "surete": 4,
+    "premier_ordinaire": "compta-20260101-000005-manuel.db"
+  },
+  "retour_arriere": {
+    "apres_restaurer": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 7,
+      "integrite": "ok"
+    },
+    "apres_retour": {
+      "operations": 2,
+      "montant": 1600.0,
+      "version": 7,
+      "integrite": "ok"
+    }
+  },
+  "init_protege": {
+    "appel": {
+      "exception": "FileExistsError",
+      "message": "Une base existe déjà à cet emplacement : <TEMP_FICTIF>/restore/compta.db\nElle n'a PAS été touchée. Pour créer un dossier, passez par la page « Dossiers » du logiciel. Pour réinitialiser malgré tout, relancez avec --ecraser : une sauvegarde sera prise avant destruction."
+    },
+    "identique": true
+  },
+  "restauration_vide": {
+    "appel": {
+      "exception": "ValueError",
+      "message": "La sauvegarde compta-vide.db ne contient aucune écriture — restauration refusée (choisissez une autre sauvegarde)."
+    },
+    "identique": true
+  },
+  "appartenance": {
+    "direct": {
+      "exception": "ValueError",
+      "message": "Cette sauvegarde n'appartient pas au dossier courant.\n  attendue dans : <TEMP_FICTIF>/restore/sauvegardes\n  trouvée dans  : <TEMP_FICTIF>/autre/sauvegardes\nTous les dossiers nomment leurs sauvegardes de la même façon : restaurer celle d'un autre dossier remplacerait cette comptabilité par une autre. Sélectionnez la sauvegarde depuis la page « Dossiers » du dossier concerné."
+    },
+    "deplace": {
+      "retour": "<TEMP_FICTIF>/restore/sauvegardes/compta-20260915-165257-avant-restauration.db"
+    },
+    "base": {
+      "operations": 1,
+      "montant": 2500.0,
+      "version": 7,
+      "integrite": "ok"
+    }
+  },
+  "archives_controle": {
+    "valides": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165257.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      },
+      {
+        "fichier": "FEC2026-cloture-20260915-165257-2.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ],
+    "modifie": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165257.txt",
+        "exercice": 2026,
+        "statut": "modifie"
+      },
+      {
+        "fichier": "FEC2026-cloture-20260915-165257-2.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ],
+    "absent": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165257.txt",
+        "exercice": 2026,
+        "statut": "absent"
+      },
+      {
+        "fichier": "FEC2026-cloture-20260915-165257-2.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ],
+    "ligne_illisible": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165257-2.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ],
+    "sans_manifeste": []
+  },
+  "archives_web": {
+    "status": 200,
+    "sha_affiche": false,
+    "telechargement": 200,
+    "contenu": "FEC fictif altere"
+  },
+  "chaine_restauree": {
+    "avant": {
+      "operations": 2,
+      "montant": 1700.0,
+      "version": 7,
+      "integrite": "ok"
+    },
+    "apres": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 7,
+      "integrite": "ok"
+    },
+    "exercices": [
+      [
+        2026,
+        "ouvert"
+      ]
+    ],
+    "archives": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165257.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ]
+  },
+  "seconde_cloture": {
+    "archives": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165257.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      },
+      {
+        "fichier": "FEC2026-cloture-20260915-165257-2.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ],
+    "recettes_base": 1800.0,
+    "lignes_manifeste": [
+      "horodatage;fichier;exercice;sha256",
+      "2026-09-15T16:52:57;FEC2026-cloture-20260915-165257.txt;2026;26159b9bb454aa2fe0ba3b30347e03f9320a3884da2915a1c0638f2cdca83fe3",
+      "2026-09-15T16:52:57;FEC2026-cloture-20260915-165257-2.txt;2026;002cb07c277e0b3b73b5c7112e6d83aebbcea259e3f5d7edbbb4de6ec6bfce3f"
+    ]
+  },
+  "cache_restauration": {
+    "status": 302,
+    "message": "/dossiers?annee=2026&ok=Dossier+restaur%C3%A9+depuis+compta-20260915-165257-v6.db.+L'%C3%A9tat+pr%C3%A9c%C3%A9dent+est+conserv%C3%A9+en+%C2%AB+avant-restauration+%C2%BB.",
+    "base": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 6,
+      "integrite": "ok"
+    },
+    "compte164000": 0,
+    "cache": true
+  },
+  "migration_future": {
+    "retour": {
+      "avant": 99,
+      "apres": 99,
+      "sauvegarde": null
+    },
+    "identique": true
+  },
+  "restauration_future": {
+    "post": 302,
+    "message": "/dossiers?annee=2026&ok=Dossier+restaur%C3%A9+depuis+compta-20260915-165257-v99.db.+L'%C3%A9tat+pr%C3%A9c%C3%A9dent+est+conserv%C3%A9+en+%C2%AB+avant-restauration+%C2%BB.",
+    "get": 409,
+    "version": 99
+  },
+  "registre_corrompu": {
+    "liste": [
+      "principal"
+    ],
+    "web": 200,
+    "retombe_principal": true,
+    "base_alpha": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 7,
+      "integrite": "ok"
+    }
+  },
+  "adoption": {
+    "adopte": true,
+    "base": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 7,
+      "integrite": "ok"
+    },
+    "renommage_stable": true,
+    "collision": {
+      "exception": "ValueError",
+      "message": "Un dossier « dossier-alpha » existe déjà — choisissez un autre nom."
+    },
+    "separateur": false
+  },
+  "dossier_absent": {
+    "status": 409,
+    "base_recree": false
+  },
+  "demarrage_disque_plein": {
+    "resultat": {
+      "exception": "OSError",
+      "message": "[Errno 28] Disque fictif plein"
+    },
+    "serveur_lance": false
+  },
+  "assertion_optimisee": {
+    "normal_code": 1,
+    "normal_assertion": true,
+    "optimise_code": 0,
+    "optimise_stdout": "{'avant': 7, 'apres': 8, 'sauvegarde': '<TEMP_FICTIF>/palier/sauvegardes/compta-20260915-165257-avant-migration.db'}",
+    "version": 8
+  },
+  "quittances": {
+    "appel": {
+      "exception": "ValueError",
+      "message": "Cette restauration ferait reculer la numérotation des quittances : la base porte des quittances jusqu'au n° 00002, la sauvegarde s'arrête au n° 00001.\n\n1 quittance(s) déjà émise(s) — et probablement remise(s) à vos locataires — disparaîtraient, et leurs numéros seraient réattribués à d'autres documents. Deux quittances porteraient alors le même numéro.\n\nSi vous voulez malgré tout restaurer, exportez d'abord la liste des quittances émises depuis la page Quittances."
+    },
+    "identique": true
+  },
+  "source_purgee": {
+    "restaurer": {
+      "retour": "<TEMP_FICTIF>/source-purge/sauvegardes/compta-20260915-165257-avant-restauration.db"
+    },
+    "tables_apres": [],
+    "source_taille": 0,
+    "surete": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 7,
+      "integrite": "ok"
+    }
+  },
+  "retour_source_purgee": {
+    "web": {
+      "exception": "OperationalError",
+      "message": "no such table: exercice"
+    },
+    "moteur": {
+      "operations": 1,
+      "montant": 800.0,
+      "version": 7,
+      "integrite": "ok"
+    }
+  },
+  "migration_echec_deja_q10": {
+    "appel": {
+      "exception": "RuntimeError",
+      "message": "Palier fictif interrompu"
+    },
+    "version": 2,
+    "comptes_cession": 2,
+    "copies": 1
+  },
+  "sorties_locales": {
+    "pdf_status": 200,
+    "pdf_signature": "%PDF",
+    "imports_dans_dossier": true,
+    "fichiers_ecrits": [
+      "<TEMP_FICTIF>/sorties/archives/FEC2026-cloture-20260915-165258.txt",
+      "<TEMP_FICTIF>/sorties/archives/manifeste.csv"
+    ],
+    "appels_reseau": []
+  },
+  "manifeste_modifiable": {
+    "exercice_illisible": {
+      "exception": "ValueError",
+      "message": "invalid literal for int() with base 10: 'illisible'"
+    },
+    "fec_et_hash_remplaces": [
+      {
+        "fichier": "FEC2026-cloture-20260915-165258.txt",
+        "exercice": 2026,
+        "statut": "ok"
+      }
+    ]
+  },
+  "registre_double_injecte": {
+    "meme_base": true
+  },
+  "sources": {
+    "app.py": "461f6c2939e30201308c0c6b405931fb840018b6a3be67342b2e9ec36ffda77c",
+    "modules/perennite.py": "07386ee31fceb96fd19f08c3c1be751138ac63409b016983466ca69cd6e63123",
+    "modules/dossiers.py": "ae30452625c081346ed23e5e42a498695762c5e765db337e41cb118f95c998fa",
+    "modules/migrations.py": "3dbde77de5520e188c557477732e455075bf23006d818989a6bff14dd9929e0e",
+    "modules/init_db.py": "411af5779bd4892f53d30e72f140248bfe007e5ca73f50c23f21be9952839e3a"
+  }
+}

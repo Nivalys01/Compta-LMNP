@@ -1,0 +1,2672 @@
+{
+  "couverture": {
+    "EQUILIBRE": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "EQUILIBRE",
+        "message": "Écriture 1 déséquilibrée : 100.00 ≠ 99.00."
+      }
+    ],
+    "DATE_HORS_EXERCICE": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "DATE_HORS_EXERCICE",
+        "message": "Écriture 1 datée du 2027-01-01, hors exercice [2026-01-01 → 2026-12-31]."
+      }
+    ],
+    "COMPTE_ATTENTE": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "COMPTE_ATTENTE",
+        "message": "Compte d'attente 472000 non soldé : 0.01 € — reclasser avant la clôture."
+      }
+    ],
+    "MONTANT_INVALIDE": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "MONTANT_INVALIDE",
+        "message": "Opération 1 (loyer) : montant 0.00 € ≤ 0."
+      }
+    ],
+    "DOUBLON": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "DOUBLON",
+        "message": "Doublon potentiel : 2× 'loyer' pour 2026-01 à 800.00 €."
+      }
+    ],
+    "REQUALIFIER": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "REQUALIFIER",
+        "message": "Article « Autres » à valider (op. 1, 2026-01, 120.00 €) : « Autres charges (à requalifier) » — à reclasser dans un compte dédié."
+      }
+    ],
+    "IMMOBILISABLE": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "IMMOBILISABLE",
+        "message": "Dépense potentiellement immobilisable (op. 1, 2026-01) : 780.00 € > seuil 500 € — charge ou immobilisation ?"
+      }
+    ],
+    "LOYER_MANQUANT": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "LOYER_MANQUANT",
+        "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+      }
+    ],
+    "SENS": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "SENS",
+        "message": "Écriture 1 : charge 614100 au crédit (50.00) — annulation ?"
+      }
+    ],
+    "ANNUEL_MULTIPLE": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "ANNUEL_MULTIPLE",
+        "message": "'cfe' (périodicité annuelle) saisi 2 fois — doublon ou rattrapage à documenter."
+      }
+    ],
+    "PERIODE_INCOHERENTE": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "PERIODE_INCOHERENTE",
+        "message": "Opération 1 (loyer) : période 2025-12 ≠ mois de la date 2026-01-05 — décalage volontaire (rattrapage) ou erreur ?"
+      }
+    ],
+    "INTERETS_MAL_CLASSES": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "INTERETS_MAL_CLASSES",
+        "message": "Opération 1 (frais_bancaires, 100.00 €) : « Intérêts emprunt fictif » — des intérêts d'emprunt ? Utiliser le gabarit dédié (compte 661100, ligne 294 du 2033-B)."
+      }
+    ],
+    "PLAUSIBILITE_N1": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "PLAUSIBILITE_N1",
+        "message": "'loyer' : 2400.00 € en 2026 vs 800.00 € en 2025 (+1600 €) — évolution à justifier."
+      }
+    ],
+    "POSTE_HABITUEL_ABSENT": [
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucun intérêt d'emprunt sur 2026. Si le bien a été financé à crédit, les intérêts et l'assurance emprunteur sont déductibles — c'est souvent le poste de charge le plus élevé. Ignorez si l'achat était comptant."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune assurance sur 2026. L'assurance propriétaire non occupant (PNO) est due, et souvent prélevée automatiquement : elle passe alors inaperçue."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune taxe foncière sur 2026. Elle est due chaque année par le propriétaire. Pensez aussi à la TEOM, sur le même avis."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune CFE sur 2026. La cotisation foncière des entreprises s'applique à la location meublée, sauf exonération, et n'est généralement pas due la première année."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune charge de copropriété sur 2026. Si le bien est en copropriété, les appels de charges sont déductibles — ventilez-les depuis la page Saisie."
+      }
+    ],
+    "DEFICIT_MENACE_PAR_39C": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "DEFICIT_MENACE_PAR_39C",
+        "message": "1000.00 € d'amortissements reportés ont été repris cette année, alors que 1200.00 € de déficits approchent de leur péremption (1200.00 € né en 2018 (expire fin 2028)). Les deux reports n'ont pas la même durée de vie : le report d'amortissement (art. 39 C) s'impute sans limite de temps, un déficit LMNP se périme à dix ans. Si le bénéfice ne suffit pas à absorber les deux, c'est le déficit qui se perd. Ce point mérite d'être posé à un professionnel avant le dépôt."
+      }
+    ],
+    "RETRAITEMENT_MANUEL_PLAFOND": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "RETRAITEMENT_MANUEL_PLAFOND",
+        "message": "1000.00 € de retraitement ont été saisis à la main, en plus des 0.00 € réintégrés automatiquement. Ce montant majore aussi le PLAFOND d'amortissement déductible (art. 39 C) — ce qui est correct si la charge retraitée est afférente au bien loué (fonds de travaux ALUR), mais indu s'il s'agit d'une charge de structure (honoraires comptables, CFE). Vérifiez ce point : dans le second cas, vous déduiriez plus d'amortissement que la loi ne l'autorise."
+      }
+    ],
+    "DUREE_ALLONGEE": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "DUREE_ALLONGEE",
+        "message": "« Mobilier fictif » : 2400.00 € d'amortissements sont comptabilisés, alors que le plan actuel n'en prévoyait que 1200.00 € à l'ouverture de 2026 (+1200.00 €). La durée a probablement été ALLONGÉE après coup. L'article 39 B du CGI impose un amortissement minimum linéaire calculé sur la durée retenue à l'origine : allonger la durée fait décrocher le cumul de ce minimum, et l'écart est définitivement perdu — il ne se reporte pas, à la différence de l'article 39 C. L'allongement n'est admis que s'il ramène à la durée normale une durée précédemment RÉDUITE pour un motif particulier (obsolescence prévue, sinistre) désormais disparu. Sinon, revenez à la durée d'origine."
+      }
+    ],
+    "LOYER_ATYPIQUE": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "LOYER_ATYPIQUE",
+        "message": "Loyer 2026-03 : 80.00 € vs médiane annuelle 800.00 € — erreur de saisie ou changement de loyer ?"
+      }
+    ],
+    "AN_ABSENTS": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "AN_ABSENTS",
+        "message": "L'exercice 2025 est clos mais 2026 n'a pas d'à-nouveaux : reprenez le bilan (Nouvel exercice → reprise) sinon le 2033-A sera faux."
+      }
+    ],
+    "DOTATION_PLAN": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "DOTATION_PLAN",
+        "message": "Dotation comptabilisée 1500.00 € ≠ plan théorique 1200.00 € — dotation en double ou composant modifié après clôture ?"
+      }
+    ],
+    "AMORT_ANTERIEURS": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "AMORT_ANTERIEURS",
+        "message": "1200.00 € d'amortissements déjà courus avant 2026 ne sont pas comptabilisés (Mobilier fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+      }
+    ],
+    "COMPOSANT_SANS_AMORT": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "COMPOSANT_SANS_AMORT",
+        "message": "Composant « Mobilier fictif » (compte 218400) : une durée d'amortissement est renseignée mais ce compte ne s'amortit pas — un terrain ne se déprécie pas. Mettez sa durée à 0 dans la page Immobilisations, sinon la clôture échouera."
+      }
+    ],
+    "VENTILATION_INCOMPLETE": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "VENTILATION_INCOMPLETE",
+        "message": "Bien « Bien fictif » : la somme des composants (6000.00 €) reste inférieure de 6000.00 € (50.0 %) au prix d'acquisition (12000.00 €). Cette part n'est donc jamais amortie : vérifiez qu'aucun poste n'a été oublié (agencements, mobilier, installations techniques). C'est un avantage fiscal perdu, silencieusement, chaque année."
+      }
+    ],
+    "TEOM_ABSENTE": [
+      {
+        "niveau": "INFO",
+        "code": "TEOM_ABSENTE",
+        "message": "Taxe foncière saisie sans TEOM : l'avis porte les deux. La taxe d'enlèvement des ordures ménagères se saisit à part (elle se récupère sur le locataire) — vérifiez votre avis."
+      }
+    ],
+    "SEUIL_LMP": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "SEUIL_LMP",
+        "message": "Recettes 24000.00 € > seuil LMP 23000 € (art. 155 IV CGI) : vérifier le critère de prépondérance au niveau du foyer — le statut LMP changerait le régime des déficits et plus-values."
+      }
+    ],
+    "CHARGE_ATTENDUE": [
+      {
+        "niveau": "INFO",
+        "code": "CHARGE_ATTENDUE",
+        "message": "Aucune taxe foncière / TEOM saisie sur 2026 — oubli probable (charge quasi certaine en location meublée)."
+      },
+      {
+        "niveau": "INFO",
+        "code": "CHARGE_ATTENDUE",
+        "message": "Aucune CFE saisie sur 2026 — oubli probable (charge quasi certaine en location meublée)."
+      },
+      {
+        "niveau": "INFO",
+        "code": "CHARGE_ATTENDUE",
+        "message": "Aucune assurance PNO saisie sur 2026 — oubli probable (charge quasi certaine en location meublée)."
+      }
+    ],
+    "ALUR_ABSENT": [
+      {
+        "niveau": "INFO",
+        "code": "ALUR_ABSENT",
+        "message": "Fonds travaux ALUR saisi en 2025 mais absent en 2026 malgré des charges de copropriété — vérifier la ventilation des appels (le fonds est réintégré fiscalement, pas déductible)."
+      }
+    ]
+  },
+  "inventaire": {
+    "c_equilibre_ecritures": 41,
+    "c_dates_hors_exercice": 143,
+    "c_compte_attente": 158,
+    "c_montants_invalides": 173,
+    "c_doublons": 56,
+    "c_autres_a_requalifier": 68,
+    "c_depense_immobilisable": 85,
+    "c_completude_loyers": 107,
+    "c_sens_comptable": 122,
+    "c_annuel_multiple": 478,
+    "c_periode_incoherente": 496,
+    "c_interets_mal_classes": 568,
+    "c_plausibilite_n1": 419,
+    "c_postes_habituels_absents": 367,
+    "c_deficit_menace_par_le_39c": 299,
+    "c_retraitement_manuel_majore_le_plafond": 254,
+    "c_duree_allongee": 185,
+    "c_loyer_atypique": 458,
+    "c_an_absents": 508,
+    "c_dotation_vs_plan": 524,
+    "c_amortissements_anterieurs": 630,
+    "c_composant_non_amortissable": 703,
+    "c_ventilation_incoherente": 662,
+    "c_teom_oubliee": 725,
+    "c_seuil_lmp": 549,
+    "c_charges_attendues": 589,
+    "c_alur_absent": 613
+  },
+  "fonctions_non_enregistrees": [],
+  "chaque_controle_vide": {
+    "c_equilibre_ecritures": [],
+    "c_dates_hors_exercice": [],
+    "c_compte_attente": [],
+    "c_montants_invalides": [],
+    "c_doublons": [],
+    "c_autres_a_requalifier": [],
+    "c_depense_immobilisable": [],
+    "c_completude_loyers": [],
+    "c_sens_comptable": [],
+    "c_annuel_multiple": [],
+    "c_periode_incoherente": [],
+    "c_interets_mal_classes": [],
+    "c_plausibilite_n1": [],
+    "c_postes_habituels_absents": [],
+    "c_deficit_menace_par_le_39c": [],
+    "c_retraitement_manuel_majore_le_plafond": [],
+    "c_duree_allongee": [],
+    "c_loyer_atypique": [],
+    "c_an_absents": [],
+    "c_dotation_vs_plan": [],
+    "c_amortissements_anterieurs": [],
+    "c_composant_non_amortissable": [],
+    "c_ventilation_incoherente": [],
+    "c_teom_oubliee": [],
+    "c_seuil_lmp": [],
+    "c_charges_attendues": [],
+    "c_alur_absent": []
+  },
+  "attente_compensee_reference": {
+    "agregats": {
+      "produits": 800.0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 800.0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 800.0
+    },
+    "suivi_39c": {
+      "stock_ouverture": 0.0,
+      "dotation_exercice": 0,
+      "plafond_deductible": 800.0,
+      "report_annee": 0.0,
+      "utilisation_annee": 0.0,
+      "stock_cloture": 0.0,
+      "sorties_39c": 0.0
+    },
+    "resultat_fiscal": 800.0,
+    "autres_retraitements": 0.0,
+    "deficits": {
+      "perimes": 0,
+      "deficit_cree": null,
+      "impute_sur_benefice": 0.0,
+      "stock_deficits": 0
+    },
+    "revenu_imposable": 800.0
+  },
+  "requalifier_drapeau": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "REQUALIFIER",
+      "message": "Article « Autres » à valider (op. 1, 2026-01, 120.00 €) : « Catégorie fictive » — à reclasser dans un compte dédié."
+    }
+  ],
+  "attente_compensee": {
+    "anomalies": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "REQUALIFIER",
+        "message": "Article « Autres » à valider (op. 2, 2026-01, 800.00 €) : « Décaissement à identifier (bloque la liasse) » — à reclasser dans un compte dédié."
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "REQUALIFIER",
+        "message": "Article « Autres » à valider (op. 1, 2026-01, 800.00 €) : « Encaissement à identifier (bloque la liasse) » — à reclasser dans un compte dédié."
+      }
+    ],
+    "agregats": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    },
+    "cloture": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    }
+  },
+  "attente_sept_chiffres": {
+    "rejeu": {
+      "ecritures": 1,
+      "normalisees": 0,
+      "comptes_crees": [
+        "4720000"
+      ],
+      "renumerotees": false
+    },
+    "anomalies": [],
+    "solde": 800.0,
+    "cloture": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    }
+  },
+  "attente_anterieure_sans_an": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "AN_ABSENTS",
+      "message": "L'exercice 2025 est clos mais 2026 n'a pas d'à-nouveaux : reprenez le bilan (Nouvel exercice → reprise) sinon le 2033-A sera faux."
+    }
+  ],
+  "attente_anterieure_avec_an": [
+    {
+      "niveau": "BLOQUANT",
+      "code": "COMPTE_ATTENTE",
+      "message": "Compte d'attente 472000 non soldé : 800.00 € — reclasser avant la clôture."
+    }
+  ],
+  "seuil_emprunt": {
+    "anomalies": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "SEUIL_LMP",
+        "message": "Recettes 100000.00 € > seuil LMP 23000 € (art. 155 IV CGI) : vérifier le critère de prépondérance au niveau du foyer — le statut LMP changerait le régime des déficits et plus-values."
+      }
+    ],
+    "agregats": {
+      "produits": 0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": 0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 0
+    }
+  },
+  "seuil_annule": {
+    "anomalies": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "SEUIL_LMP",
+        "message": "Recettes 24000.00 € > seuil LMP 23000 € (art. 155 IV CGI) : vérifier le critère de prépondérance au niveau du foyer — le statut LMP changerait le régime des déficits et plus-values."
+      }
+    ],
+    "agregats": {
+      "produits": -0.0,
+      "charges_hors_daa": 0,
+      "charges_hors_plafond": 0,
+      "charges_afferentes": 0,
+      "dotation": 0,
+      "resultat_comptable": -0.0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": -0.0
+    }
+  },
+  "annulations": {
+    "anomalies": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "IMMOBILISABLE",
+        "message": "Dépense potentiellement immobilisable (op. 1, 2026-01) : 780.00 € > seuil 500 € — charge ou immobilisation ?"
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "LOYER_MANQUANT",
+        "message": "Loyers manquants (8 mois) : 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "ANNUEL_MULTIPLE",
+        "message": "'cfe' (périodicité annuelle) saisi 2 fois — doublon ou rattrapage à documenter."
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "LOYER_ATYPIQUE",
+        "message": "Loyer 2026-04 : 80.00 € vs médiane annuelle 800.00 € — erreur de saisie ou changement de loyer ?"
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucun intérêt d'emprunt sur 2026. Si le bien a été financé à crédit, les intérêts et l'assurance emprunteur sont déductibles — c'est souvent le poste de charge le plus élevé. Ignorez si l'achat était comptant."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune assurance sur 2026. L'assurance propriétaire non occupant (PNO) est due, et souvent prélevée automatiquement : elle passe alors inaperçue."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune taxe foncière sur 2026. Elle est due chaque année par le propriétaire. Pensez aussi à la TEOM, sur le même avis."
+      },
+      {
+        "niveau": "INFO",
+        "code": "POSTE_HABITUEL_ABSENT",
+        "message": "Aucune charge de copropriété sur 2026. Si le bien est en copropriété, les appels de charges sont déductibles — ventilez-les depuis la page Saisie."
+      }
+    ],
+    "agregats": {
+      "produits": 3200.0,
+      "charges_hors_daa": 300.0,
+      "charges_hors_plafond": 300.0,
+      "charges_afferentes": 0.0,
+      "dotation": 0,
+      "resultat_comptable": 2900.0,
+      "produits_cession": 0,
+      "vnc_cession": 0,
+      "plafond_39c": 3200.0
+    }
+  },
+  "deux_locataires": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "DOUBLON",
+      "message": "Doublon potentiel : 2× 'loyer' pour 2026-01 à 800.00 €."
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_MANQUANT",
+      "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+    }
+  ],
+  "acquisition_novembre": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_MANQUANT",
+      "message": "Loyers manquants (10 mois) : 2026-01, 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10."
+    }
+  ],
+  "vide": [],
+  "exercice_inexistant": "Contrôles 2099 : aucune anomalie. ✓",
+  "vacance_maison": [
+    {
+      "niveau": "INFO",
+      "code": "POSTE_HABITUEL_ABSENT",
+      "message": "Aucun intérêt d'emprunt sur 2026. Si le bien a été financé à crédit, les intérêts et l'assurance emprunteur sont déductibles — c'est souvent le poste de charge le plus élevé. Ignorez si l'achat était comptant."
+    },
+    {
+      "niveau": "INFO",
+      "code": "POSTE_HABITUEL_ABSENT",
+      "message": "Aucune taxe foncière sur 2026. Elle est due chaque année par le propriétaire. Pensez aussi à la TEOM, sur le même avis."
+    },
+    {
+      "niveau": "INFO",
+      "code": "POSTE_HABITUEL_ABSENT",
+      "message": "Aucune CFE sur 2026. La cotisation foncière des entreprises s'applique à la location meublée, sauf exonération, et n'est généralement pas due la première année."
+    },
+    {
+      "niveau": "INFO",
+      "code": "POSTE_HABITUEL_ABSENT",
+      "message": "Aucune charge de copropriété sur 2026. Si le bien est en copropriété, les appels de charges sont déductibles — ventilez-les depuis la page Saisie."
+    }
+  ],
+  "un_loyer_sans_historique": [],
+  "loyers_deux_tarifs": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_ATYPIQUE",
+      "message": "Loyer 2026-01 : 800.00 € vs médiane annuelle 1600.00 € — erreur de saisie ou changement de loyer ?"
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_ATYPIQUE",
+      "message": "Loyer 2026-02 : 800.00 € vs médiane annuelle 1600.00 € — erreur de saisie ou changement de loyer ?"
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_ATYPIQUE",
+      "message": "Loyer 2026-03 : 800.00 € vs médiane annuelle 1600.00 € — erreur de saisie ou changement de loyer ?"
+    }
+  ],
+  "api_sans_forcer": {
+    "avant": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "COMPTE_ATTENTE",
+        "message": "Compte d'attente 472000 non soldé : 800.00 € — reclasser avant la clôture."
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "REQUALIFIER",
+        "message": "Article « Autres » à valider (op. 1, 2026-01, 800.00 €) : « Décaissement à identifier (bloque la liasse) » — à reclasser dans un compte dédié."
+      }
+    ],
+    "retour": {
+      "agregats": {
+        "produits": 0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 0,
+        "resultat_comptable": 0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 0,
+        "plafond_deductible": 0.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 0.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 0.0
+    },
+    "statut": "clos"
+  },
+  "an_absents_bilan": {
+    "False": {
+      "avant": [
+        {
+          "niveau": "AVERTISSEMENT",
+          "code": "LOYER_MANQUANT",
+          "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+        },
+        {
+          "niveau": "AVERTISSEMENT",
+          "code": "AN_ABSENTS",
+          "message": "L'exercice 2025 est clos mais 2026 n'a pas d'à-nouveaux : reprenez le bilan (Nouvel exercice → reprise) sinon le 2033-A sera faux."
+        }
+      ],
+      "cloture": {
+        "agregats": {
+          "produits": 2400.0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 1200.0,
+          "resultat_comptable": 1200.0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 2400.0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 1200.0,
+          "plafond_deductible": 2400.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 1200.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 1200.0
+      },
+      "bilan": {
+        "immo_corporelles_brut_028": 0,
+        "amortissements_030": 1200.0,
+        "immo_corporelles_net": -1200.0,
+        "total_actif_110": 0,
+        "total_actif_net_112": -1200.0,
+        "capital_individuel_120": -2400.0,
+        "resultat_exercice_136": 1200.0,
+        "total_capitaux_142": -1200.0,
+        "total_passif_180": -1200.0,
+        "equilibre": true
+      },
+      "conforme": false
+    },
+    "True": {
+      "avant": [
+        {
+          "niveau": "AVERTISSEMENT",
+          "code": "LOYER_MANQUANT",
+          "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+        }
+      ],
+      "cloture": {
+        "agregats": {
+          "produits": 2400.0,
+          "charges_hors_daa": 0,
+          "charges_hors_plafond": 0,
+          "charges_afferentes": 0,
+          "dotation": 1200.0,
+          "resultat_comptable": 1200.0,
+          "produits_cession": 0,
+          "vnc_cession": 0,
+          "plafond_39c": 2400.0
+        },
+        "suivi_39c": {
+          "stock_ouverture": 0.0,
+          "dotation_exercice": 1200.0,
+          "plafond_deductible": 2400.0,
+          "report_annee": 0.0,
+          "utilisation_annee": 0.0,
+          "stock_cloture": 0.0,
+          "sorties_39c": 0.0
+        },
+        "resultat_fiscal": 1200.0,
+        "autres_retraitements": 0.0,
+        "deficits": {
+          "perimes": 0,
+          "deficit_cree": null,
+          "impute_sur_benefice": 0.0,
+          "stock_deficits": 0
+        },
+        "revenu_imposable": 1200.0
+      },
+      "bilan": {
+        "immo_corporelles_brut_028": 12000.0,
+        "amortissements_030": 2400.0,
+        "immo_corporelles_net": 9600.0,
+        "total_actif_110": 12000.0,
+        "total_actif_net_112": 9600.0,
+        "capital_individuel_120": 8400.0,
+        "resultat_exercice_136": 1200.0,
+        "total_capitaux_142": 9600.0,
+        "total_passif_180": 9600.0,
+        "equilibre": true
+      },
+      "conforme": true
+    }
+  },
+  "pdf_attente": {
+    "anomalies": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "COMPTE_ATTENTE",
+        "message": "Compte d'attente 472000 non soldé : 800.00 € — reclasser avant la clôture."
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "REQUALIFIER",
+        "message": "Article « Autres » à valider (op. 1, 2026-01, 800.00 €) : « Décaissement à identifier (bloque la liasse) » — à reclasser dans un compte dédié."
+      }
+    ],
+    "controles_liasse": [
+      {
+        "nom": "Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 0.00 € / passif 0.00 €"
+      },
+      {
+        "nom": "2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "nom": "2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "0.00 € / 0.00 €"
+      },
+      {
+        "nom": "Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "0.00 €"
+      }
+    ],
+    "conforme": true,
+    "COMPTE_ATTENTE_imprime": false,
+    "non_solde_imprime": false
+  },
+  "equilibre_oppose": {
+    "solde_global": 0.0,
+    "anomalies": [
+      {
+        "niveau": "BLOQUANT",
+        "code": "EQUILIBRE",
+        "message": "Écriture 1 déséquilibrée : 100.00 ≠ 99.00."
+      },
+      {
+        "niveau": "BLOQUANT",
+        "code": "EQUILIBRE",
+        "message": "Écriture 2 déséquilibrée : 99.00 ≠ 100.00."
+      }
+    ]
+  },
+  "equilibre_clos": [
+    {
+      "niveau": "BLOQUANT",
+      "code": "EQUILIBRE",
+      "message": "Écriture 1 déséquilibrée : 100.00 ≠ 99.00."
+    },
+    {
+      "niveau": "BLOQUANT",
+      "code": "EQUILIBRE",
+      "message": "Écriture 2 déséquilibrée : 99.00 ≠ 100.00."
+    }
+  ],
+  "equilibre_fec_corrompu": [
+    {
+      "niveau": "BLOQUANT",
+      "code": "EQUILIBRE",
+      "message": "Écriture 1 déséquilibrée : 799.00 ≠ 800.00."
+    }
+  ],
+  "tables_absentes_avant": [
+    "exploitant",
+    "bien",
+    "journal",
+    "compte",
+    "composant",
+    "exercice",
+    "ecriture",
+    "ligne",
+    "operation",
+    "plan_amortissement",
+    "suivi_39c",
+    "deficit_lmnp",
+    "cloture_fiscale",
+    "locataire",
+    "quittance",
+    "meta"
+  ],
+  "tables_absentes_controles": [],
+  "tables_absentes_apres": [
+    "exploitant",
+    "bien",
+    "journal",
+    "compte",
+    "composant",
+    "exercice",
+    "ecriture",
+    "ligne",
+    "operation",
+    "plan_amortissement",
+    "suivi_39c",
+    "deficit_lmnp",
+    "cloture_fiscale",
+    "locataire",
+    "quittance",
+    "meta",
+    "gabarit_personnalise",
+    "regle_fiscale",
+    "compte_hors_plafond_39c"
+  ],
+  "regles_supprimees": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "IMMOBILISABLE",
+      "message": "Dépense potentiellement immobilisable (op. 1, 2026-01) : 780.00 € > seuil 500 € — charge ou immobilisation ?"
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_MANQUANT",
+      "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "SEUIL_LMP",
+      "message": "Recettes 24000.00 € > seuil LMP 23000 € (art. 155 IV CGI) : vérifier le critère de prépondérance au niveau du foyer — le statut LMP changerait le régime des déficits et plus-values."
+    }
+  ],
+  "regles_hors_millesime": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "IMMOBILISABLE",
+      "message": "Dépense potentiellement immobilisable (op. 1, 2026-01) : 780.00 € > seuil 500 € — charge ou immobilisation ?"
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "LOYER_MANQUANT",
+      "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+    },
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "SEUIL_LMP",
+      "message": "Recettes 24000.00 € > seuil LMP 23000 € (art. 155 IV CGI) : vérifier le critère de prépondérance au niveau du foyer — le statut LMP changerait le régime des déficits et plus-values."
+    }
+  ],
+  "seuils_infinis": {
+    "immo": [],
+    "lmp": []
+  },
+  "amort_avant_panne": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "AMORT_ANTERIEURS",
+      "message": "1200.00 € d'amortissements déjà courus avant 2026 ne sont pas comptabilisés (Mobilier fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+    }
+  ],
+  "amort_panne": [],
+  "date_composant_invalide": [],
+  "deficit_avant_panne": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "DEFICIT_MENACE_PAR_39C",
+      "message": "1000.00 € d'amortissements reportés ont été repris cette année, alors que 1200.00 € de déficits approchent de leur péremption (1200.00 € né en 2018 (expire fin 2028)). Les deux reports n'ont pas la même durée de vie : le report d'amortissement (art. 39 C) s'impute sans limite de temps, un déficit LMNP se périme à dix ans. Si le bénéfice ne suffit pas à absorber les deux, c'est le déficit qui se perd. Ce point mérite d'être posé à un professionnel avant le dépôt."
+    }
+  ],
+  "deficit_panne": [],
+  "annuel_personnalise": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "ANNUEL_MULTIPLE",
+      "message": "'taxe_fictive' (périodicité annuelle) saisi 2 fois — doublon ou rattrapage à documenter."
+    }
+  ],
+  "requalifier_personnalise": [],
+  "sens_restitution": [
+    {
+      "niveau": "AVERTISSEMENT",
+      "code": "SENS",
+      "message": "Écriture 1 : produit 708810 au débit (100.00) — annulation ?"
+    }
+  ],
+  "audit_nominal": {
+    "succes": true,
+    "nombre": 41,
+    "echecs": [],
+    "checks": [
+      {
+        "phase": "Phase 0 — Initialisation",
+        "nom": "Base jetable créée en mode blanc (aucune donnée personnelle)",
+        "ok": true,
+        "detail": "/tmp/audit_lmnp_fpu_bvq8/audit.db"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Création exploitant / bien / composants",
+        "ok": true,
+        "detail": "3 composants créés (bâti 25 ans, mobilier 5 ans, terrain)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Saisie 12 loyers + 5 charges + 3 acquisitions",
+        "ok": true,
+        "detail": "17 écritures BQ (attendu 17), 3 acquisitions (attendu 3)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Toutes les écritures sont équilibrées",
+        "ok": true,
+        "detail": "0 écriture(s) déséquilibrée(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Contrôles pré-clôture : aucun bloquant",
+        "ok": true,
+        "detail": "3 anomalie(s) dont 0 bloquante(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": true,
+        "detail": "dotation 5000.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": true,
+        "detail": "3100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "39 C : dotation entièrement déductible (plafond suffisant)",
+        "ok": true,
+        "detail": "plafond 8650.00 € ≥ dotation ; report 0.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat fiscal = résultat comptable (aucun retraitement)",
+        "ok": true,
+        "detail": "fiscal 3100.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Exercice marqué « clos »",
+        "ok": true,
+        "detail": "statut = clos"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "FEC exporté puis validé (conformité A47 A-1)",
+        "ok": true,
+        "detail": "0 erreur(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Doublon détecté",
+        "ok": true,
+        "detail": "EQUILIBRE:BLOQUANT | DATE_HORS_EXERCICE:BLOQUANT | DOUBLON:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | REQUALIFIER:AVERTISSEMENT | IMMOBILISABLE:AVERTISSEMENT | LOYER_MANQUANT:AVERTISSEMENT | SENS:AVERTISSEMENT | ANNUEL_MULTIPLE:AVERTISSEMENT | INTERETS_MAL_CLASSES:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | CHARGE_ATTENDUE:INFO | CHARGE_ATTENDUE:INFO"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "« Autres charges » à requalifier détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Dépense immobilisable (> seuil 500 €) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Loyer mensuel manquant détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture déséquilibrée détectée (BLOQUANT)",
+        "ok": true,
+        "detail": "2 bloquant(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge au crédit (sens anormal) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture datée hors exercice détectée (BLOQUANT)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge annuelle saisie deux fois détectée (CFE ×2)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Rappel des charges quasi certaines absentes (INFO)",
+        "ok": true,
+        "detail": "taxe foncière / assurance non saisies sur l'exercice de test"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": true,
+        "detail": "plafond 2400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": true,
+        "detail": "report 2600.00 € ; stock clôture 2600.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": true,
+        "detail": "résultat comptable -2600.00 € → fiscal 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Files 39 C et déficits LMNP jamais cumulées",
+        "ok": true,
+        "detail": "stock 39 C 2600.00 € ; stock déficits 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": true,
+        "detail": "utilisation 2600.00 € ; stock 2600.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 95000.00 € / passif 95000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "115000.00 € / 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "20000.00 € / 20000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : assemblage complet",
+        "ok": true,
+        "detail": "CA 14400.00 € ; résultat fiscal 6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "À-nouveaux internes équilibrés (sans FEC externe)",
+        "ok": true,
+        "detail": "Débit 123800.00 € / Crédit 123800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Actif net repris à l'identique (VNC conservée)",
+        "ok": true,
+        "detail": "95000.00 € (clôture 2029 : 95000.00 €)"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Compte 120000 soldé après affectation du résultat",
+        "ok": true,
+        "detail": "solde 0.00 € ; résultat reporté 8800.00 € vers 108000"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Double reprise refusée (AN déjà présents)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Reprise refusée si l'exercice précédent n'est pas clos",
+        "ok": true,
+        "detail": "exercice 2030 encore ouvert"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Règle fiscale versionnée : chaque exercice garde son millésime",
+        "ok": true,
+        "detail": "2030 → 500 € ; 2031 → 800 €"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Catégorie personnalisée saisissable sur son compte",
+        "ok": true,
+        "detail": "écriture au débit du 635130"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Fonds travaux ALUR réintégré automatiquement à la clôture",
+        "ok": true,
+        "detail": "retraitements 61.00 € (conventions des offres payantes « divers à réintégrer »)"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": true,
+        "detail": "5/5 contrôles"
+      }
+    ]
+  },
+  "audit_sans_compte_attente": {
+    "succes": true,
+    "nombre": 41,
+    "echecs": [],
+    "checks": [
+      {
+        "phase": "Phase 0 — Initialisation",
+        "nom": "Base jetable créée en mode blanc (aucune donnée personnelle)",
+        "ok": true,
+        "detail": "/tmp/audit_lmnp_eetd6ebr/audit.db"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Création exploitant / bien / composants",
+        "ok": true,
+        "detail": "3 composants créés (bâti 25 ans, mobilier 5 ans, terrain)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Saisie 12 loyers + 5 charges + 3 acquisitions",
+        "ok": true,
+        "detail": "17 écritures BQ (attendu 17), 3 acquisitions (attendu 3)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Toutes les écritures sont équilibrées",
+        "ok": true,
+        "detail": "0 écriture(s) déséquilibrée(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Contrôles pré-clôture : aucun bloquant",
+        "ok": true,
+        "detail": "3 anomalie(s) dont 0 bloquante(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": true,
+        "detail": "dotation 5000.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": true,
+        "detail": "3100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "39 C : dotation entièrement déductible (plafond suffisant)",
+        "ok": true,
+        "detail": "plafond 8650.00 € ≥ dotation ; report 0.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat fiscal = résultat comptable (aucun retraitement)",
+        "ok": true,
+        "detail": "fiscal 3100.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Exercice marqué « clos »",
+        "ok": true,
+        "detail": "statut = clos"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "FEC exporté puis validé (conformité A47 A-1)",
+        "ok": true,
+        "detail": "0 erreur(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Doublon détecté",
+        "ok": true,
+        "detail": "EQUILIBRE:BLOQUANT | DATE_HORS_EXERCICE:BLOQUANT | DOUBLON:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | REQUALIFIER:AVERTISSEMENT | IMMOBILISABLE:AVERTISSEMENT | LOYER_MANQUANT:AVERTISSEMENT | SENS:AVERTISSEMENT | ANNUEL_MULTIPLE:AVERTISSEMENT | INTERETS_MAL_CLASSES:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | CHARGE_ATTENDUE:INFO | CHARGE_ATTENDUE:INFO"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "« Autres charges » à requalifier détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Dépense immobilisable (> seuil 500 €) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Loyer mensuel manquant détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture déséquilibrée détectée (BLOQUANT)",
+        "ok": true,
+        "detail": "2 bloquant(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge au crédit (sens anormal) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture datée hors exercice détectée (BLOQUANT)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge annuelle saisie deux fois détectée (CFE ×2)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Rappel des charges quasi certaines absentes (INFO)",
+        "ok": true,
+        "detail": "taxe foncière / assurance non saisies sur l'exercice de test"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": true,
+        "detail": "plafond 2400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": true,
+        "detail": "report 2600.00 € ; stock clôture 2600.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": true,
+        "detail": "résultat comptable -2600.00 € → fiscal 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Files 39 C et déficits LMNP jamais cumulées",
+        "ok": true,
+        "detail": "stock 39 C 2600.00 € ; stock déficits 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": true,
+        "detail": "utilisation 2600.00 € ; stock 2600.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 95000.00 € / passif 95000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "115000.00 € / 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "20000.00 € / 20000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : assemblage complet",
+        "ok": true,
+        "detail": "CA 14400.00 € ; résultat fiscal 6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "À-nouveaux internes équilibrés (sans FEC externe)",
+        "ok": true,
+        "detail": "Débit 123800.00 € / Crédit 123800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Actif net repris à l'identique (VNC conservée)",
+        "ok": true,
+        "detail": "95000.00 € (clôture 2029 : 95000.00 €)"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Compte 120000 soldé après affectation du résultat",
+        "ok": true,
+        "detail": "solde 0.00 € ; résultat reporté 8800.00 € vers 108000"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Double reprise refusée (AN déjà présents)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Reprise refusée si l'exercice précédent n'est pas clos",
+        "ok": true,
+        "detail": "exercice 2030 encore ouvert"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Règle fiscale versionnée : chaque exercice garde son millésime",
+        "ok": true,
+        "detail": "2030 → 500 € ; 2031 → 800 €"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Catégorie personnalisée saisissable sur son compte",
+        "ok": true,
+        "detail": "écriture au débit du 635130"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Fonds travaux ALUR réintégré automatiquement à la clôture",
+        "ok": true,
+        "detail": "retraitements 61.00 € (conventions des offres payantes « divers à réintégrer »)"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": true,
+        "detail": "5/5 contrôles"
+      }
+    ]
+  },
+  "audit_sans_dotation": {
+    "succes": false,
+    "nombre": 41,
+    "echecs": [
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": false,
+        "detail": "dotation 0.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": false,
+        "detail": "8100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": false,
+        "detail": "report 0.00 € ; stock clôture 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": false,
+        "detail": "résultat comptable 2400.00 € → fiscal 2400.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": false,
+        "detail": "utilisation 0.00 € ; stock 0.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": false,
+        "detail": "20000.00 € / 0.00 € — écart de 20000.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": false,
+        "detail": "2033-C : amortissements fin = case 030 du bilan"
+      }
+    ],
+    "checks": [
+      {
+        "phase": "Phase 0 — Initialisation",
+        "nom": "Base jetable créée en mode blanc (aucune donnée personnelle)",
+        "ok": true,
+        "detail": "/tmp/audit_lmnp_b4i3qn30/audit.db"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Création exploitant / bien / composants",
+        "ok": true,
+        "detail": "3 composants créés (bâti 25 ans, mobilier 5 ans, terrain)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Saisie 12 loyers + 5 charges + 3 acquisitions",
+        "ok": true,
+        "detail": "17 écritures BQ (attendu 17), 3 acquisitions (attendu 3)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Toutes les écritures sont équilibrées",
+        "ok": true,
+        "detail": "0 écriture(s) déséquilibrée(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Contrôles pré-clôture : aucun bloquant",
+        "ok": true,
+        "detail": "3 anomalie(s) dont 0 bloquante(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": false,
+        "detail": "dotation 0.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": false,
+        "detail": "8100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "39 C : dotation entièrement déductible (plafond suffisant)",
+        "ok": true,
+        "detail": "plafond 8650.00 € ≥ dotation ; report 0.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat fiscal = résultat comptable (aucun retraitement)",
+        "ok": true,
+        "detail": "fiscal 8100.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Exercice marqué « clos »",
+        "ok": true,
+        "detail": "statut = clos"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "FEC exporté puis validé (conformité A47 A-1)",
+        "ok": true,
+        "detail": "0 erreur(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Doublon détecté",
+        "ok": true,
+        "detail": "EQUILIBRE:BLOQUANT | DATE_HORS_EXERCICE:BLOQUANT | DOUBLON:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | REQUALIFIER:AVERTISSEMENT | IMMOBILISABLE:AVERTISSEMENT | LOYER_MANQUANT:AVERTISSEMENT | SENS:AVERTISSEMENT | ANNUEL_MULTIPLE:AVERTISSEMENT | INTERETS_MAL_CLASSES:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | AMORT_ANTERIEURS:AVERTISSEMENT | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | CHARGE_ATTENDUE:INFO | CHARGE_ATTENDUE:INFO"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "« Autres charges » à requalifier détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Dépense immobilisable (> seuil 500 €) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Loyer mensuel manquant détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture déséquilibrée détectée (BLOQUANT)",
+        "ok": true,
+        "detail": "2 bloquant(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge au crédit (sens anormal) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture datée hors exercice détectée (BLOQUANT)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge annuelle saisie deux fois détectée (CFE ×2)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Rappel des charges quasi certaines absentes (INFO)",
+        "ok": true,
+        "detail": "taxe foncière / assurance non saisies sur l'exercice de test"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": true,
+        "detail": "plafond 2400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": false,
+        "detail": "report 0.00 € ; stock clôture 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": false,
+        "detail": "résultat comptable 2400.00 € → fiscal 2400.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Files 39 C et déficits LMNP jamais cumulées",
+        "ok": true,
+        "detail": "stock 39 C 0.00 € ; stock déficits 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": false,
+        "detail": "utilisation 0.00 € ; stock 0.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 115000.00 € / passif 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "115000.00 € / 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": false,
+        "detail": "20000.00 € / 0.00 € — écart de 20000.00 € : ce sont les amortissements déjà courus avant l'entrée du bien dans le logiciel, jamais comptabilisés. Le bien a été saisi à sa valeur BRUTE sans son cumul d'amortissement. Corrigez depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») : le résultat n'est pas touché, seul le bilan est remis à l'endroit."
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "13800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : assemblage complet",
+        "ok": true,
+        "detail": "CA 14400.00 € ; résultat fiscal 13800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "À-nouveaux internes équilibrés (sans FEC externe)",
+        "ok": true,
+        "detail": "Débit 128800.00 € / Crédit 128800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Actif net repris à l'identique (VNC conservée)",
+        "ok": true,
+        "detail": "115000.00 € (clôture 2029 : 115000.00 €)"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Compte 120000 soldé après affectation du résultat",
+        "ok": true,
+        "detail": "solde 0.00 € ; résultat reporté 13800.00 € vers 108000"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Double reprise refusée (AN déjà présents)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Reprise refusée si l'exercice précédent n'est pas clos",
+        "ok": true,
+        "detail": "exercice 2030 encore ouvert"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Règle fiscale versionnée : chaque exercice garde son millésime",
+        "ok": true,
+        "detail": "2030 → 500 € ; 2031 → 800 €"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Catégorie personnalisée saisissable sur son compte",
+        "ok": true,
+        "detail": "écriture au débit du 635130"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Fonds travaux ALUR réintégré automatiquement à la clôture",
+        "ok": true,
+        "detail": "retraitements 61.00 € (conventions des offres payantes « divers à réintégrer »)"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": false,
+        "detail": "2033-C : amortissements fin = case 030 du bilan"
+      }
+    ]
+  },
+  "audit_plafond_faux": {
+    "succes": false,
+    "nombre": 41,
+    "echecs": [
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": false,
+        "detail": "plafond 3400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": false,
+        "detail": "report 1600.00 € ; stock clôture 1600.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": false,
+        "detail": "résultat comptable -2600.00 € → fiscal -1000.00 €"
+      }
+    ],
+    "checks": [
+      {
+        "phase": "Phase 0 — Initialisation",
+        "nom": "Base jetable créée en mode blanc (aucune donnée personnelle)",
+        "ok": true,
+        "detail": "/tmp/audit_lmnp_08q0_lm5/audit.db"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Création exploitant / bien / composants",
+        "ok": true,
+        "detail": "3 composants créés (bâti 25 ans, mobilier 5 ans, terrain)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Saisie 12 loyers + 5 charges + 3 acquisitions",
+        "ok": true,
+        "detail": "17 écritures BQ (attendu 17), 3 acquisitions (attendu 3)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Toutes les écritures sont équilibrées",
+        "ok": true,
+        "detail": "0 écriture(s) déséquilibrée(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Contrôles pré-clôture : aucun bloquant",
+        "ok": true,
+        "detail": "3 anomalie(s) dont 0 bloquante(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": true,
+        "detail": "dotation 5000.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": true,
+        "detail": "3100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "39 C : dotation entièrement déductible (plafond suffisant)",
+        "ok": true,
+        "detail": "plafond 9650.00 € ≥ dotation ; report 0.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat fiscal = résultat comptable (aucun retraitement)",
+        "ok": true,
+        "detail": "fiscal 3100.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Exercice marqué « clos »",
+        "ok": true,
+        "detail": "statut = clos"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "FEC exporté puis validé (conformité A47 A-1)",
+        "ok": true,
+        "detail": "0 erreur(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Doublon détecté",
+        "ok": true,
+        "detail": "EQUILIBRE:BLOQUANT | DATE_HORS_EXERCICE:BLOQUANT | DOUBLON:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | REQUALIFIER:AVERTISSEMENT | IMMOBILISABLE:AVERTISSEMENT | LOYER_MANQUANT:AVERTISSEMENT | SENS:AVERTISSEMENT | ANNUEL_MULTIPLE:AVERTISSEMENT | INTERETS_MAL_CLASSES:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | CHARGE_ATTENDUE:INFO | CHARGE_ATTENDUE:INFO"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "« Autres charges » à requalifier détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Dépense immobilisable (> seuil 500 €) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Loyer mensuel manquant détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture déséquilibrée détectée (BLOQUANT)",
+        "ok": true,
+        "detail": "2 bloquant(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge au crédit (sens anormal) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture datée hors exercice détectée (BLOQUANT)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge annuelle saisie deux fois détectée (CFE ×2)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Rappel des charges quasi certaines absentes (INFO)",
+        "ok": true,
+        "detail": "taxe foncière / assurance non saisies sur l'exercice de test"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": false,
+        "detail": "plafond 3400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": false,
+        "detail": "report 1600.00 € ; stock clôture 1600.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": false,
+        "detail": "résultat comptable -2600.00 € → fiscal -1000.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Files 39 C et déficits LMNP jamais cumulées",
+        "ok": true,
+        "detail": "stock 39 C 1600.00 € ; stock déficits 1000.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": true,
+        "detail": "utilisation 1600.00 € ; stock 1600.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 95000.00 € / passif 95000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "115000.00 € / 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "20000.00 € / 20000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "7200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : assemblage complet",
+        "ok": true,
+        "detail": "CA 14400.00 € ; résultat fiscal 7200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "À-nouveaux internes équilibrés (sans FEC externe)",
+        "ok": true,
+        "detail": "Débit 123800.00 € / Crédit 123800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Actif net repris à l'identique (VNC conservée)",
+        "ok": true,
+        "detail": "95000.00 € (clôture 2029 : 95000.00 €)"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Compte 120000 soldé après affectation du résultat",
+        "ok": true,
+        "detail": "solde 0.00 € ; résultat reporté 8800.00 € vers 108000"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Double reprise refusée (AN déjà présents)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Reprise refusée si l'exercice précédent n'est pas clos",
+        "ok": true,
+        "detail": "exercice 2030 encore ouvert"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Règle fiscale versionnée : chaque exercice garde son millésime",
+        "ok": true,
+        "detail": "2030 → 500 € ; 2031 → 800 €"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Catégorie personnalisée saisissable sur son compte",
+        "ok": true,
+        "detail": "écriture au débit du 635130"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Fonds travaux ALUR réintégré automatiquement à la clôture",
+        "ok": true,
+        "detail": "retraitements 61.00 € (conventions des offres payantes « divers à réintégrer »)"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": true,
+        "detail": "5/5 contrôles"
+      }
+    ]
+  },
+  "audit_peremption_fausse": {
+    "succes": true,
+    "nombre": 41,
+    "echecs": [],
+    "checks": [
+      {
+        "phase": "Phase 0 — Initialisation",
+        "nom": "Base jetable créée en mode blanc (aucune donnée personnelle)",
+        "ok": true,
+        "detail": "/tmp/audit_lmnp_6z28j6fm/audit.db"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Création exploitant / bien / composants",
+        "ok": true,
+        "detail": "3 composants créés (bâti 25 ans, mobilier 5 ans, terrain)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Saisie 12 loyers + 5 charges + 3 acquisitions",
+        "ok": true,
+        "detail": "17 écritures BQ (attendu 17), 3 acquisitions (attendu 3)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Toutes les écritures sont équilibrées",
+        "ok": true,
+        "detail": "0 écriture(s) déséquilibrée(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Contrôles pré-clôture : aucun bloquant",
+        "ok": true,
+        "detail": "3 anomalie(s) dont 0 bloquante(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": true,
+        "detail": "dotation 5000.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": true,
+        "detail": "3100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "39 C : dotation entièrement déductible (plafond suffisant)",
+        "ok": true,
+        "detail": "plafond 8650.00 € ≥ dotation ; report 0.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat fiscal = résultat comptable (aucun retraitement)",
+        "ok": true,
+        "detail": "fiscal 3100.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Exercice marqué « clos »",
+        "ok": true,
+        "detail": "statut = clos"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "FEC exporté puis validé (conformité A47 A-1)",
+        "ok": true,
+        "detail": "0 erreur(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Doublon détecté",
+        "ok": true,
+        "detail": "EQUILIBRE:BLOQUANT | DATE_HORS_EXERCICE:BLOQUANT | DOUBLON:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | REQUALIFIER:AVERTISSEMENT | IMMOBILISABLE:AVERTISSEMENT | LOYER_MANQUANT:AVERTISSEMENT | SENS:AVERTISSEMENT | ANNUEL_MULTIPLE:AVERTISSEMENT | INTERETS_MAL_CLASSES:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | CHARGE_ATTENDUE:INFO | CHARGE_ATTENDUE:INFO"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "« Autres charges » à requalifier détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Dépense immobilisable (> seuil 500 €) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Loyer mensuel manquant détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture déséquilibrée détectée (BLOQUANT)",
+        "ok": true,
+        "detail": "2 bloquant(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge au crédit (sens anormal) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture datée hors exercice détectée (BLOQUANT)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge annuelle saisie deux fois détectée (CFE ×2)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Rappel des charges quasi certaines absentes (INFO)",
+        "ok": true,
+        "detail": "taxe foncière / assurance non saisies sur l'exercice de test"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": true,
+        "detail": "plafond 2400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": true,
+        "detail": "report 2600.00 € ; stock clôture 2600.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": true,
+        "detail": "résultat comptable -2600.00 € → fiscal 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Files 39 C et déficits LMNP jamais cumulées",
+        "ok": true,
+        "detail": "stock 39 C 2600.00 € ; stock déficits 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": true,
+        "detail": "utilisation 2600.00 € ; stock 2600.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 95000.00 € / passif 95000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "115000.00 € / 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "20000.00 € / 20000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : assemblage complet",
+        "ok": true,
+        "detail": "CA 14400.00 € ; résultat fiscal 6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "À-nouveaux internes équilibrés (sans FEC externe)",
+        "ok": true,
+        "detail": "Débit 123800.00 € / Crédit 123800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Actif net repris à l'identique (VNC conservée)",
+        "ok": true,
+        "detail": "95000.00 € (clôture 2029 : 95000.00 €)"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Compte 120000 soldé après affectation du résultat",
+        "ok": true,
+        "detail": "solde 0.00 € ; résultat reporté 8800.00 € vers 108000"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Double reprise refusée (AN déjà présents)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Reprise refusée si l'exercice précédent n'est pas clos",
+        "ok": true,
+        "detail": "exercice 2030 encore ouvert"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Règle fiscale versionnée : chaque exercice garde son millésime",
+        "ok": true,
+        "detail": "2030 → 500 € ; 2031 → 800 €"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Catégorie personnalisée saisissable sur son compte",
+        "ok": true,
+        "detail": "écriture au débit du 635130"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Fonds travaux ALUR réintégré automatiquement à la clôture",
+        "ok": true,
+        "detail": "retraitements 61.00 € (conventions des offres payantes « divers à réintégrer »)"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": true,
+        "detail": "5/5 contrôles"
+      }
+    ],
+    "stocks_non_vides_rencontres": 0
+  },
+  "temoin_peremption": {
+    "avant": 1200,
+    "retour": {
+      "perimes": 0,
+      "deficit_cree": null,
+      "impute_sur_benefice": 0.0,
+      "stock_deficits": 0.0
+    },
+    "apres": 0.0
+  },
+  "audit_date_degradee": {
+    "succes": true,
+    "nombre": 41,
+    "echecs": [],
+    "checks": [
+      {
+        "phase": "Phase 0 — Initialisation",
+        "nom": "Base jetable créée en mode blanc (aucune donnée personnelle)",
+        "ok": true,
+        "detail": "/tmp/audit_lmnp_9xojyomo/audit.db"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Création exploitant / bien / composants",
+        "ok": true,
+        "detail": "3 composants créés (bâti 25 ans, mobilier 5 ans, terrain)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Saisie 12 loyers + 5 charges + 3 acquisitions",
+        "ok": true,
+        "detail": "17 écritures BQ (attendu 17), 3 acquisitions (attendu 3)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Toutes les écritures sont équilibrées",
+        "ok": true,
+        "detail": "0 écriture(s) déséquilibrée(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Contrôles pré-clôture : aucun bloquant",
+        "ok": true,
+        "detail": "3 anomalie(s) dont 0 bloquante(s)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Dotation aux amortissements exacte",
+        "ok": true,
+        "detail": "dotation 5000.00 € (attendu 5000.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat comptable = produits − charges − dotation",
+        "ok": true,
+        "detail": "3100.00 € (attendu 3100.00 €)"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "39 C : dotation entièrement déductible (plafond suffisant)",
+        "ok": true,
+        "detail": "plafond 8650.00 € ≥ dotation ; report 0.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Résultat fiscal = résultat comptable (aucun retraitement)",
+        "ok": true,
+        "detail": "fiscal 3100.00 €"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "Exercice marqué « clos »",
+        "ok": true,
+        "detail": "statut = clos"
+      },
+      {
+        "phase": "Phase 1 — Cycle nominal (ouverture → clôture → FEC)",
+        "nom": "FEC exporté puis validé (conformité A47 A-1)",
+        "ok": true,
+        "detail": "0 erreur(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Doublon détecté",
+        "ok": true,
+        "detail": "EQUILIBRE:BLOQUANT | DATE_HORS_EXERCICE:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | DOUBLON:AVERTISSEMENT | REQUALIFIER:AVERTISSEMENT | IMMOBILISABLE:AVERTISSEMENT | LOYER_MANQUANT:AVERTISSEMENT | SENS:AVERTISSEMENT | ANNUEL_MULTIPLE:AVERTISSEMENT | INTERETS_MAL_CLASSES:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | PLAUSIBILITE_N1:AVERTISSEMENT | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | POSTE_HABITUEL_ABSENT:INFO | CHARGE_ATTENDUE:INFO | CHARGE_ATTENDUE:INFO"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "« Autres charges » à requalifier détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Dépense immobilisable (> seuil 500 €) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Loyer mensuel manquant détecté",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture déséquilibrée détectée (BLOQUANT)",
+        "ok": true,
+        "detail": "1 bloquant(s)"
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge au crédit (sens anormal) détectée",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Écriture datée hors exercice détectée (BLOQUANT)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Charge annuelle saisie deux fois détectée (CFE ×2)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 2 — Détection d'anomalies par le moteur de contrôles",
+        "nom": "Rappel des charges quasi certaines absentes (INFO)",
+        "ok": true,
+        "detail": "taxe foncière / assurance non saisies sur l'exercice de test"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Plafond 39 C = loyers − charges hors amortissements",
+        "ok": true,
+        "detail": "plafond 2400.00 € (attendu 2400.00 €)"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Excédent de dotation reporté (39 C)",
+        "ok": true,
+        "detail": "report 2600.00 € ; stock clôture 2600.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Résultat fiscal ramené à 0 (report réintégré) — pas de déficit artificiel",
+        "ok": true,
+        "detail": "résultat comptable -2600.00 € → fiscal 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Files 39 C et déficits LMNP jamais cumulées",
+        "ok": true,
+        "detail": "stock 39 C 2600.00 € ; stock déficits 0.00 €"
+      },
+      {
+        "phase": "Phase 3 — Limitation 39 C et déficits LMNP pluri-exercices",
+        "nom": "Stock 39 C consommé sur exercice bénéficiaire",
+        "ok": true,
+        "detail": "utilisation 2600.00 € ; stock 2600.00 € → 0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Bilan équilibré (actif net = capitaux propres)",
+        "ok": true,
+        "detail": "actif 95000.00 € / passif 95000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-B ligne 352 = 0 (résultat LMNP exclu, déclaré en 2031 bis)",
+        "ok": true,
+        "detail": "0.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : total brut fin = somme des valeurs brutes",
+        "ok": true,
+        "detail": "115000.00 € / 115000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : 2033-C : amortissements fin = case 030 du bilan",
+        "ok": true,
+        "detail": "20000.00 € / 20000.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : Résultat fiscal 2033-B = résultat fiscal de clôture",
+        "ok": true,
+        "detail": "6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Liasse 2029 : assemblage complet",
+        "ok": true,
+        "detail": "CA 14400.00 € ; résultat fiscal 6200.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "À-nouveaux internes équilibrés (sans FEC externe)",
+        "ok": true,
+        "detail": "Débit 123800.00 € / Crédit 123800.00 €"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Actif net repris à l'identique (VNC conservée)",
+        "ok": true,
+        "detail": "95000.00 € (clôture 2029 : 95000.00 €)"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Compte 120000 soldé après affectation du résultat",
+        "ok": true,
+        "detail": "solde 0.00 € ; résultat reporté 8800.00 € vers 108000"
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Double reprise refusée (AN déjà présents)",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "phase": "Phase 4 — Reprise interne des à-nouveaux + liasse fiscale",
+        "nom": "Reprise refusée si l'exercice précédent n'est pas clos",
+        "ok": true,
+        "detail": "exercice 2030 encore ouvert"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Règle fiscale versionnée : chaque exercice garde son millésime",
+        "ok": true,
+        "detail": "2030 → 500 € ; 2031 → 800 €"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Catégorie personnalisée saisissable sur son compte",
+        "ok": true,
+        "detail": "écriture au débit du 635130"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Fonds travaux ALUR réintégré automatiquement à la clôture",
+        "ok": true,
+        "detail": "retraitements 61.00 € (conventions des offres payantes « divers à réintégrer »)"
+      },
+      {
+        "phase": "Phase 5 — Réglementation versionnée & extensibilité",
+        "nom": "Liasse conforme avec gabarits personnalisés et retraitement auto",
+        "ok": true,
+        "detail": "5/5 contrôles"
+      }
+    ]
+  },
+  "seuil_conversion_1e309": "inf",
+  "amort_anterieurs_cloture": {
+    "avant": [
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "LOYER_MANQUANT",
+        "message": "Loyers manquants (11 mois) : 2026-02, 2026-03, 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10, 2026-11, 2026-12."
+      },
+      {
+        "niveau": "AVERTISSEMENT",
+        "code": "AMORT_ANTERIEURS",
+        "message": "1200.00 € d'amortissements déjà courus avant 2026 ne sont pas comptabilisés (Mobilier fictif). Le bilan présente le bien comme neuf alors que le tableau 2033-C déroule son plan depuis la mise en service : l'écart apparaîtra à chaque liasse. Corrigez-le en un clic depuis la page Immobilisations (« Reprendre les amortissements antérieurs ») — le résultat de l'exercice n'en est pas affecté, seul le bilan est remis à l'endroit."
+      }
+    ],
+    "cloture": {
+      "agregats": {
+        "produits": 2400.0,
+        "charges_hors_daa": 0,
+        "charges_hors_plafond": 0,
+        "charges_afferentes": 0,
+        "dotation": 1200.0,
+        "resultat_comptable": 1200.0,
+        "produits_cession": 0,
+        "vnc_cession": 0,
+        "plafond_39c": 2400.0
+      },
+      "suivi_39c": {
+        "stock_ouverture": 0.0,
+        "dotation_exercice": 1200.0,
+        "plafond_deductible": 2400.0,
+        "report_annee": 0.0,
+        "utilisation_annee": 0.0,
+        "stock_cloture": 0.0,
+        "sorties_39c": 0.0
+      },
+      "resultat_fiscal": 1200.0,
+      "autres_retraitements": 0.0,
+      "deficits": {
+        "perimes": 0,
+        "deficit_cree": null,
+        "impute_sur_benefice": 0.0,
+        "stock_deficits": 0
+      },
+      "revenu_imposable": 1200.0
+    },
+    "bilan": {
+      "immo_corporelles_brut_028": 12000.0,
+      "amortissements_030": 1200.0,
+      "immo_corporelles_net": 10800.0,
+      "total_actif_110": 12000.0,
+      "total_actif_net_112": 10800.0,
+      "capital_individuel_120": 9600.0,
+      "resultat_exercice_136": 1200.0,
+      "total_capitaux_142": 10800.0,
+      "total_passif_180": 10800.0,
+      "equilibre": true
+    }
+  },
+  "rapport_date_composant_invalide": "Contrôles 2026 : aucune anomalie. ✓",
+  "dossier_ordinaire": [
+    {
+      "niveau": "INFO",
+      "code": "POSTE_HABITUEL_ABSENT",
+      "message": "Aucun intérêt d'emprunt sur 2026. Si le bien a été financé à crédit, les intérêts et l'assurance emprunteur sont déductibles — c'est souvent le poste de charge le plus élevé. Ignorez si l'achat était comptant."
+    },
+    {
+      "niveau": "INFO",
+      "code": "POSTE_HABITUEL_ABSENT",
+      "message": "Aucune taxe foncière sur 2026. Elle est due chaque année par le propriétaire. Pensez aussi à la TEOM, sur le même avis."
+    },
+    {
+      "niveau": "INFO",
+      "code": "CHARGE_ATTENDUE",
+      "message": "Aucune taxe foncière / TEOM saisie sur 2026 — oubli probable (charge quasi certaine en location meublée)."
+    }
+  ],
+  "loyer_personnalise": {
+    "manquants": [],
+    "atypique": [],
+    "produits": 1680.0
+  },
+  "plan_panne_globale": "plan fictif indisponible",
+  "cli": {
+    "False": {
+      "code_retour": 0,
+      "sortie": "Dossier : <TEMP>/61.db\nSauvegarde : <TEMP>/sauvegardes/61/61-20260915-153230-avant-cloture.db\nContrôles de cohérence 2026 :\n  [BLOQUANT     ] COMPTE_ATTENTE Compte d'attente 472000 non soldé : 800.00 € — reclasser avant la clôture.\n  [AVERTISSEMENT] REQUALIFIER   Article « Autres » à valider (op. 1, 2026-01, 800.00 €) : « Décaissement à identifier (bloque la liasse) » — à reclasser dans un compte dédié.\n\nBilan : 1 bloquant(s), 1 avertissement(s).\n⛔ Des anomalies BLOQUANTES empêchent la clôture.\n\n⛔ Clôture refusée (anomalies bloquantes). Corrige-les ou utilise --forcer.\n",
+      "erreur": "",
+      "statut": "ouvert"
+    },
+    "True": {
+      "code_retour": 0,
+      "sortie": "Dossier : <TEMP>/62.db\nSauvegarde : <TEMP>/sauvegardes/62/62-20260915-153230-avant-cloture.db\nFEC archivé : <TEMP>/archives/62/FEC2026-cloture-20260915-153230.txt\n  empreinte SHA-256 : 4ea6ddf0b785e168… (consignée dans manifeste.csv)\nClôture 2026 :\n  Produits 0.00 | Charges 0.00 | Dotation 0.00\n  Résultat comptable : 0.00\n  Report 39C : +0.00 / -0.00 -> stock 0.00\n  Résultat fiscal    : 0.00\n  Déficits LMNP : stock 0.00\n",
+      "erreur": "",
+      "statut": "clos"
+    }
+  },
+  "web": {
+    "False": {
+      "http": 302,
+      "location": "/cloture?annee=2026&warn=1+anomalie(s)+bloquante(s)+—+cochez+«+Forcer+»+pour+clôturer+quand+même.",
+      "statut": "ouvert"
+    },
+    "True": {
+      "http": 302,
+      "location": "/cloture?annee=2026&ok=Exercice+2026+clôturé.+Résultat+comptable+:+0.00+€+|+Résultat+fiscal+:+0.00+€+|+Dotation+:+0.00+€",
+      "statut": "clos"
+    }
+  },
+  "web_bloquants": {
+    "EQUILIBRE": {
+      "http": 302,
+      "location": "/cloture?annee=2026&warn=1+anomalie(s)+bloquante(s)+—+cochez+«+Forcer+»+pour+clôturer+quand+même.",
+      "statut": "ouvert"
+    },
+    "DATE_HORS_EXERCICE": {
+      "http": 302,
+      "location": "/cloture?annee=2026&warn=1+anomalie(s)+bloquante(s)+—+cochez+«+Forcer+»+pour+clôturer+quand+même.",
+      "statut": "ouvert"
+    },
+    "COMPTE_ATTENTE": {
+      "http": 302,
+      "location": "/cloture?annee=2026&warn=1+anomalie(s)+bloquante(s)+—+cochez+«+Forcer+»+pour+clôturer+quand+même.",
+      "statut": "ouvert"
+    },
+    "MONTANT_INVALIDE": {
+      "http": 302,
+      "location": "/cloture?annee=2026&warn=1+anomalie(s)+bloquante(s)+—+cochez+«+Forcer+»+pour+clôturer+quand+même.",
+      "statut": "ouvert"
+    },
+    "COMPOSANT_SANS_AMORT": {
+      "http": 302,
+      "location": "/cloture?annee=2026&warn=1+anomalie(s)+bloquante(s)+—+cochez+«+Forcer+»+pour+clôturer+quand+même.",
+      "statut": "ouvert"
+    }
+  },
+  "web_attentes_non_detectees": {
+    "compensee": {
+      "location": "/cloture?annee=2026&ok=Exercice+2026+clôturé.+Résultat+comptable+:+0.00+€+|+Résultat+fiscal+:+0.00+€+|+Dotation+:+0.00+€",
+      "statut": "clos"
+    },
+    "sept_chiffres": {
+      "location": "/cloture?annee=2026&ok=Exercice+2026+clôturé.+Résultat+comptable+:+0.00+€+|+Résultat+fiscal+:+0.00+€+|+Dotation+:+0.00+€",
+      "statut": "clos"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "oracle_decimal": {
+    "cas": 216,
+    "divergences": 0
+  },
+  "propagation_I10": {
+    "0": {
+      "report_2026": 1000.0,
+      "rf_2026": 0.0,
+      "utilisation_2027": 1000.0,
+      "revenu_imposable_2027": 0.0
+    },
+    "1000": {
+      "report_2026": 0.0,
+      "rf_2026": 0.0,
+      "utilisation_2027": 0.0,
+      "revenu_imposable_2027": 1000.0
+    }
+  }
+}
