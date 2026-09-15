@@ -52,6 +52,11 @@ jobs:
           fi
           echo "Arborescence : $dossier"
           echo "dossier=$dossier" >> "$GITHUB_OUTPUT"
+          
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils   
 
       - name: Installer les dépendances épinglées
         run: |
