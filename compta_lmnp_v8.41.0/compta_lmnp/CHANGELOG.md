@@ -1,5 +1,59 @@
 # Journal des versions — Compta LMNP
 
+## 8.47.0 — 2026-09-16 (Passe L : la cession d'un bien)
+Quatre constats, trois majeurs et un mineur. La neutralisation fiscale de la
+plus-value, la ligne 352 et le traitement d'une cession à titre gratuit
+tiennent. Ce qui ne tenait pas concerne le moment de la sortie — qui est
+sans retour — et ce que le déclarant reçoit ensuite.
+
+**La sortie soldait le cumul du PLAN, pas celui des comptes.** Solder, c'est
+ramener un compte à zéro : le montant à solder est donc celui qui s'y
+trouve. Or la sortie reprenait le cumul recalculé depuis la durée et la date
+actuelles du composant, et rien ne garantit qu'il décrive ce qui a été
+comptabilisé — un historique repris d'un cabinet, ou une durée corrigée
+après coup, le démentent. Sur un composant de 12 000 € portant 3 000 €
+d'amortissements repris là où le plan en prévoyait 1 200 €, la sortie
+soldait 1 200 € : 1 800 € d'amortissements restaient en compte pour un actif
+qui n'existait plus, et la valeur nette passée en charge de cession était
+surévaluée d'autant. Le cumul se lit désormais dans les comptes. Quand le
+compte d'amortissement sert aussi à des composants qui ne sont pas cédés et
+que son solde ne concorde pas avec le plan, l'écart ne peut être attribué ni
+aux uns ni aux autres : la cession est refusée, avec le rapprochement à
+faire.
+
+**Le tableau des immobilisations effaçait l'exercice de la vente.** Le bien
+cédé en était exclu dès l'année de sa cession, ouverture et mouvements
+compris : il ne restait que des zéros. Les soldes FINAUX étaient pourtant
+justes — et comme les contrôles de concordance ne rapprochent que les soldes
+finaux, ils approuvaient. 12 000 € de brut d'ouverture, 595,07 € de dotation
+de sortie et 1 795,07 € de diminution d'amortissements n'étaient donc pas
+fournis au déclarant. Le tableau distingue maintenant un bien cédé AVANT
+l'exercice — qui n'y a plus rien à faire — d'un bien cédé PENDANT, dont les
+mouvements sont ceux de l'exercice. Deux colonnes de diminution s'ajoutent,
+au brut et aux amortissements, sur l'écran comme au PDF ; leurs montants
+sont lus dans les écritures de cession, non recalculés.
+
+**Une vente antérieure à l'acquisition était acceptée.** Seule la syntaxe de
+la date était contrôlée : une cession datée de la veille de l'acquisition
+sortait 12 000 € d'actif, enregistrait 15 000 € de produit sur une
+chronologie impossible, et la liasse déclarait le tout conforme. Le logiciel
+ne peut pas deviner laquelle des deux dates est fausse, mais il peut refuser
+la combinaison — et nommer les deux dates pour que la correction soit
+possible. Vendre le jour même de l'acquisition reste permis : c'est étrange,
+ce n'est pas impossible.
+
+**Le PDF ne rappelait pas la déclaration immobilière séparée.** Un exercice
+de cession se lit tout entier de travers si l'on croit que la neutralisation
+du BIC calcule la plus-value. En location meublée non professionnelle, elle
+relève du régime des particuliers (article 150 U du CGI) et se déclare par
+le notaire, sur la 2048-IMM, au moment de la vente. Le pense-bête le disait ;
+le PDF, qui est ce qui part chez le comptable ou reste au dossier, ne le
+disait pas. Sa page de garde le dit désormais dès qu'une cession figure dans
+l'exercice — y compris à titre gratuit, où le prix est nul mais la valeur
+comptable sort.
+
+- 24 tests ajoutés (986 au total).
+
 ## 8.46.0 — 2026-09-16 (Passe K : clôture et continuité pluriannuelle)
 Trois constats, deux majeurs et un mineur. La clôture tient par ailleurs son
 contrat atomique : soixante-quatorze interruptions par SIGKILL réparties sur

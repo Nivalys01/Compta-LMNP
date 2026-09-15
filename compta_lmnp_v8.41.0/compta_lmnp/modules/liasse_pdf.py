@@ -178,6 +178,24 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
         "numéros de cases officiels y figurent pour permettre le report "
         "champ à champ dans la télédéclaration, ou par l'expert-comptable.",
         st["note"]))
+    # Un exercice de cession se lit tout entier de travers si l'on croit
+    # que la neutralisation du BIC calcule la plus-value. Le pense-bête le
+    # dit bien, mais le PDF est ce qui part chez le comptable ou reste au
+    # dossier : il doit le dire aussi, et le dire LÀ, sur la page de garde.
+    if L.get("cession_de_l_exercice"):
+        E.append(Spacer(1, 4))
+        E.append(Paragraph(
+            "<b>Une cession a eu lieu sur cet exercice.</b> Le prix de vente "
+            "et la valeur comptable du bien sont NEUTRALISÉS dans le "
+            "résultat BIC ci-après : en location meublée non "
+            "professionnelle, la plus-value relève du régime des "
+            "PARTICULIERS (article 150 U du CGI). Ce document ne la calcule "
+            "donc pas, et l'absence de plus-value dans le résultat LMNP ne "
+            "signifie pas qu'il n'y a rien à déclarer : la plus-value "
+            "immobilière est établie et déclarée séparément par le notaire "
+            "(formulaire 2048-IMM), au moment de la vente. Vérifiez auprès "
+            "de lui que cette formalité a bien été accomplie.",
+            st["note"]))
     E.append(Spacer(1, 6))
 
     g = L["page_garde"]
@@ -319,7 +337,8 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     # est la raison d'être de ce PDF. Cases relevées sur le CERFA
     # 2033-C-SD 2026 : 420/430/450/470 (brut), 510/520/540/560 (amort.).
     lignes = [["Rubrique", "Brut début", "Augment.", "Brut fin",
-               "Amort. début", "Dotation", "Amort. fin"]]
+               "Diminutions", "Amort. début", "Dotation",
+               "Amort. dimin.", "Amort. fin"]]
     for rub in c["rubriques"]:
         # Enveloppé comme partout ailleurs : une chaîne brute ne se coupe pas
         # dans une table reportlab, elle déborde sur les colonnes voisines.
@@ -330,14 +349,16 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
             _xml(f"{rub['libelle']} (cases {rub['case_immo']} / "
                  f"{rub['case_amort']})"), st["normal"]),
                        _eur(rub["brut_debut"]), _eur(rub["augmentations"]),
-                       _eur(rub["brut_fin"]), _eur(rub["amort_debut"]),
-                       _eur(rub["dotation"]), _eur(rub["amort_fin"])])
+                       _eur(rub["diminutions"]), _eur(rub["brut_fin"]),
+                       _eur(rub["amort_debut"]), _eur(rub["dotation"]),
+                       _eur(rub["amort_diminutions"]), _eur(rub["amort_fin"])])
     tt = c["totaux"]
     lignes.append(["Totaux", _eur(tt["brut_debut"]), _eur(tt["augmentations"]),
-                   _eur(tt["brut_fin"]), _eur(tt["amort_debut"]),
-                   _eur(tt["dotation"]), _eur(tt["amort_fin"])])
-    t = _table(lignes, largeurs=[46 * mm] + [20.5 * mm] * 6,
-               aligne_droite=range(1, 7))
+                   _eur(tt["diminutions"]), _eur(tt["brut_fin"]),
+                   _eur(tt["amort_debut"]), _eur(tt["dotation"]),
+                   _eur(tt["amort_diminutions"]), _eur(tt["amort_fin"])])
+    t = _table(lignes, largeurs=[38 * mm] + [16.5 * mm] * 8,
+               aligne_droite=range(1, 9))
     _ligne_tot(t, len(lignes) - 1)
     E.append(t)
 

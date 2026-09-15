@@ -1476,25 +1476,31 @@ PAGE_LIASSE = """
   <div class="card-header">N° 2033-C — Immobilisations & amortissements</div>
   <div class="card-body" style="padding:0"><table>
     <tr><th>Rubrique</th><th class="num">Brut début</th>
-        <th class="num">Augment.</th><th class="num">Brut fin</th>
+        <th class="num">Augment.</th><th class="num">Dimin.</th>
+        <th class="num">Brut fin</th>
         <th class="num">Amort. début</th><th class="num">Dotation</th>
+        <th class="num">Amort. dimin.</th>
         <th class="num">Amort. fin</th></tr>
     {% for r in L.f2033c.rubriques %}
     <tr><td>{{ r.libelle }} <span class="case">{{ r.case_immo }} /
         {{ r.case_amort }}</span></td>
         <td class="num">{{ eur(r.brut_debut) }}</td>
         <td class="num">{{ eur(r.augmentations) }}</td>
+        <td class="num">{{ eur(r.diminutions) }}</td>
         <td class="num">{{ eur(r.brut_fin) }}</td>
         <td class="num">{{ eur(r.amort_debut) }}</td>
         <td class="num">{{ eur(r.dotation) }}</td>
+        <td class="num">{{ eur(r.amort_diminutions) }}</td>
         <td class="num">{{ eur(r.amort_fin) }}</td></tr>
     {% endfor %}
     <tr class="tot"><td>TOTAL <span class="case">490-496 / 570-576</span></td>
         <td class="num">{{ eur(L.f2033c.totaux.brut_debut) }}</td>
         <td class="num">{{ eur(L.f2033c.totaux.augmentations) }}</td>
+        <td class="num">{{ eur(L.f2033c.totaux.diminutions) }}</td>
         <td class="num">{{ eur(L.f2033c.totaux.brut_fin) }}</td>
         <td class="num">{{ eur(L.f2033c.totaux.amort_debut) }}</td>
         <td class="num">{{ eur(L.f2033c.totaux.dotation) }}</td>
+        <td class="num">{{ eur(L.f2033c.totaux.amort_diminutions) }}</td>
         <td class="num">{{ eur(L.f2033c.totaux.amort_fin) }}</td></tr>
   </table>
   <table style="margin-top:6px">

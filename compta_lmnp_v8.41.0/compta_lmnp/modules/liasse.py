@@ -306,6 +306,59 @@ def bilan_2033a(conn: sqlite3.Connection, annee: int) -> dict:
 
 # ── 2033-C : immobilisations & amortissements ────────────────────────────────
 
+def _fiscal_agregats_cession(conn: sqlite3.Connection, annee: int) -> dict:
+    """{'produit', 'valeur_comptable'} des cessions de l'exercice, ou {}."""
+    import fiscal as _fiscal
+    ag = _fiscal.agregats(conn, annee)
+    produit = round(ag.get("produits_cession", 0.0), 2)
+    vnc = round(ag.get("vnc_cession", 0.0), 2)
+    if abs(produit) < TOL and abs(vnc) < TOL:
+        return {}
+    return {"produit": produit, "valeur_comptable": vnc}
+
+
+def compte_amortissement(conn: sqlite3.Connection, composant_id: int) -> str:
+    r = conn.execute("SELECT compte_amort FROM composant WHERE id=?",
+                     (composant_id,)).fetchone()
+    return (r[0] or "") if r else ""
+
+
+def _mouvements_de_cession(conn: sqlite3.Connection, bien_id: int,
+                           annee: int) -> dict:
+    """Mouvements d'amortissement RÉELLEMENT écrits lors de la cession de ce
+    bien, par compte : la dotation complémentaire et la diminution qui solde.
+
+    Lus dans les écritures, et non recalculés depuis le plan : c'est le
+    même principe qu'en passe L pour la sortie elle-même — ce qu'on
+    présente au déclarant doit être ce qui a été comptabilisé.
+
+    Les deux pièces portent l'identifiant du bien depuis la passe I, ce qui
+    les rattache sans ambiguïté. `parts` répartit chaque compte entre les
+    composants du bien qui l'utilisent, au prorata de leur valeur brute —
+    l'identité lorsqu'ils ne sont qu'un, le cas courant.
+    """
+    out: dict[str, dict] = {}
+    for piece, cle in ((f"DAA-CESSION-{bien_id}", "dotation"),
+                       (f"CESSION-{bien_id}", "diminution")):
+        signe = -1.0 if cle == "dotation" else 1.0   # crédit pour la dotation
+        for compte, montant in conn.execute(
+                "SELECT l.compte_num, ROUND(SUM(l.debit - l.credit), 2) "
+                "FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
+                "WHERE e.exercice_annee=? AND e.piece_ref=? "
+                "AND l.compte_num LIKE '28%' GROUP BY l.compte_num",
+                (annee, piece)):
+            out.setdefault(compte, {})[cle] = round(signe * float(montant), 2)
+    for compte, valeurs in out.items():
+        membres = conn.execute(
+            "SELECT id, valeur_brute FROM composant WHERE bien_id=? "
+            "AND compte_amort=?", (bien_id, compte)).fetchall()
+        total = sum(float(v) for _i, v in membres) or 1.0
+        valeurs["parts"] = {i: float(v) / total for i, v in membres}
+        valeurs.setdefault("dotation", 0.0)
+        valeurs.setdefault("diminution", 0.0)
+    return out
+
+
 def _amortissements_traces(conn: sqlite3.Connection, composant_id: int,
                            annee: int) -> tuple[float | None, float | None]:
     """(dotation, cumul_fin) enregistrés à la clôture de `annee`, ou (None,
@@ -332,21 +385,41 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
     # `date_cession` n'existe que sur les bases où une cession a eu lieu
     # (cession.assurer_schema la crée) : on filtre donc seulement si elle
     # est là, plutôt que d'imposer une migration à tous les dossiers.
+    # Un bien cédé sort du bilan — mais l'exercice de sa cession doit
+    # MONTRER cette sortie. L'exclusion portait sur toutes les années à
+    # partir de la cession, l'année de vente comprise : le tableau
+    # n'affichait alors ni le brut d'ouverture, ni la dotation de sortie,
+    # ni la diminution, seulement des zéros. Les soldes finaux étaient
+    # justes, et les contrôles ne comparant que les soldes finaux, ils
+    # approuvaient. 12 000 € de brut et 1 795,07 € de mouvements
+    # d'amortissement manquaient au déclarant.
+    #
+    # On distingue donc deux situations : cédé AVANT l'exercice (le bien
+    # n'a plus rien à y faire) et cédé PENDANT (ses mouvements sont ceux de
+    # l'exercice, et ses soldes finaux sont nuls).
     try:
-        cedes = {r[0] for r in conn.execute(
-            "SELECT id FROM bien WHERE date_cession IS NOT NULL "
-            "AND substr(date_cession, 1, 4) <= ?", (str(annee),))}
+        cedes_avant, cedes_annee = set(), set()
+        for bid, date_cession in conn.execute(
+                "SELECT id, date_cession FROM bien "
+                "WHERE date_cession IS NOT NULL AND date_cession <> ''"):
+            if str(date_cession)[:4] < str(annee):
+                cedes_avant.add(bid)
+            elif str(date_cession)[:4] == str(annee):
+                cedes_annee.add(bid)
     except sqlite3.OperationalError:
-        cedes = set()
-    if cedes:
+        cedes_avant, cedes_annee = set(), set()
+    if cedes_avant:
         # Index positionnel et non nommé : selon l'appelant, la connexion
         # peut ne pas avoir de row_factory, et les lignes sont alors des
-        # tuples nus. bien_id est la 7e colonne du SELECT ci-dessus.
-        rows = [x for x in rows if x[7] not in cedes]
+        # tuples nus. bien_id est la 8e colonne du SELECT ci-dessus.
+        rows = [x for x in rows if x[7] not in cedes_avant]
+    mouvements = {b: _mouvements_de_cession(conn, b, annee)
+                  for b in cedes_annee}
 
     rub = {k: {"libelle": lib, "case_immo": ci, "case_amort": ca,
-               "brut_debut": 0.0, "augmentations": 0.0, "brut_fin": 0.0,
-               "amort_debut": 0.0, "dotation": 0.0, "amort_fin": 0.0}
+               "brut_debut": 0.0, "augmentations": 0.0, "diminutions": 0.0,
+               "brut_fin": 0.0, "amort_debut": 0.0, "dotation": 0.0,
+               "amort_diminutions": 0.0, "amort_fin": 0.0}
            for compte, (k, lib, ci, ca) in RUBRIQUES_2033C.items()}
     detail = []
 
@@ -361,6 +434,22 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
             r["augmentations"] += vb
         else:
             continue                       # entré après l'exercice : hors liasse
+        if _bien in cedes_annee:
+            # Entré (ou déjà là) puis sorti dans le même exercice : la
+            # diminution efface le brut, et le solde final est nul.
+            r["diminutions"] += vb
+            sortis = mouvements[_bien].get(compte_amortissement(conn, cid), {})
+            part = sortis.get("parts", {}).get(cid, 0.0)
+            dot = round(sortis.get("dotation", 0.0) * part, 2)
+            dim = round(sortis.get("diminution", 0.0) * part, 2)
+            r["dotation"] += dot
+            r["amort_diminutions"] += dim
+            r["amort_debut"] += round(dim - dot, 2)
+            detail.append({"libelle": lib, "valeur_brute": round(vb, 2),
+                           "duree": duree, "dotation": round(dot, 2),
+                           "cumul_fin": 0.0, "vnc_fin": 0.0,
+                           "sorti": True})
+            continue
         r["brut_fin"] += vb
 
         dot = cum_fin = 0.0
@@ -388,14 +477,13 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
                        "cumul_fin": round(cum_fin, 2),
                        "vnc_fin": round(vb - cum_fin, 2)})
 
+    colonnes = ("brut_debut", "augmentations", "diminutions", "brut_fin",
+                "amort_debut", "dotation", "amort_diminutions", "amort_fin")
     for r in rub.values():
-        for k in ("brut_debut", "augmentations", "brut_fin",
-                  "amort_debut", "dotation", "amort_fin"):
+        for k in colonnes:
             r[k] = round(r[k], 2)
 
-    totaux = {k: round(sum(r[k] for r in rub.values()), 2)
-              for k in ("brut_debut", "augmentations", "brut_fin",
-                        "amort_debut", "dotation", "amort_fin")}
+    totaux = {k: round(sum(r[k] for r in rub.values()), 2) for k in colonnes}
     return {"rubriques": [rub[k] for k in ORDRE_RUBRIQUES],
             "totaux": totaux, "detail_composants": detail}
 
@@ -643,8 +731,14 @@ def generer(conn: sqlite3.Connection, annee: int) -> dict:
          f"{b2033b['resultat_fiscal_lmnp']:.2f} €"),
     ]
 
+    # Signal EXPLICITE d'une cession dans l'exercice, pour que le rendu
+    # n'ait pas à le déduire de montants. Il vaut aussi pour une cession à
+    # titre gratuit, où le prix est nul mais la valeur comptable sort.
+    ag_cession = _fiscal_agregats_cession(conn, annee)
+
     return {
         "annee": annee,
+        "cession_de_l_exercice": ag_cession,
         "statut_exercice": ex["statut"],
         "provisoire": ex["statut"] != "clos",
         "exploitant": dict(exploitant) if exploitant else None,
