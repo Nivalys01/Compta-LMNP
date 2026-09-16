@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import urlparse, parse_qs
 ROOT=Path(__file__).resolve().parents[2]
-SRC=ROOT/'compta_lmnp_v8.41.0/compta_lmnp'
+SRC=ROOT/'compta_lmnp'
 sys.path[:0]=[str(SRC/'modules'),str(SRC)]
 import init_db, amortissement as am, ecritures, operations, fiscal, controles, liasse, reprise, plan_immo, rejeu_fec, export_fec
 TMP=tempfile.TemporaryDirectory(prefix='audit-h-'); WORK=Path(TMP.name); OUT={}; SEQ=0

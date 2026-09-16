@@ -4,7 +4,7 @@ Réexamen du 15 septembre 2026. **Cinq constats majeurs actifs : I-07, I-10, I-1
 
 ## Version examinée et méthode
 
-Le répertoire source est `compta_lmnp_v8.41.0/compta_lmnp/`, mais son fichier `VERSION` indique désormais **8.43.0**. Des modifications de production sont apparues pendant cette reprise de l'audit, notamment dans `fiscal.py`. Les premières exécutions confirmaient le rapport initial ; elles ne décrivent plus le code final examiné. Une copie des sources a donc été figée, les scénarios réexécutés sur cette copie puis sur le répertoire courant, et leurs empreintes comparées. Le [manifeste de 40 fichiers](preuves_i/reverification_source.json) identifie exactement cette version, y compris ses modifications non commitées. Aucun correctif de production n'a été appliqué par cette passe.
+Le répertoire source est `compta_lmnp/`, mais son fichier `VERSION` indique désormais **8.43.0**. Des modifications de production sont apparues pendant cette reprise de l'audit, notamment dans `fiscal.py`. Les premières exécutions confirmaient le rapport initial ; elles ne décrivent plus le code final examiné. Une copie des sources a donc été figée, les scénarios réexécutés sur cette copie puis sur le répertoire courant, et leurs empreintes comparées. Le [manifeste de 40 fichiers](preuves_i/reverification_source.json) identifie exactement cette version, y compris ses modifications non commitées. Aucun correctif de production n'a été appliqué par cette passe.
 
 Les cinq pièces demandées sont présentes. `controles.py`, `cession.py`, `migrations.py`, `liasse_pdf.py`, `rejeu_fec.py`, `perennite.py` et `app.py` ont aussi été utilisés : ils sont nécessaires pour vérifier les alertes, les importations, la restauration et le document réellement imprimé. Les références fichier/ligne ci-dessous sont relatives à la racine source. Les invariants, le CHANGELOG, les correctifs antérieurs et le test de calage ont été consultés.
 
@@ -21,11 +21,11 @@ Toutes les reproductions publiées utilisent des identités fictives et des base
 Commandes depuis la racine :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/cas_complementaires.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/complements_reverification.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/calage.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_i/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_i/cas_complementaires.py
+compta_lmnp/.venv/bin/python docs/preuves_i/complements_reverification.py
+compta_lmnp/.venv/bin/python docs/preuves_i/calage.py
+compta_lmnp/.venv/bin/python docs/preuves_i/verifier.py
 ```
 
 Environnement : Python 3.14.6, SQLite 3.51.2, `pdftotext` pour l'extraction des PDF. La page contenant le suivi mono-bien a aussi été rendue en image et examinée. Le [rapport antérieur](preuves_i/rapport_avant_correctifs.md) et ses [sorties antérieures](preuves_i/resultats_avant_correctifs.json) restent des pièces historiques, pas le bilan actif.

@@ -68,5 +68,5 @@ for sens,cle in [('benefice','case_5NA'),('deficit','case_5NY')]:
 eq(j['arrondi_anterieur_0.5']['aide']['cases_deficits_anterieurs'],[])
 eq(j['arrondi_anterieur_100.5']['aide']['cases_deficits_anterieurs'][0]['montant'],100)
 for f,h in j['environnement']['sha256'].items():
-    eq(hashlib.sha256((P.parents[1]/'compta_lmnp_v8.41.0/compta_lmnp'/f).read_bytes()).hexdigest(),h)
+    eq(hashlib.sha256((P.parents[1]/'compta_lmnp'/f).read_bytes()).hexdigest(),h)
 print(f'{n} vérifications réussies sur 50 groupes exécutés, dont 15 cas d’arrondi.')

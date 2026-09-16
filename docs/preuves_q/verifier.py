@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SRC = HERE.parents[1] / 'compta_lmnp_v8.41.0/compta_lmnp'
+SRC = HERE.parents[1] / 'compta_lmnp'
 r = json.loads((HERE / 'resultats.json').read_text())
 assert not any(k.startswith('HARNESS_ERROR_') for k in r)
 assert len(r['lectures']) == 13

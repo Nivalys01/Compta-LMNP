@@ -1,6 +1,6 @@
 # Audit — passe Q : atomicité, concurrence et exceptions
 
-Date : 15 septembre 2026. Code examiné : `compta_lmnp_v8.41.0/compta_lmnp/`.
+Date : 15 septembre 2026. Code examiné : `compta_lmnp/`.
 
 Rapport préexistant repris et vérifié le 15 septembre 2026 : les scénarios ont été réexécutés sur le code présent, avec sortie globale 0. Les douze constats ci-dessous restent reproduits ; leur numérotation est conservée. L'inventaire et les résultats ont été régénérés. [Vérification des résultats](preuves_q/verifier.py) et [empreintes SHA-256 du code examiné](preuves_q/code_examine.json) complètent les preuves. Ces empreintes identifient uniquement les sources Python applicatives, sans lire les bases, les FEC privés ni le seed d'identité.
 
@@ -22,7 +22,7 @@ Pièces reproductibles :
 Commande depuis la racine du dépôt :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_q/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_q/reproduire.py
 ```
 
 Exécution retenue : Python **3.14.6**, SQLite **3.51.2**, Flask de l'environnement local. Un premier essai avec le Python système a signalé l'absence de Flask ; tous les scénarios ont ensuite été rejoués avec le bon interpréteur. Le script échoue explicitement si un scénario ne peut pas s'exécuter.

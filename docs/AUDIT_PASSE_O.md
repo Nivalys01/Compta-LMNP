@@ -6,14 +6,14 @@ Le risque principal est de confondre une copie créée avec une sauvegarde utili
 
 ## Périmètre et méthode
 
-Code : `compta_lmnp_v8.41.0/compta_lmnp/`. Les fichiers et lignes ci-dessous sont relatifs à cette racine. Lecture du récapitulatif B du CHANGELOG v8.37.0, des compléments D2/E/F consultables dans Git et des rapports présents, notamment K et Q. Les suppressions préexistantes des anciens rapports ne sont pas modifiées.
+Code : `compta_lmnp/`. Les fichiers et lignes ci-dessous sont relatifs à cette racine. Lecture du récapitulatif B du CHANGELOG v8.37.0, des compléments D2/E/F consultables dans Git et des rapports présents, notamment K et Q. Les suppressions préexistantes des anciens rapports ne sont pas modifiées.
 
 Les cinq fichiers demandés sont présents. Les modules appelés et les modèles HTML ont également été consultés. **Aucune base réelle, aucun FEC réel, aucun seed privé et aucun fichier d'empreintes privées n'ont été utilisés.** Les bases sont initialisées en mode blanc, avec une identité fictive et des loyers de 800 €. Aucun correctif de production n'est appliqué.
 
 Preuves livrées : [script exécutable](preuves_o/reproduire.py), [résultats et empreintes des cinq sources](preuves_o/resultats.json).
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_o/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_o/reproduire.py
 ```
 
 Les injections sont distinguées des usages ordinaires : corruption SQL, fichier vide, registre tronqué, panne disque simulée et évolution de version simulée. Les vues web utilisent Flask avec des chemins redirigés vers les bases fictives. Le bloc de démarrage est exécuté depuis son AST, avec ces mêmes chemins, sans lancer de serveur réel. Les bases temporaires sont supprimées à la fin. Le script termine en code 0 ; une erreur inattendue interrompt sa production de résultats.

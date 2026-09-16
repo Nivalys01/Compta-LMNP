@@ -4,7 +4,7 @@ Audit du 15 septembre 2026. **Quatre constats reproduits : trois majeurs, un min
 
 ## Périmètre et preuves
 
-Source examinée : `compta_lmnp_v8.41.0/compta_lmnp/`. Les chemins et numéros de ligne ci-dessous sont relatifs à cette racine. Les quatre modules demandés et `schema.sql` sont présents. Les colonnes de sortie ne figurent pas dans ce schéma initial ; elles sont ajoutées par le logiciel. Les modules complémentaires utilisés, notamment `liasse_pdf.py`, `pense_bete.py`, `rejeu_fec.py` et `init_db.py`, existent également.
+Source examinée : `compta_lmnp/`. Les chemins et numéros de ligne ci-dessous sont relatifs à cette racine. Les quatre modules demandés et `schema.sql` sont présents. Les colonnes de sortie ne figurent pas dans ce schéma initial ; elles sont ajoutées par le logiciel. Les modules complémentaires utilisés, notamment `liasse_pdf.py`, `pense_bete.py`, `rejeu_fec.py` et `init_db.py`, existent également.
 
 Lecture préalable des récapitulatifs du CHANGELOG, notamment v8.35.0 et v8.38.0, et des rapports disponibles G à K et Q pour les sujets concernés. Les anciennes passes C, E et F ne sont pas disponibles comme rapports complets dans l'arbre courant : leurs corrections ne sont pas reconstituées au-delà du CHANGELOG. Les données privées, les FEC de référence et le fichier d'identité ne sont pas utilisés. Toutes les fixtures sont fictives et créées dans des bases temporaires vierges. Aucun code applicatif n'a été modifié.
 
@@ -13,8 +13,8 @@ Preuves : [reproducteur](preuves_l/reproduire.py), [résultats complets](preuves
 Depuis la racine du dépôt :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_l/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_l/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_l/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_l/verifier.py
 ```
 
 Le reproducteur nécessite `pdftotext`. Les tests existants de cession utilisant des fichiers privés n'ont pas été lancés.

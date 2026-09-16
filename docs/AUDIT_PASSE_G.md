@@ -2,7 +2,7 @@
 
 **15 septembre 2026 — 15 constats reproduits : 2 critiques, 11 majeurs, 2 mineurs.**
 
-Code examiné : `compta_lmnp_v8.41.0/compta_lmnp/`. Les chemins de modules ci-dessous sont relatifs à ce répertoire.
+Code examiné : `compta_lmnp/`. Les chemins de modules ci-dessous sont relatifs à ce répertoire.
 
 Les risques principaux sont une reprise qui perd des lignes sans annoncer leur rejet, une cession acceptée avec un prix non numérique, et des contrôles capables de déclarer conformes des écritures qu'ils n'ont pas correctement vérifiées.
 
@@ -15,7 +15,7 @@ Les essais utilisent exclusivement des bases **blanches**, un exploitant fictif 
 Livraison reproductible : [script](preuves_g/reproduire.py), [sorties complètes et empreintes des sources](preuves_g/resultats.json), [matrice de couverture](preuves_g/COUVERTURE.md).
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_g/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_g/reproduire.py
 ```
 
 Environnement exécuté : **Python 3.14.6 / SQLite 3.51.2**. Les bases temporaires sont supprimées après exécution. Les erreurs attendues sont capturées et leur persistance en base mesurée ; une erreur du dispositif d'audit produit un code de sortie non nul. Les vues web sont exécutées dans un contexte Flask de requête, avec des chemins temporaires et de vrais fichiers transmis à la vue.

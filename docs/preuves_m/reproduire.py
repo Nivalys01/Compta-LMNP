@@ -3,7 +3,7 @@ import contextlib, dataclasses, inspect, io, json, os, sqlite3, subprocess, sys,
 from pathlib import Path
 from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
-SRC = ROOT / 'compta_lmnp_v8.41.0/compta_lmnp'
+SRC = ROOT / 'compta_lmnp'
 sys.path[:0] = [str(SRC/'modules'), str(SRC)]
 import init_db, controles as C, operations as O, fiscal as F, amortissement as A
 import gabarits as G, parametres as P, reprise, ecritures as E, audit_cycle as AC

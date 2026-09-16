@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-src = HERE.parents[1] / 'compta_lmnp_v8.41.0/compta_lmnp'
+src = HERE.parents[1] / 'compta_lmnp'
 d = json.loads((HERE / 'sorties.json').read_text())
 assert d['desordre'] == [[500.0,'2000-01-01','2024-12-31'],[700.0,'2025-01-01',None],[1000.0,'2026-07-01',None]]
 assert d['duree_zero']['2027']['stock_deficits'] == 0

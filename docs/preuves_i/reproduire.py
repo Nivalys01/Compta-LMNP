@@ -3,7 +3,7 @@ import hashlib,json,sqlite3,sys,tempfile,subprocess,io
 from pathlib import Path
 from decimal import Decimal
 from unittest.mock import patch
-ROOT=Path(__file__).resolve().parents[2];SRC=ROOT/'compta_lmnp_v8.41.0/compta_lmnp'
+ROOT=Path(__file__).resolve().parents[2];SRC=ROOT/'compta_lmnp'
 sys.path[:0]=[str(SRC/'modules'),str(SRC)]
 import export_fec,init_db,fiscal,amortissement as am,liasse,liasse_pdf,operations,ecritures,reprise,rejeu_fec,cession,migrations,parametres,controles,perennite
 TMP=tempfile.TemporaryDirectory(prefix='audit-i-');WORK=Path(TMP.name);SEQ=0;OUT={}

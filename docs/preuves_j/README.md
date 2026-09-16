@@ -7,8 +7,8 @@ Voir [le rapport](../AUDIT_PASSE_J.md), [les résultats](resultats.json), [le re
 Depuis la racine du dépôt :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_j/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_j/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_j/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_j/verifier.py
 ```
 
 `pdftotext` est nécessaire. Les bases sont temporaires, les identités et écritures fictives. Aucun dossier réel n'est chargé. Les PDF et extractions sont régénérés dans ce répertoire. Les résultats incluent les empreintes des principaux fichiers métier.

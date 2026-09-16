@@ -1,6 +1,6 @@
 # Passe J — Déficits LMNP : péremption, imputation et déclaration
 
-Audit du **15 septembre 2026**, sur `compta_lmnp_v8.41.0/compta_lmnp/`.
+Audit du **15 septembre 2026**, sur `compta_lmnp/`.
 
 **Cinq nouveaux constats reproduits : un critique, trois majeurs, un mineur.** Le moteur respecte l'année limite et l'ordre FIFO sur les cas exécutés. Les défauts nouveaux concernent surtout les montants remis au déclarant et la conservation de leur historique. Les confusions entre déficit ordinaire et amortissement différé déjà établies en passe I sont prolongées jusqu'en N+11, sans nouvelle numérotation.
 
@@ -37,7 +37,7 @@ présents à leur ouverture ; leurs rééditions sont stables.
 
 ### Résultats de non-régression
 
-Tests dédiés : [test_passe_j.py](../compta_lmnp_v8.41.0/compta_lmnp/tests/test_passe_j.py).
+Tests dédiés : [test_passe_j.py](../compta_lmnp/tests/test_passe_j.py).
 **35 tests réussis**, exclusivement sur bases blanches et données fictives :
 
 - restitution de 1 000 € entièrement consommés et de 6 000 € répartis sur trois années ;
@@ -50,7 +50,7 @@ Tests dédiés : [test_passe_j.py](../compta_lmnp_v8.41.0/compta_lmnp/tests/test
 - migration d'un ancien schéma, rollback après interruption réelle du moteur, `commit=False`, refus d'un double traitement et refus explicite d'une ancienne réédition non traçable.
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python -m pytest -q compta_lmnp_v8.41.0/compta_lmnp/tests/test_passe_j.py
+compta_lmnp/.venv/bin/python -m pytest -q compta_lmnp/tests/test_passe_j.py
 ```
 
 La suite complète exécutée avant l'ajout des cinq derniers tests dédiés a donné
@@ -82,8 +82,8 @@ Les invariants et les corrections pertinentes du CHANGELOG ont été relus, nota
 **Exécutions :** [script](preuves_j/reproduire.py), [résultats complets](preuves_j/resultats.json), [vérificateur des résultats](preuves_j/verifier.py), [index des preuves](preuves_j/README.md). **50 groupes exécutés**, dont 15 cas d'arrondi ; **85 vérifications réussies** des sorties et des empreintes des six principaux fichiers source. Python 3.14.6, SQLite 3.51.2.
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_j/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_j/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_j/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_j/verifier.py
 ```
 
 Le reproducteur utilise des bases blanches temporaires, une identité fictive, des écritures fictives et `pdftotext`. Les tests de clôture appellent réellement le moteur ; les PDF sont réellement générés puis leur texte extrait. Les tests historiques indiquent lorsqu'un stock d'ouverture est injecté en SQL. Le test d'ancienne déclaration suit aussi une chronologie complète par les fonctions publiques. Aucun FEC privé, fichier d'identité ou fichier d'empreintes privées n'est utilisé. Le logiciel n'est pas modifié.

@@ -1,6 +1,6 @@
 # Passe K — Clôture et continuité pluriannuelle
 
-Audit exécuté le 15 septembre 2026 sur `compta_lmnp_v8.41.0/compta_lmnp/`.
+Audit exécuté le 15 septembre 2026 sur `compta_lmnp/`.
 
 **Trois nouveaux constats : deux majeurs, un mineur.** Sur les deux scénarios instrumentés, la clôture tient son contrat atomique : un seul commit, 74 interruptions SIGKILL, aucune clôture partielle persistante. Les défauts nouveaux concernent la chronologie des clôtures, la reconstruction des à-nouveaux et la précision annoncée par le contrôle de jonction.
 

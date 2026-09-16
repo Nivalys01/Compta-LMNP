@@ -1,6 +1,6 @@
 # Audit — Passe N : règles versionnées, gabarits et veille
 
-Date : 15 septembre 2026. Version exécutée : `compta_lmnp_v8.41.0/compta_lmnp`.
+Date : 15 septembre 2026. Version exécutée : `compta_lmnp`.
 
 ## Périmètre et preuves
 

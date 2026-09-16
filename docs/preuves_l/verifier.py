@@ -2,7 +2,7 @@
 import hashlib, json
 from pathlib import Path
 P=Path(__file__).parent; X=json.loads((P/'resultats.json').read_text())
-SRC=P.parents[1]/'compta_lmnp_v8.41.0/compta_lmnp'
+SRC=P.parents[1]/'compta_lmnp'
 N=0
 def eq(actual,expected):
     global N

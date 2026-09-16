@@ -1,6 +1,6 @@
 # Passe I — Article 39 C : plafond, mémoire et ventilation par bien
 
-Audit du 15 septembre 2026 — source examinée : `compta_lmnp_v8.41.0/compta_lmnp/`.
+Audit du 15 septembre 2026 — source examinée : `compta_lmnp/`.
 
 **Onze constats reproduits : deux critiques, huit majeurs, un mineur.** Les écarts touchent la qualification fiscale de comptes importés, l'affectation du report, la reprise des historiques et son rendu. Le moteur élémentaire conserve correctement les stocks sur les entrées valides testées ; cela ne garantit pas que ses entrées ni leur ventilation soient justes.
 
@@ -15,8 +15,8 @@ Lecture des invariants, du CHANGELOG, des récapitulatifs disponibles des passes
 Depuis la racine du dépôt :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_i/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_i/verifier.py
 ```
 
 Le script exige `pdftotext` pour extraire les PDF réellement générés. Il recrée uniquement ses bases temporaires et ses preuves. Il ne modifie pas le logiciel. Python 3.14.6 et SQLite 3.51.2 ont été utilisés ; les empreintes des huit principaux fichiers examinés figurent dans le JSON.

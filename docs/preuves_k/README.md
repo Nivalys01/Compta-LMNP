@@ -3,8 +3,8 @@
 Depuis la racine du dépôt :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_k/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_k/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_k/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_k/verifier.py
 ```
 
 `reproduire.py` exécute le code applicatif sur des bases SQLite temporaires vierges, puis remplace `resultats.json` par les observations du nouvel essai. Les données sont entièrement fictives. Les sorties web et CLI remplacent le chemin temporaire par `DOSSIER_FICTIF`. Aucun fichier de référence privée ni base réelle n’est utilisé.

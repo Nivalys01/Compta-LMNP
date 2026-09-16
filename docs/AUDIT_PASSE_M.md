@@ -1,6 +1,6 @@
 # Audit — passe M : le moteur de contrôles et son propre auditeur
 
-Date : **15 septembre 2026**. Version examinée : `compta_lmnp_v8.41.0/compta_lmnp/`.
+Date : **15 septembre 2026**. Version examinée : `compta_lmnp/`.
 
 **27 contrôles sur 27 déclenchés par exécution ; 14 constats, dont 7 majeurs et 7 mineurs.** Aucun contrôle entièrement inatteignable n'a été trouvé. En revanche, un contrôle atteignable peut manquer le cas qui importe : compte d'attente importé, flux qui se compensent, échec de calcul caché. Le PDF ne transporte pas les anomalies du moteur. L'audit de cycle détecte les mutations de dotation et de plafond, mais approuve une péremption des déficits volontairement cassée.
 
@@ -22,7 +22,7 @@ Pièces de preuve :
 Commande depuis la racine :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_m/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_m/reproduire.py
 ```
 
 Environnement exécuté : **Python 3.14.6, SQLite 3.51.2**, avec Flask et ReportLab de l’environnement local.

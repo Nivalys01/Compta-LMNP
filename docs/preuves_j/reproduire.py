@@ -3,7 +3,7 @@ import hashlib,json,sqlite3,sys,tempfile,subprocess,threading
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
-ROOT=Path(__file__).resolve().parents[2];SRC=ROOT/'compta_lmnp_v8.41.0/compta_lmnp'
+ROOT=Path(__file__).resolve().parents[2];SRC=ROOT/'compta_lmnp'
 sys.path[:0]=[str(SRC/'modules'),str(SRC)]
 import init_db,fiscal,liasse,liasse_pdf,operations,ecritures,reprise,perennite,parametres,controles,export_fec,rejeu_fec
 ART=Path(__file__).parent;TMP=tempfile.TemporaryDirectory(prefix='audit-j-');WORK=Path(TMP.name);SEQ=0;OUT={}

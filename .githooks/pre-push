@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Contrôle de publication, joué AVANT chaque push.
+#
+# Pourquoi un hook et pas une étape d'intégration continue : `verifier_depot.py`
+# refuse délibérément de conclure sans les empreintes du dossier privé
+# (`reference/`, `seed_exemple.sql`), qui ne sont publiées nulle part. Sur un
+# runner de CI il échouerait toujours — et une CI rouge en permanence finit
+# par ne plus être lue. Le contrôle est donc LOCAL, sur le poste qui détient
+# les données, et c'est le seul endroit où il a un sens.
+#
+# Restait un maillon humain : se souvenir de le lancer. Un dépôt public ne
+# pardonne pas un oubli — un fichier poussé reste dans l'historique même
+# supprimé ensuite. Ce hook supprime le maillon.
+#
+# Installation (une fois, par clone) :
+#     git config core.hooksPath .githooks
+#
+# Contournement, en connaissance de cause :
+#     git push --no-verify
+
+set -u
+
+racine="$(git rev-parse --show-toplevel)"
+controle="$racine/compta_lmnp/verifier_depot.py"
+
+if [ ! -f "$controle" ]; then
+    echo "pre-push : $controle introuvable — push refusé." >&2
+    echo "Un contrôle qu'on ne trouve pas n'est pas un contrôle qui passe." >&2
+    exit 1
+fi
+
+# Le venv du projet d'abord : reportlab et pdftotext y sont, et l'extraction
+# du texte des PDF en dépend. Un interpréteur système peut rendre un
+# avertissement « PDF non inspecté » là où le contrôle sait lire.
+python="$racine/compta_lmnp/.venv/bin/python"
+[ -x "$python" ] || python="$(command -v python3 || command -v python)"
+
+if [ -z "$python" ]; then
+    echo "pre-push : aucun interpréteur Python trouvé — push refusé." >&2
+    exit 1
+fi
+
+echo "pre-push : contrôle de publication…"
+if ! "$python" "$controle"; then
+    cat >&2 <<'FIN'
+
+──────────────────────────────────────────────────────────────────────────
+PUSH REFUSÉ — le contrôle de publication a signalé quelque chose.
+
+Lisez le détail ci-dessus. Un fichier poussé par erreur reste dans
+l'historique git même après suppression : le corriger après coup suppose
+de réécrire l'historique d'un dépôt déjà public, ce qui n'efface rien des
+clones déjà faits.
+
+Si le signalement est un faux positif, corrigez le contrôle plutôt que de
+le contourner — c'est lui qu'on relira la prochaine fois.
+──────────────────────────────────────────────────────────────────────────
+FIN
+    exit 1
+fi
+
+exit 0

@@ -12,7 +12,7 @@ from unittest.mock import patch
 from urllib.parse import urlparse, parse_qs
 
 ROOT=Path(__file__).resolve().parents[2]
-SRC=ROOT/'compta_lmnp_v8.41.0/compta_lmnp'
+SRC=ROOT/'compta_lmnp'
 sys.path[:0]=[str(SRC/'modules'),str(SRC)]
 import init_db, ecritures, operations, export_fec, fec_io, valider_fec
 import rejeu_fec, reprise, fiscal, cession, amortissement, controles, migrations, perennite

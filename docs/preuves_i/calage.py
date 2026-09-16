@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SRC = HERE.parents[1] / 'compta_lmnp_v8.41.0/compta_lmnp'
+SRC = HERE.parents[1] / 'compta_lmnp'
 TEST = SRC / 'tests/test_or_liasses_reelles.py'
 sys.path[:0] = [str(SRC / 'modules'), str(SRC)]
 result = {'mode': 'assertions existantes executees directement, sans pytest',

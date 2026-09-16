@@ -20,6 +20,7 @@ sécurité sur les données réelles.
 | `O-perennite.md` | Sauvegardes, restauration, piste d'audit | `perennite`, `dossiers`, `migrations` |
 | `P-quittances.md` | Documents remis à un tiers, données du locataire | `quittances` |
 | `Q-atomicite.md` | **Transverse** : transactions, concurrence | tous les modules qui écrivent |
+| `R-propriete-intellectuelle.md` | Licence, titularité, composants tiers, actifs non-code | `LICENSE`, `NOTICES-TIERS.md`, documents de la racine |
 
 ## Ordre conseillé
 
@@ -37,6 +38,10 @@ Il n'est pas arbitraire — chaque passe s'appuie sur ce que la précédente a
 5. **M** : auditer les contrôles en dernier a un sens, on sait alors ce qu'ils
    auraient dû voir.
 6. **N**, **O**, **P** : indépendantes, dans n'importe quel ordre.
+7. **R** en dernier, et **avant la publication** : elle n'audite pas un calcul
+   mais ce que le dépôt affirme — licence, titularité, notices, marques. Elle
+   suppose donc que l'arborescence est stabilisée, et elle est la seule dont
+   les constats deviennent irréversibles au moment du push.
 
 ## Ce qui manque pour aller au bout
 

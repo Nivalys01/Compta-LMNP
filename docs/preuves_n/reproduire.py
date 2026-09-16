@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import date
 from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
-SRC = ROOT / 'compta_lmnp_v8.41.0/compta_lmnp'
+SRC = ROOT / 'compta_lmnp'
 sys.path[:0] = [str(SRC / 'modules'), str(SRC)]
 import init_db, parametres as p, gabarits as g, veille_fiscale as v
 import pense_bete as pb, fiscal, operations, liasse, controles, import_bancaire as ib

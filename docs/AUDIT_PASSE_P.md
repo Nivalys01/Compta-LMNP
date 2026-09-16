@@ -6,14 +6,14 @@ Le parcours web peut attester **880 € sans encaissement**. Un paiement partiel
 
 ## Périmètre et preuves
 
-Racine des sources citées : `compta_lmnp_v8.41.0/compta_lmnp/`. Les cinq pièces demandées sont présentes. Les fonctions réellement appelées dans `modules/perennite.py`, `outils_demo.py` et `verifier_depot.py` ont également été examinées. Lecture préalable du récapitulatif de la passe B, notamment les trois corrections de quittancement, et des recoupements O et Q. Le récapitulatif F a été retrouvé et lu dans Git : les suppressions préexistantes des anciens rapports dans l'arbre de travail n'ont pas été modifiées. Les corrections d'anonymisation F ont aussi été consultées dans les fonctions concernées.
+Racine des sources citées : `compta_lmnp/`. Les cinq pièces demandées sont présentes. Les fonctions réellement appelées dans `modules/perennite.py`, `outils_demo.py` et `verifier_depot.py` ont également été examinées. Lecture préalable du récapitulatif de la passe B, notamment les trois corrections de quittancement, et des recoupements O et Q. Le récapitulatif F a été retrouvé et lu dans Git : les suppressions préexistantes des anciens rapports dans l'arbre de travail n'ont pas été modifiées. Les corrections d'anonymisation F ont aussi été consultées dans les fonctions concernées.
 
 **Aucune source privée de comptabilité, d'identité ou d'empreintes n'a été utilisée.** Les scénarios emploient des bases temporaires blanches et des personnes fictives. Seul le seed destiné au client a aussi été exécuté en mémoire, pour compter ses locataires et quittances, sans restituer ses valeurs d'identité. Aucun correctif de production appliqué.
 
 Preuves : [script](preuves_p/reproduire.py), [résultats réels et empreintes des sources](preuves_p/resultats.json), [HTML sans encaissement](preuves_p/impaye.html), [paiement partiel](preuves_p/partiel.html), [après annulation](preuves_p/apres_annulation.html), [mentions et échappement](preuves_p/mentions.html).
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_p/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_p/reproduire.py
 ```
 
 Exécution terminée en **code 0**, Python 3.14.6, SQLite 3.51.2. Une traceback fictive est volontairement produite pour vérifier le journal. Les réponses web passent par le client Flask et les gabarits réels, avec chemins redirigés vers les dossiers temporaires. Les altérations SQL et la synchronisation artificielle de deux threads sont explicitement distinguées des parcours ordinaires. Les HTML ont été générés ; aucune impression physique ni exécution des CSS par un navigateur n'est revendiquée.

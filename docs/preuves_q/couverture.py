@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
-SRC=HERE.parents[1]/'compta_lmnp_v8.41.0/compta_lmnp'
+SRC=HERE.parents[1]/'compta_lmnp'
 rows=json.loads((HERE/'inventaire.json').read_text())
 classes={
 ('app.py','immobilisations'): 'Lecture HTTP ; connexion créée dans la vue, commit de préparation du schéma de cession. Pas une connexion empruntée à une autre requête.',

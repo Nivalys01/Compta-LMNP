@@ -13,7 +13,7 @@
 # permanence, soit à leur ajouter un mode dégradé — c'est-à-dire à rouvrir
 # exactement le défaut qu'on vient de refermer. Le contrôle de publication
 # est un geste LOCAL, avant push, sur le poste qui détient les données :
-#     python compta_lmnp_v*/compta_lmnp/verifier_depot.py
+#     python compta_lmnp/verifier_depot.py
 #
 # Ce que la CI vérifie en revanche, et qui a du sens partout : que la suite
 # passe sur un clone public. Les tests qui exigent le dossier privé se
@@ -40,41 +40,39 @@ jobs:
         with:
           python-version: "3.13"
 
-      # L'arborescence porte le numéro de version : on la cherche au lieu de
-      # l'écrire en dur, sinon la CI casse au prochain incrément.
-      - name: Localiser l'arborescence du logiciel
-        id: source
+      # L'arborescence portait le numéro de version — `compta_lmnp_v8.41.0/` —
+      # et cette étape devait donc la CHERCHER, sinon la CI cassait au
+      # prochain incrément. Le dossier s'appelle désormais `compta_lmnp/`,
+      # sans version : le chemin est écrit une fois, en dur, et la recherche
+      # disparaît. Un chemin stable est aussi ce qui permet aux liens
+      # permanents d'un dépôt public de survivre à une release.
+      - name: Vérifier que l'arborescence est là
         run: |
-          dossier=$(ls -d compta_lmnp_v*/compta_lmnp 2>/dev/null | sort -V | tail -1)
-          if [ -z "$dossier" ]; then
-            echo "Aucune arborescence compta_lmnp_v*/compta_lmnp trouvée." >&2
-            exit 1
-          fi
-          echo "Arborescence : $dossier"
-          echo "dossier=$dossier" >> "$GITHUB_OUTPUT"
-          
+          test -f compta_lmnp/requirements-dev.txt || {
+            echo "compta_lmnp/ introuvable ou incomplet." >&2; exit 1; }
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y poppler-utils   
+          sudo apt-get install -y poppler-utils
 
       - name: Installer les dépendances épinglées
         run: |
           python -m pip install --upgrade pip
-          pip install -r "${{ steps.source.outputs.dossier }}/requirements-dev.txt"
+          pip install -r compta_lmnp/requirements-dev.txt
 
       - name: Tests
-        working-directory: ${{ steps.source.outputs.dossier }}
+        working-directory: compta_lmnp
         run: pytest -q
 
       - name: Lint
-        working-directory: ${{ steps.source.outputs.dossier }}
+        working-directory: compta_lmnp
         run: ruff check .
 
       # Filet : le dossier privé ne doit JAMAIS arriver jusqu'ici. S'il est
       # présent sur un runner, c'est qu'il a été committé.
       - name: Vérifier qu'aucune donnée privée n'a été publiée
-        working-directory: ${{ steps.source.outputs.dossier }}
+        working-directory: compta_lmnp
         run: |
           fautifs=""
           [ -d reference ] && fautifs="$fautifs reference/"

@@ -64,7 +64,7 @@ for v in j['lectures_transactionnelles'].values():
 for key in ['comptes_dotation7', 'comptes_charges7', 'comptes_cession7', 'comptes_produit_financier']:
     eq(j[key]['etat']['controles'], [])
     eq(all(c['ok'] for c in j[key]['etat']['liasse']), True)
-src = HERE.parents[1] / 'compta_lmnp_v8.41.0/compta_lmnp'
+src = HERE.parents[1] / 'compta_lmnp'
 for path, digest in j['environnement']['sha256'].items():
     eq(hashlib.sha256((src / path).read_bytes()).hexdigest(), digest)
 extra = json.loads((HERE / 'cas_complementaires.json').read_text())

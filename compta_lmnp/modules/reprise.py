@@ -1,0 +1,244 @@
+# Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# sans autorisation écrite de l'auteur.
+
+"""
+Jalon J0 — Reprise / migration depuis un prestataire externe.
+
+Lit un FEC de clôture (ex. 2025), calcule la balance des comptes de bilan,
+et génère dans la base l'écriture d'à-nouveaux (AN) de l'exercice suivant,
+suivie de l'OD d'affectation du résultat — exactement comme le fait un cabinet.
+
+Le logiciel REMPLACE le prestataire externe : ce module est le pont qui garantit que le premier
+bilan d'ouverture se réconcilie au centime avec le dernier bilan déclaré.
+"""
+from __future__ import annotations
+import sqlite3
+
+import ecritures
+from collections import defaultdict
+
+import fec_io
+
+CENT = 0.005  # tolérance d'arrondi (demi-centime)
+
+
+def lire_balance_fec(fec_path: str) -> dict[str, float]:
+    """Solde net (débit - crédit) par compte, sur tout le fichier.
+
+    Lecture par fec_io (socle commun aux trois consommateurs de FEC).
+    Sémantique historique préservée : une ligne porte une balance dès
+    qu'elle atteint la colonne Credit (13 champs) — plus tolérant que le
+    rejeu, qui exige les 18 colonnes, car la balance sert aussi à
+    contrôler des fichiers partiels.
+
+    Ce qui est tolérant, c'est le SEUIL, pas le silence : une ligne trop
+    courte pour porter un montant était simplement sautée, et le bilan
+    d'ouverture se construisait alors sur une balance amputée — équilibrée,
+    donc indétectable en aval. Elle est maintenant refusée avec son numéro.
+    """
+    bal: dict[str, float] = defaultdict(float)
+    _entete, lignes = fec_io.lire_brut(fec_path)
+    rejets = []
+    for i, r in enumerate(lignes, start=2):     # ligne 1 = en-tête
+        if not any(x.strip() for x in r):
+            continue
+        if len(r) < 13:
+            rejets.append(f"L.{i} ({len(r)} champs)")
+            continue
+        bal[r[4]] += fec_io.nombre(r[11]) - fec_io.nombre(r[12])
+    if rejets:
+        apercu = ", ".join(rejets[:5]) + ("…" if len(rejets) > 5 else "")
+        raise ValueError(
+            f"{len(rejets)} ligne(s) du FEC s'arrêtent avant la colonne "
+            f"Credit : {apercu}. La balance qu'on en tirerait serait "
+            "incomplète — et un bilan d'ouverture faux ne se voit plus "
+            "ensuite. Corrigez le fichier source, puis relancez.")
+    return dict(bal)
+
+
+def lire_balance_interne(conn: sqlite3.Connection, annee: int) -> dict[str, float]:
+    """
+    Solde net (débit - crédit) par compte, calculé DEPUIS LA BASE sur les
+    écritures de l'exercice `annee`. Comme l'AN de cet exercice porte déjà
+    tout l'historique antérieur, cette balance est cumulative depuis
+    l'origine — strictement équivalente à la lecture du FEC de clôture.
+    """
+    rows = conn.execute(
+        "SELECT l.compte_num, ROUND(SUM(l.debit - l.credit), 2) "
+        "FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
+        "WHERE e.exercice_annee = ? GROUP BY l.compte_num", (annee,)
+    ).fetchall()
+    return {compte: solde for compte, solde in rows}
+
+
+def construire_an(conn: sqlite3.Connection, fec_path: str, annee_cible: int, *,
+                  commit: bool = True) -> None:
+    """Insère l'AN d'ouverture `annee_cible` + l'OD d'affectation du résultat,
+    depuis un FEC de clôture EXTERNE (migration depuis un logiciel du marché)."""
+    _construire_an_depuis_balance(conn, lire_balance_fec(fec_path),
+                                  annee_cible, commit=commit)
+
+
+def construire_an_interne(conn: sqlite3.Connection, annee_cible: int, *,
+                          commit: bool = True) -> dict:
+    """
+    Reprise INTERNE : clôture N-1 → ouverture N sans fichier externe.
+    Lit la balance de clôture de l'exercice précédent directement dans la
+    base et génère l'AN + l'OD d'affectation, exactement comme la reprise FEC.
+
+    Garde-fous :
+      - l'exercice N-1 doit exister et être CLOS ;
+      - aucun AN ne doit déjà exister sur l'exercice cible.
+    Renvoie {'annee_source', 'resultat_reporte', 'nb_comptes'}.
+    """
+    annee_source = annee_cible - 1
+    ex = conn.execute("SELECT statut FROM exercice WHERE annee=?",
+                      (annee_source,)).fetchone()
+    if ex is None:
+        raise ValueError(f"Aucun exercice {annee_source} en base : "
+                         "reprise interne impossible.")
+    if ex[0] != "clos":
+        raise ValueError(f"L'exercice {annee_source} n'est pas clôturé : "
+                         "clôturez-le avant d'ouvrir avec reprise des à-nouveaux.")
+    bal = lire_balance_interne(conn, annee_source)
+    resultat = -sum(v for n, v in bal.items() if n[0] in "67")
+    nb = _construire_an_depuis_balance(conn, bal, annee_cible, commit=commit)
+    return {"annee_source": annee_source,
+            "resultat_reporte": round(resultat, 2), "nb_comptes": nb}
+
+
+LIBELLE_AFFECTATION = "Affectation du résultat"
+
+
+def reprise_deja_presente(conn: sqlite3.Connection, annee_cible: int) -> str:
+    """Décrit la reprise déjà présente sur l'exercice, ou une chaîne vide.
+
+    Une reprise est un LOT : l'écriture d'à-nouveaux et l'OD d'affectation
+    du résultat qui la solde. La garde ne cherchait que le journal AN, si
+    bien qu'une suppression manuelle de la seule écriture AN — sur un
+    exercice ouvert, clés étrangères actives, ses lignes partant en
+    cascade — laissait l'OD d'affectation seule et rendait la reconstruction
+    possible : le résultat était alors affecté DEUX FOIS. Les 600 € de
+    bénéfice se retrouvaient au crédit de 108000 et au débit de 120000 en
+    double, chaque OD étant elle-même équilibrée, donc invisible à tout
+    contrôle d'équilibre. La reprise suivante butait ensuite sur un solde
+    120000 résiduel que les comptes de bilan repris n'expliquaient pas.
+
+    On regarde donc les deux moitiés du lot, et on nomme celle qui est là.
+    """
+    an = conn.execute(
+        "SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? "
+        "AND journal_code='AN'", (annee_cible,)).fetchone()[0]
+    affectation = conn.execute(
+        "SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? "
+        "AND journal_code='OD' AND libelle=?",
+        (annee_cible, LIBELLE_AFFECTATION)).fetchone()[0]
+    if an and affectation:
+        return "des à-nouveaux et leur affectation du résultat"
+    if an:
+        return ("des à-nouveaux dont l'OD d'affectation du résultat a "
+                "disparu")
+    if affectation:
+        return ("une OD d'affectation du résultat dont l'écriture "
+                "d'à-nouveaux a disparu")
+    return ""
+
+
+def _construire_an_depuis_balance(conn: sqlite3.Connection,
+                                  bal: dict[str, float], annee_cible: int, *,
+                                  commit: bool = True) -> int:
+    """Mécanique commune : balance de clôture → écriture AN + OD d'affectation."""
+    # Point de passage UNIQUE des deux chemins de reprise (interne et depuis
+    # un FEC externe) : la garde vit ici, pour qu'aucun d'eux ne puisse
+    # reconstruire par-dessus une reprise déjà là, fût-elle à moitié
+    # supprimée.
+    presente = reprise_deja_presente(conn, annee_cible)
+    if presente:
+        raise ValueError(
+            f"L'exercice {annee_cible} contient déjà {presente}. Une reprise "
+            "forme un tout — l'écriture d'à-nouveaux et l'OD qui affecte le "
+            "résultat — et en reconstruire une moitié compterait le résultat "
+            "deux fois. Supprimez ce qu'il en reste, ou restaurez une "
+            "sauvegarde antérieure, avant de relancer la reprise.")
+    date_ouv = f"{annee_cible}-01-01"
+
+    # Comptes de bilan = classes 1 à 5, hors résultat 120000 traité à part.
+    #
+    # Les classes 3 et 5 étaient omises. La 5 est celle de la TRÉSORERIE :
+    # tout dossier tenu avec un compte bancaire dédié — le cas ordinaire
+    # chez un cabinet — produisait donc une écriture d'à-nouveaux
+    # déséquilibrée du montant exact du solde bancaire, et la reprise
+    # s'arrêtait sur « Écriture déséquilibrée », en accusant une écriture
+    # que l'utilisateur n'avait jamais saisie. Aucune migration d'un
+    # dossier bancarisé n'était possible.
+    #
+    # `migration_fec._balance_bilan` retenait déjà les classes 1 à 5 : les
+    # deux modules ne s'accordaient pas sur ce qu'est un compte de bilan.
+    classe = {n: n[0] for n in bal}
+    bilan = {n: v for n, v in bal.items()
+             if classe[n] in "12345" and n != "120000" and abs(v) > CENT}
+
+    # Résultat comptable = -(somme nette des comptes de charges/produits).
+    resultat = -sum(v for n, v in bal.items() if classe[n] in "67")
+
+    # Les comptes du cabinet ne figurent pas au plan livré : on les crée
+    # avant d'écrire, sinon l'insertion échoue sur une contrainte de clé
+    # étrangère brute, qui ne nomme même pas le compte fautif.
+    fec_io.assurer_comptes(conn, [(n, n) for n in bilan] + [("120000", "Résultat")])
+
+    # --- Écriture AN -------------------------------------------------------
+    lignes: list[tuple] = []
+    for compte, net in sorted(bilan.items()):
+        lignes.append((compte, round(net, 2) if net > 0 else 0.0,
+                       round(-net, 2) if net < 0 else 0.0))
+    # Le résultat de l'exercice clos est porté par 120000 (perte = débit).
+    if abs(resultat) > CENT:
+        lignes.append(("120000",
+                       round(-resultat, 2) if resultat < 0 else 0.0,
+                       round(resultat, 2) if resultat > 0 else 0.0,
+                       "A Nouveaux - résultat reporté"))
+    r_an = ecritures.inserer(conn, journal="AN", date=date_ouv, annee=annee_cible,
+                             libelle="A Nouveaux", lignes=lignes, commit=False)
+
+    # --- OD d'affectation du résultat (120000 -> 108000) -------------------
+    montant = round(abs(resultat), 2)
+    if resultat < 0:   # perte : on débite 108000, on crédite 120000
+        aff = [("108000", montant, 0.0), ("120000", 0.0, montant)]
+    else:              # bénéfice : on crédite 108000, on débite 120000
+        aff = [("108000", 0.0, montant), ("120000", montant, 0.0)]
+    ecritures.inserer(conn, journal="OD", date=date_ouv, annee=annee_cible,
+                      libelle="Affectation du résultat", lignes=aff,
+                      num=r_an["ecriture_num"] + 1, commit=False)
+    # `commit=False` : l'appelant compose. L'ouverture d'un exercice AVEC
+    # reprise est un seul geste — l'exercice ne doit pas survivre à une
+    # reprise refusée (constat Q-11).
+    if commit:
+        conn.commit()
+    return len(bilan)
+
+
+def controle_equilibre(conn: sqlite3.Connection, annee: int) -> tuple[float, float]:
+    """Renvoie (total_debit, total_credit) des écritures d'un exercice."""
+    row = conn.execute(
+        "SELECT COALESCE(SUM(l.debit),0), COALESCE(SUM(l.credit),0) "
+        "FROM ligne l JOIN ecriture e ON e.id = l.ecriture_id "
+        "WHERE e.exercice_annee = ?", (annee,),
+    ).fetchone()
+    return round(row[0], 2), round(row[1], 2)
+
+
+def ouvrir_exercice(conn: sqlite3.Connection, annee: int,
+                    avec_reprise: bool = True) -> None:
+    """Ouvre l'exercice `annee` (01/01 → 31/12) ; si l'exercice précédent est
+    clos et `avec_reprise` est vrai, construit les à-nouveaux internes.
+    Point d'entrée UNIQUE d'ouverture d'exercice (interface web, CLI, tests)."""
+    conn.execute("INSERT INTO exercice (annee, date_debut, date_fin, statut) "
+                 "VALUES (?, ?, ?, 'ouvert')",
+                 (annee, f"{annee}-01-01", f"{annee}-12-31"))
+    conn.commit()
+    if avec_reprise:
+        prec = conn.execute("SELECT statut FROM exercice WHERE annee=?",
+                            (annee - 1,)).fetchone()
+        if prec and prec[0] == "clos":
+            construire_an_interne(conn, annee)

@@ -7,11 +7,11 @@ Voir [le rapport actif](../AUDIT_PASSE_I.md). Le répertoire source a conservé 
 Depuis la racine, avec l'environnement Python fourni et `pdftotext` :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/cas_complementaires.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/complements_reverification.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/calage.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_i/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_i/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_i/cas_complementaires.py
+compta_lmnp/.venv/bin/python docs/preuves_i/complements_reverification.py
+compta_lmnp/.venv/bin/python docs/preuves_i/calage.py
+compta_lmnp/.venv/bin/python docs/preuves_i/verifier.py
 ```
 
 Les trois premiers scripts emploient exclusivement des bases et identités fictives. Ils exécutent 38 groupes principaux, deux nouveaux scénarios de ventilation, un oracle décimal de 216 cas et deux chaînes 2026–2027. Ils génèrent les quatre PDF et leurs extractions texte.

@@ -3,8 +3,8 @@
 Le script `reproduire.py` crée uniquement des bases blanches temporaires et produit `resultats.json`. Il s'arrête sur une erreur de harnais. `verifier.py` contrôle les valeurs effectivement exécutées ; il ne conclut pas à partir de motifs présents dans le code source.
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_h/reproduire.py
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_h/verifier.py
+compta_lmnp/.venv/bin/python docs/preuves_h/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_h/verifier.py
 ```
 
 ## Correspondance avec les demandes

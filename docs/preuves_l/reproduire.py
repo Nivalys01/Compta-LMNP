@@ -2,7 +2,7 @@
 import datetime, hashlib, json, sqlite3, subprocess, sys, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
-SRC = ROOT / 'compta_lmnp_v8.41.0/compta_lmnp'
+SRC = ROOT / 'compta_lmnp'
 sys.path[:0] = [str(SRC/'modules'), str(SRC)]
 import init_db, cession, fiscal, liasse, liasse_pdf, amortissement, ecritures, reprise, pense_bete, export_fec, rejeu_fec
 ART = Path(__file__).parent

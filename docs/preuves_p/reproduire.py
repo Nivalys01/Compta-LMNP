@@ -5,7 +5,7 @@ from unittest.mock import patch
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import unquote
 ROOT=Path(__file__).resolve().parents[2]
-SRC=ROOT/'compta_lmnp_v8.41.0/compta_lmnp'
+SRC=ROOT/'compta_lmnp'
 sys.path[:0]=[str(SRC/'modules'),str(SRC)]
 import init_db, operations as op, quittances as q, perennite as p, fiscal, export_fec, liasse, liasse_pdf, controles
 import app as web

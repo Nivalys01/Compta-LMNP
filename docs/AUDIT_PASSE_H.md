@@ -6,7 +6,7 @@
 
 ## Périmètre et méthode
 
-Les fichiers cités sont relatifs à `compta_lmnp_v8.41.0/compta_lmnp/`. Les numéros de ligne désignent cette version ; les empreintes SHA-256 sont dans les preuves. Le code de production n'a pas été modifié.
+Les fichiers cités sont relatifs à `compta_lmnp/`. Les numéros de ligne désignent cette version ; les empreintes SHA-256 sont dans les preuves. Le code de production n'a pas été modifié.
 
 Lecture préalable des invariants, notamment la règle 2, du CHANGELOG (dont v8.35.0, v8.36.0, v8.39.0 et v8.14.0), des récapitulatifs E/F disponibles dans Git, et des rapports G/Q présents. Les rapports E/F supprimés du répertoire de travail n'ont pas été restaurés. Les correctifs sont distingués de leurs limites : le plafonnement fonctionne pour un composant seul ; la centralisation dans `plan_immo.py` existe ; le refus du terrain sans compte fonctionne. Le contrôle corrigé des dotations absentes **dans un FEC de migration** se trouve dans `migration_fec.py` ; ce n'est pas le contrôle `DOTATION_PLAN` examiné ici.
 
@@ -15,7 +15,7 @@ Toutes les bases sont créées en mode blanc dans un répertoire temporaire. Ide
 Reproduction depuis la racine du dépôt :
 
 ```bash
-compta_lmnp_v8.41.0/compta_lmnp/.venv/bin/python docs/preuves_h/reproduire.py
+compta_lmnp/.venv/bin/python docs/preuves_h/reproduire.py
 ```
 
 - [Script autonome](preuves_h/reproduire.py).
