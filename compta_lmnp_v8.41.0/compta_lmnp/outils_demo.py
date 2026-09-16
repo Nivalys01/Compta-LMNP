@@ -407,6 +407,19 @@ def construire_seed_demo() -> str:
     # échoue en silence.
     src = src.replace("les acteurs payants actuels", "prestataire")
 
+    # 1 bis. TABLES PERSONNELLES. `locataire` et `quittance` portent des
+    #        noms de personnes, et l'anonymisation ne les traitait pas : un
+    #        locataire absent de la liste d'empreintes traversait intact
+    #        jusque dans l'artefact distribué, sous un en-tête promettant
+    #        « AUCUNE donnée personnelle ». Le contrôle final ne pouvait
+    #        pas le rattraper, puisqu'il cherche des termes inscrits à la
+    #        main — or c'est précisément d'un terme NON inscrit qu'il
+    #        s'agit. Une promesse d'anonymisation ne peut pas reposer sur
+    #        un inventaire nominatif tenu à jour par la mémoire de
+    #        quelqu'un : une table qui porte des personnes est traitée
+    #        comme telle, ou la génération est refusée.
+    src = _neutraliser_tables_personnelles(src)
+
     # 2. Codes de pièce du prestataire (6 majuscules entre quotes).
     #    NUMÉROTÉS : la colonne composant.code_immo est UNIQUE au schéma,
     #    un code identique pour tous ferait échouer l'insertion du seed.
@@ -450,6 +463,38 @@ def construire_seed_demo() -> str:
     open(SEED_DEMO, "w", encoding="utf-8").write(entete + corps)
     _controler_apres_generation(SEED_DEMO)
     return SEED_DEMO
+
+
+# Tables dont chaque ligne décrit une PERSONNE. Elles sont retirées du jeu
+# de démonstration : leur contenu n'instruit rien — la mécanique des
+# quittances se démontre avec un locataire fictif créé à la main — et le
+# moindre oubli d'anonymisation y devient une fuite.
+TABLES_PERSONNELLES = ("locataire", "quittance")
+
+
+def _neutraliser_tables_personnelles(src: str) -> str:
+    """Retire du seed les INSERT visant une table de personnes.
+
+    Le refus serait plus strict, mais il bloquerait toute génération sur un
+    dossier réel qui a des locataires — c'est-à-dire le cas normal. Le
+    retrait est donc le bon compromis : rien de personnel ne sort, et le
+    jeu de démonstration reste générable. Une table personnelle NOUVELLE,
+    elle, ne sera pas connue d'ici : d'où le contrôle qui suit.
+    """
+    lignes, retirees = [], 0
+    for ligne in src.splitlines():
+        depart = ligne.lstrip().lower()
+        if any(depart.startswith(f"insert into {t}")
+               or depart.startswith(f'insert into "{t}"')
+               for t in TABLES_PERSONNELLES):
+            retirees += 1
+            continue
+        lignes.append(ligne)
+    if retirees:
+        lignes.append(f"-- {retirees} ligne(s) de tables personnelles "
+                      f"({', '.join(TABLES_PERSONNELLES)}) retirées du jeu "
+                      "de démonstration.")
+    return "\n".join(lignes)
 
 
 def _accorder_composants_au_fec(src: str) -> str:

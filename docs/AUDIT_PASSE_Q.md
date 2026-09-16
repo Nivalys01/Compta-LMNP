@@ -321,3 +321,15 @@ La trace apparaît bien sur la sortie d'erreur du processus. Elle n'est pas écr
 | Q-12 | Premier import annulé sans journal de fichier | Incident non conservé après fermeture du lanceur | mineur |
 
 Aucun correctif de production appliqué dans cette passe. Les sorties reproductibles constituent l'état de référence avant correction.
+
+**État du suivi :** les douze constats ont été corrigés en production le 16 septembre 2026 (version 8.50.0). Les preuves de `preuves_q/` sont conservées **telles qu'observées avant correction** : elles restent la référence du défaut, pas de l'état actuel du code. La non-régression est figée par `tests/test_passe_q.py` (32 tests), dont 18 échouent si l'on retire les correctifs.
+
+Quatre précisions de méthode. **Le correctif de Q-02, Q-03 et Q-04 tient en un déplacement**, pas en un contrôle nouveau : la lecture d'état passe *après* `BEGIN IMMEDIATE`. Deux tests le prouvent par l'ordre réel des instructions SQL, et non par leur seul effet — un essai séquentiel passerait aussi sur l'ancien code, puisque la clôture ou l'annulation concurrente y est déjà validée quand la lecture a lieu. Corollaire : lorsque le contrôle refuse, il ne défait la transaction que s'il l'a lui-même ouverte, faute de quoi il annulerait la saisie composée d'un appelant qui ne lui a rien demandé.
+
+**Q-08 va dans le sens inverse des autres.** Partout ailleurs cette passe resserre ; ici elle desserre. Le code annonçait une annulation là où le commit était passé, et l'utilisateur relançait un import qui n'avait aucune clé d'idempotence pour le rattraper. Un échec de nettoyage devient donc un avertissement sur un import *réussi* — même raisonnement que pour l'archivage après clôture. La contre-épreuve est explicite dans les tests : un échec pendant la boucle d'insertion reste, lui, une erreur qui annule tout.
+
+**Q-09 conserve la préparation.** Le `finally` effaçait le dossier téléversé y compris quand la reprise échouait : l'action se terminait en erreur et de quoi recommencer avait disparu. La suppression est maintenant conditionnée au succès, et le message dit explicitement que les fichiers restent chargés.
+
+**Q-10 refuse sans enfermer.** La garde bloque l'accès métier à un schéma incomplet, mais la page 409 laisse joignable le retour au dossier principal, et le chemin est retiré des dossiers déjà migrés pour qu'un redémarrage puisse réessayer. Un refus sans issue, avec un cookie de dossier valable 180 jours, rendrait le logiciel inutilisable pour tous les dossiers.
+
+Un mot sur **Q-01**, qui n'est pas un défaut de quittances mais un défaut de *contrat* : `executescript` valide implicitement la transaction en cours, et n'importe quel appelant en `commit=False` pouvait donc voir ses écritures figées par une simple lecture. Le correctif n'a pas rendu ce `executescript` inoffensif : il a supprimé son appel quand il n'y a rien à créer. C'est le même raisonnement que celui appliqué aux autres chemins de lecture du logiciel — lire ne doit jamais écrire.

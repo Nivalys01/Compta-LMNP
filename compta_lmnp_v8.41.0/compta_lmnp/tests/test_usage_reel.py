@@ -1040,7 +1040,7 @@ def test_quittance_lit_les_montants_dans_les_ecritures(bailleur):
     operations.saisir(conn, type="loyer", montant=670, periode="2026-03",
                       date_operation="2026-03-05", bien_id=1)
     conn.commit()
-    q = quittances.emettre(conn, locataire_id=loc, periode="2026-03")
+    q = quittances.emettre(conn, locataire_id=loc, periode="2026-03", forcer=True)
     assert q["loyer"] == pytest.approx(670.0)
     assert q["numero"] == 1
 
@@ -1051,7 +1051,8 @@ def test_numerotation_incrementale_et_sans_trou(bailleur):
     numeros = []
     for mois in ("2026-01", "2026-02", "2026-03"):
         numeros.append(quittances.emettre(
-            conn, locataire_id=loc, periode=mois, loyer=670, charges=50)["numero"])
+            conn, locataire_id=loc, periode=mois, loyer=670, charges=50,
+            forcer=True)["numero"])
     assert numeros == [1, 2, 3]
     assert quittances.prochain_numero(conn) == 4
 
@@ -1059,23 +1060,25 @@ def test_numerotation_incrementale_et_sans_trou(bailleur):
 def test_quittance_refuse_les_trois_cas_dangereux(bailleur):
     import quittances
     conn, loc = bailleur
-    quittances.emettre(conn, locataire_id=loc, periode="2026-03", loyer=670)
+    quittances.emettre(conn, locataire_id=loc, periode="2026-03", loyer=670, forcer=True)
     # 1. deux quittances pour le même mois = deux preuves du même paiement
     with pytest.raises(ValueError, match="existe déjà"):
-        quittances.emettre(conn, locataire_id=loc, periode="2026-03", loyer=670)
+        quittances.emettre(conn, locataire_id=loc, periode="2026-03",
+                           loyer=670, forcer=True)
     # 2. une quittance atteste d'un paiement REÇU
     with pytest.raises(ValueError, match="Aucun encaissement"):
         quittances.emettre(conn, locataire_id=loc, periode="2026-07")
     # 3. hors période de présence
     with pytest.raises(ValueError, match="n'occupe pas"):
-        quittances.emettre(conn, locataire_id=loc, periode="2025-06", loyer=670)
+        quittances.emettre(conn, locataire_id=loc, periode="2025-06",
+                           loyer=670, forcer=True)
 
 
 def test_quittance_imprimable_est_conforme(bailleur):
     import quittances
     conn, loc = bailleur
     q = quittances.emettre(conn, locataire_id=loc, periode="2026-03",
-                           loyer=670, charges=50)
+                           loyer=670, charges=50, forcer=True)
     d = quittances.detail(conn, q["id"])
     # la distinction loyer / charges est une OBLIGATION légale
     assert d["loyer"] == 670.0 and d["charges"] == 50.0
@@ -1141,7 +1144,8 @@ def test_numerotation_unique_a_travers_plusieurs_biens(tmp_path):
     for periode in ("2026-01", "2026-02"):
         for loc in locs:
             numeros.append(quittances.emettre(
-                c, locataire_id=loc, periode=periode, loyer=600)["numero"])
+                c, locataire_id=loc, periode=periode, loyer=600,
+                forcer=True)["numero"])
     assert numeros == list(range(1, 7))          # continue
     assert len(set(numeros)) == len(numeros)     # sans doublon
     c.close()
@@ -1159,7 +1163,7 @@ def test_quittances_anciennes_restent_accessibles(tmp_path):
     loc = quittances.ajouter_locataire(c, bien_id=1, nom="DUPONT",
                                        date_entree="2023-01-01")
     for an in ("2023", "2024", "2025", "2026"):
-        quittances.emettre(c, locataire_id=loc, periode=f"{an}-05", loyer=600)
+        quittances.emettre(c, locataire_id=loc, periode=f"{an}-05", loyer=600, forcer=True)
     assert len(quittances.lister(c)) == 4          # aucune limite d'ancienneté
     assert len(quittances.lister(c, 2023)) == 1
     vieille = [q for q in quittances.lister(c)
@@ -1181,7 +1185,7 @@ def test_locataire_sorti_ne_peut_plus_etre_quittance(tmp_path):
     parti = quittances.ajouter_locataire(
         c, bien_id=1, nom="PARTI", date_entree="2024-01-01",
         date_sortie="2026-06-30")
-    quittances.emettre(c, locataire_id=parti, periode="2026-05", loyer=600)
+    quittances.emettre(c, locataire_id=parti, periode="2026-05", loyer=600, forcer=True)
     with pytest.raises(ValueError, match="n'occupe pas"):
         quittances.emettre(c, locataire_id=parti, periode="2026-09", loyer=600)
     c.close()
@@ -1201,7 +1205,7 @@ def test_quittances_sans_effet_sur_la_comptabilite(bien_nu):
     loc = quittances.ajouter_locataire(bien_nu, bien_id=1, nom="DUPONT",
                                        date_entree="2026-01-01")
     for m in range(1, 4):
-        quittances.emettre(bien_nu, locataire_id=loc, periode=f"2026-{m:02d}")
+        quittances.emettre(bien_nu, locataire_id=loc, periode=f"2026-{m:02d}", forcer=True)
     apres = tuple(bien_nu.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
                   for t in ("ecriture", "ligne", "operation"))
     assert avant == apres
@@ -1226,7 +1230,7 @@ def test_quittances_absentes_du_fec(tmp_path):
                       date_operation="2026-01-05", bien_id=1)
     loc = quittances.ajouter_locataire(c, bien_id=1, nom="ZZTOPLOCATAIRE",
                                        date_entree="2026-01-01")
-    quittances.emettre(c, locataire_id=loc, periode="2026-01")
+    quittances.emettre(c, locataire_id=loc, periode="2026-01", forcer=True)
     c.commit()
     chemin = str(tmp_path / "fec.txt")
     export_fec.exporter(c, 2026, chemin)
@@ -2221,9 +2225,16 @@ def test_colocation_pas_deux_quittances_sur_un_encaissement(tmp_path):
     operations.saisir(c, type="loyer", montant=800, periode="2026-03",
                       date_operation="2026-03-05", bien_id=1)
     c.commit()
+    # Depuis la passe P, la colocation est PRATICABLE : ce qui reste
+    # interdit est d'attester plus que l'encaissement du logement. La part
+    # de 400 € du second colocataire est donc légitime…
     quittances.emettre(c, locataire_id=a, periode="2026-03", loyer=400)
-    with pytest.raises(ValueError, match="déjà été quittancé"):
-        quittances.emettre(c, locataire_id=b, periode="2026-03")
+    quittances.emettre(c, locataire_id=b, periode="2026-03", loyer=400)
+    # …mais pas un centime de plus : 800 € ont été encaissés, 800 € attestés.
+    d = quittances.ajouter_locataire(c, bien_id=1, nom="DURAND",
+                                     date_entree="2025-09-01")
+    with pytest.raises(ValueError, match="déjà été quittancé|encaissé"):
+        quittances.emettre(c, locataire_id=d, periode="2026-03", loyer=400)
     c.close()
 
 
@@ -2237,7 +2248,7 @@ def test_quittance_signale_un_encaissement_annule(tmp_path):
     operations.saisir(c, type="loyer", montant=800, periode="2026-03",
                       date_operation="2026-03-05", bien_id=1)
     c.commit()
-    q = quittances.emettre(c, locataire_id=loc, periode="2026-03")
+    q = quittances.emettre(c, locataire_id=loc, periode="2026-03", forcer=True)
     assert quittances.detail(c, q["id"])["ecart_ecritures"] is None
     op = c.execute("SELECT id FROM operation LIMIT 1").fetchone()[0]
     operations.annuler(c, op)
@@ -2257,11 +2268,11 @@ def test_restauration_refuse_de_reculer_la_numerotation(tmp_path):
     c, quittances = _bailleur_quittances(tmp_path, "r")
     loc = quittances.ajouter_locataire(c, bien_id=1, nom="D",
                                        date_entree="2024-01-01")
-    quittances.emettre(c, locataire_id=loc, periode="2026-01", loyer=700)
+    quittances.emettre(c, locataire_id=loc, periode="2026-01", loyer=700, forcer=True)
     c.commit()
     db = str(tmp_path / "r.db")
     sv = perennite.sauvegarder(db, motif="demarrage")
-    quittances.emettre(c, locataire_id=loc, periode="2026-02", loyer=700)
+    quittances.emettre(c, locataire_id=loc, periode="2026-02", loyer=700, forcer=True)
     c.commit()
     c.close()
     chemin = sv["chemin"] if isinstance(sv, dict) else sv
@@ -2341,7 +2352,7 @@ def test_liste_des_quittances_montre_les_orphelines(tmp_path):
     c, quittances = _bailleur_quittances(tmp_path, "j")
     loc = quittances.ajouter_locataire(c, bien_id=1, nom="D",
                                        date_entree="2024-01-01")
-    quittances.emettre(c, locataire_id=loc, periode="2026-01", loyer=700)
+    quittances.emettre(c, locataire_id=loc, periode="2026-01", loyer=700, forcer=True)
     c.execute("PRAGMA foreign_keys = OFF")
     c.execute("DELETE FROM bien WHERE id=1")
     c.commit()

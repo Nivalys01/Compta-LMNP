@@ -72,13 +72,16 @@ def lire_balance_interne(conn: sqlite3.Connection, annee: int) -> dict[str, floa
     return {compte: solde for compte, solde in rows}
 
 
-def construire_an(conn: sqlite3.Connection, fec_path: str, annee_cible: int) -> None:
+def construire_an(conn: sqlite3.Connection, fec_path: str, annee_cible: int, *,
+                  commit: bool = True) -> None:
     """Insère l'AN d'ouverture `annee_cible` + l'OD d'affectation du résultat,
     depuis un FEC de clôture EXTERNE (migration depuis un logiciel du marché)."""
-    _construire_an_depuis_balance(conn, lire_balance_fec(fec_path), annee_cible)
+    _construire_an_depuis_balance(conn, lire_balance_fec(fec_path),
+                                  annee_cible, commit=commit)
 
 
-def construire_an_interne(conn: sqlite3.Connection, annee_cible: int) -> dict:
+def construire_an_interne(conn: sqlite3.Connection, annee_cible: int, *,
+                          commit: bool = True) -> dict:
     """
     Reprise INTERNE : clôture N-1 → ouverture N sans fichier externe.
     Lit la balance de clôture de l'exercice précédent directement dans la
@@ -100,7 +103,7 @@ def construire_an_interne(conn: sqlite3.Connection, annee_cible: int) -> dict:
                          "clôturez-le avant d'ouvrir avec reprise des à-nouveaux.")
     bal = lire_balance_interne(conn, annee_source)
     resultat = -sum(v for n, v in bal.items() if n[0] in "67")
-    nb = _construire_an_depuis_balance(conn, bal, annee_cible)
+    nb = _construire_an_depuis_balance(conn, bal, annee_cible, commit=commit)
     return {"annee_source": annee_source,
             "resultat_reporte": round(resultat, 2), "nb_comptes": nb}
 
@@ -143,7 +146,8 @@ def reprise_deja_presente(conn: sqlite3.Connection, annee_cible: int) -> str:
 
 
 def _construire_an_depuis_balance(conn: sqlite3.Connection,
-                                  bal: dict[str, float], annee_cible: int) -> int:
+                                  bal: dict[str, float], annee_cible: int, *,
+                                  commit: bool = True) -> int:
     """Mécanique commune : balance de clôture → écriture AN + OD d'affectation."""
     # Point de passage UNIQUE des deux chemins de reprise (interne et depuis
     # un FEC externe) : la garde vit ici, pour qu'aucun d'eux ne puisse
@@ -206,7 +210,11 @@ def _construire_an_depuis_balance(conn: sqlite3.Connection,
     ecritures.inserer(conn, journal="OD", date=date_ouv, annee=annee_cible,
                       libelle="Affectation du résultat", lignes=aff,
                       num=r_an["ecriture_num"] + 1, commit=False)
-    conn.commit()
+    # `commit=False` : l'appelant compose. L'ouverture d'un exercice AVEC
+    # reprise est un seul geste — l'exercice ne doit pas survivre à une
+    # reprise refusée (constat Q-11).
+    if commit:
+        conn.commit()
     return len(bilan)
 
 

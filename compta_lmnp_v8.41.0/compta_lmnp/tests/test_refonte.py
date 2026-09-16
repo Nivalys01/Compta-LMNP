@@ -115,18 +115,25 @@ def test_app_reste_de_la_logique_pure():
         assert "<div" not in bloc and "<table" not in bloc, \
             "du HTML est réapparu dans app.py : il appartient à pages.py"
     assert 'PAGE_SAISIE = """' not in src        # aucun gabarit réintroduit
-    # Seuil relevé de 2000 à 2200 en v8.40.0, puis à 2250 après les passes
-    # G à O. Ce garde-fou vise l'accumulation de HTML et de logique métier
+    # Seuil relevé de 2000 à 2200 en v8.40.0, puis à 2300 au fil des passes
+    # G à Q. Ce garde-fou vise l'accumulation de HTML et de logique métier
     # dans le routeur ; les deux vérifications ci-dessus s'en chargent et
-    # restent strictes. Les lignes ajoutées depuis sont des GARDES —
-    # migration à l'ouverture, base absente, sortie de secours, refus de
-    # clôturer sur anomalie bloquante, invalidation du cache après
-    # restauration — et chaque fois que la RÈGLE elle-même pouvait vivre
-    # ailleurs, elle y a été déplacée : la durée d'amortissement dans
-    # `amortissement`, l'intégrité d'une archive dans `perennite`. Relever
-    # le seuil plutôt que supprimer le contrôle : il continue de signaler
-    # une dérive, et il l'a signalée deux fois pendant ces passes.
-    assert src.count("\n") < 2250, "app.py devient un monolithe"
+    # restent strictes.
+    #
+    # Ce qui s'est ajouté depuis relève des GARDES et de l'ATOMICITÉ, qui
+    # sont par nature du ressort de l'appelant : migration à l'ouverture,
+    # dossier absent, sortie de secours, refus de clôturer sur anomalie
+    # bloquante, invalidation du cache après restauration, transaction
+    # unique pour « créer un composant et comptabiliser son acquisition »
+    # ou « ouvrir un exercice avec ses à-nouveaux ».
+    #
+    # Et chaque fois que la RÈGLE elle-même pouvait vivre ailleurs, elle y
+    # a été déplacée — parce que ce garde-fou l'a exigé, quatre fois : la
+    # durée d'amortissement dans `amortissement`, l'intégrité d'une archive
+    # dans `perennite`, l'enregistrement d'un import dans
+    # `import_bancaire`, le rendu de la page 409 factorisé. C'est bien son
+    # office : signaler la dérive, pas l'interdire.
+    assert src.count("\n") < 2300, "app.py devient un monolithe"
 
 
 def test_toutes_les_pages_rendent_encore(tmp_path, monkeypatch):

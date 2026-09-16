@@ -75,6 +75,18 @@ def sauvegarder(db_path: str, motif: str = "manuel",
     horodatage = datetime.now().strftime("%Y%m%d-%H%M%S")
     motif_sain = "".join(c if c.isalnum() or c in "-_" else "-" for c in motif)
     cible = os.path.join(dossier, f"{stem}-{horodatage}-{motif_sain}.db")
+    # Le nom ne porte que la SECONDE. Deux sauvegardes déclenchées dans la
+    # même seconde — deux restaurations lancées ensemble, par exemple —
+    # visaient le même fichier, et la seconde écrasait la première : la
+    # copie de sûreté censée permettre le retour en arrière contenait alors
+    # l'état DÉJÀ restauré, et les données d'avant la première demande
+    # n'existaient plus nulle part. Comme pour les archives, on suffixe
+    # plutôt que d'écraser : une copie de sûreté ne se remplace jamais.
+    n = 1
+    while os.path.exists(cible):
+        n += 1
+        cible = os.path.join(
+            dossier, f"{stem}-{horodatage}-{motif_sain}-{n}.db")
 
     src = sqlite3.connect(db_path)
     try:
@@ -135,23 +147,54 @@ def _copie_inutilisable(chemin: str) -> str:
     return ""
 
 
-def _max_quittance(chemin: str) -> int:
-    """Plus haut numéro de quittance d'une base, 0 si la table est absente."""
+def _max_quittance(chemin: str) -> int | None:
+    """Plus haut numéro de quittance d'une base.
+
+    0 si la table est absente — un dossier qui n'a jamais quittancé —, mais
+    **None si la lecture ÉCHOUE**. Les deux étaient confondus : un compteur
+    devenu illisible passait pour l'absence de toute quittance, la garde ne
+    voyait donc aucun recul de numérotation, et le numéro d'un document
+    déjà remis à un locataire pouvait être réattribué à un autre.
+    """
     if not os.path.exists(chemin):
         return 0
     try:
         c = sqlite3.connect(chemin)
         try:
+            tables = {r[0] for r in c.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")}
+            if "quittance" not in tables:
+                return 0                 # dossier sans quittance : cas normal
             return c.execute(
                 "SELECT COALESCE(MAX(numero), 0) FROM quittance").fetchone()[0]
         finally:
             c.close()
     except sqlite3.DatabaseError:
-        return 0
+        return None
 
 
 def _avertir_quittances_perdues(db_path: str, sauvegarde: str) -> None:
     avant, apres = _max_quittance(db_path), _max_quittance(sauvegarde)
+    # Lecture impossible du compteur. On refuse — SAUF si la base courante
+    # est elle-même globalement inexploitable : c'est alors précisément le
+    # sinistre que la restauration vient réparer, et bloquer reviendrait à
+    # enfermer l'utilisateur dans sa panne. Le cas visé ici est l'autre :
+    # une base par ailleurs saine dont la table des quittances ne se lit
+    # plus, où l'échec de lecture était pris pour « aucune quittance » et
+    # laissait réattribuer le numéro d'un document déjà remis.
+    base_exploitable = not _copie_inutilisable(db_path) \
+        if os.path.exists(db_path) else False
+    if (avant is None and base_exploitable) or apres is None:
+        ou = "la base actuelle" if avant is None else "la sauvegarde"
+        raise ValueError(
+            f"Impossible de lire la numérotation des quittances dans {ou} : "
+            "la restauration est refusée. Un document déjà remis à un "
+            "locataire porte un numéro qui ne doit jamais être réattribué, "
+            "et le logiciel ne peut pas vérifier ici qu'il ne le sera pas. "
+            "Rétablissez la table des quittances, ou exportez la liste des "
+            "quittances émises avant de recommencer.")
+    if avant is None or apres is None:
+        return                       # sinistre global : la restauration passe
     if avant > apres:
         raise ValueError(
             f"Cette restauration ferait reculer la numérotation des "

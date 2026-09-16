@@ -2072,8 +2072,26 @@ PAGE_QUITTANCE_IMPRIMABLE = """<!DOCTYPE html>
   {{ q.ecart_ecritures.message }}</p>
 {% endif %}
 
-<h1>Quittance de loyer</h1>
+<h1>{{ q.titre_document or 'Quittance de loyer' }}</h1>
 <p class="num">N° {{ '%05d'|format(q.numero) }} — {{ q.periode_lettres }}</p>
+
+{% if q.type_document == 'recu' %}
+<p style="background:#fff8ee;border-left:4px solid #e8710a;padding:10px 14px">
+  <b>Paiement partiel.</b> Ce document n'est pas une quittance : il atteste
+  d'un versement reçu, sans solder la période.
+  {% if q.reste_du and q.reste_du > 0 %}Reste dû au titre de
+  {{ q.periode_lettres }} : <b>{{ '%.2f'|format(q.reste_du) }} €</b>.{% endif %}
+  Une quittance sera établie lorsque la période sera intégralement réglée
+  (article 21 de la loi du 6 juillet 1989).</p>
+{% endif %}
+
+{% if q.referentiel_modifie %}
+<p class="noprint" style="background:#fff8ee;border-left:4px solid #e8710a;
+   padding:10px 14px;font-size:.9em">
+  Depuis l'émission de ce document, {{ q.referentiel_modifie|join(' et ') }}
+  a changé dans le dossier. Ce qui est imprimé ci-dessous est l'identité
+  <b>figée à l'émission</b> — celle du document réellement remis.</p>
+{% endif %}
 
 <div class="parties">
   <div class="bloc"><b>Bailleur</b>
@@ -2086,8 +2104,19 @@ PAGE_QUITTANCE_IMPRIMABLE = """<!DOCTYPE html>
 <b>{{ q.bien_adresse or q.bien }}</b>, déclare avoir reçu de
 <b>{{ q.locataire }}</b> la somme de
 <b>{{ '%.2f'|format(q.total) }} €</b>, au titre du loyer et des charges de
-la période de <b>{{ q.periode_lettres }}</b>, et lui en donne quittance,
+la période de <b>{{ q.periode_lettres }}</b>,
+{% if q.type_document == 'recu' %}à valoir sur les sommes dues pour cette
+période, sans que ce versement en constitue quittance.
+{% else %}et lui en donne quittance,{% endif %}
 sous réserve de tous mes droits.</p>
+
+{% if not q.bien_adresse %}
+<p class="noprint" style="background:#fff8ee;border-left:4px solid #e8710a;
+   padding:10px 14px;font-size:.9em">
+  <b>Adresse du logement absente.</b> Le libellé interne
+  « {{ q.bien }} » est imprimé à sa place : renseignez l'adresse postale du
+  bien dans la page Immobilisations avant de remettre ce document.</p>
+{% endif %}
 
 <table>
   <tr><th>Désignation</th><th class="droite">Montant</th></tr>

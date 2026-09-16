@@ -209,6 +209,46 @@ def _seuil_immobilisation(conn=None, annee: int | None = None) -> float:
                                    defaut=500.0))
 
 
+class ImportAnnule(Exception):
+    """Un import n'a pas pu être enregistré ; rien n'a été écrit."""
+
+    def __init__(self, rang: int, total: int, cause: Exception):
+        self.rang, self.total, self.cause = rang, total, cause
+        super().__init__(
+            f"Import ANNULÉ à la ligne {rang} sur {total} : {cause}\n\n"
+            "Aucune opération n'a été enregistrée — la base est exactement "
+            "dans l'état où elle était. Corrigez la ligne fautive dans le "
+            "relevé et relancez l'analyse.")
+
+
+def enregistrer(conn, propositions, retenues) -> tuple[int, int]:
+    """Enregistre les propositions COCHÉES. Renvoie (faites, écartées).
+
+    TOUT OU RIEN. `saisir` committait à chaque tour : un échec à la
+    septième ligne sur dix laissait les six premières en base, sans retour
+    arrière, et le message d'erreur ne disait pas où l'on s'était arrêté.
+    L'utilisateur relançait, et les six premières étaient saisies DEUX fois
+    — l'import ne porte aucune clé d'idempotence.
+    """
+    import operations as _ops
+    faites, ecartees = 0, 0
+    try:
+        for i, p in enumerate(propositions):
+            if i not in retenues:
+                ecartees += 1
+                continue
+            _ops.saisir(conn, type=p["type"], montant=p["montant"],
+                        date_operation=p["date_operation"],
+                        periode=p.get("periode"), libelle=p.get("libelle"),
+                        source="import", commit=False)
+            faites += 1
+        conn.commit()
+    except Exception as exc:                         # noqa: BLE001
+        conn.rollback()
+        raise ImportAnnule(faites + 1, len(retenues), exc) from exc
+    return faites, ecartees
+
+
 def categoriser(libelle: str, montant: float, conn=None,
                 annee: int | None = None) -> str:
     """Renvoie le type de gabarit proposé pour une ligne de relevé.

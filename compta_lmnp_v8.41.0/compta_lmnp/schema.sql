@@ -208,7 +208,18 @@ CREATE TABLE IF NOT EXISTS quittance (
     date_paiement   TEXT,
     loyer           REAL    NOT NULL,
     charges         REAL    NOT NULL DEFAULT 0,
-    UNIQUE (locataire_id, periode)
+    -- Le type distingue le REÇU d'un paiement partiel de la QUITTANCE d'un
+    -- mois soldé (art. 21 de la loi du 6 juillet 1989) : les deux
+    -- coexistent, chacun avec son numéro. L'identité est FIGÉE ici, et non
+    -- reconstruite par jointure — corriger un nom réécrirait sinon tous les
+    -- justificatifs déjà remis.
+    type_document    TEXT   NOT NULL DEFAULT 'quittance',
+    nom_locataire    TEXT,
+    adresse_logement TEXT,
+    bailleur_nom     TEXT,
+    bailleur_adresse TEXT,
+    montant_du       REAL,
+    UNIQUE (locataire_id, periode, type_document)
 );
 
 -- Soldes arrêtés par exercice, y compris les millésimes épuisés et périmés.

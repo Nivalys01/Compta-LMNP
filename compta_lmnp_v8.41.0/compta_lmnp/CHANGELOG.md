@@ -1,5 +1,154 @@
 # Journal des versions — Compta LMNP
 
+## 8.50.0 — 2026-09-16 (Passe Q : le bon contrôle, au mauvais moment)
+
+Douze constats, quatre critiques, sept majeurs et un mineur. Cette passe ne
+reproche presque rien aux contrôles du logiciel : elle reproche l'INSTANT où
+ils sont posés. Presque tous étaient justes ; ils regardaient seulement un
+état qui n'était plus celui dans lequel on écrivait.
+
+**Un contrôle pris avant le verrou ne décrit que le passé.** Entre le moment
+où l'on constate qu'un loyer n'est pas encore annulé et celui où on l'annule,
+une seconde demande passait : deux contre-passations pour une écriture, et
+800 € de produits envolés. Entre le moment où l'on constate qu'un logement
+n'est pas encore quittancé et celui où l'on émet, une seconde demande
+passait : 1 600 € attestés à des tiers pour 800 € encaissés — la contrainte
+d'unicité, qui porte sur (locataire, période), ne voit pas le logement.
+Entre le moment où un exercice est déclaré ouvert et celui où l'on y écrit,
+une clôture passait : l'écriture entrait dans un exercice dont le résultat
+figé ne la comptait pas, sans qu'aucun équilibre ne soit rompu. Ces trois
+contrôles sont désormais relus APRÈS `BEGIN IMMEDIATE`, et le refus relâche
+lui-même le verrou qu'il vient de prendre — sans toucher à la transaction
+d'un appelant qui composait déjà la sienne.
+
+**Et de l'autre côté du commit, la symétrique.** Un import de dix loyers
+était bel et bien enregistré, puis la suppression du fichier temporaire
+échouait, et le logiciel annonçait « Import interrompu ». L'utilisateur
+relançait — l'import ne porte aucune clé d'idempotence — et saisissait
+8 000 € de recettes une seconde fois. Un échec de ménage n'annule pas ce qui
+est validé : c'est maintenant un avertissement sur un import réussi, qui
+nomme le fichier à supprimer à la main et interdit la relance.
+
+**Lire ne doit jamais valider.** `assurer_schema` exécutait un
+`executescript`, et SQLite valide implicitement la transaction en cours avant
+d'en exécuter le script : consulter la liste des quittances au milieu d'une
+saisie composée rendait définitifs 800 € que l'appelant s'apprêtait peut-être
+à annuler. Le contrat `commit=False` était rompu pour tout appelant, sans
+qu'aucun d'eux ne puisse le soupçonner. La fonction n'écrit plus rien quand
+il n'y a rien à créer.
+
+**Deux copies de sûreté dans la même seconde n'en font plus qu'une.** Le nom
+d'une sauvegarde ne portait que la seconde : deux restaurations lancées
+ensemble visaient le même fichier, et la seconde écrasait la première avec
+l'état déjà restauré. Le loyer que la copie devait permettre de retrouver
+disparaissait donc aussi d'elle. Les collisions reçoivent désormais un
+suffixe, et l'intégrité SQLite — qui ne voyait rien à redire — n'est plus
+seule à répondre de la perte.
+
+**Ce qui se fait en deux écritures doit tenir ou tomber ensemble.** Un
+composant à 12 000 € était validé, puis son écriture d'acquisition échouait
+sur une date inexistante : le référentiel gardait l'immobilisation sans
+l'écriture, et le message d'erreur n'en disait rien. Un appel de charges
+gardait ses deux premières composantes quand la troisième était refusée. Une
+reprise de deux FEC laissait durablement le premier exercice quand le second
+échouait — tout en effaçant, par son `finally`, les fichiers téléversés avec
+quoi recommencer. Un exercice 2027 était créé alors que la reprise des
+à-nouveaux qu'on lui demandait venait d'être refusée, et le message invitait
+à clôturer 2026 « puis recommencer » sur un exercice déjà là. Ces quatre
+traitements sont maintenant d'un seul tenant.
+
+**Une mise à niveau interrompue ferme la porte.** L'exception d'une migration
+échouée était avalée : la requête continuait sur un schéma à moitié monté,
+sans un mot. La garde de version refuse désormais de servir un dossier dans
+cet état, en nommant la cause, en rappelant qu'une sauvegarde a été prise
+avant la tentative, et en laissant ouverte la seule sortie utile — le retour
+au dossier principal.
+
+**Un incident géré se conserve comme les autres.** Le journal persistant
+était branché par le gestionnaire d'exception global, c'est-à-dire par les
+seules erreurs NON gérées : un import proprement annulé à la septième ligne
+sur dix n'écrivait rien sur le disque, et sa trace disparaissait avec la
+fenêtre du lanceur. Ce sont pourtant ces incidents-là qu'on veut relire à
+froid.
+
+Non-régression : `tests/test_passe_q.py` (32 tests), dont 18 échouent si l'on
+retire les correctifs. L'enregistrement d'un import a quitté `app.py` pour
+`import_bancaire.enregistrer`, avec son exception `ImportAnnule` qui porte le
+rang et le total — la quatrième fois de ce programme d'audit que le garde-fou
+anti-monolithe impose de déplacer une règle là où elle appartient.
+
+
+## 8.49.0 — 2026-09-16 (Passe P : la quittance est un document remis à un tiers)
+Sept constats, six majeurs et un mineur. Une quittance n'est pas un état
+interne : c'est un document remis à un locataire, qui le fera valoir contre
+le bailleur. Tout ce qui suit en découle.
+
+**Un document remis ne s'invente pas.** L'avertissement de discordance
+existait à la consultation, mais l'émission n'était pas bloquée : 880 €
+pouvaient être attestés sans le moindre encaissement. Et seul le TOTAL
+était comparé, si bien que 800 € de loyer plus 80 € de charges encaissés
+pouvaient devenir 880 € de loyer et zéro charge — le total tombait juste,
+la ventilation était fausse, et c'est précisément cette ventilation que
+l'article 21 de la loi du 6 juillet 1989 impose et que le locataire fera
+valoir. Le rapprochement se fait maintenant poste par poste, avant
+l'émission, avec une dérogation explicite pour ce que le logiciel ne peut
+pas voir.
+
+**Le reçu d'un acompte n'est pas la quittance d'un mois.** Un versement de
+400 € sur 800 € dus produisait une QUITTANCE DE LOYER — titre qui solde la
+période — puis interdisait tout justificatif du solde une fois celui-ci
+payé : 400 € supplémentaires restaient hors de toute preuve. Les deux
+documents sont désormais distingués, conformément à l'article 21 : le reçu
+porte le reste dû, et la quittance lui succède sans l'effacer, chacun avec
+son numéro.
+
+**La colocation était conseillée puis refusée.** Le message d'erreur
+invitait à « indiquer le montant revenant à chacun », et le contrôle
+refusait ensuite la seconde part : le parcours conseillé était interdit par
+le contrôle qui le conseillait. En relocation, le premier occupant recevait
+même les fonds versés par le second. Ce qui doit rester interdit n'est pas
+d'émettre deux documents, c'est d'attester DEUX FOIS le même encaissement :
+c'est donc le montant, et non le nombre de documents, qui borne désormais.
+
+**Un numéro remis ne se réattribue jamais.** Un compteur de quittances
+devenu illisible était assimilé à l'absence de toute quittance : la garde
+ne voyait aucun recul de numérotation, et le n° 2 déjà remis pour février
+était réattribué à mars. La restauration est refusée quand la numérotation
+ne peut pas être lue — sauf si la base courante est elle-même hors
+d'usage, puisque c'est alors le sinistre que la restauration vient réparer.
+
+**Un document remis ne se recalcule pas.** Le justificatif était reconstruit
+par jointure sur le référentiel COURANT : corriger le nom d'un locataire ou
+l'adresse d'un logement réécrivait rétroactivement tous ses documents, sous
+leurs numéros d'origine, sans qu'aucune trace ne subsiste de ce qui avait
+réellement circulé. L'identité — locataire, adresse, bailleur, montant dû —
+est désormais FIGÉE à l'émission, et l'écran signale quand le dossier a
+changé depuis.
+
+**Le justificatif situe et date ce qu'il atteste.** La date du paiement
+était connue dans l'opération et le document ne la portait pas ; l'adresse
+postale manquante était remplacée en silence par le libellé interne du bien
+— « Logement Alpha Fictif » présenté comme une adresse. La date est reprise
+de l'encaissement, et l'absence d'adresse est signalée plutôt que masquée.
+
+**Enfin, une promesse d'anonymisation ne peut pas reposer sur un
+inventaire.** Le générateur du jeu de démonstration remplaçait les termes
+inscrits à la main dans une liste ; un locataire absent de cette liste
+traversait intact jusque dans l'artefact distribué, sous un en-tête
+promettant « AUCUNE donnée personnelle ». Le contrôle final ne pouvait pas
+le rattraper, puisqu'il cherche exactement les mêmes termes. Les tables qui
+portent des PERSONNES — `locataire`, `quittance` — sont maintenant retirées
+du jeu de démonstration : leur contenu n'instruit rien, et le moindre oubli
+y devenait une fuite.
+
+Le schéma passe en version 8 : le type de document et l'identité figée sont
+ajoutés à la table `quittance`, dont l'unicité porte désormais sur
+(locataire, période, type). Les bases existantes sont migrées au premier
+accès — la contrainte d'unicité d'un CREATE TABLE ne s'altérant pas, la
+table est reconstruite.
+
+- 30 tests ajoutés (1111 au total).
+
 ## 8.48.0 — 2026-09-16 (Passes M, N, O : ce qui garde, et ce qui garde la garde)
 Trente-deux constats. Ces trois passes n'examinent pas la comptabilité :
 elles examinent ce qui la surveille, ce qui la paramètre et ce qui la

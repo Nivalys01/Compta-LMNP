@@ -123,6 +123,10 @@ def _form_float(nom: str, defaut=None):
 # sauvegarde, et SQLite rendant « database is locked » au premier
 # chargement, sur le chemin le plus sensible du logiciel.
 _MIGRES: set = set()
+# Dossiers dont la migration a ÉCHOUÉ : leur schéma n'est pas au niveau du
+# logiciel, et la garde de version refuse de les servir tant que ce n'est
+# pas réglé (constat Q-10).
+_MIGRATIONS_EN_ECHEC: dict = {}
 _VERROU_MIGRATION = threading.Lock()
 
 
@@ -147,8 +151,17 @@ def _migrer_si_besoin() -> None:
             c.close()
         if retard:
             migrations.migrer(chemin)
-    except Exception:                            # noqa: BLE001
+    except Exception as exc:                     # noqa: BLE001
+        # L'exception était AVALÉE : la requête continuait sur un schéma à
+        # moitié mis à niveau, sans un mot. Les paliers déjà passés restent
+        # (chacun est committé séparément), mais l'accès métier s'arrête :
+        # la garde de version transforme cet échec en refus (Q-10).
         _MIGRES.discard(chemin)                  # réessayer au prochain accès
+        _assurer_journal()
+        app.logger.exception("Migration de %s interrompue", chemin)
+        _MIGRATIONS_EN_ECHEC[chemin] = str(exc)
+        return
+    _MIGRATIONS_EN_ECHEC.pop(chemin, None)
 
 
 # Méthodes qui CHANGENT l'état. Une lecture forgée ne coûte rien ; une
@@ -231,6 +244,18 @@ def _garde_version_schema():
     # qu'une base plus RÉCENTE), et les routes écrivaient dans un schéma
     # périmé — sans la copie de sûreté que la migration produit.
     _migrer_si_besoin()
+    # Migration en ÉCHEC : le schéma n'est pas au niveau du logiciel, et
+    # continuer reviendrait à écrire dans une base à moitié mise à jour.
+    # L'exception était avalée et la requête poursuivait sans un mot.
+    echec = _MIGRATIONS_EN_ECHEC.get(_db_path())
+    if echec:
+        return _page_409(
+            "La mise à niveau de ce dossier n'a pas pu être menée à son "
+            f"terme : {echec}\n\nSon schéma est donc incomplet, et le "
+            "logiciel refuse d'y écrire tant que ce n'est pas réglé — une "
+            "sauvegarde a été prise avant la tentative. Redémarrez le "
+            "logiciel pour réessayer ; si l'échec persiste, restaurez cette "
+            "sauvegarde depuis la page Dossiers.")
     # LECTURE SEULE : marquer la version ici écrirait en base à CHAQUE
     # affichage de page (transaction d'écriture inutile, contention possible
     # avec une clôture en cours) et surtout ferait croire qu'un dossier est
@@ -248,14 +273,38 @@ def _garde_version_schema():
         # vaut 180 jours. Sans elle, le logiciel devenait
         # inutilisable pour TOUS ses dossiers jusqu'à suppression
         # manuelle d'un cookie dans le navigateur.
-        corps = render_template_string(PAGE_VERSION_TROP_RECENTE,
-                                       msg=msg)
-        try:
-            return _base(corps, active="", annee=date.today().year,
-                         annees=[]), 409
-        except Exception:
-            return msg, 409
+        return _page_409(msg)
     return None
+
+
+def _assurer_journal() -> None:
+    """Branche le journal s'il ne l'est pas encore.
+
+    Le branchement était PARESSEUX, déclenché par le gestionnaire
+    d'exception global — c'est-à-dire par les seules erreurs NON gérées.
+    Un incident rattrapé proprement, comme un import annulé à la septième
+    ligne sur dix, n'initialisait donc rien : sa trace partait sur la
+    sortie d'erreur du processus, et disparaissait à la fermeture du
+    lanceur. Or ce sont précisément ces incidents-là qu'on veut pouvoir
+    relire à froid.
+    """
+    if any(getattr(x, "_journal_compta", False) for x in app.logger.handlers):
+        return
+    try:
+        _journal_erreurs()
+    except Exception:                            # noqa: BLE001
+        pass                     # un journal absent ne doit rien empêcher
+
+
+def _page_409(msg: str):
+    """Page de refus « dossier inutilisable en l'état », avec sa sortie de
+    secours. Le repli en texte brut couvre le cas où la coquille elle-même
+    ne peut pas être rendue — sans lui, l'utilisateur verrait un traceback."""
+    corps = render_template_string(PAGE_VERSION_TROP_RECENTE, msg=msg)
+    try:
+        return _base(corps, active="", annee=date.today().year, annees=[]), 409
+    except Exception:                            # noqa: BLE001
+        return msg, 409
 
 
 def _journal_erreurs() -> None:
@@ -644,7 +693,8 @@ def saisie():
         propositions=None, jeton="")
     return _base(body, active="saisie", annee=annee, annees=annees,
                  flash_ok=request.args.get("ok",""),
-                 flash_err=request.args.get("err",""))
+                 flash_err=request.args.get("err",""),
+                 flash_warn=request.args.get("warn",""))
 
 
 @app.route("/operation/<int:operation_id>/dupliquer", methods=["POST"])
@@ -781,7 +831,8 @@ def immobilisations():
     )
     return _base(body, active="immobilisations", annee=annee, annees=annees,
                  flash_ok=request.args.get("ok",""),
-                 flash_err=request.args.get("err",""))
+                 flash_err=request.args.get("err",""),
+                 flash_warn=request.args.get("warn",""))
 
 
 @app.route("/immobilisations/exploitant", methods=["POST"])
@@ -879,7 +930,8 @@ def creer_composant():
              request.form.get("categorie",""), float(request.form["valeur_brute"]),
              duree, dms, cpt_immo, cpt_amort, amortissable)
         )
-        conn.commit()
+        # Pas de commit ici : il vient après l'écriture d'acquisition, pour
+        # que les deux tiennent ou tombent ensemble (constat Q-07).
         ok = f"Composant « {request.form['libelle']} » ajouté."
         # Alerte de cohérence AU MOMENT DE L'AJOUT : c'est là qu'elle sert,
         # pendant que l'utilisateur a le montant en tête.
@@ -917,8 +969,13 @@ def creer_composant():
             ok += (f" Écriture d'acquisition n°{res['ecriture_num']} "
                    f"générée sur {cible}.")
     except Exception as exc:
+        # Le composant était committé AVANT l'écriture d'acquisition : une
+        # date invalide laissait 12 000 € au référentiel sans écriture, et
+        # l'erreur ne disait pas qu'une partie était enregistrée (Q-07).
+        conn.rollback()
         conn.close()
         return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
+    conn.commit()
     conn.close()
     return redirect(url_for("immobilisations", annee=annee, ok=ok))
 
@@ -1348,27 +1405,33 @@ def exercice_ouvrir():
         exis = conn.execute("SELECT annee FROM exercice WHERE annee=?", (a,)).fetchone()
         if exis:
             raise ValueError(f"L'exercice {a} existe déjà.")
+        # UN SEUL GESTE. L'exercice était créé et committé AVANT que la
+        # reprise ne soit tentée : un refus laissait un exercice vide, alors
+        # que le message invitait à recommencer après clôture. Ouvrir avec
+        # reprise aboutit, ou ne laisse rien (constat Q-11).
+        reprise_demandee = request.form.get("reprise") == "1"
+        conn.execute("BEGIN IMMEDIATE")
         conn.execute(
             "INSERT INTO exercice (annee, date_debut, date_fin, statut) VALUES (?,?,?,'ouvert')",
             (a, deb, fin)
         )
-        conn.commit()
-
         msg = f"Exercice {a} ouvert ({deb} → {fin})."
-        if veille_fiscale.veille_a_refaire(conn):
-            msg += (" Pensez à votre veille fiscale avant de saisir : "
-                    "voir le menu « Veille fiscale ».")
-        if request.form.get("reprise") == "1":
-            info = reprise.construire_an_interne(conn, a)
+        if reprise_demandee:
+            info = reprise.construire_an_interne(conn, a, commit=False)
             d, c_ = reprise.controle_equilibre(conn, a)
             if abs(d - c_) > 0.005:
                 raise ValueError("À-nouveaux déséquilibrés — reprise annulée.")
             msg += (f" À-nouveaux repris depuis {info['annee_source']} : "
                     f"{info['nb_comptes']} comptes, résultat reporté "
                     f"{info['resultat_reporte']:.2f} € (affecté au compte exploitant).")
+        conn.commit()
+        if veille_fiscale.veille_a_refaire(conn):
+            msg += (" Pensez à votre veille fiscale avant de saisir : "
+                    "voir le menu « Veille fiscale ».")
         conn.close()
         return redirect(url_for("exercice_nouveau", annee=a, ok=msg))
     except Exception as exc:
+        conn.rollback()
         conn.close()
         return redirect(url_for("exercice_nouveau", err=str(exc)))
 
@@ -1939,38 +2002,32 @@ def import_valider():
     conn = _conn()
     try:
         props = import_bancaire.proposer(chemin, conn)
-        faites, ecartees = 0, 0
-        # TOUT OU RIEN. `saisir` committait à chaque tour : un échec à la
-        # septième ligne sur dix laissait les six premières en base, sans
-        # retour arrière, et le message « Import interrompu » ne disait pas
-        # où l'on s'était arrêté. L'utilisateur relançait, et les six
-        # premières étaient saisies DEUX fois — l'import ne porte aucune clé
-        # d'idempotence.
         try:
-            for i, p in enumerate(props):
-                if i not in retenues:
-                    ecartees += 1
-                    continue
-                operations.saisir(conn, type=p["type"], montant=p["montant"],
-                                  date_operation=p["date_operation"],
-                                  periode=p.get("periode"),
-                                  libelle=p.get("libelle"), source="import",
-                                  commit=False)
-                faites += 1
-            conn.commit()
-        except Exception as exc:                     # noqa: BLE001
-            conn.rollback()
-            app.logger.exception("Import annulé à la ligne %s", faites + 1)
-            return redirect(url_for("saisie", err=(
-                f"Import ANNULÉ à la ligne {faites + 1} sur "
-                f"{len(retenues)} : {exc}\n\nAucune opération n'a été "
-                "enregistrée — la base est exactement dans l'état où elle "
-                "était. Corrigez la ligne fautive dans le relevé et "
-                "relancez l'analyse.")))
-        os.remove(chemin)
-        return redirect(url_for("saisie",
-            ok=f"Import terminé : {faites} opération(s) enregistrée(s), "
-               f"{ecartees} écartée(s)."))
+            faites, ecartees = import_bancaire.enregistrer(conn, props,
+                                                           retenues)
+        except import_bancaire.ImportAnnule as annule:
+            _assurer_journal()
+            app.logger.exception("Import annulé à la ligne %s", annule.rang)
+            return redirect(url_for("saisie", err=str(annule)))
+        # À PARTIR D'ICI L'IMPORT EST ENREGISTRÉ : le commit est passé. Un
+        # échec du seul NETTOYAGE faisait pourtant annoncer « Import
+        # interrompu », l'utilisateur relançait, et 8 000 € de recettes
+        # étaient saisis deux fois — l'import n'a aucune clé d'idempotence.
+        # C'est un avertissement sur un import réussi, pas une annulation
+        # (constat Q-08 ; même raisonnement que l'archivage après clôture).
+        message = (f"Import terminé : {faites} opération(s) enregistrée(s), "
+                   f"{ecartees} écartée(s).")
+        try:
+            os.remove(chemin)
+        except OSError as exc:                       # noqa: BLE001
+            _assurer_journal()
+            app.logger.exception("Nettoyage du fichier d'import impossible")
+            return redirect(url_for("saisie", warn=(
+                message + f" ATTENTION : le fichier temporaire n'a pas pu "
+                f"être supprimé ({exc}). NE RELANCEZ PAS cet import — les "
+                "opérations sont enregistrées ; vous les saisiriez une "
+                f"seconde fois. Supprimez à la main : {chemin}")))
+        return redirect(url_for("saisie", ok=message))
     except Exception as exc:
         return redirect(url_for("saisie", err=f"Import interrompu : {exc}"))
     finally:
@@ -2042,6 +2099,7 @@ def exercice_reprendre_fec_multi():
         return redirect(url_for("exercice_nouveau",
                                 err="Session d'analyse expirée — recommencez."))
     conn = _conn()
+    echoue = False
     try:
         chemins = [os.path.join(dossier, n) for n in sorted(os.listdir(dossier))]
         ordre = migration_fec.ordonner(chemins)
@@ -2055,7 +2113,7 @@ def exercice_reprendre_fec_multi():
             conn.execute("INSERT INTO exercice (annee, date_debut, date_fin, "
                          "statut) VALUES (?,?,?,'ouvert')",
                          (a, f"{a}-01-01", f"{a}-12-31"))
-            res = rejeu_fec.rejouer(conn, x["chemin"], a)
+            res = rejeu_fec.rejouer(conn, x["chemin"], a, commit=False)
             faits.append(f"{a} ({res['ecritures']} écritures)")
             deja.add(a)
         conn.commit()
@@ -2070,13 +2128,24 @@ def exercice_reprendre_fec_multi():
                 "dans l'ordre.")
         return redirect(url_for("exercice_nouveau", ok=msg))
     except Exception as exc:
+        # TOUT OU RIEN, et la PRÉPARATION EST CONSERVÉE. Chaque rejeu
+        # committait le sien : une reprise de deux fichiers qui échouait sur
+        # le second laissait durablement le premier exercice, tandis que le
+        # `finally` effaçait le dossier des fichiers téléversés. L'action
+        # globale se terminait en erreur, l'état était partiel, et de quoi
+        # recommencer avait disparu (constat Q-09).
         conn.rollback()
-        return redirect(url_for("exercice_nouveau",
-                                err=f"Reprise interrompue : {exc}"))
+        echoue = True
+        return redirect(url_for("exercice_nouveau", err=(
+            f"Reprise interrompue : {exc}\n\nAucun exercice n'a été repris "
+            "— la base est dans l'état où elle était. Vos fichiers restent "
+            "chargés : corrigez celui qui est en cause, puis relancez "
+            "l'analyse.")))
     finally:
         conn.close()
-        import shutil
-        shutil.rmtree(dossier, ignore_errors=True)
+        if not echoue:
+            import shutil
+            shutil.rmtree(dossier, ignore_errors=True)
 
 
 @app.route("/exercice/reprendre-fec", methods=["POST"])

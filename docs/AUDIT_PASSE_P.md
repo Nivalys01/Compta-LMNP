@@ -255,3 +255,9 @@ promesse_absence=true  [en-tête : « AUCUNE donnée personnelle »]
 | P-07 | Table personnelle non couverte par l'anonymisation | Nom fictif conservé dans le seed généré malgré le contrôle final | majeur |
 
 **Recoupements sans nouvelle numérotation : Q-01 (commit implicite), Q-04 (concurrence).** Aucun choix de modèle comptable expressément assumé n'est signalé comme défaut.
+
+**État du suivi :** les sept constats ont été corrigés en production le 16 septembre 2026 (version 8.49.0). Les preuves de `preuves_p/` sont conservées **telles qu'observées avant correction** : elles restent la référence du défaut, pas de l'état actuel du code. La non-régression est figée par `tests/test_passe_p.py` (30 tests), dont 23 échouent si l'on retire les correctifs.
+
+Trois précisions. **P-02 et P-03 ont demandé une évolution de schéma** (palier 8) : le type de document et l'identité figée entrent dans la table `quittance`, et l'unicité passe de (locataire, période) à (locataire, période, type). Une contrainte d'unicité déclarée dans un `CREATE TABLE` ne s'altère pas : la table est reconstruite au premier accès sur les bases existantes, les quittances déjà émises étant reprises comme telles. **P-03 inverse la logique du garde-fou** : ce n'est plus le nombre de documents qui est borné, mais le montant attesté — deux parts de 400 € sur 800 € encaissés sont légitimes, une troisième ne l'est pas. Enfin, **P-04 ne bloque pas une base globalement sinistrée** : refuser la restauration quand la base courante est elle-même illisible enfermerait l'utilisateur dans sa panne ; le refus vise le cas où la base est saine mais sa table de quittances ne se lit plus.
+
+Un point de méthode sur **P-01** : le rapprochement avec l'encaissement est désormais bloquant à l'émission, avec une dérogation `forcer=True`. Onze appels de tests existants ont dû la déclarer — ce sont des fixtures qui attestaient sans saisir d'encaissement, pour éprouver la numérotation ou l'impression.

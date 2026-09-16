@@ -305,10 +305,25 @@ def saisir_appel_charges(conn: sqlite3.Connection, *, date_operation: str,
         raise ValueError("Appel de charges vide : renseignez au moins un montant.")
     per = periode or date_operation[:7]
     ref = f"APPEL {per}"
-    ops = [saisir(conn, type=t, montant=m, date_operation=date_operation,
-                  periode=per, bien_id=bien_id, tiers=tiers, libelle=lib,
-                  exercice=exercice, piece_ref=ref)
-           for t, m, lib in parts]
+    # TOUT OU RIEN. Chaque composante était saisie avec le commit par
+    # défaut : un montant invalide sur la troisième laissait les deux
+    # premières en base — 700 € de charges comptables persistaient pour un
+    # appel annoncé en erreur, et une relance complète les aurait doublées.
+    # Un appel de charges se ventile, il ne se fractionne pas : les trois
+    # composantes portent la même référence de pièce et décrivent un seul
+    # document du syndic.
+    deja_en_transaction = conn.in_transaction
+    try:
+        ops = [saisir(conn, type=t, montant=m, date_operation=date_operation,
+                      periode=per, bien_id=bien_id, tiers=tiers, libelle=lib,
+                      exercice=exercice, piece_ref=ref, commit=False)
+               for t, m, lib in parts]
+        if not deja_en_transaction:
+            conn.commit()
+    except Exception:
+        if not deja_en_transaction:
+            conn.rollback()
+        raise
     return {"operations": ops,
             "total": round(sum(m for _, m, _ in parts), 2),
             "piece_ref": ref}
@@ -362,6 +377,17 @@ def annuler(conn: sqlite3.Connection, operation_id: int,
         opérations marquées.
     """
     assurer_colonne_annulee(conn)
+    # VERROU D'ÉCRITURE AVANT LA LECTURE DU MARQUEUR. Deux annulations
+    # simultanées de la même opération lisaient toutes deux « non annulée »,
+    # puis passaient chacune leur contre-passation : le loyer était
+    # contre-passé DEUX fois, et les produits minorés de 800 € sans qu'aucun
+    # déséquilibre ne le trahisse. Le verrou pris plus loin par l'insertion
+    # sérialisait bien les écritures, mais ne faisait pas relire le marqueur
+    # contrôlé avant lui — un contrôle pris hors verrou ne décrit que le
+    # passé. Avec BEGIN IMMEDIATE, la seconde demande attend son tour et
+    # relit un marqueur déjà positionné.
+    if not conn.in_transaction:
+        conn.execute("BEGIN IMMEDIATE")
     op = conn.execute("SELECT * FROM operation WHERE id=?",
                       (operation_id,)).fetchone()
     if op is None:

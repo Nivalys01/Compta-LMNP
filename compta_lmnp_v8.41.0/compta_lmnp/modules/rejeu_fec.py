@@ -42,7 +42,8 @@ def _date_iso(valeur: str, ou: str) -> str:
     return d.isoformat()
 
 
-def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int) -> dict:
+def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int, *,
+            commit: bool = True) -> dict:
     """Insère toutes les écritures du FEC dans l'exercice `annee` (déjà
     ouvert). Retourne {"ecritures": n, "normalisees": n, "comptes_crees": [...]}."""
     lignes = fec_io.lignes_nommees(fec_path)
@@ -181,9 +182,14 @@ def rejouer(conn: sqlite3.Connection, fec_path: str, annee: int) -> dict:
                               valid_date=_date_iso(r0["ValidDate"],
                                                    f"ValidDate de l'{ou}"),
                               num=num, commit=False, lignes=lgs)
-        conn.commit()
+        # `commit=False` : la reprise de PLUSIEURS fichiers compose. Chaque
+        # rejeu committait le sien, si bien qu'un lot interrompu laissait
+        # les premiers exercices durablement repris (constat Q-09).
+        if commit:
+            conn.commit()
     except Exception:
-        conn.rollback()
+        if commit:
+            conn.rollback()
         raise
     return {"ecritures": len(par_ecriture), "normalisees": n_norm,
             "comptes_crees": comptes_crees, "renumerotees": renumeroter,

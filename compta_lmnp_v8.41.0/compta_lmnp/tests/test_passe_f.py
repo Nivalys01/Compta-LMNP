@@ -527,13 +527,23 @@ def test_d204_la_validation_dimport_est_tout_ou_rien():
     """saisir committait à chaque tour : un échec à la septième ligne sur dix
     laissait les six premières en base, et une relance les saisissait DEUX
     fois — l'import ne porte aucune clé d'idempotence."""
-    src = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
-    bloc = src[src.index("def import_valider"):]
-    bloc = bloc[:bloc.index("\n@app.route")]
+    # La boucle d'enregistrement a quitté le routeur pour son module métier
+    # en passe Q (`import_bancaire.enregistrer`) : le garde-fou
+    # anti-monolithe d'app.py l'a exigé, et c'est bien là qu'elle appartient.
+    # On lit donc le module qui porte désormais la règle — et surtout, le
+    # test suivant la vérifie par EXÉCUTION.
+    import conftest as _conftest
+    src = open(_conftest.source("import_bancaire.py"), encoding="utf-8").read()
+    bloc = src[src.index("def enregistrer"):]
+    bloc = bloc[:bloc.index("\ndef categoriser")]
     assert "commit=False" in bloc
     assert "conn.rollback()" in bloc
     assert "conn.commit()" in bloc
-    assert "ANNULÉ" in bloc, "le message ne dit pas que RIEN n'a été écrit"
+    src_app = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    bloc_app = src_app[src_app.index("def import_valider"):]
+    bloc_app = bloc_app[:bloc_app.index("\n@app.route")]
+    assert "ANNULÉ" in src or "ANNULÉ" in bloc_app, \
+        "le message ne dit pas que RIEN n'a été écrit"
 
 
 def test_d204_un_import_qui_echoue_ne_laisse_rien(tmp_path, monkeypatch):

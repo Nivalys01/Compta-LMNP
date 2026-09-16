@@ -174,18 +174,6 @@ def inserer(conn: sqlite3.Connection, *, journal: str, date: str, annee: int,
                                  libelle=libelle, piece_ref=piece_ref,
                                  lignes=lignes)
 
-    # Un exercice CLOS est scellé : son résultat est figé et son FEC archivé.
-    # Rien ne détecterait une écriture ajoutée après coup (les contrôles
-    # tournent AVANT clôture) — rejet dur, sans exception ni contournement.
-    ex = conn.execute("SELECT statut FROM exercice WHERE annee=?",
-                      (annee,)).fetchone()
-    if ex is None:
-        raise ValueError(f"Exercice {annee} inconnu — ouvrez-le d'abord "
-                         "(menu « Nouvel exercice »).")
-    if ex[0] == "clos":
-        raise ValueError(f"L'exercice {annee} est clos : aucune écriture ne "
-                         "peut plus y être ajoutée.")
-
     num_auto = num is None
     cur = conn.cursor()
     # SAVEPOINT : si l'insertion des lignes échoue (compte inconnu, montant
@@ -208,6 +196,30 @@ def inserer(conn: sqlite3.Connection, *, journal: str, date: str, annee: int,
         debutee_ici = True
     else:
         debutee_ici = False
+
+    # Un exercice CLOS est scellé : son résultat est figé et son FEC archivé.
+    # Rien ne détecterait une écriture ajoutée après coup (les contrôles
+    # tournent AVANT clôture) — rejet dur, sans exception ni contournement.
+    #
+    # Ce contrôle était fait AVANT le verrou d'écriture. Une saisie qui
+    # lisait « ouvert », puis une clôture menée à son terme par une autre
+    # connexion, et la saisie reprenait son cours : l'écriture entrait dans
+    # un exercice désormais clos, dont le résultat figé ne la comptait pas.
+    # 800 € d'écart entre le résultat enregistré et les écritures qui
+    # servent au FEC, sans qu'aucun équilibre ne soit rompu. La protection
+    # contre deux clôtures simultanées tenait, mais elle ne couvrait pas
+    # cette course-ci : un contrôle pris avant le verrou ne décrit que le
+    # passé. On le relit donc une fois le verrou obtenu.
+    ex = conn.execute("SELECT statut FROM exercice WHERE annee=?",
+                      (annee,)).fetchone()
+    if ex is None:
+        raise ValueError(f"Exercice {annee} inconnu — ouvrez-le d'abord "
+                         "(menu « Nouvel exercice »).")
+    if ex[0] == "clos":
+        if debutee_ici:
+            conn.rollback()
+        raise ValueError(f"L'exercice {annee} est clos : aucune écriture ne "
+                         "peut plus y être ajoutée.")
     # Rejeu borné : deux saisies simultanées (deux onglets, deux instances)
     # peuvent calculer le même numéro d'écriture ; la contrainte UNIQUE en
     # rejette une. Quand le numéro était AUTO-attribué, on recalcule et on

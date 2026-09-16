@@ -81,8 +81,24 @@ def _palier_7(conn: sqlite3.Connection) -> None:
          ("758000", "Produits divers de gestion courante", "produit", 7)])
 
 
+def _palier_8(conn: sqlite3.Connection) -> None:
+    """v8 — le justificatif de loyer conserve son identité (passe P).
+
+    Ajoute à `quittance` le type de document (reçu partiel / quittance) et
+    les champs figés à l'émission : nom du locataire, adresse du logement,
+    identité du bailleur, montant dû. Sans eux, un document déjà remis
+    était reconstruit par jointure sur le référentiel COURANT — corriger un
+    nom réécrivait rétroactivement tous les justificatifs de ce locataire,
+    sous leurs numéros d'origine.
+
+    `assurer_schema` est idempotent et connaît les colonnes à ajouter.
+    """
+    import quittances
+    quittances.assurer_schema(conn)
+
+
 PALIERS = {2: _palier_2, 3: _palier_3, 4: _palier_4, 5: _palier_5,
-           6: _palier_6, 7: _palier_7}
+           6: _palier_6, 7: _palier_7, 8: _palier_8}
 
 # Garde-fou de développement. La boucle de `migrer` ignorait silencieusement
 # un palier absent, puis marquait la base au niveau du logiciel : une base
