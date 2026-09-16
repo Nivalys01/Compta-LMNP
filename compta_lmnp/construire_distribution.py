@@ -15,6 +15,7 @@ personnelles est bloquante, pas simplement évitée.
 from __future__ import annotations
 
 import os
+import posixpath
 import re
 import sys
 import zipfile
@@ -54,10 +55,48 @@ DONNEES = ["schema.sql", "seed_referentiel.sql", "seed_demo.sql",
 # toujours.
 DOCS = [("LICENSE.txt", os.path.join("..", "LICENSE")),
         ("NOTICES-TIERS.md", os.path.join("..", "NOTICES-TIERS.md")),
+        ("CONTRIBUTING.md", os.path.join("..", "CONTRIBUTING.md")),
+        ("README.md", os.path.join("..", "README.md")),
         ("CHANGELOG.md", "CHANGELOG.md"),
         ("ARCHITECTURE.md", "ARCHITECTURE.md"),
         ("LISEZ-MOI.md", "LISEZ-MOI.md"),
         ("VERSION", "VERSION")]
+
+# Les documents de la racine sont d'un cran au-dessus du logiciel DANS LE
+# DÉPÔT, et à côté de lui DANS LE PAQUET. Les liens relatifs écrits pour l'un
+# sont donc faux dans l'autre : `../LICENSE` ne menait nulle part une fois le
+# zip décompressé, et c'est justement vers la licence et la procédure de
+# contribution que ces liens pointaient (constat R-04).
+#
+# Ils sont réécrits à la construction. La table dit ce que devient chaque
+# cible ; la garde plus bas vérifie qu'AUCUN lien local du paquet ne pend,
+# celui-ci compris — parce qu'une table de réécriture est encore une liste
+# écrite à la main, et qu'elle ne peut pas signaler le lien qu'on n'y a pas
+# inscrit.
+#
+# Deux cas, et il faut les distinguer : ce que le paquet CONTIENT sous un
+# autre nom se réécrit en local ; ce qu'il ne contient pas — les rapports
+# d'audit, le hook — devient un lien vers le dépôt, parce qu'un renvoi
+# honnête vaut mieux qu'un chemin qui pend.
+DEPOT = "https://github.com/Nivalys01/Compta-LMNP/"
+REECRITURES = {
+    # présents dans le paquet, sous un autre chemin
+    "../LICENSE": "LICENSE.txt",
+    "LICENSE": "LICENSE.txt",
+    "../NOTICES-TIERS.md": "NOTICES-TIERS.md",
+    "../CONTRIBUTING.md": "CONTRIBUTING.md",
+    "../README.md": "README.md",
+    "compta_lmnp/CHANGELOG.md": "CHANGELOG.md",
+    "compta_lmnp/LISEZ-MOI.md": "LISEZ-MOI.md",
+    # absents du paquet : renvoyés vers le dépôt
+    ".githooks/pre-push": DEPOT + "blob/main/.githooks/pre-push",
+    "docs/": DEPOT + "tree/main/docs/",
+    "docs/audit/": DEPOT + "tree/main/docs/audit/",
+}
+
+# Un lien Markdown : [texte](cible). On ne retient que les cibles locales —
+# ni http(s), ni ancre pure.
+LIEN_MD = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
 # Un SEUL fichier .sh est livré. Le générateur de certificat existait en
 # double (.sh et .py) et s'affichait juste à côté du lanceur : sur un
 # bureau Linux, l'utilisateur ouvrait l'un pour l'autre (constaté en
@@ -122,8 +161,14 @@ def construire() -> str:
 
     with zipfile.ZipFile(cible, "w", zipfile.ZIP_DEFLATED) as z:
         for dans_paquet, sur_disque in fichiers:
-            z.write(os.path.join(HERE, sur_disque),
-                    arcname=f"compta_lmnp/{dans_paquet}")
+            chemin = os.path.join(HERE, sur_disque)
+            if dans_paquet.endswith(".md"):
+                texte = open(chemin, encoding="utf-8").read()
+                for avant, apres in REECRITURES.items():
+                    texte = texte.replace(f"]({avant})", f"]({apres})")
+                z.writestr(f"compta_lmnp/{dans_paquet}", texte)
+            else:
+                z.write(chemin, arcname=f"compta_lmnp/{dans_paquet}")
 
     # ── Garde anti-fuite n°1 : aucun NOM interdit ───────────────────────
     with zipfile.ZipFile(cible) as z:
@@ -132,6 +177,37 @@ def construire() -> str:
     if fuites:
         os.remove(cible)
         raise SystemExit(f"FUITE BLOQUÉE — fichiers interdits : {fuites}")
+
+    # ── Garde anti-lien mort : tout renvoi local doit aboutir ───────────
+    #
+    #    Cinq liens du document d'accueil pendaient dans le paquet, dont
+    #    deux vers la licence et un vers la procédure de contribution
+    #    (constat R-04). Aucune garde ne les voyait : le paquet se
+    #    construisait, et c'est le lecteur du zip qui découvrait le trou.
+    #
+    #    Le contrôle porte sur le CONTENU RÉEL de l'archive et sur la
+    #    totalité de ses liens — pas sur la table de réécriture, qui est
+    #    une liste écrite à la main et ne peut donc pas signaler le lien
+    #    qu'on a oublié d'y inscrire.
+    with zipfile.ZipFile(cible) as z:
+        presents = set(z.namelist())
+        morts = []
+        for entree in z.namelist():
+            if not entree.endswith(".md"):
+                continue
+            texte = z.read(entree).decode("utf-8", "replace")
+            for _libelle, vise in LIEN_MD.findall(texte):
+                if "://" in vise or vise.startswith(("#", "mailto:")):
+                    continue
+                resolu = posixpath.normpath(posixpath.join(
+                    posixpath.dirname(entree), vise.split("#")[0]))
+                if resolu not in presents:
+                    morts.append(f"{entree} → {vise}")
+    if morts:
+        os.remove(cible)
+        raise SystemExit(
+            "LIENS MORTS DANS LE PAQUET — un document livré renvoie vers "
+            f"ce qu'il ne contient pas : {sorted(set(morts))}")
 
     # ── Garde anti-fuite n°2 : aucun CONTENU personnel ───────────────────
     #

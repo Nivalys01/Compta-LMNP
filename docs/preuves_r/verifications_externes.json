@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-16",
+  "source_application": {
+    "cible": "href du lien code source extrait du ZIP 8.51.1 ; identifiant de compte non recopie",
+    "authentification": "aucune",
+    "redirections": "suivies",
+    "curl_exit_code": 0,
+    "http_final": 404
+  },
+  "fsf": {
+    "url": "https://www.gnu.org/licenses/agpl-3.0.txt",
+    "curl_exit_code": 0,
+    "octets": 34523,
+    "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+  },
+  "poppler": {
+    "commande": "rpm -qi poppler-utils",
+    "version": "26.01.0",
+    "release": "3.fc44",
+    "licence_rpm": "(GPL-2.0-only OR GPL-3.0-only) AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND MIT",
+    "texte_lu": "/usr/share/licenses/poppler/COPYING"
+  },
+  "polices_pdf_git": {
+    "commande": "pdffonts sur chaque PDF de git ls-files",
+    "documents": 14,
+    "polices": ["Helvetica", "Helvetica-Bold"],
+    "incorporees": false
+  },
+  "tests_existants": {
+    "selection": "modele_proprietaire or licence_livree or notices_tierces or entetes_portent",
+    "passed": 4,
+    "deselected": 44
+  }
+}

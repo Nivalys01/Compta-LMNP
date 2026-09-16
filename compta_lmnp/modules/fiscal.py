@@ -1,6 +1,5 @@
 # Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# sans autorisation écrite de l'auteur.
 
 """
 Jalon J5 — Moteurs fiscaux : limitation art. 39 C du CGI et déficits LMNP.

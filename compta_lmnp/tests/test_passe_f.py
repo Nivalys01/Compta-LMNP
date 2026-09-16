@@ -180,15 +180,23 @@ def _paquet_jetable(tmp_path, seed_demo_contenu):
     for d in ("modules", "demo", "reference"):
         if os.path.isdir(os.path.join(HERE, d)):
             shutil.copytree(os.path.join(HERE, d), os.path.join(paquet, d))
-    # La licence et les notices tierces vivent à la RACINE du dépôt, un cran
+    # Plusieurs documents livrés vivent à la RACINE du dépôt, un cran
     # au-dessus du logiciel : la construction va les y chercher pour les
     # embarquer (l'AGPL exige que le paquet porte sa licence). La copie
     # jetable doit donc reproduire CETTE disposition — sans quoi elle
     # testerait une arborescence qui n'existe nulle part, et la construction
     # échouerait sur des fichiers manquants avant d'atteindre la garde que
     # le test vise.
-    for f in ("LICENSE", "NOTICES-TIERS.md"):
-        src = os.path.join(os.path.dirname(HERE), f)
+    #
+    # La liste est DÉDUITE de construire_distribution.DOCS, jamais recopiée :
+    # elle l'a été, et l'ajout de README.md et CONTRIBUTING.md au paquet
+    # (constat R-04) a cassé d'un coup les deux tests qui passent par ici.
+    sys.path.insert(0, HERE)
+    import construire_distribution
+    for _nom, source in construire_distribution.DOCS:
+        if not source.startswith(".."):
+            continue
+        src = os.path.join(HERE, source)
         if os.path.exists(src):
             shutil.copy(src, str(tmp_path))
     open(os.path.join(paquet, "seed_demo.sql"), "w", encoding="utf-8").write(

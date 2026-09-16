@@ -1,6 +1,5 @@
 # Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# sans autorisation écrite de l'auteur.
 
 """
 Tests des modes d'amorçage : 'blanc' (produit livré) vs 'demo' (exemple).

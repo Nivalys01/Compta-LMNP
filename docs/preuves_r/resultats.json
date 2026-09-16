@@ -1,0 +1,78 @@
+{
+  "version": "8.51.1",
+  "head": "82ba5d04aa668b73858cd21e8cbba290680ea3a3",
+  "licence": {
+    "octets": 34520,
+    "sha256": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+    "canon_octets": 34523,
+    "canon_sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+    "identique": false,
+    "identique_apres_http_https": true
+  },
+  "zip": {
+    "nombre": 45,
+    "extensions": {
+      ".py": 32,
+      ".sql": 3,
+      ".txt": 2,
+      ".sh": 1,
+      ".bat": 1,
+      ".desktop": 1,
+      ".md": 4,
+      "": 1
+    },
+    "licence_identique": true,
+    "clause_13": true,
+    "restes_autorisation": [
+      "compta_lmnp/modules/amortissement.py",
+      "compta_lmnp/modules/audit_cycle.py",
+      "compta_lmnp/modules/controles.py",
+      "compta_lmnp/modules/dossiers.py",
+      "compta_lmnp/modules/ecritures.py",
+      "compta_lmnp/modules/export_fec.py",
+      "compta_lmnp/modules/fiscal.py",
+      "compta_lmnp/modules/gabarits.py",
+      "compta_lmnp/modules/import_bancaire.py",
+      "compta_lmnp/modules/init_db.py",
+      "compta_lmnp/modules/liasse.py",
+      "compta_lmnp/modules/liasse_pdf.py",
+      "compta_lmnp/modules/operations.py",
+      "compta_lmnp/modules/parametres.py",
+      "compta_lmnp/modules/perennite.py",
+      "compta_lmnp/modules/plan_immo.py",
+      "compta_lmnp/modules/reprise.py",
+      "compta_lmnp/modules/valider_fec.py",
+      "compta_lmnp/app.py",
+      "compta_lmnp/cli.py"
+    ]
+  },
+  "liens_locaux_absents": [
+    "../LICENSE",
+    "../LICENSE",
+    "../README.md",
+    "../NOTICES-TIERS.md",
+    "../CONTRIBUTING.md"
+  ],
+  "interface": {
+    "http": 200,
+    "source_lien_present": true,
+    "source_lien_versionne": false,
+    "version_visible": true
+  },
+  "sprite_genere_present": true,
+  "poppler_execution": {
+    "texte": "Document fictif audit R sans aucune donnee personnelle.",
+    "reserve": ""
+  },
+  "inventaire": {
+    "fichiers": 215,
+    "sans_spdx": 127,
+    "sans_spdx_ni_mention": 104
+  },
+  "git": {
+    "commits": 46,
+    "identites": 6,
+    "signed_off_by": 0,
+    "tags": []
+  }
+}

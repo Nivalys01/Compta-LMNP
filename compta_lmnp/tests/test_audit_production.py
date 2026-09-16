@@ -251,6 +251,11 @@ def test_aucun_placeholder_de_titulaire():
     assert not restants, f"placeholder de titulaire restant : {restants}"
 
 
+# Les deux gardes qui vivaient ici — liste de motifs interdits, présence
+# d'un SPDX — sont remplacées par `tests/test_passe_r.py`, qui vérifie la
+# FORME de l'en-tête au lieu d'énumérer ce qui ne doit pas s'y trouver.
+# Une liste de motifs n'a pas vu les 25 fichiers qui gardaient la dernière
+# ligne de l'ancien en-tête (constat R-05).
 RACINE_DEPOT = os.path.dirname(HERE)
 
 
@@ -273,47 +278,6 @@ def test_licence_est_bien_lagpl_complete():
         assert section in lic, section
 
 
-def test_aucun_reste_du_modele_proprietaire():
-    """Anti-régression. Le logiciel a été diffusé sous une licence maison
-    « gratuit, revente interdite » avant de passer sous AGPL. Une seule
-    ligne oubliée — un en-tête de fichier, une phrase du README — et le
-    lecteur ne sait plus sous quel régime il se trouve. Le doute sur la
-    licence vaut refus d'usage pour quiconque est prudent."""
-    import glob
-    interdits = ("Tous droits réservés", "tous droits réservés",
-                 "revente interdite", "revente interdites",
-                 "Logiciel propriétaire")
-    fautifs = []
-    for f in (glob.glob(os.path.join(RACINE_DEPOT, "**/*.py"), recursive=True)
-              + glob.glob(os.path.join(RACINE_DEPOT, "**/*.md"),
-                          recursive=True)):
-        if any(p in f for p in (".venv", os.sep + "dist" + os.sep, "v_ant",
-                                os.sep + "docs" + os.sep, "CHANGELOG.md")):
-            continue          # journal et rapports d'audit : archives datées
-        if os.path.basename(f) == os.path.basename(__file__):
-            continue          # ce fichier-ci doit citer les motifs qu'il chasse
-        try:
-            texte = open(f, encoding="utf-8").read()
-        except (OSError, UnicodeDecodeError):
-            continue
-        if any(motif in texte for motif in interdits):
-            fautifs.append(os.path.relpath(f, RACINE_DEPOT))
-    assert not fautifs, f"mention du modèle propriétaire restante : {fautifs}"
-
-
-def test_entetes_portent_lidentifiant_spdx():
-    """Un en-tête qui nomme un titulaire sans nommer de licence laisse le
-    lecteur déduire « propriétaire » par défaut. L'identifiant SPDX est lu
-    par les outils d'analyse et ne se prête à aucune interprétation."""
-    import glob
-    sans = []
-    for f in glob.glob(os.path.join(HERE, "**/*.py"), recursive=True):
-        if ".venv" in f or os.sep + "dist" + os.sep in f:
-            continue
-        tete = "".join(open(f, encoding="utf-8").readlines()[:5])
-        if "SPDX-License-Identifier: AGPL-3.0-or-later" not in tete:
-            sans.append(os.path.relpath(f, HERE))
-    assert not sans, f"fichiers sans identifiant SPDX : {sans}"
 
 
 def test_licence_livree_avec_le_paquet_et_source_offerte():

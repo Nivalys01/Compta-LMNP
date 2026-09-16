@@ -1,5 +1,77 @@
 # Journal des versions — Compta LMNP
 
+## 8.52.0 — 2026-09-16 (Passe R : une garde ne doit pas prouver moins qu'elle n'en a l'air)
+
+Sept constats, deux majeurs et cinq mineurs, aucun critique. Cette passe
+n'audite pas un calcul : elle audite ce que le dépôt **affirme**. Et son
+résultat le plus utile porte sur les gardes écrites trois jours plus tôt pour
+protéger la migration AGPL — elles passaient toutes au vert pendant que
+l'audit relevait les défauts qu'elles étaient censées empêcher.
+
+**L'ancien en-tête tenait sur trois lignes ; deux ont été supprimées.** La
+troisième — « sans autorisation écrite de l'auteur. » — est restée dans 25
+fichiers, juste sous l'identifiant SPDX qui autorise la modification. La garde
+anti-retour cherchait une **liste de motifs interdits** où ce fragment ne
+figurait pas : structurellement incapable de le voir. C'est l'invariant n°5
+retourné contre celui qui croyait s'en prémunir. Elle vérifie désormais que le
+bloc de commentaires de tête vaut **exactement** les deux lignes attendues, et
+signale tout le reste quel qu'en soit le texte — le total moins ce qui est
+identifié, plutôt qu'une énumération de ce qu'on a su imaginer.
+
+**Une négation absolue ne se vérifie pas, et celle-ci était fausse.**
+`NOTICES-TIERS.md` affirmait qu'aucun composant à réciprocité n'entrait dans
+le projet, alors que le contrôle de publication et la CI **exécutent Poppler**,
+qui est sous GPL. Le document distingue maintenant trois régimes qu'on
+confondait — **redistribué**, **installé**, **exécuté** — parce que c'est cette
+confusion qui produit à la fois les fausses alertes et les vraies infractions.
+Appeler un programme GPL en sous-processus n'impose rien à l'appelant ; le
+paquet client, lui, ne redistribue toujours aucun composant tiers. La police
+DarkGarden livrée dans reportlab, sous GPL avec exception, est documentée comme
+non utilisée : les liasses imprimées emploient Helvetica non incorporée.
+
+**L'inventaire des dépendances se déduit des métadonnées, plus de la
+mémoire.** Pillow 12.3.0 et charset-normalizer 3.5.1, transitives sans
+condition de reportlab, manquaient ; `cryptography`, installé uniquement
+lorsqu'on demande HTTPS sans certificat, aussi. Le test correspondant
+reconstruit la liste depuis les paquets réellement installés et la compare au
+document — une liste écrite à la main ne peut pas signaler ce qu'on a oublié
+d'y inscrire.
+
+**Cinq liens du document d'accueil pendaient dans le paquet**, dont deux vers
+la licence et un vers la procédure de contribution : les documents de la
+racine sont un cran au-dessus du logiciel dans le dépôt, et à côté de lui dans
+le paquet. Ils sont réécrits à la construction, le paquet livre désormais
+`README.md` et `CONTRIBUTING.md`, et une garde résout **tous** les liens
+locaux de l'archive avant de la valider. Dès sa première exécution, cette
+garde en a trouvé **huit de plus** que l'audit.
+
+**La licence est le canonique de la FSF, à l'octet près.** Trois URL en
+`http://` au lieu de `https://` suffisaient à distinguer la copie du texte de
+référence. L'écart était bénin ; le principe ne l'est pas — une licence se
+compare par empreinte, pas par titres de sections. Le test fige
+`0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0`.
+
+**Le périmètre de la licence est écrit, plus déduit.** Une licence de code ne
+couvre pas d'elle-même la documentation ni les données, et le dépôt contient
+les trois : un tableau les nomme une par une, y compris ce qui n'appartient
+pas au projet — vos données comptables — et deux réserves, la nomenclature du
+PCG et les cases des formulaires administratifs.
+
+**Ce qu'un test ne peut pas vérifier est confié à un humain, par écrit.** Le
+lien « code source » du pied de page répond 404 tant que le dépôt est privé,
+et aucun test hors ligne ne peut établir le contraire. L'ancien test cherchait
+la chaîne `github.com` dans `app.py` et présentait cela comme la vérification
+de l'offre de source de l'article 13. Il vérifie maintenant la forme de l'URL
+et **dit qu'il ne prouve pas son accessibilité** ; le README porte une liste
+de contrôle avant ouverture du dépôt, dont la vérification anonyme du lien.
+
+Non-régression : `tests/test_passe_r.py` (12 tests), chacun vérifié en échec
+sans son correctif. Les trois questions juridiques du rapport — titularité
+d'un code assisté par IA, régime des référentiels et formulaires, marque — ne
+sont pas traitées comme des défauts : elles appellent un conseil, et le
+rapport le dit.
+
+
 ## 8.51.1 — 2026-09-16 (Un outil externe absent doit se nommer lui-même)
 
 **Cinq tests de la passe J tombaient en `FileNotFoundError: 'pdftotext'`.**

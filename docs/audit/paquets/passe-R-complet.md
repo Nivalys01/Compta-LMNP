@@ -402,7 +402,7 @@ Angle qu'aucune passe n'a couvert, et le plus susceptible de rapporter.
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -1044,7 +1044,7 @@ the "copyright" line and a pointer to where the full notice is found.
     GNU Affero General Public License for more details.
 
     You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 Also add information on how to contact you by electronic and paper mail.
 
@@ -1059,7 +1059,7 @@ specific requirements.
   You should also get your employer (if you work as a programmer) or school,
 if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
-<http://www.gnu.org/licenses/>.
+<https://www.gnu.org/licenses/>.
 ````
 
 
@@ -1117,6 +1117,42 @@ En français courant, et sans valeur contractuelle :
 
 Autrement dit : prenez, améliorez, vendez si vous voulez — mais ne refermez
 pas. Ce qui a été ouvert le reste.
+
+### Ce que la licence couvre
+
+Une licence de code ne couvre pas d'elle-même la documentation ni les données,
+et le dépôt contient les trois. Le périmètre est donc dit explicitement plutôt
+que laissé à déduire (constat R-06) :
+
+| Catégorie | Régime |
+|---|---|
+| Code source (`compta_lmnp/`, scripts, tests) | AGPL-3.0-or-later |
+| Documentation (`*.md`, `docs/`, rapports d'audit et preuves) | AGPL-3.0-or-later |
+| Référentiel et données d'exemple (`schema.sql`, `seed_referentiel.sql`, `seed_demo.sql`, `demo/FEC_DEMO_2025.txt`) | AGPL-3.0-or-later, en tant que partie du logiciel |
+| **Vos** données comptables | **à vous.** La licence ne porte sur rien de ce que vous saisissez |
+| Composants tiers | leurs propres licences — voir [`NOTICES-TIERS.md`](NOTICES-TIERS.md) |
+
+Deux réserves, dites parce qu'elles sont réelles :
+
+- **Le plan de comptes** suit la nomenclature du Plan comptable général. La
+  sélection et les libellés retenus sont l'œuvre de l'auteur ; la nomenclature
+  elle-même ne lui appartient pas.
+- **Les numéros et libellés de cases** des formulaires 2031, 2033 et
+  2042-C-PRO reproduisent des formulaires administratifs. Ce sont des données
+  factuelles nécessaires à l'interopérabilité, et non une revendication de
+  droits sur les formulaires.
+
+### Obtenir le code source
+
+L'article 13 de l'AGPL vous donne droit au code source correspondant à la
+version que vous utilisez, y compris lorsque vous y accédez par le réseau. Le
+pied de page de l'application porte le lien du dépôt.
+
+> ⚠️ **Tant que ce dépôt n'est pas public, ce lien répond 404 à qui n'y a pas
+> accès** (constat R-01). Le paquet client contient toutefois l'intégralité des
+> sources de production : il n'existe aucune distribution binaire de ce
+> logiciel. L'ouverture du dépôt est un prérequis de la publication, pas une
+> conséquence — voir la liste de contrôle ci-dessous.
 
 > **Pourquoi l'AGPL, et pas une licence maison « gratuit mais non revendable ».**
 > Ce logiciel a d'abord été diffusé sous une licence maison qui interdisait la
@@ -1186,6 +1222,18 @@ Les signalements de défauts et les correctifs sont bienvenus — voir
 donnée réelle** dans une contribution, et **un test de non-régression** par
 correctif.
 
+## Liste de contrôle avant ouverture du dépôt
+
+Trois gestes, dans cet ordre, et le premier conditionne les deux autres :
+
+1. **Rendre le dépôt public.** Tant qu'il ne l'est pas, l'offre de source de
+   l'article 13 n'est pas tenue (constat R-01).
+2. **Poser le tag de version**, pour rattacher la source publiée à la version
+   qui tourne chez l'utilisateur.
+3. **Vérifier le lien du pied de page anonymement** — déconnecté, ou en
+   navigation privée. Un test automatique ne peut pas le faire à votre place :
+   il constate la présence du lien, jamais son accessibilité.
+
 ## État du projet et limites connues
 
 Le logiciel est utilisé en production par son auteur. Dix-huit passes d'audit
@@ -1216,57 +1264,108 @@ les plus récentes avec leurs preuves reproductibles. Les limites suivantes sont
 ````markdown
 # Composants tiers
 
-Compta LMNP est distribué sous licence **AGPL-3.0-or-later**. Il s'appuie sur
-les composants ci-dessous, dont les licences s'appliquent **à ces composants
-uniquement**. Toutes sont permissives (BSD, MIT, PSF) et donc compatibles avec
-une œuvre sous AGPL : leurs termes sont respectés dès lors que le copyright et
-le texte de licence accompagnent toute redistribution.
+Compta LMNP est distribué sous licence **AGPL-3.0-or-later**. Ce document
+inventorie ce dont il dépend, et sous quel régime.
 
-| Composant | Rôle | Licence |
+> **Inventaire borné et daté**, établi le **16 septembre 2026** sur la version
+> **8.52.0**, à partir des **métadonnées des paquets installés** et des
+> commandes réellement exécutées — pas de mémoire. Une version antérieure de
+> ce document déclarait qu'aucun composant à réciprocité n'entrait dans le
+> projet. C'était une **négation absolue**, et elle était fausse : l'outillage
+> de ce dépôt exécute Poppler, qui est sous GPL (constat R-02). Une assurance
+> générale de ce type ne peut pas être vérifiée, donc ne devrait jamais être
+> écrite ; elle est remplacée par les trois rubriques ci-dessous.
+
+## La distinction qui commande les obligations
+
+Trois régimes, à ne jamais confondre — c'est la confusion entre eux qui
+produit à la fois les fausses alertes et les vraies infractions :
+
+| Régime | Ce que cela veut dire | Ce que cela oblige |
 |---|---|---|
-| Python | interpréteur | PSF License |
-| Flask | serveur web local | BSD-3-Clause |
-| Werkzeug | couche WSGI (dépendance de Flask) | BSD-3-Clause |
-| Jinja2 | gabarits (dépendance de Flask) | BSD-3-Clause |
-| MarkupSafe | échappement HTML | BSD-3-Clause |
-| itsdangerous | signature de sessions (dépendance de Flask) | BSD-3-Clause |
-| click | ligne de commande (dépendance de Flask) | BSD-3-Clause |
-| blinker | signaux (dépendance de Flask) | MIT |
-| reportlab | export PDF de la liasse — **facultatif** | BSD-3-Clause |
+| **Redistribué** | le composant est **dans** le livrable que vous recevez | joindre copyright et texte de licence au livrable |
+| **Installé** | téléchargé depuis PyPI **sur votre machine**, par les lanceurs | rien pour ce projet : c'est vous qui l'installez |
+| **Exécuté** | programme externe appelé en sous-processus | rien : appeler un programme n'est pas en dériver |
 
-Aucun composant sous licence à réciprocité (GPL ou assimilée) n'est utilisé.
+**Le paquet client et le dépôt ne redistribuent aucun composant tiers.** La
+colonne « redistribué » est vide, et c'est ce qui explique qu'aucun texte de
+licence tiers ne soit livré à côté.
 
-## Ce que le projet redistribue — et ce qu'il ne redistribue pas
+## 1. Installé sur la machine de l'utilisateur
 
-Cette distinction commande les obligations, et elle a déjà été manquée une
-fois :
+Les lanceurs `.bat` / `.sh` créent un `.venv` et y installent :
 
-- **Le paquet client** (`dist/compta_lmnp_client_vX.Y.Z.zip`) et le dépôt
-  **ne contiennent aucun composant tiers**. Les lanceurs `.bat` / `.sh`
-  installent Flask et reportlab depuis PyPI **sur la machine de
-  l'utilisateur**, au premier démarrage. Il n'y a donc pas de redistribution,
-  et les obligations BSD/MIT ne sont pas déclenchées.
-- **Un exécutable PyInstaller**, lui, embarquerait Flask et reportlab dans le
-  binaire : ce serait une redistribution **binaire**, et la BSD-3-Clause
-  exigerait alors que le copyright et le texte de licence de chaque composant
-  accompagnent le livrable. `construire_exe.py` ne le faisait pas — il
-  n'embarquait ni licence, ni notices. C'est l'une des raisons pour lesquelles
-  la construction d'exécutable a été **retirée du périmètre** (elle était par
-  ailleurs cassée : ni seeds SQL embarqués, ni gestion de `sys._MEIPASS`).
+| Composant | Version vérifiée | Licence déclarée | Nécessité |
+|---|---|---|---|
+| Flask | 3.1.3 | BSD-3-Clause | **obligatoire** — serveur web local |
+| Werkzeug | 3.1.8 | BSD-3-Clause | transitive de Flask |
+| Jinja2 | 3.1.6 | BSD License | transitive de Flask |
+| MarkupSafe | 3.0.3 | BSD-3-Clause | transitive de Flask |
+| itsdangerous | 2.2.0 | BSD License | transitive de Flask |
+| click | 8.5.0 | BSD-3-Clause | transitive de Flask |
+| blinker | 1.9.0 | MIT License | transitive de Flask |
+| reportlab | 5.0.1 | BSD | **facultatif** — export PDF de la liasse |
+| Pillow | 12.3.0 | MIT-CMU | transitive de reportlab |
+| charset-normalizer | 3.5.1 | MIT | transitive de reportlab |
+| cryptography | *non installé ici* | Apache-2.0 **ou** BSD-3-Clause | **conditionnel** — uniquement si `--https` est demandé et qu'aucun certificat n'existe (`generer_certificat.py`) |
 
-**Si l'exécutable est un jour remis en service**, il faudra livrer à côté du
-binaire : le fichier `LICENSE` (AGPL du logiciel), ce fichier, et le texte
-complet de chaque licence tierce — la BSD-3 exige la reproduction du texte,
-pas un simple renvoi vers le projet d'origine.
+Pillow et charset-normalizer sont des dépendances **déclarées sans condition**
+par reportlab 5.0.1 : demander l'export PDF les installe. Elles manquaient à
+cet inventaire (constat R-03).
 
-## Textes complets
+La licence de `cryptography` est celle que le projet publie ; elle n'est pas
+vérifiée sur un paquet installé, faute d'installation dans l'environnement
+audité. Ses propres dépendances transitives ne sont pas inventoriées ici.
 
-Les textes ne sont pas recopiés ici tant qu'il n'y a pas de redistribution
-binaire. Ils sont disponibles auprès de chaque projet, et dans les
-métadonnées des paquets installés :
+Python lui-même (PSF License) est un prérequis, installé par l'utilisateur.
+
+## 2. Exécuté comme programme externe
+
+| Programme | Licence | Appelé par |
+|---|---|---|
+| **Poppler** (`pdftotext`) | GPL-2.0-only OR GPL-3.0-only, **et** GPL-2.0-or-later, LGPL-2.0-or-later, LGPL-2.1-or-later, MIT selon les composants | `verifier_depot.texte_du_pdf`, quatre fichiers de tests, l'étape « Dépendances système » de la CI |
+
+**Poppler est sous GPL, et c'est sans conséquence sur la licence de ce
+logiciel.** Compta LMNP ne l'inclut pas, ne s'y lie pas et ne le redistribue
+pas : il l'appelle en **sous-processus**, comme on appellerait `grep`. La GPL
+ne s'étend pas à un programme qui se contente d'en exécuter un autre. Poppler
+n'est utilisé que par l'**outillage** — le contrôle avant publication et les
+tests — jamais par l'application comptable elle-même : un utilisateur qui
+n'installe pas poppler perd la relecture du texte des PDF, rien d'autre.
+
+## 3. Ressources embarquées dans une dépendance
+
+reportlab 5.0.1 livre la police **DarkGarden** (`fonts/DarkGardenMK.pfb`) sous
+GPL-2.0-or-later **avec exception d'incorporation** : incorporer la police
+dans un document n'impose pas de licence au document.
+
+Ce projet ne l'utilise pas. Les PDF produits emploient **Helvetica et
+Helvetica-Bold, non incorporées**. Les liasses que vous imprimez ne sont donc
+soumises à aucune obligation issue de cette police — point vérifié sur les
+quatorze PDF suivis par le dépôt (constat R-02, limite indépendante).
+
+## 4. Outillage de développement (jamais livré)
+
+`requirements-dev.txt` installe aussi **pytest** 9.1.1 (MIT) et **ruff** 0.16.7
+(MIT). Ils ne servent qu'au développement et ne sont ni livrés, ni nécessaires
+à l'utilisateur.
+
+## Si un exécutable autonome est un jour construit
+
+La construction PyInstaller a été retirée (voir `compta_lmnp/LISEZ-MOI.md`).
+Si elle revient, elle **redistribuerait** Flask, reportlab et leurs
+transitives : la colonne « redistribué » cesserait d'être vide, et il faudrait
+alors livrer à côté du binaire le fichier `LICENSE`, ce document, **et le
+texte complet de chaque licence tierce** — la BSD-3-Clause exige la
+reproduction du texte, pas un renvoi vers le projet d'origine.
+
+## Retrouver les textes de licence
+
+Ils ne sont pas recopiés ici tant qu'il n'y a pas de redistribution : ils sont
+livrés avec chaque paquet installé.
 
 ```bash
-python -m pip show -f flask reportlab      # emplacement des fichiers de licence
+python -m pip show -f flask reportlab pillow charset-normalizer
 ```
 
 | Projet | Source |
@@ -1275,6 +1374,10 @@ python -m pip show -f flask reportlab      # emplacement des fichiers de licence
 | Flask, Werkzeug, Jinja2, MarkupSafe, itsdangerous, click | <https://github.com/pallets> |
 | blinker | <https://github.com/pallets-eco/blinker> |
 | reportlab | <https://www.reportlab.com/software/opensource/> |
+| Pillow | <https://github.com/python-pillow/Pillow> |
+| charset-normalizer | <https://github.com/jawah/charset_normalizer> |
+| cryptography | <https://github.com/pyca/cryptography> |
+| Poppler | <https://poppler.freedesktop.org/> |
 ````
 
 
@@ -2026,6 +2129,7 @@ personnelles est bloquante, pas simplement évitée.
 from __future__ import annotations
 
 import os
+import posixpath
 import re
 import sys
 import zipfile
@@ -2065,10 +2169,48 @@ DONNEES = ["schema.sql", "seed_referentiel.sql", "seed_demo.sql",
 # toujours.
 DOCS = [("LICENSE.txt", os.path.join("..", "LICENSE")),
         ("NOTICES-TIERS.md", os.path.join("..", "NOTICES-TIERS.md")),
+        ("CONTRIBUTING.md", os.path.join("..", "CONTRIBUTING.md")),
+        ("README.md", os.path.join("..", "README.md")),
         ("CHANGELOG.md", "CHANGELOG.md"),
         ("ARCHITECTURE.md", "ARCHITECTURE.md"),
         ("LISEZ-MOI.md", "LISEZ-MOI.md"),
         ("VERSION", "VERSION")]
+
+# Les documents de la racine sont d'un cran au-dessus du logiciel DANS LE
+# DÉPÔT, et à côté de lui DANS LE PAQUET. Les liens relatifs écrits pour l'un
+# sont donc faux dans l'autre : `../LICENSE` ne menait nulle part une fois le
+# zip décompressé, et c'est justement vers la licence et la procédure de
+# contribution que ces liens pointaient (constat R-04).
+#
+# Ils sont réécrits à la construction. La table dit ce que devient chaque
+# cible ; la garde plus bas vérifie qu'AUCUN lien local du paquet ne pend,
+# celui-ci compris — parce qu'une table de réécriture est encore une liste
+# écrite à la main, et qu'elle ne peut pas signaler le lien qu'on n'y a pas
+# inscrit.
+#
+# Deux cas, et il faut les distinguer : ce que le paquet CONTIENT sous un
+# autre nom se réécrit en local ; ce qu'il ne contient pas — les rapports
+# d'audit, le hook — devient un lien vers le dépôt, parce qu'un renvoi
+# honnête vaut mieux qu'un chemin qui pend.
+DEPOT = "https://github.com/Nivalys01/Compta-LMNP/"
+REECRITURES = {
+    # présents dans le paquet, sous un autre chemin
+    "../LICENSE": "LICENSE.txt",
+    "LICENSE": "LICENSE.txt",
+    "../NOTICES-TIERS.md": "NOTICES-TIERS.md",
+    "../CONTRIBUTING.md": "CONTRIBUTING.md",
+    "../README.md": "README.md",
+    "compta_lmnp/CHANGELOG.md": "CHANGELOG.md",
+    "compta_lmnp/LISEZ-MOI.md": "LISEZ-MOI.md",
+    # absents du paquet : renvoyés vers le dépôt
+    ".githooks/pre-push": DEPOT + "blob/main/.githooks/pre-push",
+    "docs/": DEPOT + "tree/main/docs/",
+    "docs/audit/": DEPOT + "tree/main/docs/audit/",
+}
+
+# Un lien Markdown : [texte](cible). On ne retient que les cibles locales —
+# ni http(s), ni ancre pure.
+LIEN_MD = re.compile(r"\[([^\]]*)\]\(([^)\s]+)\)")
 # Un SEUL fichier .sh est livré. Le générateur de certificat existait en
 # double (.sh et .py) et s'affichait juste à côté du lanceur : sur un
 # bureau Linux, l'utilisateur ouvrait l'un pour l'autre (constaté en
@@ -2133,8 +2275,14 @@ def construire() -> str:
 
     with zipfile.ZipFile(cible, "w", zipfile.ZIP_DEFLATED) as z:
         for dans_paquet, sur_disque in fichiers:
-            z.write(os.path.join(HERE, sur_disque),
-                    arcname=f"compta_lmnp/{dans_paquet}")
+            chemin = os.path.join(HERE, sur_disque)
+            if dans_paquet.endswith(".md"):
+                texte = open(chemin, encoding="utf-8").read()
+                for avant, apres in REECRITURES.items():
+                    texte = texte.replace(f"]({avant})", f"]({apres})")
+                z.writestr(f"compta_lmnp/{dans_paquet}", texte)
+            else:
+                z.write(chemin, arcname=f"compta_lmnp/{dans_paquet}")
 
     # ── Garde anti-fuite n°1 : aucun NOM interdit ───────────────────────
     with zipfile.ZipFile(cible) as z:
@@ -2143,6 +2291,37 @@ def construire() -> str:
     if fuites:
         os.remove(cible)
         raise SystemExit(f"FUITE BLOQUÉE — fichiers interdits : {fuites}")
+
+    # ── Garde anti-lien mort : tout renvoi local doit aboutir ───────────
+    #
+    #    Cinq liens du document d'accueil pendaient dans le paquet, dont
+    #    deux vers la licence et un vers la procédure de contribution
+    #    (constat R-04). Aucune garde ne les voyait : le paquet se
+    #    construisait, et c'est le lecteur du zip qui découvrait le trou.
+    #
+    #    Le contrôle porte sur le CONTENU RÉEL de l'archive et sur la
+    #    totalité de ses liens — pas sur la table de réécriture, qui est
+    #    une liste écrite à la main et ne peut donc pas signaler le lien
+    #    qu'on a oublié d'y inscrire.
+    with zipfile.ZipFile(cible) as z:
+        presents = set(z.namelist())
+        morts = []
+        for entree in z.namelist():
+            if not entree.endswith(".md"):
+                continue
+            texte = z.read(entree).decode("utf-8", "replace")
+            for _libelle, vise in LIEN_MD.findall(texte):
+                if "://" in vise or vise.startswith(("#", "mailto:")):
+                    continue
+                resolu = posixpath.normpath(posixpath.join(
+                    posixpath.dirname(entree), vise.split("#")[0]))
+                if resolu not in presents:
+                    morts.append(f"{entree} → {vise}")
+    if morts:
+        os.remove(cible)
+        raise SystemExit(
+            "LIENS MORTS DANS LE PAQUET — un document livré renvoie vers "
+            f"ce qu'il ne contient pas : {sorted(set(morts))}")
 
     # ── Garde anti-fuite n°2 : aucun CONTENU personnel ───────────────────
     #
@@ -3891,7 +4070,6 @@ def resume(conn: sqlite3.Connection, annee: int) -> dict:
 ````python
 # Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# sans autorisation écrite de l'auteur.
 
 """
 Règles fiscales VERSIONNÉES — le point d'entrée des dispositions légales.
@@ -4193,7 +4371,6 @@ def _veille(date_iso: str) -> str:
 ````python
 # Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# sans autorisation écrite de l'auteur.
 
 """
 Gabarits de saisie : chaque type d'opération sait quel compte de résultat il
@@ -4484,7 +4661,6 @@ def par_groupe(conn: sqlite3.Connection | None = None) -> list[tuple[str, list]]
 ````python
 # Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# sans autorisation écrite de l'auteur.
 
 """
 Export PDF de la liasse fiscale — J7.

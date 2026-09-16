@@ -1,0 +1,1077 @@
+[
+  {
+    "fichier": ".githooks/pre-push",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": ".github/workflows/controles.yml",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": ".gitignore",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "CONTRIBUTING.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "LICENSE",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "NOTICES-TIERS.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "README.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "build_client.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/.gitignore",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/ARCHITECTURE.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/CHANGELOG.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/Compta-LMNP-Linux-macOS.sh",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/Compta-LMNP-Windows.bat",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/Compta-LMNP.desktop",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/LISEZ-MOI.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/VERSION",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/app.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/cli.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/construire_distribution.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/demo/FEC_DEMO_2025.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/generer_certificat.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/generer_certificat.sh",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/modules/amortissement.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/audit_cycle.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/cession.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/controles.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/dossiers.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/ecritures.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/export_fec.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/fec_io.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/fiscal.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/gabarits.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/import_bancaire.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/init_db.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/liasse.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/liasse_pdf.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/migration_fec.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/migrations.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/operations.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/pages.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/parametres.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/pense_bete.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/perennite.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/plan_immo.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/quittances.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/rejeu_fec.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/reprise.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/valider_fec.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/modules/veille_fiscale.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/outils_demo.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/outils_sprite.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/ouvrir_navigateur.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/pyproject.toml",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/requirements-dev.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/schema.sql",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/seed_demo.sql",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/seed_referentiel.sql",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "compta_lmnp/tests/conftest.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_39c_par_bien.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_audit_externe.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_audit_fonctionnel.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_audit_production.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_audit_v7.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_audit_v72.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_bac_a_sable.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_cession.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_controles_enrichis.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_duplication_perennite.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_fiabilite.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_import_cabinet.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_interface.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_irritants.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_j0_j1.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_j2_controles.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_j3.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_j4_j5.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_j8_dossiers.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_j9_release.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_lanceur.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_modes.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_or_liasses_reelles.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_panel_beta.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_e.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_f.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_g.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_h.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_i.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_j.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_k.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_l.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_m.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_n.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_o.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_p.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_passe_q.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_pense_bete.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_qualite.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_rapprochement_fec.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_refonte.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_reglementation.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_reprise_liasse.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_stress_compta.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_stress_web_fec.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_usage_reel.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_v71_perennite_pdf.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/tests/test_veille_fiscale.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "compta_lmnp/verifier_depot.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_G.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_H.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_I.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_J.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_K.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_L.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_M.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_N.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_O.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_P.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/AUDIT_PASSE_Q.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/00-INVARIANTS.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/G-regularite-comptable.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/H-amortissements.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/I-article-39C.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/J-deficits-lmnp.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/K-cloture-pluriannuel.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/L-cession.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/M-moteur-de-controles.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/N-regles-versionnees.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/O-perennite.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/P-quittances.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/Q-atomicite.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/audit/R-propriete-intellectuelle.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "docs/audit/README.md",
+    "spdx": false,
+    "mention_licence": true
+  },
+  {
+    "fichier": "docs/audit/assembler.py",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "docs/audit/paquets/passe-R-complet.md",
+    "spdx": true,
+    "mention_licence": true
+  },
+  {
+    "fichier": "docs/preuves_g/COUVERTURE.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_g/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_g/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_h/COUVERTURE.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_h/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_h/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_h/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/README.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/calage.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/calage.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/cas_complementaires.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/cas_complementaires.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/cession_un_bien.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_i/cession_un_bien.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/complements.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/complements_reverification.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/rapport_avant_correctifs.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/reintegration.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_i/reintegration.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/resultats_avant_correctifs.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/reverification_resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/reverification_source.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/suivi_deux_biens.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_i/suivi_deux_biens.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/utilisation.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_i/utilisation.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_i/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/README.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/arrondi_deficit.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/arrondi_deficit.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/deficit_epuise.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/deficit_epuise.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/dix_millesimes.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/dix_millesimes.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/historique_apres.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/historique_apres.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/historique_avant.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/historique_avant.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/peremption_apres.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/peremption_apres.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/peremption_avant.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_j/peremption_avant.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_j/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_k/README.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_k/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_k/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_k/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_l/cession.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_l/cession.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_l/cycle.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_l/cycle.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_l/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_l/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_l/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_m/attente.pdf",
+    "spdx": false,
+    "mention_licence": "binaire à examiner séparément"
+  },
+  {
+    "fichier": "docs/preuves_m/attente.txt",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_m/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_m/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_m/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_n/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_n/sorties.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_n/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_o/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_o/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_p/apres_annulation.html",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_p/impaye.html",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_p/mentions.html",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_p/partiel.html",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_p/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_p/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/COUVERTURE.md",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/code_examine.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/couverture.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/inventaire.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/reproduire.py",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/resultats.json",
+    "spdx": false,
+    "mention_licence": false
+  },
+  {
+    "fichier": "docs/preuves_q/verifier.py",
+    "spdx": false,
+    "mention_licence": false
+  }
+]

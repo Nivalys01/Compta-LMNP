@@ -50,6 +50,42 @@ En français courant, et sans valeur contractuelle :
 Autrement dit : prenez, améliorez, vendez si vous voulez — mais ne refermez
 pas. Ce qui a été ouvert le reste.
 
+### Ce que la licence couvre
+
+Une licence de code ne couvre pas d'elle-même la documentation ni les données,
+et le dépôt contient les trois. Le périmètre est donc dit explicitement plutôt
+que laissé à déduire (constat R-06) :
+
+| Catégorie | Régime |
+|---|---|
+| Code source (`compta_lmnp/`, scripts, tests) | AGPL-3.0-or-later |
+| Documentation (`*.md`, `docs/`, rapports d'audit et preuves) | AGPL-3.0-or-later |
+| Référentiel et données d'exemple (`schema.sql`, `seed_referentiel.sql`, `seed_demo.sql`, `demo/FEC_DEMO_2025.txt`) | AGPL-3.0-or-later, en tant que partie du logiciel |
+| **Vos** données comptables | **à vous.** La licence ne porte sur rien de ce que vous saisissez |
+| Composants tiers | leurs propres licences — voir [`NOTICES-TIERS.md`](NOTICES-TIERS.md) |
+
+Deux réserves, dites parce qu'elles sont réelles :
+
+- **Le plan de comptes** suit la nomenclature du Plan comptable général. La
+  sélection et les libellés retenus sont l'œuvre de l'auteur ; la nomenclature
+  elle-même ne lui appartient pas.
+- **Les numéros et libellés de cases** des formulaires 2031, 2033 et
+  2042-C-PRO reproduisent des formulaires administratifs. Ce sont des données
+  factuelles nécessaires à l'interopérabilité, et non une revendication de
+  droits sur les formulaires.
+
+### Obtenir le code source
+
+L'article 13 de l'AGPL vous donne droit au code source correspondant à la
+version que vous utilisez, y compris lorsque vous y accédez par le réseau. Le
+pied de page de l'application porte le lien du dépôt.
+
+> ⚠️ **Tant que ce dépôt n'est pas public, ce lien répond 404 à qui n'y a pas
+> accès** (constat R-01). Le paquet client contient toutefois l'intégralité des
+> sources de production : il n'existe aucune distribution binaire de ce
+> logiciel. L'ouverture du dépôt est un prérequis de la publication, pas une
+> conséquence — voir la liste de contrôle ci-dessous.
+
 > **Pourquoi l'AGPL, et pas une licence maison « gratuit mais non revendable ».**
 > Ce logiciel a d'abord été diffusé sous une licence maison qui interdisait la
 > vente et les versions dérivées. Une telle licence n'est pas un logiciel
@@ -117,6 +153,18 @@ Les signalements de défauts et les correctifs sont bienvenus — voir
 [`CONTRIBUTING.md`](CONTRIBUTING.md). Deux exigences non négociables : **aucune
 donnée réelle** dans une contribution, et **un test de non-régression** par
 correctif.
+
+## Liste de contrôle avant ouverture du dépôt
+
+Trois gestes, dans cet ordre, et le premier conditionne les deux autres :
+
+1. **Rendre le dépôt public.** Tant qu'il ne l'est pas, l'offre de source de
+   l'article 13 n'est pas tenue (constat R-01).
+2. **Poser le tag de version**, pour rattacher la source publiée à la version
+   qui tourne chez l'utilisateur.
+3. **Vérifier le lien du pied de page anonymement** — déconnecté, ou en
+   navigation privée. Un test automatique ne peut pas le faire à votre place :
+   il constate la présence du lien, jamais son accessibilité.
 
 ## État du projet et limites connues
 
