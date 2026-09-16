@@ -51,10 +51,22 @@ jobs:
           test -f compta_lmnp/requirements-dev.txt || {
             echo "compta_lmnp/ introuvable ou incomplet." >&2; exit 1; }
 
-      - name: Install system dependencies
+      # pdftotext (poppler) : quatre fichiers de tests relisent le texte des
+      # PDF produits, et `verifier_depot.py` s'en sert pour inspecter les PDF
+      # avant publication. L'installation ne suffit pas — il faut VÉRIFIER
+      # qu'elle a produit son effet. Sans le contrôle qui suit, une
+      # installation sans effet ne se voyait pas ici : elle ressortait
+      # quarante secondes plus tard, en cinq FileNotFoundError au milieu de
+      # constats fiscaux, c'est-à-dire à l'endroit qui désigne le mauvais
+      # coupable.
+      - name: Dépendances système (poppler)
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils
+          command -v pdftotext || {
+            echo "pdftotext absent APRÈS installation de poppler-utils." >&2
+            exit 1; }
+          pdftotext -v
 
       - name: Installer les dépendances épinglées
         run: |

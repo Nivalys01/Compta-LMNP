@@ -22,7 +22,6 @@ Aucune donnée réelle : exploitant fictif, bases blanches.
 Lancer :  pytest -q tests/test_passe_l.py
 """
 import os
-import shutil
 import subprocess
 import tempfile
 
@@ -85,6 +84,7 @@ def solde(conn, compte, annee=2026):
 
 def texte_pdf(conn, annee, tmp_path, nom="liasse.pdf"):
     import liasse_pdf
+    conftest.exiger_pdftotext()
     chemin = str(tmp_path / nom)
     liasse_pdf.generer_pdf(liasse.generer(conn, annee), chemin)
     return subprocess.run(["pdftotext", "-layout", chemin, "-"],
@@ -259,8 +259,6 @@ def test_l02_un_exercice_sans_cession_a_ses_diminutions_nulles(tmp_path):
         conn.close()
 
 
-@pytest.mark.skipif(shutil.which("pdftotext") is None,
-                    reason="pdftotext absent")
 def test_l02_le_pdf_porte_une_colonne_diminutions(tmp_path):
     conn = _cycle_avec_cession(tmp_path, "l02f.db")
     try:
@@ -355,8 +353,6 @@ def test_l04_aucun_signal_sans_cession(tmp_path):
         conn.close()
 
 
-@pytest.mark.skipif(shutil.which("pdftotext") is None,
-                    reason="pdftotext absent")
 @pytest.mark.parametrize("prix", [15000, 0])
 def test_l04_le_pdf_renvoie_a_la_declaration_immobiliere(tmp_path, prix):
     """Le destinataire du PDF voyait la vente neutralisée, sans indication
@@ -374,8 +370,6 @@ def test_l04_le_pdf_renvoie_a_la_declaration_immobiliere(tmp_path, prix):
         conn.close()
 
 
-@pytest.mark.skipif(shutil.which("pdftotext") is None,
-                    reason="pdftotext absent")
 def test_l04_un_exercice_sans_cession_ne_porte_pas_la_mention(tmp_path):
     """Contre-épreuve : la page de garde ne doit pas se charger d'un
     avertissement sans objet."""

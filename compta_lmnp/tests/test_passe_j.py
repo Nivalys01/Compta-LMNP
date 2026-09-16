@@ -4,6 +4,7 @@
 import subprocess
 from unittest.mock import patch
 
+import conftest
 import pytest
 
 import controles
@@ -52,6 +53,11 @@ def cases(c, annee=2025):
 
 
 def pdf(c, tmp_path, annee=2025):
+    # Sans cette garde, l'absence de poppler ne produisait pas un test ignoré
+    # mais un FileNotFoundError brut, cinq fois, au milieu de constats
+    # fiscaux — un échec qui ne nomme pas sa cause et qu'on finit par
+    # attribuer au code testé.
+    conftest.exiger_pdftotext()
     p = tmp_path / f'liasse-{annee}.pdf'
     liasse_pdf.generer_pdf(liasse.generer(c, annee), str(p))
     return subprocess.check_output(['pdftotext', '-layout', str(p), '-'], text=True)

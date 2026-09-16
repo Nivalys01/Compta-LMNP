@@ -23,7 +23,6 @@ Aucune donnée réelle : exploitant fictif, bases blanches.
 Lancer :  pytest -q tests/test_passe_m.py
 """
 import os
-import shutil
 import subprocess
 import tempfile
 
@@ -92,6 +91,7 @@ def codes(conn, annee=2026):
 
 def texte_pdf(conn, annee, tmp_path, nom="m.pdf"):
     import liasse_pdf
+    conftest.exiger_pdftotext()
     chemin = str(tmp_path / nom)
     liasse_pdf.generer_pdf(liasse.generer(conn, annee), chemin)
     return subprocess.run(["pdftotext", "-layout", chemin, "-"],
@@ -155,8 +155,6 @@ def test_m03_la_liasse_transporte_les_anomalies_du_moteur(base):
     assert any(a["niveau"] == "BLOQUANT" for a in L["anomalies"])
 
 
-@pytest.mark.skipif(shutil.which("pdftotext") is None,
-                    reason="pdftotext absent")
 def test_m03_le_pdf_imprime_l_anomalie_bloquante(base, tmp_path):
     """Le PDF affichait cinq validations internes en vert et ne portait pas
     l'anomalie BLOQUANTE du moteur : les deux ensembles de contrôles
@@ -168,8 +166,6 @@ def test_m03_le_pdf_imprime_l_anomalie_bloquante(base, tmp_path):
     assert "BLOQUANTE" in texte
 
 
-@pytest.mark.skipif(shutil.which("pdftotext") is None,
-                    reason="pdftotext absent")
 def test_m03_un_dossier_sain_affiche_l_absence_d_anomalie(base, tmp_path):
     """Contre-épreuve : le nouveau bloc ne doit pas alarmer pour rien. Les
     rappels de niveau INFO — « aucune taxe foncière saisie » — restent

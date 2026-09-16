@@ -1,5 +1,34 @@
 # Journal des versions — Compta LMNP
 
+## 8.51.1 — 2026-09-16 (Un outil externe absent doit se nommer lui-même)
+
+**Cinq tests de la passe J tombaient en `FileNotFoundError: 'pdftotext'`.**
+Quatre fichiers de tests relisent le texte des PDF produits ; trois s'étaient
+protégés par un `@pytest.mark.skipif` recopié à la main, le quatrième n'avait
+rien. Trois gardes écrites à la main et un oubli : le motif exact de
+l'invariant n°5 — une liste tenue à la main ne peut pas signaler ce qu'on a
+oublié d'y inscrire. La règle n'est donc plus écrite qu'à un seul endroit,
+`conftest.exiger_pdftotext()`, et les trois décorateurs disparaissent.
+
+**Mais « ignorer si absent » aurait été la mauvaise règle.** Sur un poste de
+développement, poppler n'a pas à être un prérequis pour lancer la suite : le
+test est ignoré, en le disant. Sur un runner d'intégration continue, le
+workflow l'installe explicitement : son absence y est une panne
+d'environnement, et l'ignorer reviendrait à conclure au vert sans avoir
+vérifié — ce que la passe F reproche à tout garde-fou qui approuve faute de
+pouvoir travailler. La garde échoue donc franchement quand `CI` est défini, en
+nommant l'étape du workflow qui n'a pas produit son effet. Un test ignoré en
+silence sur la CI, c'est une couverture qui disparaît sans que personne ne
+l'apprenne.
+
+**L'installation de poppler vérifie désormais son propre effet.** L'étape
+posait `apt-get install -y poppler-utils` et passait à la suite sans regarder.
+Une installation sans effet ne se voyait pas là où elle avait lieu : elle
+ressortait quarante secondes plus tard, en cinq échecs au milieu de constats
+fiscaux — à l'endroit qui désigne le mauvais coupable. Elle exige maintenant
+`command -v pdftotext` et affiche la version obtenue.
+
+
 ## 8.51.0 — 2026-09-16 (Le logiciel devient libre : AGPL-3.0-or-later)
 
 **Une licence qui interdit la revente n'est pas un logiciel libre, et le dire

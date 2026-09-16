@@ -31,7 +31,6 @@ ici. Les scénarios chiffrés reprennent ceux du rapport.
 Lancer :  pytest -q tests/test_passe_i.py
 """
 import os
-import shutil
 import sqlite3
 import subprocess
 import tempfile
@@ -538,9 +537,6 @@ def test_i10_une_cloture_sans_retraitement_passe_sans_avertissement(tmp_path,
 
 # ═══ I-11 — l'état archivable se réconcilie ═════════════════════════
 
-@pytest.mark.skipif(shutil.which("pdftotext") is None,
-                    reason="pdftotext absent : le texte du PDF ne peut pas "
-                           "être extrait pour vérification")
 def test_i11_la_sortie_de_stock_figure_dans_le_pdf_mono_bien(tmp_path):
     """5 000 + 1 200 − 0 − 6 200 = 0. Seule la ligne de SORTIE manquait au
     tableau imprimé — elle ne vivait que dans le détail par bien, lequel
@@ -548,6 +544,7 @@ def test_i11_la_sortie_de_stock_figure_dans_le_pdf_mono_bien(tmp_path):
     archivable voyait donc un tableau qui ne tombe pas juste, et 6 200 €
     de mouvement sans explication."""
     import liasse_pdf
+    conftest.exiger_pdftotext()
     conn = _base(tmp_path, "i11.db")
     try:
         _historique(conn, 2025, 5000)

@@ -141,3 +141,50 @@ def exiger_dossier_prive() -> None:
         _pytest.skip("exige le dossier privé (reference/ + seed_exemple.sql) : "
                      "les gardes de publication refusent de conclure sans "
                      "empreintes — voir passe F, constats F-01 et F-03")
+
+
+# ── Tests qui relisent le TEXTE d'un PDF produit ──────────────────────────
+#
+# L'extraction passe par `pdftotext` (poppler), un binaire externe. Quatre
+# fichiers de tests en dépendent, et chacun s'était protégé à sa façon :
+# trois posaient un `skipif` recopié à la main, le quatrième — la passe J —
+# n'avait rien, et ses cinq tests tombaient en FileNotFoundError sur toute
+# machine sans poppler. Trois gardes écrites à la main et un oubli : c'est le
+# motif habituel (invariant n°5), et la réponse habituelle est de n'avoir
+# qu'UN seul endroit où la règle est écrite.
+#
+# La règle n'est pas « ignorer si absent ». Elle dépend de l'endroit :
+#
+#   - sur un poste de développement, poppler n'a pas à être un prérequis
+#     pour lancer la suite : le test est ignoré, en le DISANT ;
+#   - sur un runner d'intégration continue, le workflow l'installe
+#     explicitement. Son absence y est une panne d'environnement, pas une
+#     configuration locale. Ignorer reviendrait à conclure au vert sans
+#     avoir vérifié — précisément ce que la passe F reproche à un garde-fou
+#     qui approuve faute de pouvoir travailler.
+#
+# Un test ignoré en silence sur la CI, c'est une couverture qui disparaît
+# sans que personne ne l'apprenne. L'échec bruyant est le comportement utile.
+
+def pdftotext_present() -> bool:
+    import shutil as _shutil
+    return _shutil.which("pdftotext") is not None
+
+
+def exiger_pdftotext() -> None:
+    """À appeler avant toute extraction du texte d'un PDF."""
+    import os as _os
+
+    import pytest as _pytest
+    if pdftotext_present():
+        return
+    if _os.environ.get("CI"):
+        _pytest.fail(
+            "pdftotext (poppler) absent du runner ALORS QUE le workflow "
+            "l'installe : l'étape « Dépendances système » de "
+            ".github/workflows/controles.yml n'a pas produit son effet. "
+            "Ignorer ce test ici masquerait la perte de couverture.")
+    _pytest.skip(
+        "pdftotext (poppler) absent : le texte des PDF produits ne peut pas "
+        "être relu. Pour l'installer : apt install poppler-utils, "
+        "dnf install poppler-utils, ou brew install poppler.")
