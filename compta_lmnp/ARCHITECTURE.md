@@ -94,8 +94,9 @@ métier (français, termes du PCG et de la DGFiP).
 
 1. ~~`app.py` mêlait 1 300 lignes de HTML à la logique~~ **soldée (v8.6.0)** :
    les gabarits vivent dans `pages.py` (présentation pure, zéro logique),
-   `app.py` ne contient plus que les routes (~1 200 l.). Étape suivante
-   possible mais non nécessaire : blueprints par domaine.
+   `app.py` ne contient plus que les routes. Le chiffre annoncé ici
+   (« ~1 200 l. ») était périmé de moitié — voir plus bas, les compteurs
+   ne sont plus recopiés à la main.
 2. ~~Trois parseurs FEC~~ **soldée (v8.6.0)** : socle commun `fec_io.py`
    (colonnes A-47 A-1, tokenisation, montants). Les RÈGLES restent chez
    chaque consommateur ; l'écriture (`export_fec`) reste séparée pour que
@@ -104,6 +105,22 @@ métier (français, termes du PCG et de la DGFiP).
    `reprise.ouvrir_exercice`, nom public, point d'entrée unique.
 4. Les libellés de gabarits et la liste des comptes hors plafond 39 C
    mériteraient une page d'administration (aujourd'hui : base uniquement).
+5. **Cycles d'imports et grandes unités** — ouverte, constat T-07.
+   `fiscal ↔ controles` et `init_db ↔ perennite` s'importent mutuellement ;
+   les imports différés évitent le plantage au chargement mais ne
+   suppriment pas le couplage. `generer_pdf` et `valider` dépassent
+   chacune 290 lignes. Direction retenue si le sujet est repris : extraire
+   les calculs purs partagés dans un module sans dépendance au service de
+   clôture, décomposer le PDF par sections et le validateur par phases,
+   avec les mêmes tests de sortie. **L'indépendance du validateur
+   vis-à-vis de l'exportateur doit être préservée** : mutualiser leurs
+   décisions créerait un angle mort commun. Non entrepris à ce jour —
+   c'est un chantier de refonte, pas un correctif.
+6. **Configuration globale** — ouverte, constat T-07. Les chemins, le
+   journal et les états de migration sont des variables de module ; les
+   tests passent donc par des substitutions globales. Un
+   `create_app(config)` et un contexte de dossier injecté lèveraient la
+   contrainte. Même remarque : chantier, pas correctif.
 
 ## Par où commencer une modification
 
@@ -117,9 +134,19 @@ métier (français, termes du PCG et de la DGFiP).
 - Toute écriture nouvelle → passer par `ecritures.inserer`, jamais
   d'INSERT direct dans `ecriture`/`ligne`.
 
-## Suite de tests (279)
+## Suite de tests
 
-`pytest -q` (~45 s). Familles notables : test en or (`test_or_liasses_reelles`),
+Le nombre de tests figurait ici, écrit à la main, et annonçait 279 pour
+plus de mille : un compteur recopié se périme en silence, et donne au
+mainteneur un modèle mental faux (constat T-09). L'inventaire se demande
+désormais à l'outil, qui ne se trompe pas :
+
+```bash
+pytest -q --collect-only | tail -1     # nombre de tests
+ruff check .                           # doit rester vierge
+```
+
+`pytest -q` (~10 s). Familles notables : test en or (`test_or_liasses_reelles`),
 rapprochement guichet↔FEC (`test_rapprochement_fec`), fiabilité
 crash/concurrence/restauration (`test_fiabilite`), stress moteur
 (`test_stress_compta`), web+FEC (`test_stress_web_fec`), 39 C par bien,

@@ -30,15 +30,25 @@ on:
 
 jobs:
   tests:
-    name: Tests et lint
+    # Le logiciel annonce « Python 3.12 ou plus récent » et ruff cible
+    # py312 ; la CI n'éprouvait que 3.13. Les deux bornes qui comptent sont
+    # le MINIMUM annoncé — celui qu'un utilisateur installera en suivant le
+    # LISEZ-MOI — et la version la plus récente, sur laquelle une nouveauté
+    # de Python peut casser sans prévenir. Tester entre les deux seulement,
+    # c'est ne garantir aucune des deux (constat T-08).
+    name: Tests et lint (Python ${{ matrix.python }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false        # un échec en 3.12 ne doit pas masquer 3.14
+      matrix:
+        python: ["3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python }}
 
       # L'arborescence portait le numéro de version — `compta_lmnp_v8.41.0/` —
       # et cette étape devait donc la CHERCHER, sinon la CI cassait au

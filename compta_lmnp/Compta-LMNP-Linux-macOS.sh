@@ -315,7 +315,10 @@ PY=./.venv/bin/python
 if ! "$PY" -c "import flask" >/dev/null 2>&1; then
     info "Installation de Flask (une seule fois)…"
     "$PY" -m pip install --quiet --upgrade pip >/dev/null 2>&1 || true
-    if ! "$PY" -m pip install --quiet flask; then
+    # Le manifeste borne les versions au lieu de laisser pip prendre
+    # n'importe quoi : deux installations d'une même version du logiciel
+    # doivent donner le même environnement (constat T-06).
+    if ! "$PY" -m pip install --quiet -r "$DOSSIER/requirements.txt"; then
         err "Installation de Flask impossible."
         info "Une connexion internet est nécessaire au premier lancement."
         info "Derrière un proxy d'entreprise, renseignez la variable"
@@ -325,8 +328,33 @@ if ! "$PY" -c "import flask" >/dev/null 2>&1; then
 fi
 # reportlab ne sert qu'à l'export PDF : son absence ne doit RIEN bloquer.
 if ! "$PY" -c "import reportlab" >/dev/null 2>&1; then
-    "$PY" -m pip install --quiet reportlab >/dev/null 2>&1 \
+    "$PY" -m pip install --quiet -r "$DOSSIER/requirements.txt" >/dev/null 2>&1 \
         || warn "reportlab non installé — tout fonctionne sauf l'export PDF."
+fi
+# Un import qui réussit ne dit PAS que l'environnement est celui qu'attend
+# CETTE version du logiciel : le lanceur passait outre, et un .venv vieilli
+# survivait à toutes les mises à jour (constat T-06).
+#
+# On compare donc l'empreinte du manifeste à celle enregistrée lors de la
+# dernière installation réussie. C'est déterministe, ça ne demande pas le
+# réseau quand rien n'a changé, et ça se déclenche exactement quand le
+# manifeste bouge — c'est-à-dire quand l'utilisateur met à jour le logiciel.
+EMPREINTE_REQ="$DOSSIER/.venv/.compta-requirements"
+ATTENDUE="$("$PY" - "$DOSSIER/requirements.txt" <<'EOF'
+import sys
+from hashlib import sha256
+print(sha256(open(sys.argv[1], "rb").read()).hexdigest())
+EOF
+)"
+if [ "$(cat "$EMPREINTE_REQ" 2>/dev/null || true)" != "$ATTENDUE" ]; then
+    info "Mise à niveau des dépendances vers les versions attendues…"
+    if "$PY" -m pip install --quiet --upgrade \
+            -r "$DOSSIER/requirements.txt" >/dev/null 2>&1; then
+        printf '%s' "$ATTENDUE" > "$EMPREINTE_REQ"
+    else
+        warn "Dépendances non mises à niveau (hors ligne ?) — le logiciel"
+        warn "démarre avec l'environnement existant."
+    fi
 fi
 ok "Flask : $("$PY" -c 'import importlib.metadata as m; print(m.version("flask"))')"
 

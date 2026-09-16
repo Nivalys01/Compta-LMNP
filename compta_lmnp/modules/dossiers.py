@@ -28,9 +28,11 @@ Compatibilité : un `compta.db` existant à la racine reste le dossier
 """
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
+import threading
 import unicodedata
 from datetime import date
 
@@ -91,12 +93,55 @@ def _enregistrer(racine: str, entrees: list[dict]) -> None:
     l'ancien registre d'un seul geste : à tout instant, le fichier sur
     disque est soit l'ancien complet, soit le nouveau complet."""
     cible = _chemin_registre(racine)
-    temporaire = cible + ".tmp"
-    with open(temporaire, "w", encoding="utf-8") as f:
-        json.dump({"dossiers": entrees}, f, ensure_ascii=False, indent=2)
-        f.flush()
-        os.fsync(f.fileno())
-    os.replace(temporaire, cible)
+    # Nom temporaire UNIQUE. `dossiers.json.tmp`, partagé, faisait que deux
+    # écritures simultanées se marchaient dessus dans le fichier même censé
+    # rendre l'opération sûre (constat T-05).
+    temporaire = f"{cible}.{os.getpid()}.{threading.get_ident()}.tmp"
+    try:
+        with open(temporaire, "w", encoding="utf-8") as f:
+            json.dump({"dossiers": entrees}, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporaire, cible)
+    except BaseException:
+        try:
+            os.remove(temporaire)
+        except OSError:
+            pass
+        raise
+
+
+# ── Le registre se modifie d'un seul tenant ───────────────────────────────
+#
+# `os.replace` rend la PUBLICATION atomique, pas le cycle qui la précède.
+# Renommer un dossier, c'est lire le registre, modifier une entrée, puis
+# réécrire le tout : deux renommages simultanés lisaient la même version,
+# et le second réécrivait par-dessus le premier. Les deux appels
+# réussissaient, et l'une des deux modifications disparaissait sans un mot
+# (constat T-05) — le pire des cas, puisque rien ne permet de le remarquer.
+#
+# La réponse n'est pas une écriture plus atomique : c'est de faire de la
+# lecture ET de l'écriture UNE SEULE section critique.
+_VERROU_REGISTRE = threading.RLock()
+
+
+@contextlib.contextmanager
+def _registre_exclusif(racine: str):
+    """Charge le registre, laisse l'appelant le modifier, le réécrit.
+
+    L'écriture n'a lieu QUE si le bloc s'achève normalement : une
+    exception laisse le registre intact, ce qui est le comportement
+    voulu pour une création refusée.
+
+    **Portée : les fils d'exécution d'un processus.** Le serveur est local,
+    mono-processus et lié à 127.0.0.1 ; deux instances lancées en parallèle
+    sur le même dossier restent hors de portée de ce verrou. Le dire vaut
+    mieux que le laisser croire.
+    """
+    with _VERROU_REGISTRE:
+        entrees = _charger(racine)
+        yield entrees
+        _enregistrer(racine, entrees)
 
 
 # ── Slugs ────────────────────────────────────────────────────────────────────
@@ -176,23 +221,22 @@ def creer(racine: str, nom: str, annee_cible: int | None = None) -> dict:
     slug = slugifier(nom)
     if slug in RESERVES:
         raise ValueError(f"Le nom « {nom} » est réservé par l'application.")
-    entrees = _charger(racine)
-    if any(e["slug"] == slug for e in entrees):
-        raise ValueError(f"Un dossier « {slug} » existe déjà — choisissez un "
-                         "autre nom.")
-    rel = os.path.join(SOUS_DOSSIER, slug, "compta.db")
-    chemin = os.path.join(racine, rel)
-    # GARDE-FOU perte de données : si une base existe déjà à cet emplacement
-    # (registre perdu, copie partielle…), on ne la réinitialise JAMAIS — on la
-    # RATTACHE au registre telle quelle. Réinitialiser écraserait des
-    # écritures comptables sans avertissement.
-    adopte = os.path.exists(chemin)
-    if not adopte:
-        os.makedirs(os.path.dirname(chemin), exist_ok=True)
-        init_db.init(chemin, "blanc",
-                     annee_cible=annee_cible or date.today().year).close()
-    entrees.append({"slug": slug, "nom": nom, "chemin": rel})
-    _enregistrer(racine, entrees)
+    with _registre_exclusif(racine) as entrees:
+        if any(e["slug"] == slug for e in entrees):
+            raise ValueError(f"Un dossier « {slug} » existe déjà — "
+                             "choisissez un autre nom.")
+        rel = os.path.join(SOUS_DOSSIER, slug, "compta.db")
+        chemin = os.path.join(racine, rel)
+        # GARDE-FOU perte de données : si une base existe déjà à cet
+        # emplacement (registre perdu, copie partielle…), on ne la
+        # réinitialise JAMAIS — on la RATTACHE au registre telle quelle.
+        # Réinitialiser écraserait des écritures comptables sans avertir.
+        adopte = os.path.exists(chemin)
+        if not adopte:
+            os.makedirs(os.path.dirname(chemin), exist_ok=True)
+            init_db.init(chemin, "blanc",
+                         annee_cible=annee_cible or date.today().year).close()
+        entrees.append({"slug": slug, "nom": nom, "chemin": rel})
     return {"slug": slug, "nom": nom, "chemin": chemin, "adopte": adopte}
 
 
@@ -202,13 +246,12 @@ def renommer(racine: str, slug: str, nouveau_nom: str) -> None:
     nouveau_nom = (nouveau_nom or "").strip()
     if not nouveau_nom:
         raise ValueError("Le nouveau nom est vide.")
-    entrees = _charger(racine)
-    for e in entrees:
-        if e["slug"] == slug:
-            e["nom"] = nouveau_nom
-            _enregistrer(racine, entrees)
-            return
-    raise ValueError(f"Dossier inconnu : {slug}")
+    with _registre_exclusif(racine) as entrees:
+        for e in entrees:
+            if e["slug"] == slug:
+                e["nom"] = nouveau_nom
+                return
+        raise ValueError(f"Dossier inconnu : {slug}")
 
 
 def nom(racine: str, slug: str) -> str:

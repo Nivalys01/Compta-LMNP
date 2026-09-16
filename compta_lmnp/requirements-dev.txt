@@ -9,13 +9,19 @@
 pytest==9.1.1
 ruff==0.16.0
 
-# Les deux suivantes ne sont pas de l'outillage : ce sont des dépendances
-# RUNTIME, que les lanceurs installent chez l'utilisateur sans les épingler
-# (et sans bloquer pour reportlab, dont l'absence ne coûte que l'export
-# PDF). Elles figurent ici parce que la SUITE DE TESTS en dépend :
+# Les deux suivantes ne sont pas de l'outillage : ce sont les dépendances
+# RUNTIME, déclarées pour l'utilisateur dans `requirements.txt`, où elles
+# sont BORNÉES et non épinglées — chez un particulier, une version exacte
+# sans roue précompilée fait échouer l'installation.
+#
+# Ici, elles sont épinglées : le développement et l'intégration continue
+# doivent éprouver UNE version connue, sans quoi une régression n'est pas
+# reproductible d'une machine à l'autre (constat T-06). Ces épingles sont
+# donc les versions de référence citées par `requirements.txt`, et les deux
+# fichiers doivent rester cohérents — un test le vérifie.
+#
+# La suite de tests en dépend directement :
 #   - flask     : les tests de bout en bout passent par le client web ;
 #   - reportlab : cinq tests de la liasse PDF échouaient sans elle.
-# Un environnement de développement incomplet donne des échecs permanents
-# qu'on finit par ignorer — le pire état pour une suite de tests.
 flask==3.1.3
 reportlab==5.0.1

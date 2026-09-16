@@ -1,0 +1,40 @@
+# Compta LMNP — dépendances d'EXÉCUTION, celles installées chez l'utilisateur.
+#
+# Ce manifeste n'existait pas : les lanceurs écrivaient `pip install flask`
+# en clair, sans version, et un import déjà réussi les dispensait même de
+# revérifier quoi que ce soit. Deux utilisateurs d'une même version du
+# logiciel pouvaient donc exécuter deux environnements différents, et une
+# régression rapportée par l'un n'était pas reproductible chez l'autre
+# (constat T-06).
+#
+# POURQUOI DES BORNES ET NON DES VERSIONS EXACTES
+#
+# L'outillage de développement, lui, est épinglé au point (voir
+# requirements-dev.txt) : c'est un environnement unique, maîtrisé, où une
+# mise à jour de linter qui change le verdict est un incident.
+#
+# Ici, c'est l'inverse. Le logiciel s'installe chez un particulier, sur un
+# Python que nous ne choisissons pas, éventuellement plus récent que tout ce
+# que nous avons éprouvé. Une version exacte n'y aurait pas de roue
+# précompilée disponible, pip tenterait une compilation depuis les sources,
+# et l'installation échouerait — pour une raison bien plus obscure que celle
+# qu'on prétendait éviter. On borne donc la MAJEURE, qui est ce qui casse la
+# compatibilité, et on laisse les correctifs de sécurité arriver.
+#
+# Les versions entre parenthèses sont celles sur lesquelles la suite de
+# tests est passée au 16 septembre 2026 ; requirements-dev.txt les épingle
+# pour le développement et l'intégration continue.
+
+# Serveur web local — INDISPENSABLE (éprouvé en 3.1.3)
+flask>=3.1.3,<4
+
+# Export PDF de la liasse — FACULTATIF (éprouvé en 5.0.1).
+# Son absence ne coûte que l'export PDF : les lanceurs n'échouent pas
+# dessus, et l'application le dit clairement au lieu de planter.
+reportlab>=5.0.1,<6
+
+# Certificat auto-signé pour HTTPS local — CONDITIONNEL (non installé par
+# défaut). Les lanceurs ne l'installent que si `--https` est demandé et
+# qu'aucun certificat n'existe. Laissé ici pour que l'inventaire soit
+# complet : il figure aussi dans NOTICES-TIERS.md.
+# cryptography>=43,<48

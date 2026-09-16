@@ -43,7 +43,12 @@ MODULES_PROD = sorted(f for f in os.listdir(os.path.join(HERE, "modules"))
 # une moitié de la même chose et se renvoyaient l'un à l'autre.
 # Données et documents : racine du paquet.
 DONNEES = ["schema.sql", "seed_referentiel.sql", "seed_demo.sql",
-           "demo/FEC_DEMO_2025.txt"]
+           "demo/FEC_DEMO_2025.txt",
+           # Manifeste des dépendances d'exécution : les lanceurs
+           # l'installent (`pip install -r requirements.txt`). Sans lui dans
+           # le paquet, le premier démarrage chez l'utilisateur échoue
+           # (constat T-06).
+           "requirements.txt"]
 # Documents : (nom dans le paquet, chemin sur le disque relatif à HERE).
 #
 # La licence et les notices tierces vivent à la RACINE du dépôt, pas ici —

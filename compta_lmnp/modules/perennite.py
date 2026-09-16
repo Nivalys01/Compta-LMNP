@@ -81,21 +81,52 @@ def sauvegarder(db_path: str, motif: str = "manuel",
     # l'état DÉJÀ restauré, et les données d'avant la première demande
     # n'existaient plus nulle part. Comme pour les archives, on suffixe
     # plutôt que d'écraser : une copie de sûreté ne se remplace jamais.
+    #
+    # Mais suffixer après un `os.path.exists` reste un « vérifier puis
+    # agir » : entre le test et la création, l'autre appelant passe. Deux
+    # threads obtenaient ainsi le MÊME chemin, chacun croyant tenir sa
+    # copie (constat T-04). Le nom est donc RÉSERVÉ par une création
+    # exclusive — `O_CREAT | O_EXCL` échoue si le fichier existe déjà, et
+    # cet échec est atomique au niveau du système de fichiers. C'est le
+    # seul moyen de transformer un test en garantie.
     n = 1
-    while os.path.exists(cible):
-        n += 1
-        cible = os.path.join(
-            dossier, f"{stem}-{horodatage}-{motif_sain}-{n}.db")
-
-    src = sqlite3.connect(db_path)
-    try:
-        dst = sqlite3.connect(cible)
+    while True:
         try:
-            src.backup(dst)                    # copie cohérente (API SQLite)
+            os.close(os.open(cible, os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+                             0o600))
+            break                                # nom réservé, il est à nous
+        except FileExistsError:
+            n += 1
+            cible = os.path.join(
+                dossier, f"{stem}-{horodatage}-{motif_sain}-{n}.db")
+            if n > 1000:                         # garde-fou : jamais atteint
+                raise RuntimeError(
+                    "Impossible de réserver un nom de sauvegarde dans "
+                    f"{dossier} après 1000 tentatives.") from None
+    # Le fichier réservé est VIDE : sqlite3.connect l'adopte et `backup()`
+    # y écrit la base complète. Si quoi que ce soit échoue ensuite, on
+    # retire cette coquille — mais jamais celle d'un autre appelant, que
+    # l'exclusivité ci-dessus nous a précisément empêché d'obtenir.
+
+    try:
+        src = sqlite3.connect(db_path)
+        try:
+            dst = sqlite3.connect(cible)
+            try:
+                src.backup(dst)                # copie cohérente (API SQLite)
+            finally:
+                dst.close()
         finally:
-            dst.close()
-    finally:
-        src.close()
+            src.close()
+    except BaseException:
+        # La coquille réservée ne doit pas survivre à l'échec : elle
+        # figurerait dans la liste des sauvegardes, où un fichier vide
+        # serait pris pour une protection.
+        try:
+            os.remove(cible)
+        except OSError:
+            pass
+        raise
 
     # UNE COPIE N'EST PAS UNE SAUVEGARDE tant qu'on n'a pas vérifié qu'elle
     # se relit. L'API `backup` garantit une copie fidèle, pas la validité

@@ -55,18 +55,18 @@ if errorlevel 1 goto :echec_venv
 ".venv\Scripts\python.exe" -m pip --version >nul 2>nul || ".venv\Scripts\python.exe" -m ensurepip --upgrade >nul 2>nul
 ".venv\Scripts\python.exe" -m pip install --quiet --upgrade pip
 echo   [..] Installation de Flask...
-".venv\Scripts\python.exe" -m pip install --quiet flask
+".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt
 if errorlevel 1 goto :echec_pip
 rem reportlab sert uniquement a l'export PDF : son absence n'empeche
 rem pas le logiciel de fonctionner (l'application le detecte et le dit).
 echo   [..] Installation de reportlab (export PDF, facultatif)...
-".venv\Scripts\python.exe" -m pip install --quiet reportlab
+".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt
 if errorlevel 1 echo   [!!] reportlab non installe - tout fonctionne sauf
 if errorlevel 1 echo        l'export PDF de la liasse (l'affichage a l'ecran
 if errorlevel 1 echo        et l'impression navigateur restent disponibles).
 :venv_ok
 set "PY=.venv\Scripts\python.exe"
-"%PY%" -c "import flask" >nul 2>nul || "%PY%" -m pip install --quiet flask
+"%PY%" -c "import flask" >nul 2>nul || "%PY%" -m pip install --quiet -r requirements.txt
 echo   [OK] Environnement local pret.
 
 rem --- 3. Raccourci sur le Bureau (une seule fois) ----------------------

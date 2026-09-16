@@ -273,12 +273,22 @@ def gabarit(type_op: str, conn: sqlite3.Connection | None = None) -> dict:
     return g[type_op]
 
 
-def par_groupe(conn: sqlite3.Connection | None = None) -> list[tuple[str, list]]:
-    """[(groupe, [(cle, gabarit), …]), …] dans l'ordre d'affichage de la saisie."""
-    g = tous(conn)
+def grouper(g: dict) -> list[tuple[str, list]]:
+    """Regroupe un catalogue DÉJÀ CHARGÉ. Fonction pure, sans connexion.
+
+    `par_groupe(conn)` relisait le catalogue pour son propre compte, alors
+    que son appelant venait de le charger : une page de saisie lisait ainsi
+    trois fois la même table (constat T-09). La lecture et le regroupement
+    sont désormais deux gestes distincts, et l'appelant choisit.
+    """
     groupes: dict[str, list] = {}
     for cle, gab in g.items():
         groupes.setdefault(gab.get("groupe", "Divers"), []).append((cle, gab))
     ordre = ORDRE_GROUPES + [x for x in groupes if x not in ORDRE_GROUPES]
     return [(grp, sorted(groupes[grp], key=lambda kv: kv[1]["libelle"]))
             for grp in ordre if grp in groupes]
+
+
+def par_groupe(conn: sqlite3.Connection | None = None) -> list[tuple[str, list]]:
+    """[(groupe, [(cle, gabarit), …]), …] dans l'ordre d'affichage."""
+    return grouper(tous(conn))

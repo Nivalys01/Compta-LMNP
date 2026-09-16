@@ -170,7 +170,12 @@ def test_reportlab_non_bloquant_a_l_installation():
     avant = src.split("reportlab")[0]
     # Flask seul est essentiel : cryptography ne servait qu'à fabriquer le
     # certificat auto-signé, abandonné comme défaut en v8.15.0.
-    assert "pip install --quiet flask" in avant
+    #
+    # Les lanceurs n'écrivent plus les noms de paquets en clair : ils
+    # installent le manifeste `requirements.txt`, qui BORNE les versions.
+    # Deux installations d'une même version du logiciel donnaient sinon
+    # deux environnements différents (constat T-06).
+    assert "pip install --quiet -r requirements.txt" in avant
     assert "goto :echec_pip" not in src.split("reportlab", 1)[1].split(
         ":venv_ok")[0]                          # reportlab n'avorte rien
 

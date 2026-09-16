@@ -2157,7 +2157,12 @@ MODULES_PROD = sorted(f for f in os.listdir(os.path.join(HERE, "modules"))
 # une moitié de la même chose et se renvoyaient l'un à l'autre.
 # Données et documents : racine du paquet.
 DONNEES = ["schema.sql", "seed_referentiel.sql", "seed_demo.sql",
-           "demo/FEC_DEMO_2025.txt"]
+           "demo/FEC_DEMO_2025.txt",
+           # Manifeste des dépendances d'exécution : les lanceurs
+           # l'installent (`pip install -r requirements.txt`). Sans lui dans
+           # le paquet, le premier démarrage chez l'utilisateur échoue
+           # (constat T-06).
+           "requirements.txt"]
 # Documents : (nom dans le paquet, chemin sur le disque relatif à HERE).
 #
 # La licence et les notices tierces vivent à la RACINE du dépôt, pas ici —
@@ -2418,14 +2423,20 @@ if __name__ == "__main__":
 pytest==9.1.1
 ruff==0.16.0
 
-# Les deux suivantes ne sont pas de l'outillage : ce sont des dépendances
-# RUNTIME, que les lanceurs installent chez l'utilisateur sans les épingler
-# (et sans bloquer pour reportlab, dont l'absence ne coûte que l'export
-# PDF). Elles figurent ici parce que la SUITE DE TESTS en dépend :
+# Les deux suivantes ne sont pas de l'outillage : ce sont les dépendances
+# RUNTIME, déclarées pour l'utilisateur dans `requirements.txt`, où elles
+# sont BORNÉES et non épinglées — chez un particulier, une version exacte
+# sans roue précompilée fait échouer l'installation.
+#
+# Ici, elles sont épinglées : le développement et l'intégration continue
+# doivent éprouver UNE version connue, sans quoi une régression n'est pas
+# reproductible d'une machine à l'autre (constat T-06). Ces épingles sont
+# donc les versions de référence citées par `requirements.txt`, et les deux
+# fichiers doivent rester cohérents — un test le vérifie.
+#
+# La suite de tests en dépend directement :
 #   - flask     : les tests de bout en bout passent par le client web ;
 #   - reportlab : cinq tests de la liasse PDF échouaient sans elle.
-# Un environnement de développement incomplet donne des échecs permanents
-# qu'on finit par ignorer — le pire état pour une suite de tests.
 flask==3.1.3
 reportlab==5.0.1
 ````
@@ -2751,7 +2762,10 @@ PY=./.venv/bin/python
 if ! "$PY" -c "import flask" >/dev/null 2>&1; then
     info "Installation de Flask (une seule fois)…"
     "$PY" -m pip install --quiet --upgrade pip >/dev/null 2>&1 || true
-    if ! "$PY" -m pip install --quiet flask; then
+    # Le manifeste borne les versions au lieu de laisser pip prendre
+    # n'importe quoi : deux installations d'une même version du logiciel
+    # doivent donner le même environnement (constat T-06).
+    if ! "$PY" -m pip install --quiet -r "$DOSSIER/requirements.txt"; then
         err "Installation de Flask impossible."
         info "Une connexion internet est nécessaire au premier lancement."
         info "Derrière un proxy d'entreprise, renseignez la variable"
@@ -2761,8 +2775,33 @@ if ! "$PY" -c "import flask" >/dev/null 2>&1; then
 fi
 # reportlab ne sert qu'à l'export PDF : son absence ne doit RIEN bloquer.
 if ! "$PY" -c "import reportlab" >/dev/null 2>&1; then
-    "$PY" -m pip install --quiet reportlab >/dev/null 2>&1 \
+    "$PY" -m pip install --quiet -r "$DOSSIER/requirements.txt" >/dev/null 2>&1 \
         || warn "reportlab non installé — tout fonctionne sauf l'export PDF."
+fi
+# Un import qui réussit ne dit PAS que l'environnement est celui qu'attend
+# CETTE version du logiciel : le lanceur passait outre, et un .venv vieilli
+# survivait à toutes les mises à jour (constat T-06).
+#
+# On compare donc l'empreinte du manifeste à celle enregistrée lors de la
+# dernière installation réussie. C'est déterministe, ça ne demande pas le
+# réseau quand rien n'a changé, et ça se déclenche exactement quand le
+# manifeste bouge — c'est-à-dire quand l'utilisateur met à jour le logiciel.
+EMPREINTE_REQ="$DOSSIER/.venv/.compta-requirements"
+ATTENDUE="$("$PY" - "$DOSSIER/requirements.txt" <<'EOF'
+import sys
+from hashlib import sha256
+print(sha256(open(sys.argv[1], "rb").read()).hexdigest())
+EOF
+)"
+if [ "$(cat "$EMPREINTE_REQ" 2>/dev/null || true)" != "$ATTENDUE" ]; then
+    info "Mise à niveau des dépendances vers les versions attendues…"
+    if "$PY" -m pip install --quiet --upgrade \
+            -r "$DOSSIER/requirements.txt" >/dev/null 2>&1; then
+        printf '%s' "$ATTENDUE" > "$EMPREINTE_REQ"
+    else
+        warn "Dépendances non mises à niveau (hors ligne ?) — le logiciel"
+        warn "démarre avec l'environnement existant."
+    fi
 fi
 ok "Flask : $("$PY" -c 'import importlib.metadata as m; print(m.version("flask"))')"
 
@@ -2945,18 +2984,18 @@ if errorlevel 1 goto :echec_venv
 ".venv\Scripts\python.exe" -m pip --version >nul 2>nul || ".venv\Scripts\python.exe" -m ensurepip --upgrade >nul 2>nul
 ".venv\Scripts\python.exe" -m pip install --quiet --upgrade pip
 echo   [..] Installation de Flask...
-".venv\Scripts\python.exe" -m pip install --quiet flask
+".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt
 if errorlevel 1 goto :echec_pip
 rem reportlab sert uniquement a l'export PDF : son absence n'empeche
 rem pas le logiciel de fonctionner (l'application le detecte et le dit).
 echo   [..] Installation de reportlab (export PDF, facultatif)...
-".venv\Scripts\python.exe" -m pip install --quiet reportlab
+".venv\Scripts\python.exe" -m pip install --quiet -r requirements.txt
 if errorlevel 1 echo   [!!] reportlab non installe - tout fonctionne sauf
 if errorlevel 1 echo        l'export PDF de la liasse (l'affichage a l'ecran
 if errorlevel 1 echo        et l'impression navigateur restent disponibles).
 :venv_ok
 set "PY=.venv\Scripts\python.exe"
-"%PY%" -c "import flask" >nul 2>nul || "%PY%" -m pip install --quiet flask
+"%PY%" -c "import flask" >nul 2>nul || "%PY%" -m pip install --quiet -r requirements.txt
 echo   [OK] Environnement local pret.
 
 rem --- 3. Raccourci sur le Bureau (une seule fois) ----------------------
@@ -4644,15 +4683,25 @@ def gabarit(type_op: str, conn: sqlite3.Connection | None = None) -> dict:
     return g[type_op]
 
 
-def par_groupe(conn: sqlite3.Connection | None = None) -> list[tuple[str, list]]:
-    """[(groupe, [(cle, gabarit), …]), …] dans l'ordre d'affichage de la saisie."""
-    g = tous(conn)
+def grouper(g: dict) -> list[tuple[str, list]]:
+    """Regroupe un catalogue DÉJÀ CHARGÉ. Fonction pure, sans connexion.
+
+    `par_groupe(conn)` relisait le catalogue pour son propre compte, alors
+    que son appelant venait de le charger : une page de saisie lisait ainsi
+    trois fois la même table (constat T-09). La lecture et le regroupement
+    sont désormais deux gestes distincts, et l'appelant choisit.
+    """
     groupes: dict[str, list] = {}
     for cle, gab in g.items():
         groupes.setdefault(gab.get("groupe", "Divers"), []).append((cle, gab))
     ordre = ORDRE_GROUPES + [x for x in groupes if x not in ORDRE_GROUPES]
     return [(grp, sorted(groupes[grp], key=lambda kv: kv[1]["libelle"]))
             for grp in ordre if grp in groupes]
+
+
+def par_groupe(conn: sqlite3.Connection | None = None) -> list[tuple[str, list]]:
+    """[(groupe, [(cle, gabarit), …]), …] dans l'ordre d'affichage."""
+    return grouper(tous(conn))
 ````
 
 
@@ -5911,7 +5960,7 @@ PAGE_SAISIE = """
 </div>
 
 <script>
-const perioMap = {{ perio_json | safe }};
+const perioMap = {{ perio | tojson }};
 function majPeriode(type) {
   const bloc = document.getElementById('bloc-periode');
   bloc.style.display = (perioMap[type] === 'mensuel') ? '' : 'none';
@@ -6202,7 +6251,7 @@ PAGE_IMMO = """
 {% endif %}
 
 <script>
-const amortMap = {{ amort_json | safe }};
+const amortMap = {{ amort | tojson }};
 function majAmort(num) {
   // pas de champ visible pour compte_amort : géré côté serveur
 }

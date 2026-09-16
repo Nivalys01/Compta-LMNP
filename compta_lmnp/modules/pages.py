@@ -721,7 +721,7 @@ PAGE_SAISIE = """
 </div>
 
 <script>
-const perioMap = {{ perio_json | safe }};
+const perioMap = {{ perio | tojson }};
 function majPeriode(type) {
   const bloc = document.getElementById('bloc-periode');
   bloc.style.display = (perioMap[type] === 'mensuel') ? '' : 'none';
@@ -1012,7 +1012,7 @@ PAGE_IMMO = """
 {% endif %}
 
 <script>
-const amortMap = {{ amort_json | safe }};
+const amortMap = {{ amort | tojson }};
 function majAmort(num) {
   // pas de champ visible pour compte_amort : géré côté serveur
 }

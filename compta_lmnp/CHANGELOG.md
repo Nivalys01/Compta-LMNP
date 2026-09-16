@@ -1,5 +1,87 @@
 # Journal des versions — Compta LMNP
 
+## 8.53.0 — 2026-09-16 (Passe T : ce que chaque garde tient, leur composition le lâche)
+
+Neuf constats, quatre élevés, aucun critique — une passe agnostique, menée
+sans les invariants du programme d'audit, et c'est ce qui en fait la valeur :
+elle a regardé là où les passes précédentes avaient cessé de regarder. Son fil
+rouge n'est pas la faute isolée mais la **composition**. Chaque garde faisait
+ce qu'elle annonçait ; c'est leur assemblage qui laissait passer. Quatre des
+cinq défauts prioritaires ne sont visibles que sous concurrence, et aucun test
+séquentiel ne pouvait les voir : la suite passait au vert pendant que l'audit
+les reproduisait.
+
+**Se lier à 127.0.0.1 restreint l'interface réseau, pas les noms d'hôte qui
+résolvent vers elle.** N'importe quel domaine peut pointer sur l'adresse de
+bouclage — c'est le principe du DNS rebinding. Le serveur acceptait le `Host`
+annoncé, et la garde d'origine comparait `Origin` à ce même `Host` : un
+attaquant maîtrisant les deux les faisait coïncider. Reproduit : GET 200, POST
+302, et un dossier réellement créé sous `audit.invalid`. Une garde qui tire sa
+référence de ce qu'elle doit contrôler ne contrôle rien. Les hôtes acceptés
+sont désormais énumérés, et la garde est enregistrée **avant toute autre** —
+l'ordre est la moitié du correctif, puisque Flask exécute les `before_request`
+dans l'ordre de déclaration et ne filtre les hôtes qu'au routage.
+
+**Une seconde requête voyait « déjà migré » pendant que la première migrait
+encore.** Le correctif Q-10 posait le marqueur de succès sous verrou, puis
+travaillait après l'avoir relâché : il manquait la distinction entre
+« quelqu'un s'en occupe » et « c'est fait ». Ce sont maintenant deux ensembles
+distincts, le succès n'est publié qu'après coup, et la requête concurrente
+**attend** au lieu de contourner — puis reçoit un 503 borné plutôt que de
+patienter indéfiniment.
+
+**Deux sauvegardes simultanées n'en faisaient qu'une.** Le suffixe ajouté en
+Q-05 empêchait l'écrasement séquentiel, mais restait un « vérifier puis
+agir » : entre le `os.path.exists` et la création, l'autre appelant passait.
+Deux threads obtenaient le même chemin, chacun croyant tenir sa copie de
+sûreté. Le nom est désormais **réservé** par une création exclusive, atomique
+au niveau du système de fichiers — le seul moyen de transformer un test en
+garantie.
+
+**Et le registre des dossiers perdait une modification sur deux.**
+`os.replace` rend la publication atomique, pas le cycle lecture-modification-
+écriture qui la précède : deux renommages lisaient la même version, et le
+second réécrivait par-dessus le premier. Les deux appels réussissaient, et
+l'une des modifications disparaissait sans un mot — le pire des cas, puisque
+rien ne permet de le remarquer. Lecture et écriture ne font plus qu'une
+section critique.
+
+**`json.dumps` produit du JSON valide ; il n'échappe pas `</script>`.** Une
+catégorie personnalisée dont le libellé contenait cette séquence fermait le
+script de la page de saisie, et le filtre `| safe` retirait la dernière
+protection. Le gabarit reçoit maintenant le dictionnaire et le rend par
+`| tojson`.
+
+**Deux utilisateurs d'une même version pouvaient exécuter deux
+environnements.** Les lanceurs écrivaient `pip install flask`, sans version, et
+un import réussi les dispensait de vérifier quoi que ce soit — un `.venv`
+vieilli survivait à toutes les mises à jour. Un manifeste `requirements.txt`
+borne désormais les versions ; les lanceurs l'installent et comparent son
+empreinte à celle de la dernière installation réussie. Les bornes ne sont pas
+des épingles, et c'est délibéré : chez un particulier, une version exacte sans
+roue précompilée fait échouer l'installation pour une raison plus obscure que
+celle qu'on prétendait éviter.
+
+**Trois lectures de la même table pour une seule page** : `_catalogue`
+appelait `tous` puis `par_groupe`, qui rappelait `tous`, et la route
+rechargeait le tout. La page de saisie passe de 14 à 10 instructions SQL, sans
+cache global — dont l'invalidation aurait coûté plus cher que les trois
+lectures.
+
+**Ce qui n'est pas traité est dit.** Les cycles d'imports `fiscal ↔ controles`
+et `init_db ↔ perennite` restent ouverts, avec la direction consignée dans
+`ARCHITECTURE.md` : c'est un chantier de refonte, et le mêler à des correctifs
+de sécurité, dans le même lot, juste avant une publication, serait une faute
+de méthode. Le test navigateur et la matrice de plateformes restent ouverts
+eux aussi ; la matrice Python 3.12 / 3.13 / 3.14 est en place.
+
+Non-régression : `tests/test_passe_t.py` (22 tests, dont sept **à barrière**),
+chacun vérifié en échec sans son correctif. La première version du test T-02
+ne distinguait pas les deux états et a été refaite — le constat T-08 trouvant
+sa première application sur le traitement de T-08 lui-même. `ARCHITECTURE.md`
+ne recopie plus de compteurs : ils annonçaient 279 tests pour plus de mille.
+
+
 ## 8.52.0 — 2026-09-16 (Passe R : une garde ne doit pas prouver moins qu'elle n'en a l'air)
 
 Sept constats, deux majeurs et cinq mineurs, aucun critique. Cette passe

@@ -7,7 +7,6 @@ Lancer : python app.py   puis ouvrir http://localhost:5000
 """
 from __future__ import annotations
 import io
-import json
 import math
 import os
 import sqlite3
@@ -54,6 +53,7 @@ import uuid
 import veille_fiscale
 from pages import (ASSISTANT, PAGE_DOSSIER_ABSENT, PAGE_VERSION_TROP_RECENTE, PAGE_DEMARRAGE, PAGE_DON_SECTION, PAGE_QUITTANCES, PAGE_QUITTANCE_IMPRIMABLE, PAGE_IMPORT_SECTION, CSS, PAGE_ARCHIVES, PAGE_CLOTURE, PAGE_DOSSIERS, PAGE_EX_NOUVEAU, PAGE_IMMO, PAGE_LIASSE, PAGE_PENSE_BETE, PAGE_REGLEMENTATION, PAGE_SAISIE, PAGE_SANDBOX, PAGE_SAUVEGARDES_SECTION, PAGE_VEILLE)
 import audit_cycle
+import gardes_http
 import gabarits as gabarits_mod
 import liasse as liasse_mod
 import perennite
@@ -126,22 +126,53 @@ _MIGRES: set = set()
 # logiciel, et la garde de version refuse de les servir tant que ce n'est
 # pas réglé (constat Q-10).
 _MIGRATIONS_EN_ECHEC: dict = {}
-_VERROU_MIGRATION = threading.Lock()
+# Dossiers dont la migration est EN COURS, ici et maintenant.
+#
+# Le correctif Q-10 posait le marqueur de succès sous verrou, puis migrait
+# APRÈS l'avoir relâché. Une seconde requête voyait donc « déjà migré »
+# pendant que la première transformait encore le schéma, et repartait servir
+# des pages métier : reproduit en passe T, la requête concurrente obtenait
+# 200 alors que la migration échouait ensuite (constat T-03).
+#
+# La distinction manquante était celle entre « quelqu'un s'en occupe » et
+# « c'est fait ». Elles sont désormais deux ensembles distincts, et l'on ne
+# publie `_MIGRES` qu'après SUCCÈS.
+_MIGRATIONS_EN_COURS: set = set()
+# Condition, et non simple verrou : les requêtes concurrentes ATTENDENT la
+# fin de la migration au lieu de la contourner.
+_VERROU_MIGRATION = threading.Condition()
+# Au-delà, on cesse d'attendre et l'on répond « indisponible » plutôt que de
+# tenir la requête indéfiniment : une migration qui dure plus longtemps a un
+# problème, et un navigateur qui ne rend pas la main en a un autre.
+_ATTENTE_MIGRATION_S = 30.0
+
+
+class MigrationEnCours(Exception):
+    """La base est en cours de mise à niveau : rien à servir pour l'instant."""
 
 
 def _migrer_si_besoin() -> None:
     """Migre la base courante si son schéma est en retard. Une seule fois
     par chemin et par exécution : la vérification est une simple lecture,
     mais la migration prend une sauvegarde et ne doit pas se rejouer à
-    chaque page."""
+    chaque page.
+
+    Lève `MigrationEnCours` si une autre requête migre encore au bout de
+    `_ATTENTE_MIGRATION_S` — un refus explicite valant mieux qu'une page
+    servie sur un schéma à moitié transformé.
+    """
     try:
         chemin = _db_path()
     except FichierDossierAbsent:
         return                                   # traité par son gestionnaire
     with _VERROU_MIGRATION:
+        if not _VERROU_MIGRATION.wait_for(
+                lambda: chemin not in _MIGRATIONS_EN_COURS,
+                timeout=_ATTENTE_MIGRATION_S):
+            raise MigrationEnCours(chemin)
         if chemin in _MIGRES:
-            return
-        _MIGRES.add(chemin)
+            return                               # établi, et établi APRÈS coup
+        _MIGRATIONS_EN_COURS.add(chemin)
     try:
         c = sqlite3.connect(chemin)
         try:
@@ -155,72 +186,31 @@ def _migrer_si_besoin() -> None:
         # moitié mis à niveau, sans un mot. Les paliers déjà passés restent
         # (chacun est committé séparément), mais l'accès métier s'arrête :
         # la garde de version transforme cet échec en refus (Q-10).
-        _MIGRES.discard(chemin)                  # réessayer au prochain accès
+        with _VERROU_MIGRATION:
+            _MIGRATIONS_EN_COURS.discard(chemin)  # réessayer au prochain accès
+            _MIGRATIONS_EN_ECHEC[chemin] = str(exc)
+            _VERROU_MIGRATION.notify_all()
         _assurer_journal()
         app.logger.exception("Migration de %s interrompue", chemin)
-        _MIGRATIONS_EN_ECHEC[chemin] = str(exc)
         return
-    _MIGRATIONS_EN_ECHEC.pop(chemin, None)
+    with _VERROU_MIGRATION:
+        _MIGRATIONS_EN_COURS.discard(chemin)
+        _MIGRES.add(chemin)                      # publié seulement maintenant
+        _MIGRATIONS_EN_ECHEC.pop(chemin, None)
+        _VERROU_MIGRATION.notify_all()
 
 
-# Méthodes qui CHANGENT l'état. Une lecture forgée ne coûte rien ; une
-# écriture forgée peut clôturer un exercice ou restaurer une sauvegarde.
-_METHODES_ECRITURE = {"POST", "PUT", "PATCH", "DELETE"}
-
-
-def _hote(url: str) -> str:
-    """« http://localhost:5000/x » -> « http://localhost:5000 »."""
-    from urllib.parse import urlsplit
-    p = urlsplit(url or "")
-    return f"{p.scheme}://{p.netloc}" if p.scheme and p.netloc else ""
-
-
-@app.before_request
-def _garde_origine():
-    """Refuse une écriture dont l'ORIGINE n'est pas le logiciel lui-même.
-
-    Le modèle de menace reposait sur `host="127.0.0.1"` — « l'application
-    n'est jamais exposée au réseau local ». C'est exact pour le réseau et
-    SANS EFFET pour le navigateur : toute page ouverte dans le même
-    navigateur pouvait poster ici. Reproduit avant correctif — un POST sans
-    cookie, sans Referer et sans jeton clôturait l'exercice.
-
-    Deux aggravations le rendaient pire qu'un CSRF ordinaire. `samesite=Lax`
-    empêche l'envoi du cookie `dossier` sur une requête inter-site, si bien
-    que `_dossier_actif()` retombait sur PRINCIPAL : une requête forgée
-    visait TOUJOURS la comptabilité réelle, jamais le bac à sable. Et les
-    routes concernées remplacent la base, clôturent, annulent, cèdent —
-    aucune ne demande de connaître les données de l'utilisateur.
-
-    Règle retenue : une origine PRÉSENTE et différente est refusée ; une
-    origine ABSENTE est acceptée. Ce second choix est délibéré — curl, la
-    ligne de commande et le client de test n'envoient aucun de ces
-    en-têtes, et les exiger transformerait le contrôle en obstacle sans
-    rien gagner : un navigateur, lui, envoie TOUJOURS `Origin` sur un POST
-    inter-site (« null » si la politique de référent le masque), donc
-    l'attaque par formulaire caché est bien couverte.
-    """
-    if request.method not in _METHODES_ECRITURE:
-        return None
-    attendu = _hote(request.base_url)
-    for entete in ("Origin", "Referer"):
-        valeur = request.headers.get(entete)
-        if not valeur:
-            continue
-        if _hote(valeur) != attendu:
-            app.logger.warning("Écriture refusée — %s %s depuis %s",
-                               request.method, request.path, valeur)
-            return (
-                "Requête refusée : elle ne vient pas du logiciel.\n\n"
-                f"Origine annoncée : {valeur}\n"
-                f"Origine attendue : {attendu}\n\n"
-                "Si vous lisiez cette page dans le logiciel, revenez à "
-                "l'accueil et refaites l'action. Si vous ne comprenez pas "
-                "ce message, ne refaites rien : une autre page de votre "
-                "navigateur a peut-être tenté d'agir sur votre "
-                "comptabilité.", 403, {"Content-Type": "text/plain; charset=utf-8"})
-        return None                     # origine présente et conforme
-    return None                         # aucune origine annoncée
+# Les gardes d'ENTRÉE HTTP — nom d'hôte accepté, origine d'une écriture —
+# vivent dans `modules/gardes_http.py`. Elles ne touchent ni à la base, ni
+# au dossier actif, ni à la liasse : les garder ici gonflait le point
+# d'entrée sans qu'aucune d'elles ne dépende de lui (constat T-07).
+#
+# L'ORDRE D'ENREGISTREMENT COMPTE, et c'est pourquoi l'appel est ici, avant
+# toute autre `before_request` : Flask les exécute dans l'ordre de
+# déclaration, et son propre filtrage TRUSTED_HOSTS n'intervient qu'au
+# routage. Un hôte hostile atteindrait sinon la migration et la garde de
+# version avant d'être rejeté.
+gardes_http.enregistrer(app)
 
 
 @app.before_request
@@ -242,7 +232,17 @@ def _garde_version_schema():
     # était ouverte telle quelle : le garde ne voyait rien (il ne refuse
     # qu'une base plus RÉCENTE), et les routes écrivaient dans un schéma
     # périmé — sans la copie de sûreté que la migration produit.
-    _migrer_si_besoin()
+    try:
+        _migrer_si_besoin()
+    except MigrationEnCours:
+        return (
+            "Mise à niveau du dossier en cours.\n\n"
+            "Le schéma de cette comptabilité est en train d'être transformé "
+            "par une autre fenêtre ou un autre onglet. Servir cette page "
+            "maintenant reviendrait à lire une base à moitié convertie.\n\n"
+            "Patientez quelques secondes et rechargez.",
+            503, {"Content-Type": "text/plain; charset=utf-8",
+                  "Retry-After": "5"})
     # Migration en ÉCHEC : le schéma n'est pas au niveau du logiciel, et
     # continuer reviendrait à écrire dans une base à moitié mise à jour.
     # L'exception était avalée et la requête poursuivait sans un mot.
@@ -418,11 +418,21 @@ def _db_path() -> str:
 
 
 def _catalogue(conn):
-    """(choix_groupes, produit_types, libelles) pour la connexion courante."""
+    """(choix_groupes, produit_types, libelles, periodicites) — UNE lecture.
+
+    Les quatre vues sortent du même chargement. Elles venaient de trois
+    lectures distinctes de `gabarit_personnalise` pour une seule page de
+    saisie : `_catalogue` appelait `tous` puis `par_groupe`, qui rappelait
+    `tous`, et la route rechargeait le tout pour les périodicités (constat
+    T-09). Coût constant et évitable — corrigé en dérivant les vues d'un
+    dictionnaire, plutôt qu'en posant un cache global dont l'invalidation
+    serait plus risquée que les trois lectures.
+    """
     g = gabarits_mod.tous(conn)
-    return (gabarits_mod.par_groupe(conn),
+    return (gabarits_mod.grouper(g),
             {k for k, v in g.items() if v["nature"] == "produit"},
-            {k: v["libelle"] for k, v in g.items()})
+            {k: v["libelle"] for k, v in g.items()},
+            {k: v["periodicite"] for k, v in g.items()})
 
 # Comptes immobilisation disponibles (compte_immo → compte_amort ou None).
 # La table vivait ICI, en dur, dans la couche web — une connaissance
@@ -683,15 +693,14 @@ def saisie():
         "WHERE o.exercice_annee=? ORDER BY o.date_operation DESC, o.id DESC LIMIT 100",
         (annee,),
     ).fetchall()
-    choix_groupes, produit_types, libs = _catalogue(conn)
-    perio = {k: g["periodicite"] for k, g in gabarits_mod.tous(conn).items()}
+    choix_groupes, produit_types, libs, perio = _catalogue(conn)
     conn.close()
     body = render_template_string(PAGE_DON_SECTION) \
         + render_template_string(PAGE_SAISIE,
         annee=annee, today=date.today().isoformat(),
         choix_groupes=choix_groupes, biens=biens, ops=ops,
         produit_types=produit_types, gabarits_lib=libs,
-        perio_json=json.dumps(perio),
+        perio=perio,
     ) + render_template_string(PAGE_IMPORT_SECTION,
         propositions=None, jeton="")
     return _base(body, active="saisie", annee=annee, annees=annees,
@@ -830,7 +839,7 @@ def immobilisations():
             if not any(c["bien_id"] == b["id"] for c in compos)},
         annee=annee, exploitant=exp, biens=biens, composants=compos,
         comptes_immo=COMPTES_IMMO,
-        amort_json=json.dumps(amort_map),
+        amort=amort_map,
     )
     return _base(body, active="immobilisations", annee=annee, annees=annees,
                  flash_ok=request.args.get("ok",""),
@@ -1970,14 +1979,13 @@ def import_proposer():
         annee = _annee_param(conn)
         annees = _annees(conn)
         biens = conn.execute("SELECT id, libelle FROM bien ORDER BY id").fetchall()
-        choix_groupes, produit_types, libs = _catalogue(conn)
-        perio = {k: g["periodicite"] for k, g in gabarits_mod.tous(conn).items()}
+        choix_groupes, produit_types, libs, perio = _catalogue(conn)
         ops = []
         body = render_template_string(PAGE_SAISIE,
             annee=annee, today=date.today().isoformat(),
             choix_groupes=choix_groupes, biens=biens, ops=ops,
             produit_types=produit_types, gabarits_lib=libs,
-            perio_json=json.dumps(perio),
+            perio=perio,
         ) + render_template_string(PAGE_IMPORT_SECTION,
             propositions=props, jeton=jeton)
         avertissement = ("" if not rejets else
