@@ -149,8 +149,15 @@ def cmd_cloturer(a):
         print(controles.rapport(conn, a.annee))
         print("\n⛔ Clôture refusée (anomalies bloquantes). Corrige-les ou utilise --forcer.")
         conn.close()
-        return
-    res = fiscal.cloturer(conn, a.annee, autres_retraitements=a.retraitements)
+        # Le CODE DE RETOUR est le verdict pour tout ce qui appelle cette
+        # commande autrement qu'en la lisant : script de sauvegarde, tâche
+        # planifiée, chaîne d'intégration. Il valait 0 sur un refus, et un
+        # appelant pouvait donc enchaîner comme si la clôture avait eu
+        # lieu. Le texte affiché était pourtant sans ambiguïté : c'est le
+        # contrat de commande qui manquait.
+        raise SystemExit(1)
+    res = fiscal.cloturer(conn, a.annee, autres_retraitements=a.retraitements,
+                          forcer=a.forcer)
     # Archivage du FEC : la version web le fait, celle-ci ne le faisait PAS,
     # alors que le commentaire ci-dessus affirmait le contraire. Une clôture
     # en ligne de commande ne laissait donc aucune trace dans archives/ ni

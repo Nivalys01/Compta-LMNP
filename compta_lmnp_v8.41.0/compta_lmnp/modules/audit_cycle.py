@@ -279,6 +279,16 @@ def phase_2_detection(conn: sqlite3.Connection, r: Rapport, annee: int) -> None:
         operations.saisir(conn, type="cfe", montant=341.0,
                           date_operation=f"{annee}-12-{j}", periode=f"{annee}-12")
 
+    # Deux flux ENCORE « à identifier », de sens opposés et de même montant.
+    # Le compte d'attente n'avait aucun témoin dans ce cycle : retirer son
+    # contrôle de la liste passait donc inaperçu. Les deux montants se
+    # compensent exprès — un solde nul ne vaut pas apurement, c'est
+    # précisément ce que le contrôle doit reconnaître.
+    operations.saisir(conn, type="attente_encaissement", montant=800.0,
+                      date_operation=f"{annee}-09-05", periode=f"{annee}-09")
+    operations.saisir(conn, type="attente_decaissement", montant=800.0,
+                      date_operation=f"{annee}-09-06", periode=f"{annee}-09")
+
     anos = controles.controler(conn, annee)
     codes = " | ".join(f"{a.code}:{a.niveau}" for a in anos)
 
@@ -293,8 +303,18 @@ def phase_2_detection(conn: sqlite3.Connection, r: Rapport, annee: int) -> None:
             detecte("EQUILIBRE") and bool(controles.bloquants(anos)),
             f"{len(controles.bloquants(anos))} bloquant(s)")
     r.check(P, "Charge au crédit (sens anormal) détectée", detecte("SENS"), "")
+    # Le NIVEAU fait partie du contrat, pas seulement la présence du code :
+    # dégrader `DATE_HORS_EXERCICE` en simple avertissement passait
+    # inaperçu, l'audit ne cherchant que le code.
+    date_bloquante = any(a.code == "DATE_HORS_EXERCICE"
+                         and a.niveau == controles.BLOQUANT for a in anos)
     r.check(P, "Écriture datée hors exercice détectée (BLOQUANT)",
-            detecte("DATE_HORS_EXERCICE"), "")
+            date_bloquante,
+            "présente mais non bloquante" if detecte("DATE_HORS_EXERCICE")
+            and not date_bloquante else "")
+    r.check(P, "Compte d'attente non apuré détecté (BLOQUANT)",
+            any(a.code == "COMPTE_ATTENTE" and a.niveau == controles.BLOQUANT
+                for a in anos), "")
     r.check(P, "Intérêts d'emprunt mal classés détectés (cas réel 2024)",
             detecte("INTERETS_MAL_CLASSES"), "")
     r.check(P, "Charge annuelle saisie deux fois détectée (CFE ×2)",
@@ -303,14 +323,26 @@ def phase_2_detection(conn: sqlite3.Connection, r: Rapport, annee: int) -> None:
             detecte("CHARGE_ATTENDUE"),
             "taxe foncière / assurance non saisies sur l'exercice de test")
 
-    # La clôture doit REFUSER tant que le bloquant n'est pas levé — ici on
-    # vérifie simplement que le moteur classe l'anomalie comme bloquante,
-    # puis on neutralise l'écriture pour laisser la base propre.
+    # La clôture doit REFUSER tant qu'un bloquant subsiste. L'audit se
+    # contentait de vérifier le CLASSEMENT de l'anomalie, puis effaçait les
+    # écritures fautives avant de clôturer : il n'éprouvait donc jamais le
+    # refus qu'il annonçait. On l'éprouve pour de bon, en tentant la
+    # clôture AVANT le nettoyage.
+    refus = ""
+    try:
+        fiscal.cloturer(conn, annee)
+        refuse = False
+    except ValueError as exc:
+        refus, refuse = str(exc)[:80], True
+    r.check(P, "Clôture REFUSÉE tant qu'une anomalie bloquante subsiste",
+            refuse, refus or "la clôture a été acceptée malgré un bloquant")
+
     conn.execute("DELETE FROM ligne WHERE ecriture_id IN "
                  "(SELECT id FROM ecriture WHERE piece_ref LIKE 'AUDIT-%')")
     conn.execute("DELETE FROM ecriture WHERE piece_ref LIKE 'AUDIT-%'")
+    conn.execute("UPDATE operation SET annulee=1 WHERE type LIKE 'attente_%'")
     conn.commit()
-    fiscal.cloturer(conn, annee)   # clôture propre pour enchaîner la phase 3
+    fiscal.cloturer(conn, annee, forcer=True)   # base nettoyée : on enchaîne
 
 
 # ── Phase 3 : mécanique 39 C / déficits sur plusieurs exercices ─────────────
@@ -339,9 +371,16 @@ def phase_3_fiscal(conn: sqlite3.Connection, r: Rapport, annee: int) -> None:
             f"résultat comptable {ag['resultat_comptable']:.2f} € → fiscal "
             f"{res['resultat_fiscal']:.2f} €")
 
+    # Ce contrôle passait `True` en dur : il affichait deux montants et
+    # concluait au succès quoi qu'ils vaillent. Une condition constante
+    # n'éprouve rien — elle donne seulement l'apparence d'une vérification.
+    # Ce que la règle affirme, c'est que l'excédent de dotation part au
+    # report 39 C et NON au déficit : un exercice dont le résultat fiscal
+    # est ramené à zéro par le report ne doit créer aucun déficit.
     stock_defi = conn.execute("SELECT COALESCE(SUM(solde),0) FROM deficit_lmnp").fetchone()[0]
     r.check(P, "Files 39 C et déficits LMNP jamais cumulées",
-            True, f"stock 39 C {s['stock_cloture']:.2f} € ; stock déficits {stock_defi:.2f} €")
+            s["stock_cloture"] > 0 and abs(stock_defi) < 0.01,
+            f"stock 39 C {s['stock_cloture']:.2f} € ; stock déficits {stock_defi:.2f} €")
 
     # Exercice bénéficiaire suivant : utilisation du stock 39 C
     annee2 = annee + 1

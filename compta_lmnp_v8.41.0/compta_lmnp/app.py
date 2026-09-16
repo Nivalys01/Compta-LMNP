@@ -1237,28 +1237,26 @@ def cloturer():
             conn.close()
             return redirect(url_for("cloture", annee=annee, warn=warn))
 
-        # Le retraitement saisi À L'INSTANT n'est encore nulle part en base :
-        # le contrôle qui en avertit ne pouvait donc parler qu'après la
-        # clôture, sur un exercice déjà figé — et une saisie malencontreuse
-        # faisait disparaître le report 39 C sans que rien ne l'ait annoncé.
-        # On le consulte avec la valeur soumise, AVANT de figer.
-        if retr and not forcer:
-            avert = controles.c_retraitement_manuel_majore_le_plafond(
-                conn, annee, manuel_saisi=retr)
-            if avert:
-                conn.close()
-                return redirect(url_for(
-                    "cloture", annee=annee,
-                    warn=avert[0].message
-                    + " Si c'est bien ce que vous voulez, cochez « Forcer » "
-                      "pour clôturer avec ce retraitement."))
+        # Le retraitement saisi À L'INSTANT n'est encore nulle part en
+        # base : le contrôle ne pouvait donc parler qu'après la clôture, sur
+        # un exercice déjà figé (constat I-10).
+        avert = (controles.c_retraitement_manuel_majore_le_plafond(
+            conn, annee, manuel_saisi=retr) if retr and not forcer else [])
+        if avert:
+            conn.close()
+            return redirect(url_for("cloture", annee=annee, warn=(
+                avert[0].message + " Si c'est bien ce que vous voulez, "
+                "cochez « Forcer » pour clôturer avec ce retraitement.")))
 
         # J6 — pérennité : sauvegarde AVANT l'opération la plus lourde de
         # conséquences, archivage FEC + empreinte SHA-256 APRÈS (piste
         # d'audit). Sans objet dans le bac à sable (dossier jetable).
         if not _en_bac_a_sable():
             perennite.sauvegarder(_db_path(), "avant-cloture")
-        res = fiscal.cloturer(conn, annee, autres_retraitements=retr)
+        # `forcer` est transmis : sans lui, l'API refuserait la clôture que
+        # l'utilisateur vient justement de confirmer par la case à cocher.
+        res = fiscal.cloturer(conn, annee, autres_retraitements=retr,
+                              forcer=forcer)
         # À PARTIR D'ICI L'EXERCICE EST CLOS — fiscal.cloturer a committé.
         # L'archivage qui suit est une piste d'audit, pas une condition : il
         # était dans le même try que la clôture, si bien qu'un disque plein
@@ -1578,6 +1576,11 @@ def archive_telecharger(nom):
     chemin = os.path.join(dossier, os.path.basename(nom))
     if not os.path.isfile(chemin) or not chemin.lower().endswith(".txt"):
         return redirect(url_for("archives_page", err="Archive introuvable."))
+    # Une archive n'a de valeur que parce que son empreinte le prouve : la
+    # servir sans vérifier, c'est en faire un fichier ordinaire.
+    refus = perennite.motif_archive_non_servable(_db_path(), chemin)
+    if refus:
+        return redirect(url_for("archives_page", err=refus))
     return send_file(chemin, as_attachment=True,
                      download_name=os.path.basename(chemin),
                      mimetype="text/plain")
@@ -1595,6 +1598,12 @@ def sauvegardes_restaurer():
     chemin = os.path.join(perennite.dossier_sauvegardes(_db_path()), nom)
     try:
         perennite.restaurer(_db_path(), chemin)
+        # Cache de migration indexé par CHEMIN : après restauration, le
+        # chemin est le même mais la base ne l'est plus. On l'oublie, et la
+        # migration repasse (constat O-07).
+        with _VERROU_MIGRATION:
+            _MIGRES.discard(_db_path())
+        _migrer_si_besoin()
         return redirect(url_for("dossiers_page", annee=annee,
                                 ok=f"Dossier restauré depuis {nom}. L'état "
                                    "précédent est conservé en « avant-"

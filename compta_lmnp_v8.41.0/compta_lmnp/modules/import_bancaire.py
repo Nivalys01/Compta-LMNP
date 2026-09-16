@@ -204,12 +204,9 @@ def _seuil_immobilisation(conn=None, annee: int | None = None) -> float:
     """
     if conn is None or annee is None:
         return 500.0
-    try:
-        import parametres
-        return float(parametres.valeur(conn, "seuil_immobilisation", annee,
-                                       defaut=500.0))
-    except Exception:                     # noqa: BLE001 — le seuil ne doit
-        return 500.0                      # jamais faire échouer un import
+    import parametres
+    return float(parametres.valeur(conn, "seuil_immobilisation", annee,
+                                   defaut=500.0))
 
 
 def categoriser(libelle: str, montant: float, conn=None,
@@ -267,7 +264,19 @@ def _depasse_le_seuil(type_op: str, montant: float, conn=None,
     g = _gabarits.tous(conn) if conn is not None else _gabarits.GABARITS
     if not g.get(type_op, {}).get("seuil_immo"):
         return False
-    return abs(montant) > _seuil_immobilisation(conn, annee)
+    # Le seuil est le GARDE-FOU : s'il ne peut pas être lu, la ligne part en
+    # attente plutôt qu'en charge. L'exception était avalée au profit de la
+    # valeur livrée — une règle abaissée à 300 € et devenue illisible
+    # laissait donc proposer en charge un achat de 400 € que la règle
+    # disponible excluait, sans que la proposition dise un mot de son
+    # ignorance. Un repli silencieux vers la valeur la plus permissive est
+    # la pire réponse possible à l'indisponibilité d'un garde-fou : on
+    # préfère l'attente, qui demande une décision.
+    try:
+        seuil = _seuil_immobilisation(conn, annee)
+    except Exception:                                # noqa: BLE001
+        return True
+    return abs(montant) > seuil
 
 
 def _signature(libelle: str) -> str:

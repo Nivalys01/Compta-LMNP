@@ -28,6 +28,9 @@ Règles livrées (valeurs 2026, références légales en commentaire) :
 """
 from __future__ import annotations
 
+import datetime
+import math
+
 import sqlite3
 
 # (cle, valeur, date_debut, reference, commentaire, libelle humain)
@@ -96,6 +99,65 @@ def impact(cle: str) -> tuple[str, str]:
                              "l'usage qui en est fait."))
 
 
+# Domaine de validité de chaque règle livrée : (minimum, maximum, entier).
+# Une règle fiscale est versionnable, pas arbitraire. Sans domaine, une
+# durée de report saisie à ZÉRO faisait expirer un déficit l'année même de
+# sa naissance — 1 200 € purgés par le moteur, et un bénéfice de 1 200 €
+# laissé sans son imputation. Un seuil négatif, lui, déclenche une alerte
+# sur toute dépense ; un seuil démesuré n'en déclenche plus aucune.
+DOMAINES: dict[str, tuple] = {
+    "seuil_immobilisation": (1.0, 100_000.0, False),
+    "duree_report_deficit_lmnp": (1.0, 30.0, True),
+    "seuil_lmp_recettes": (1.0, 10_000_000.0, False),
+    "seuil_micro_bic_meuble": (1.0, 10_000_000.0, False),
+    "retraitement_alur_auto": (0.0, 1.0, True),
+}
+
+
+# Marque apposée au commentaire d'une règle RECRÉÉE après coup, c'est-à-dire
+# réapparue alors que d'autres règles existaient déjà — signature d'une
+# configuration perdue, et non d'une première initialisation.
+MARQUE_RETABLIE = " [rétablie à sa valeur livrée]"
+# Clé de `meta` posée au premier ensemencement des règles.
+MARQUE_SEMEES = "regles_fiscales_semees_le"
+
+
+def regles_retablies(conn: sqlite3.Connection) -> list[str]:
+    """Clés des règles recréées à leur valeur livrée après une disparition.
+
+    Leur valeur d'origine n'est pas récupérable : la table d'historique ne
+    conserve que ce qui s'y trouve. Le seul service honnête est de DIRE
+    que la valeur affichée n'est peut-être pas celle qui s'appliquait.
+    """
+    assurer(conn)
+    return [r[0] for r in conn.execute(
+        "SELECT DISTINCT cle FROM regle_fiscale WHERE commentaire LIKE ?",
+        ("%" + MARQUE_RETABLIE + "%",))]
+
+
+def verifier_domaine(cle: str, valeur_numerique: float) -> None:
+    """Lève ValueError si la valeur sort du domaine admis pour cette règle."""
+    if not math.isfinite(valeur_numerique):
+        raise ValueError(
+            f"Valeur de règle invalide pour « {cle} » : un seuil doit être "
+            "un nombre fini. Une valeur infinie rendrait définitivement "
+            "muets les contrôles qui s'y comparent.")
+    borne = DOMAINES.get(cle)
+    if borne is None:
+        return                     # règle personnalisée : domaine inconnu
+    mini, maxi, entier = borne
+    libelle = LIBELLES.get(cle, cle)
+    if entier and abs(valeur_numerique - round(valeur_numerique)) > 1e-9:
+        raise ValueError(f"« {libelle} » attend un nombre entier : "
+                         f"{valeur_numerique} n'en est pas un.")
+    if not (mini <= valeur_numerique <= maxi):
+        raise ValueError(
+            f"« {libelle} » : {valeur_numerique:g} est hors du domaine admis "
+            f"({mini:g} à {maxi:g}). Une valeur hors de ces bornes ne "
+            "traduit aucune disposition applicable — elle ne ferait que "
+            "neutraliser les calculs qui s'y réfèrent.")
+
+
 def assurer(conn: sqlite3.Connection) -> None:
     """Crée la table si besoin et insère les règles par défaut manquantes."""
     conn.execute(
@@ -107,13 +169,34 @@ def assurer(conn: sqlite3.Connection) -> None:
         "  date_fin    TEXT,"                    # NULL = toujours en vigueur
         "  reference   TEXT NOT NULL DEFAULT ''," # texte légal (CGI, BOFiP, LF)
         "  commentaire TEXT NOT NULL DEFAULT '')")
+    # Une table VIDE ne dit pas si c'est la première ouverture du dossier
+    # ou la disparition de sa configuration : les deux se présentent
+    # exactement pareil. On pose donc une marque durable au premier
+    # ensemencement, et c'est son absence — et non celle des règles — qui
+    # signe une première fois.
+    conn.execute("CREATE TABLE IF NOT EXISTS meta ("
+                 "cle TEXT PRIMARY KEY, valeur TEXT NOT NULL)")
+    deja_seme = conn.execute("SELECT 1 FROM meta WHERE cle=?",
+                             (MARQUE_SEMEES,)).fetchone() is not None
+    premiere_fois = not deja_seme
     for cle, valeur, debut, ref, com, _lib in REGLES_DEFAUT:
         n = conn.execute("SELECT COUNT(*) FROM regle_fiscale WHERE cle=?",
                          (cle,)).fetchone()[0]
         if n == 0:
+            # Le commentaire porte la TRACE de cette réinsertion. Une règle
+            # recréée en silence est indiscernable d'une règle jamais
+            # touchée : un seuil abaissé à 300 €, puis perdu, revenait à
+            # 500 € et l'avertissement disparaissait avec lui, sans que
+            # rien ne distingue cette perte d'une première initialisation.
+            # `regles_retablies()` permet de la signaler.
             conn.execute(
                 "INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, "
-                "commentaire) VALUES (?,?,?,?,?)", (cle, valeur, debut, ref, com))
+                "commentaire) VALUES (?,?,?,?,?)",
+                (cle, valeur, debut, ref,
+                 com if premiere_fois else com + MARQUE_RETABLIE))
+    conn.execute("INSERT INTO meta (cle, valeur) VALUES (?, ?) "
+                 "ON CONFLICT(cle) DO NOTHING",
+                 (MARQUE_SEMEES, datetime.date.today().isoformat()))
     # Même précaution que `gabarits.assurer_table` : cette fonction sème la
     # table au premier accès, donc sur un chemin de LECTURE — `valeur()`
     # l'appelle. Committer inconditionnellement terminerait la transaction
@@ -167,10 +250,32 @@ def definir(conn: sqlite3.Connection, cle: str, nouvelle_valeur: float,
         "UPDATE regle_fiscale SET date_fin=? WHERE cle=? AND date_debut<? "
         "AND (date_fin IS NULL OR date_fin>=?)",
         (veille, cle, date_debut, date_debut))
+    # …et la nouvelle version reçoit sa propre fin lorsqu'une version
+    # POSTÉRIEURE existe déjà. Seule la clôture de la version précédente
+    # était faite : saisir une règle rétroactive laissait donc deux
+    # périodes ouvertes en même temps, et l'historique se contredisait.
+    # Le tri par date décroissante sauvait le calcul, mais il ne peut pas
+    # servir de justification devant un vérificateur — et il suffisait de
+    # clore la version la plus récente pour voir l'ancienne ressurgir.
+    suivante = conn.execute(
+        "SELECT MIN(date_debut) FROM regle_fiscale WHERE cle=? AND "
+        "date_debut>?", (cle, date_debut)).fetchone()[0]
+    fin = _veille(suivante) if suivante else None
+    # Une règle fiscale est un NOMBRE FINI. `float()` accepte « inf » et
+    # « 1e309 » : enregistrer un seuil infini rendait muets, pour toujours
+    # et sans un mot, les contrôles qui s'y comparent — aucune dépense ne
+    # dépasse l'infini. Un garde-fou qu'on peut désactiver par une saisie
+    # est pire qu'un garde-fou absent : on croit encore l'avoir.
+    try:
+        valeur_numerique = float(nouvelle_valeur)
+    except (TypeError, ValueError):
+        raise ValueError(f"Valeur de règle invalide pour « {cle} » : "
+                         f"{nouvelle_valeur!r} n'est pas un nombre.") from None
+    verifier_domaine(cle, valeur_numerique)
     conn.execute(
-        "INSERT INTO regle_fiscale (cle, valeur, date_debut, reference, commentaire) "
-        "VALUES (?,?,?,?,?)",
-        (cle, float(nouvelle_valeur), date_debut, reference, commentaire))
+        "INSERT INTO regle_fiscale (cle, valeur, date_debut, date_fin, "
+        "reference, commentaire) VALUES (?,?,?,?,?,?)",
+        (cle, valeur_numerique, date_debut, fin, reference, commentaire))
     conn.commit()
 
 

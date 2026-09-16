@@ -90,7 +90,7 @@ def test_reprise_resout_l_ecart_sans_toucher_au_resultat(dossier):
     assert apres["f2033b"]["benefice_ou_perte_310"] == pytest.approx(avant)
     # le bilan porte désormais le cumul d'ouverture
     assert apres["f2033a"]["amortissements_030"] == pytest.approx(r["total"])
-    fiscal.cloturer(dossier, 2026)
+    fiscal.cloturer(dossier, 2026, forcer=True)
     fin = liasse.generer(dossier, 2026)
     ecart = (fin["f2033c"]["totaux"]["amort_fin"]
              - fin["f2033a"]["amortissements_030"])
@@ -181,12 +181,12 @@ def test_la_projection_annonce_exactement_la_cloture(dossier):
                                     fonds_alur=25, travaux=500)
     proj = liasse.generer(dossier, 2026)["projection_cloture"]
     assert proj["dotation_previsionnelle"] > 0      # dotation pas encore écrite
-    apres = fiscal.cloturer(dossier, 2026)["resultat_fiscal"]
+    apres = fiscal.cloturer(dossier, 2026, forcer=True)["resultat_fiscal"]
     assert proj["resultat_fiscal_projete"] == pytest.approx(apres)
 
 
 def test_projection_absente_si_exercice_clos(dossier):
-    fiscal.cloturer(dossier, 2026)
+    fiscal.cloturer(dossier, 2026, forcer=True)
     assert liasse.generer(dossier, 2026)["projection_cloture"] is None
 
 
@@ -392,7 +392,7 @@ def test_duree_corrigeable_depuis_l_interface(tmp_path, monkeypatch):
     assert cx.execute("SELECT amortissable FROM composant WHERE id=1"
                       ).fetchone()[0] == 0
     cx.row_factory = sqlite3.Row
-    fiscal.cloturer(cx, 2026)                     # la clôture passe enfin
+    fiscal.cloturer(cx, 2026, forcer=True)                     # la clôture passe enfin
     cx.close()
     monkeypatch.delenv("COMPTA_DB")
     importlib.reload(app_mod)
@@ -605,7 +605,7 @@ def test_imputation_des_deficits_du_plus_ancien_au_plus_recent(bien_nu):
     bien_nu.commit()
     operations.saisir(bien_nu, type="loyer", montant=900, periode="2026-01",
                       date_operation="2026-01-05", bien_id=1)
-    fiscal.cloturer(bien_nu, 2026)
+    fiscal.cloturer(bien_nu, 2026, forcer=True)
     soldes = dict(bien_nu.execute(
         "SELECT annee_origine, solde FROM deficit_lmnp"))
     assert soldes[2016] == pytest.approx(0.0)      # le plus ancien d'abord
@@ -1206,7 +1206,7 @@ def test_quittances_sans_effet_sur_la_comptabilite(bien_nu):
                   for t in ("ecriture", "ligne", "operation"))
     assert avant == apres
     # …et la clôture doit continuer de fonctionner à l'identique
-    r = fiscal.cloturer(bien_nu, 2026)
+    r = fiscal.cloturer(bien_nu, 2026, forcer=True)
     assert r["resultat_fiscal"] is not None
 
 
@@ -1472,14 +1472,14 @@ def test_stock_39c_est_bien_neutralise_a_la_cession(tmp_path):
     operations.saisir(c, type="loyer", montant=2000, periode="2026-01",
                       date_operation="2026-01-05", bien_id=1)
     c.commit()
-    r1 = fiscal.cloturer(c, 2026)
+    r1 = fiscal.cloturer(c, 2026, forcer=True)
     assert r1["suivi_39c"]["stock_cloture"] > 0
     reprise.ouvrir_exercice(c, 2027)
     operations.saisir(c, type="loyer", montant=2000, periode="2027-01",
                       date_operation="2027-01-05", bien_id=1)
     cession.ceder_bien(c, bien_id=1, date_cession="2027-06-30",
                        prix_cession=150000)
-    r2 = fiscal.cloturer(c, 2027)
+    r2 = fiscal.cloturer(c, 2027, forcer=True)
     assert r2["suivi_39c"]["stock_cloture"] == pytest.approx(0.0)
     sortie = c.execute("SELECT COALESCE(SUM(sortie_bien), 0) FROM "
                        "suivi_39c_bien WHERE exercice_annee=2027"
@@ -1507,7 +1507,7 @@ def test_recloture_refusee_apres_reouverture(tmp_path):
     operations.saisir(c, type="loyer", montant=20000, periode="2024-01",
                       date_operation="2024-01-05", bien_id=1)
     c.commit()
-    fiscal.cloturer(c, 2024)
+    fiscal.cloturer(c, 2024, forcer=True)
     c.execute("UPDATE exercice SET statut='ouvert' WHERE annee=2024")
     c.commit()
     with pytest.raises(Exception, match="déjà générée"):
@@ -1566,7 +1566,7 @@ def test_deficit_menace_par_le_39c_est_signale(tmp_path):
     operations.saisir(c, type="loyer", montant=5000, periode="2025-01",
                       date_operation="2025-01-05", bien_id=1)
     c.commit()
-    fiscal.cloturer(c, 2025)
+    fiscal.cloturer(c, 2025, forcer=True)
     alertes = [a for a in controles.controler(c, 2025)
                if a.code == "DEFICIT_MENACE_PAR_39C"]
     assert alertes, "le déficit menacé n'est pas signalé"
@@ -1720,7 +1720,7 @@ def test_charges_exceptionnelles_entrent_dans_le_resultat(tmp_path):
     ligne 310 comptait la recette de la vente sans sa contrepartie."""
     import fiscal
     c = _dossier_cede(tmp_path)
-    rc = fiscal.cloturer(c, 2026)
+    rc = fiscal.cloturer(c, 2026, forcer=True)
     L = liasse.generer(c, 2026)
     assert L["f2033b"]["benefice_ou_perte_310"] == pytest.approx(
         rc["agregats"]["resultat_comptable"], abs=0.01)
@@ -1733,7 +1733,7 @@ def test_2033c_exclut_les_biens_cedes(tmp_path):
     immobilisations : les deux divergeaient définitivement."""
     import fiscal
     c = _dossier_cede(tmp_path, vb=9000)
-    fiscal.cloturer(c, 2026)
+    fiscal.cloturer(c, 2026, forcer=True)
     L = liasse.generer(c, 2026)
     assert L["f2033c"]["totaux"]["brut_fin"] == pytest.approx(0.0, abs=0.01)
     c.close()
@@ -1759,7 +1759,7 @@ def test_stock_39c_survit_a_une_annee_manquante(tmp_path):
     operations.saisir(c, type="maintenance", montant=9000,
                       date_operation="2023-02-05", bien_id=1)
     c.commit()
-    r23 = fiscal.cloturer(c, 2023)
+    r23 = fiscal.cloturer(c, 2023, forcer=True)
     assert r23["suivi_39c"]["stock_cloture"] == pytest.approx(4000.0)
     # 2024 n'est JAMAIS ouvert
     c.execute("INSERT INTO exercice (annee, date_debut, date_fin, statut) "
@@ -1770,7 +1770,7 @@ def test_stock_39c_survit_a_une_annee_manquante(tmp_path):
     operations.saisir(c, type="maintenance", montant=2000,
                       date_operation="2025-02-05", bien_id=1)
     c.commit()
-    r25 = fiscal.cloturer(c, 2025)
+    r25 = fiscal.cloturer(c, 2025, forcer=True)
     assert r25["suivi_39c"]["stock_ouverture"] == pytest.approx(4000.0)
     assert r25["resultat_fiscal"] == pytest.approx(0.0)   # et non 3 000
     par_bien = sum(x[0] for x in c.execute(
@@ -1823,7 +1823,7 @@ def test_changement_de_duree_ne_sur_amortit_pas(tmp_path):
         operations.saisir(c, type="loyer", montant=9000, periode=f"{a}-01",
                           date_operation=f"{a}-01-05", bien_id=1)
         c.commit()
-        fiscal.cloturer(c, a)
+        fiscal.cloturer(c, a, forcer=True)
     c.execute("UPDATE composant SET duree_annees=8 WHERE id=1")
     c.commit()
     for a in range(2025, 2031):
@@ -1831,7 +1831,7 @@ def test_changement_de_duree_ne_sur_amortit_pas(tmp_path):
         operations.saisir(c, type="loyer", montant=9000, periode=f"{a}-01",
                           date_operation=f"{a}-01-05", bien_id=1)
         c.commit()
-        fiscal.cloturer(c, a)
+        fiscal.cloturer(c, a, forcer=True)
     cumul = c.execute(
         "SELECT ROUND(SUM(l.credit - l.debit), 2) FROM ligne l "
         "JOIN ecriture e ON e.id = l.ecriture_id "
@@ -1881,7 +1881,7 @@ def test_bien_cede_emporte_sa_part_du_report(tmp_path):
     c.commit()
     cession.ceder_bien(c, bien_id=1, date_cession="2026-06-30",
                        prix_cession=250000)
-    r = fiscal.cloturer(c, 2026)
+    r = fiscal.cloturer(c, 2026, forcer=True)
     lignes = {x[0]: x for x in c.execute(
         "SELECT bien_id, ROUND(report_bien,2), ROUND(sortie_bien,2), "
         "ROUND(stock_cloture,2) FROM suivi_39c_bien WHERE exercice_annee=2026")}
@@ -1911,14 +1911,14 @@ def test_cases_2042c_sur_la_meme_base(tmp_path):
     operations.saisir(c, type="maintenance", montant=10000,
                       date_operation="2025-02-05", bien_id=1)
     c.commit()
-    fiscal.cloturer(c, 2025)                    # déficit 8 000
+    fiscal.cloturer(c, 2025, forcer=True)                    # déficit 8 000
     reprise.ouvrir_exercice(c, 2026)
     operations.saisir(c, type="loyer", montant=9000, periode="2026-01",
                       date_operation="2026-01-05", bien_id=1)
     operations.saisir(c, type="maintenance", montant=4000,
                       date_operation="2026-02-05", bien_id=1)
     c.commit()
-    fiscal.cloturer(c, 2026)                    # bénéfice 5 000
+    fiscal.cloturer(c, 2026, forcer=True)                    # bénéfice 5 000
     aide = liasse.generer(c, 2026)["aide_2042c"]
     assert aide["case_5NA"] == 5000             # bénéfice avant imputation
     deficits = {d["annee_origine"]: d["montant"]
@@ -2398,7 +2398,7 @@ def test_ligne_352_vaut_zero_sur_un_exercice_de_cession(tmp_path):
     conforme — sur un montage parfaitement tenu."""
     import fiscal
     c = _cession_simple(tmp_path, "d")
-    fiscal.cloturer(c, 2026)
+    fiscal.cloturer(c, 2026, forcer=True)
     L = liasse.generer(c, 2026)
     assert L["f2033b"]["resultat_fiscal_352"] == pytest.approx(0.0, abs=0.01)
     assert L["conforme"], [x["nom"] for x in L["controles"] if not x["ok"]]
@@ -2440,7 +2440,7 @@ def test_chaque_bien_cede_porte_sa_propre_dotation(tmp_path):
                        prix_cession=60000)
     cession.ceder_bien(c, bien_id=2, date_cession="2026-06-30",
                        prix_cession=170000)
-    r = fiscal.cloturer(c, 2026)
+    r = fiscal.cloturer(c, 2026, forcer=True)
     lignes = {x[0]: x for x in c.execute(
         "SELECT bien_id, ROUND(dotation_bien,2), ROUND(report_bien,2), "
         "ROUND(stock_cloture,2) FROM suivi_39c_bien WHERE exercice_annee=2026")}
@@ -2458,7 +2458,7 @@ def test_pas_de_faux_positif_de_dotation_sur_une_cession(tmp_path):
     faux à CHAQUE cession."""
     import fiscal
     c = _cession_simple(tmp_path, "f")
-    fiscal.cloturer(c, 2026)
+    fiscal.cloturer(c, 2026, forcer=True)
     codes = [a.code for a in controles.controler(c, 2026)]
     assert "DOTATION_PLAN" not in codes
     c.close()
@@ -2513,7 +2513,7 @@ def test_plafond_39c_majore_par_le_manuel_est_signale(tmp_path):
     operations.saisir(c, type="loyer", montant=9000, periode="2026-01",
                       date_operation="2026-01-05", bien_id=1)
     c.commit()
-    fiscal.cloturer(c, 2026, autres_retraitements=800)
+    fiscal.cloturer(c, 2026, autres_retraitements=800, forcer=True)
     codes = [a.code for a in controles.controler(c, 2026)]
     assert "RETRAITEMENT_MANUEL_PLAFOND" in codes, codes
     c.close()
@@ -2556,7 +2556,7 @@ def test_allongement_de_duree_signale_article_39b(tmp_path):
         operations.saisir(c, type="loyer", montant=9000, periode=f"{a}-01",
                           date_operation=f"{a}-01-05", bien_id=1)
         c.commit()
-        fiscal.cloturer(c, a)
+        fiscal.cloturer(c, a, forcer=True)
     # durée inchangée : rien à signaler
     reprise.ouvrir_exercice(c, 2024)
     assert not [a for a in controles.controler(c, 2024)

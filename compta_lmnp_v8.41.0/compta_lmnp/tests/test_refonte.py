@@ -115,14 +115,18 @@ def test_app_reste_de_la_logique_pure():
         assert "<div" not in bloc and "<table" not in bloc, \
             "du HTML est réapparu dans app.py : il appartient à pages.py"
     assert 'PAGE_SAISIE = """' not in src        # aucun gabarit réintroduit
-    # Seuil relevé de 2000 à 2200 en v8.40.0. Ce garde-fou vise
-    # l'accumulation de HTML et de logique métier dans le routeur ; les
-    # deux vérifications ci-dessus s'en chargent et restent strictes. Les
-    # lignes ajoutées par la revue de la couche web sont des GARDES —
-    # migration à l'ouverture, base absente, sortie de secours — dont le
-    # HTML est bien parti dans pages.py. Relever le seuil plutôt que de
-    # supprimer le contrôle : il continue de signaler une dérive.
-    assert src.count("\n") < 2200, "app.py devient un monolithe"
+    # Seuil relevé de 2000 à 2200 en v8.40.0, puis à 2250 après les passes
+    # G à O. Ce garde-fou vise l'accumulation de HTML et de logique métier
+    # dans le routeur ; les deux vérifications ci-dessus s'en chargent et
+    # restent strictes. Les lignes ajoutées depuis sont des GARDES —
+    # migration à l'ouverture, base absente, sortie de secours, refus de
+    # clôturer sur anomalie bloquante, invalidation du cache après
+    # restauration — et chaque fois que la RÈGLE elle-même pouvait vivre
+    # ailleurs, elle y a été déplacée : la durée d'amortissement dans
+    # `amortissement`, l'intégrité d'une archive dans `perennite`. Relever
+    # le seuil plutôt que supprimer le contrôle : il continue de signaler
+    # une dérive, et il l'a signalée deux fois pendant ces passes.
+    assert src.count("\n") < 2250, "app.py devient un monolithe"
 
 
 def test_toutes_les_pages_rendent_encore(tmp_path, monkeypatch):

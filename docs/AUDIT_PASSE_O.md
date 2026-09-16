@@ -326,3 +326,5 @@ Dans l'essai regroupant sauvegarde, PDF, import et archivage, les connexions ré
 | O-08 | Version future installée avant refus | Succès de restauration puis dossier bloqué en 409 | majeur |
 | O-09 | Registre illisible changé en liste vide | Dossier de 800 € masqué, sélection du principal | majeur |
 | O-10 | Archives non rattachées à l'histoire restaurée | Deux FEC intègres de 800 et 1 800 € sans lien de substitution | majeur |
+
+**État du suivi :** les constats de cette passe ont été corrigés en production le 16 septembre 2026 (version 8.48.0). Les preuves de `preuves_o/` sont conservées **telles qu'observées avant correction** : elles restent la référence du défaut, pas de l'état actuel du code. La non-régression est figée par `tests/test_passe_o.py`.

@@ -431,3 +431,9 @@ L'inventaire des fonctions `c_*` est comparé à `CONTROLES` : **aucune fonction
 | M-14 | Rapport positif sur exercice inexistant | Assurance de contrôle sans exercice à examiner | mineur |
 
 Aucun correctif de production appliqué. Les preuves constituent l'état observé avant correction.
+
+**État du suivi :** les constats de cette passe ont été corrigés en production le 16 septembre 2026 (version 8.48.0). Les preuves de `preuves_m/` sont conservées **telles qu'observées avant correction** : elles restent la référence du défaut, pas de l'état actuel du code. La non-régression est figée par `tests/test_passe_m.py`.
+
+Trois précisions. **M-09 était déjà corrigé** par la passe J, qui a fait porter le contrôle du seuil LMP sur les loyers acquis des écritures : il a été vérifié puis figé par deux tests, non recorrigé. **M-02 a été traité autrement que ne le suggérait une première lecture** : le mouvement du compte d'attente ne peut pas servir de signal, puisqu'un compte régulièrement apuré porte par construction l'écriture d'origine et sa reclassification — le dossier de référence en compte 287 847,78 €, tous légitimes. Le signal retenu est donc l'existence d'opérations encore typées « à identifier ». Enfin, **M-07 a un rayon d'action large** : le refus de clôturer déplacé dans l'API a obligé 59 appels de tests à déclarer `forcer=True`, ces fixtures clôturant sciemment des dossiers partiels ; c'est la contrepartie assumée d'une garantie qui ne dépend plus de la discipline de ses appelants.
+
+Au passage, `c_ventilation_incoherente` (constat H-08) a été resserré : il ne se déclenche plus sur un `prix_total` renseigné, mais sur un actif effectivement INSCRIT AUX COMPTES qu'aucun composant n'explique. Renseigner le prix d'un bien avant d'en comptabiliser l'acquisition ne bloque donc plus la clôture.

@@ -56,16 +56,32 @@ def _chemin_registre(racine: str) -> str:
     return os.path.join(racine, REGISTRE)
 
 
+class RegistreIllisible(Exception):
+    """Le registre des dossiers existe mais ne peut pas être lu."""
+
+
 def _charger(racine: str) -> list[dict]:
     chemin = _chemin_registre(racine)
     if not os.path.exists(chemin):
-        return []
+        return []                      # pas encore de registre : cas normal
     try:
         with open(chemin, encoding="utf-8") as f:
             data = json.load(f)
         return list(data.get("dossiers", []))
-    except (OSError, ValueError):
-        return []
+    except (OSError, ValueError) as exc:
+        # Un registre TRONQUÉ était traité comme un registre VIDE : tous
+        # les dossiers secondaires disparaissaient de l'interface, la
+        # session retombait sur le dossier principal, et les comptabilités
+        # correspondantes restaient sur le disque sans que rien ne dise
+        # où elles étaient passées. Pire : réenregistrer un dossier aurait
+        # réécrit le registre par-dessus ce qu'il en restait.
+        raise RegistreIllisible(
+            f"Le registre des dossiers ({chemin}) est présent mais "
+            f"illisible ({type(exc).__name__} : {exc}). Les dossiers "
+            "secondaires ne peuvent pas être listés — leurs bases sont "
+            "intactes sur le disque, mais le logiciel ne sait plus où. "
+            "Restaurez ce fichier depuis une sauvegarde, ou renommez-le "
+            "pour repartir d'un registre neuf.") from exc
 
 
 def _enregistrer(racine: str, entrees: list[dict]) -> None:
@@ -116,13 +132,30 @@ def lister(racine: str, db_principal: str) -> list[dict]:
     """
     out = [{"slug": PRINCIPAL, "nom": "Dossier principal",
             "chemin": os.path.abspath(db_principal)}]
-    for e in _charger(racine):
+    # Un registre illisible ne doit enfermer personne : le dossier
+    # principal ne dépend pas de lui et reste accessible. Mais il ne doit
+    # pas non plus passer pour un registre vide — `probleme_registre()`
+    # rend le motif, que l'interface et les contrôles affichent.
+    try:
+        entrees = _charger(racine)
+    except RegistreIllisible:
+        entrees = []
+    for e in entrees:
         out.append({"slug": e["slug"], "nom": e["nom"],
                     "chemin": os.path.join(racine, e["chemin"])})
     for e in out:
         e["existe"] = os.path.exists(e["chemin"])
         e["taille"] = os.path.getsize(e["chemin"]) if e["existe"] else 0
     return out
+
+
+def probleme_registre(racine: str) -> str:
+    """Motif d'illisibilité du registre, ou chaîne vide s'il se lit bien."""
+    try:
+        _charger(racine)
+    except RegistreIllisible as exc:
+        return str(exc)
+    return ""
 
 
 def chemin_db(racine: str, slug: str) -> str | None:

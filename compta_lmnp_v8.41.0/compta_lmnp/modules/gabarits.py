@@ -215,6 +215,7 @@ def ajouter_personnalise(conn: sqlite3.Connection, *, cle: str, libelle: str,
                          periodicite: str = "variable",
                          retraitement: str | None = None) -> None:
     """Nouvelle catégorie d'opération (disposition future) — sans toucher au code."""
+    deja_en_transaction = conn.in_transaction
     assurer_table(conn)
     cle = cle.strip().lower().replace(" ", "_")
     if not cle:
@@ -230,7 +231,14 @@ def ajouter_personnalise(conn: sqlite3.Connection, *, cle: str, libelle: str,
         "INSERT INTO gabarit_personnalise (cle, libelle, compte_num, nature, "
         "periodicite, retraitement) VALUES (?,?,?,?,?,?)",
         (cle, libelle, compte_num, nature, periodicite, retraitement))
-    conn.commit()
+    # Ne committer QUE si l'appelant n'avait pas sa propre transaction —
+    # même précaution que `assurer_table` et que les lecteurs de règles
+    # (constat D2-08). Un `commit()` inconditionnel validait au passage tout
+    # ce que l'appelant avait écrit sans le vouloir : un loyer de 800 €
+    # saisi en `commit=False` survivait au rollback qui suivait, parce
+    # qu'un gabarit avait été créé entre-temps sur la même connexion.
+    if not deja_en_transaction:
+        conn.commit()
 
 
 def _personnalises(conn: sqlite3.Connection) -> dict:

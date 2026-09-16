@@ -139,7 +139,7 @@ def test_h01_deux_composants_sur_un_meme_compte_ne_depassent_pas_le_brut(base):
             base.commit()
         if annee > 2026:
             ouvrir_exercice_suivant(base, annee)
-        fiscal.cloturer(base, annee)
+        fiscal.cloturer(base, annee, forcer=True)
         assert cumul(base, "281840", annee) <= 16000.0 + 0.005, annee
     assert cumul(base, "281840", 2033) == 16000.0     # ni plus, ni moins
 
@@ -149,12 +149,12 @@ def test_h01_la_vnc_comptable_ne_devient_jamais_negative(base):
     composant(base, "A", 8000, 5, "218400", "281840")
     composant(base, "B", 8000, 5, "218400", "281840")
     acquisition(base, "218400", 16000)
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     for annee in range(2027, 2032):
         ouvrir_exercice_suivant(base, annee)
         base.execute("UPDATE composant SET duree_annees=8")
         base.commit()
-        fiscal.cloturer(base, annee)
+        fiscal.cloturer(base, annee, forcer=True)
         # 218400 est un compte d'ACTIF : son solde débiteur ressort négatif
         # de `cumul()`, qui mesure crédit − débit. La valeur nette est donc
         # le brut moins le cumul d'amortissement, et elle ne peut pas
@@ -175,7 +175,7 @@ def test_h02_une_dotation_manuelle_n_en_fait_pas_generer_une_seconde(base):
     dotation_manuelle(base, "281840", 1200)
     operations.saisir(base, type="loyer", montant=1800, periode="2026-03",
                       date_operation="2026-03-10")
-    r = fiscal.cloturer(base, 2026)
+    r = fiscal.cloturer(base, 2026, forcer=True)
     assert cumul(base, "281840", 2026) == 1200.0      # et non 2400
     assert r["revenu_imposable"] == 600.0
     assert r["suivi_39c"]["stock_cloture"] == 0.0
@@ -187,7 +187,7 @@ def test_h02_dotation_manuelle_complete_ne_double_pas_la_valeur_brute(base):
     composant(base, "Mobilier", 12000, 1, "218400", "281840")
     acquisition(base, "218400", 12000)
     dotation_manuelle(base, "281840", 12000)
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     assert cumul(base, "281840", 2026) == 12000.0
 
 
@@ -202,7 +202,7 @@ def test_h02_amortissements_repris_en_a_nouveaux_sont_vus(base):
     ecritures.inserer(base, journal="AN", date="2026-01-01", annee=2026,
                       libelle="A-nouveaux", piece_ref="AN",
                       lignes=[("213150", 8000, 0.0), ("281315", 0.0, 8000)])
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     assert cumul(base, "281315", 2026) == 8000.0      # et non 9000
 
 
@@ -210,7 +210,7 @@ def test_h02_la_cloture_ordinaire_dote_toujours(base):
     """Contre-épreuve : sans rien de déjà passé, la dotation reste due."""
     composant(base, "Mobilier", 12000, 10, "218400", "281840")
     acquisition(base, "218400", 12000)
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     assert cumul(base, "281840", 2026) == 1200.0
 
 
@@ -223,7 +223,7 @@ def test_h02_les_deux_lectures_du_moteur_sont_distinctes(base):
     avant = amortissement.dotations_exercice(base, 2026)
     reste = amortissement.dotations_exercice(base, 2026, a_comptabiliser=True)
     assert [d["dotation"] for d in avant] == [d["dotation"] for d in reste]
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     assert amortissement.dotations_exercice(base, 2026)[0]["dotation"] == 1200.0
     assert amortissement.dotations_exercice(
         base, 2026, a_comptabiliser=True) == []
@@ -278,7 +278,7 @@ def test_h04_omission_de_dotation_signalee_apres_cloture(base):
     pratiqués. L'écart n'apparaissait que dans la liasse."""
     composant(base, "Mobilier", 12000, 10, "218400", "281840")
     acquisition(base, "218400", 12000)
-    fiscal.cloturer(base, 2026, generer_dotation=False)
+    fiscal.cloturer(base, 2026, generer_dotation=False, forcer=True)
     anomalies = [a for a in controles.controler(base, 2026)
                  if a.code.startswith("AMORT_CUMUL")]
     assert anomalies, "l'omission du minimum d'amortissement doit se voir"
@@ -305,12 +305,12 @@ def test_h06_duree_raccourcie_plan_epuise_et_vnc_restante(base):
     for annee in (2026, 2027, 2028):
         if annee > 2026:
             ouvrir_exercice_suivant(base, annee)
-        fiscal.cloturer(base, annee)
+        fiscal.cloturer(base, annee, forcer=True)
     assert cumul(base, "281315", 2028) == 3000.0
     ouvrir_exercice_suivant(base, 2029)
     base.execute("UPDATE composant SET duree_annees=4")
     base.commit()
-    fiscal.cloturer(base, 2029)
+    fiscal.cloturer(base, 2029, forcer=True)
     ouvrir_exercice_suivant(base, 2030)
     bloquants = [a for a in controles.controler(base, 2030)
                  if a.code == "AMORT_CUMUL_FIN"]
@@ -325,7 +325,7 @@ def test_h04_un_retard_n_est_jamais_rattrape_d_office(base):
     pas le déduire l'année suivante. Il le signale, il ne le répare pas."""
     composant(base, "Mobilier", 12000, 10, "218400", "281840")
     acquisition(base, "218400", 12000)
-    fiscal.cloturer(base, 2026, generer_dotation=False)
+    fiscal.cloturer(base, 2026, generer_dotation=False, forcer=True)
     ouvrir_exercice_suivant(base, 2027)
     dotations = amortissement.dotations_exercice(base, 2027,
                                                  a_comptabiliser=True)
@@ -353,7 +353,7 @@ def test_h05_modifier_une_duree_ne_reecrit_pas_un_exercice_clos(base):
     bougeaient pas."""
     composant(base, "Mobilier", 12000, 10, "218400", "281840")
     acquisition(base, "218400", 12000)
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     avant = liasse.immobilisations_2033c(base, 2026)["totaux"]
     base.execute("UPDATE composant SET duree_annees=20")
     base.commit()
@@ -497,7 +497,7 @@ def test_h09_un_compte_inconnu_ne_bloque_pas_la_cloture(base):
     prix_du_bien(base, 8000)
     composant(base, "Générique", 8000, 10, "2180000", "2818000")
     acquisition(base, "2180000", 8000)
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     assert cumul(base, "2818000", 2026) == 800.0      # 8 000 € sur dix ans
 
 
@@ -618,7 +618,7 @@ def test_un_exercice_ordinaire_traverse_tous_les_nouveaux_controles(base):
                 "COMPTE_IMMO_INCONNU", "AMORT_CUMUL", "AMORT_CUMUL_FIN",
                 "DOTATION_ANNULEE"}
     assert not (set(codes(base, 2026)) & nouveaux)
-    fiscal.cloturer(base, 2026)
+    fiscal.cloturer(base, 2026, forcer=True)
     assert not (set(codes(base, 2026)) & nouveaux)
     assert cumul(base, "281840", 2026) == 1200.0
 

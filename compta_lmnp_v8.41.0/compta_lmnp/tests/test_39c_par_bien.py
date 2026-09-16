@@ -42,7 +42,7 @@ def test_mono_bien_ventilation_egale_global(conn):
     for m in range(1, 13):
         operations.saisir(conn, type="loyer", montant=450,
                           date_operation=f"2026-{m:02d}-05", bien_id=1)
-    r = fiscal.cloturer(conn, 2026)
+    r = fiscal.cloturer(conn, 2026, forcer=True)
     par_bien = fiscal.suivi_39c_par_bien(conn, 2026)
     assert len(par_bien) == 1
     v = par_bien[0]
@@ -71,7 +71,7 @@ def test_deux_biens_report_ventile_selon_leur_insuffisance(conn):
     for m in range(1, 13):
         operations.saisir(conn, type="loyer", montant=300,
                           date_operation=f"2026-{m:02d}-05", bien_id=1)
-    r = fiscal.cloturer(conn, 2026)
+    r = fiscal.cloturer(conn, 2026, forcer=True)
     s = r["suivi_39c"]
     assert s["report_annee"] > 0                     # scénario significatif
     par_bien = {v["bien_id"]: v for v in fiscal.suivi_39c_par_bien(conn, 2026)}
@@ -115,7 +115,7 @@ def test_activation_en_cours_de_vie_historique_au_bien_ancien(conn):
     for m in range(1, 13):
         operations.saisir(conn, type="loyer", montant=350,
                           date_operation=f"2026-{m:02d}-05", bien_id=2)
-    r = fiscal.cloturer(conn, 2026)
+    r = fiscal.cloturer(conn, 2026, forcer=True)
     par_bien = {v["bien_id"]: v for v in fiscal.suivi_39c_par_bien(conn, 2026)}
     assert par_bien[1]["stock_ouverture"] == pytest.approx(500.0)   # héritage
     assert par_bien[2]["stock_ouverture"] == pytest.approx(0.0)
@@ -130,14 +130,14 @@ def test_utilisation_ventilee_au_prorata_des_stocks(conn):
     for m in range(1, 13):
         operations.saisir(conn, type="loyer", montant=300,
                           date_operation=f"2026-{m:02d}-05", bien_id=1)
-    r1 = fiscal.cloturer(conn, 2026)
+    r1 = fiscal.cloturer(conn, 2026, forcer=True)
     assert r1["suivi_39c"]["stock_cloture"] > 0
     # année 2 : gros loyers → utilisation du stock
     reprise.ouvrir_exercice(conn, 2027)
     for m in range(1, 13):
         operations.saisir(conn, type="loyer", montant=1500,
                           date_operation=f"2027-{m:02d}-05", bien_id=1)
-    r2 = fiscal.cloturer(conn, 2027)
+    r2 = fiscal.cloturer(conn, 2027, forcer=True)
     s = r2["suivi_39c"]
     assert s["utilisation_annee"] > 0
     par_bien = fiscal.suivi_39c_par_bien(conn, 2027)

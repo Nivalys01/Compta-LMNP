@@ -251,3 +251,5 @@ La péremption n'est **pas** une constante de dix ans dans le moteur de créatio
 | N-06 | Veille future ou indisponible sans rappel | Rappel absent malgré une date incohérente ou une consultation en échec | mineur |
 | N-07 | Repli bancaire sur un seuil illisible | Proposition de charge de 400 € au lieu d'une attente | majeur |
 | N-08 | ALUR absent de la liste explicite de veille | Règle de réintégration omise de la revue guidée | mineur |
+
+**État du suivi :** les constats de cette passe ont été corrigés en production le 16 septembre 2026 (version 8.48.0). Les preuves de `preuves_n/` sont conservées **telles qu'observées avant correction** : elles restent la référence du défaut, pas de l'état actuel du code. La non-régression est figée par `tests/test_passe_n.py`.

@@ -306,6 +306,23 @@ def bilan_2033a(conn: sqlite3.Connection, annee: int) -> dict:
 
 # ── 2033-C : immobilisations & amortissements ────────────────────────────────
 
+def _anomalies_du_moteur(conn: sqlite3.Connection, annee: int) -> list[dict]:
+    """Anomalies de `controles.controler`, sous une forme imprimable.
+
+    Sa propre défaillance ne doit pas empêcher d'éditer la liasse : elle
+    devient une ligne d'anomalie, pas une exception.
+    """
+    import controles as _controles
+    try:
+        anos = _controles.controler(conn, annee)
+    except Exception as exc:                          # noqa: BLE001
+        return [{"niveau": "BLOQUANT", "code": "CONTROLES_INDISPONIBLES",
+                 "message": f"Les contrôles de cohérence n'ont pas pu être "
+                            f"exécutés ({type(exc).__name__} : {exc})."}]
+    return [{"niveau": a.niveau, "code": a.code, "message": a.message}
+            for a in anos]
+
+
 def _fiscal_agregats_cession(conn: sqlite3.Connection, annee: int) -> dict:
     """{'produit', 'valeur_comptable'} des cessions de l'exercice, ou {}."""
     import fiscal as _fiscal
@@ -757,5 +774,12 @@ def generer(conn: sqlite3.Connection, annee: int) -> dict:
         "projection_cloture": _projection_cloture(conn, annee),
         "controles": [{"nom": n, "ok": bool(ok), "detail": d}
                       for n, ok, d in controles],
+        # Les anomalies du MOTEUR DE CONTRÔLES, distinctes des cinq
+        # vérifications internes ci-dessus. Les deux ensembles n'étaient
+        # pas reliés : le document remis pouvait afficher cinq « conforme »
+        # en vert alors qu'une anomalie BLOQUANTE — 800 € en compte
+        # d'attente — attendait dans le moteur. Le filigrane « provisoire »
+        # ne restitue ni l'anomalie ni son montant.
+        "anomalies": _anomalies_du_moteur(conn, annee),
         "conforme": all(ok for _, ok, _ in controles),
     }

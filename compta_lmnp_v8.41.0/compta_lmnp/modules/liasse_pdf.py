@@ -488,5 +488,37 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
             ("FONTNAME", (1, i), (1, i), "Helvetica-Bold")]))
     E.append(t)
 
+    # Les anomalies du MOTEUR DE CONTRÔLES. Le tableau ci-dessus ne porte
+    # que cinq vérifications internes de cohérence de la liasse : il
+    # pouvait afficher cinq « conforme » en vert alors qu'une anomalie
+    # bloquante attendait dans le moteur, et le document remis au comptable
+    # ne la révélait pas. Les deux ensembles n'étaient tout simplement pas
+    # reliés.
+    anomalies = L.get("anomalies") or []
+    bloquantes = [a for a in anomalies if a["niveau"] == "BLOQUANT"]
+    E.append(Paragraph("Contrôles de cohérence du dossier", st["h2"]))
+    if not anomalies:
+        E.append(Paragraph("Aucune anomalie détectée par les contrôles de "
+                           "cohérence.", st["normal"]))
+    else:
+        if bloquantes:
+            E.append(Paragraph(
+                f"<b>{len(bloquantes)} anomalie(s) BLOQUANTE(S)</b> : cet "
+                "exercice ne devrait pas être clôturé en l'état, et les "
+                "montants ci-dessus peuvent s'en trouver faussés.",
+                st["note"]))
+        lignes = [["Niveau", "Contrôle", "Constat"]]
+        for a in anomalies:
+            lignes.append([a["niveau"], a["code"],
+                           Paragraph(_xml(a["message"]), st["normal"])])
+        t = _table(lignes, largeurs=[24 * mm, 34 * mm, 112 * mm],
+                   aligne_droite=())
+        for i, a in enumerate(anomalies, start=1):
+            if a["niveau"] == "BLOQUANT":
+                t.setStyle(TableStyle([
+                    ("TEXTCOLOR", (0, i), (0, i), ROUGE),
+                    ("FONTNAME", (0, i), (0, i), "Helvetica-Bold")]))
+        E.append(t)
+
     pied = _pied_de_page(L["provisoire"])
     doc.build(E, onFirstPage=pied, onLaterPages=pied)

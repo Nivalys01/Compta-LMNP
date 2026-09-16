@@ -1,5 +1,154 @@
 # Journal des versions — Compta LMNP
 
+## 8.48.0 — 2026-09-16 (Passes M, N, O : ce qui garde, et ce qui garde la garde)
+Trente-deux constats. Ces trois passes n'examinent pas la comptabilité :
+elles examinent ce qui la surveille, ce qui la paramètre et ce qui la
+protège. Une même question les traverse — **que vaut un verdict positif ?**
+
+### Le moteur de contrôles (passe M, 14 constats)
+
+**Un contrôle qui échouait rendait une liste vide.** « Je n'ai pas pu
+vérifier » devenait « rien à signaler » : le déclarant recevait une
+assurance positive sur un cumul d'amortissement de 12 000 € qui n'avait
+jamais été contrôlé. Chaque contrôle est désormais ISOLÉ — un échec devient
+une anomalie bloquante qui le nomme, et n'emporte plus les vingt-six
+autres avec lui. Dans le même esprit, un rapport demandé pour un exercice
+absent de la base concluait « aucune anomalie ✓ » : il prétendait avoir
+vérifié ce qu'il n'avait pas pu lire.
+
+**Le document remis ne portait pas les anomalies du moteur.** Le PDF
+affichait cinq validations internes en vert pendant qu'une anomalie
+BLOQUANTE — 800 € en compte d'attente — attendait ailleurs : les deux
+ensembles de contrôles n'étaient tout simplement pas reliés. Ils le sont.
+
+**Le refus de clôturer n'existait que dans les interfaces.** La route web
+et la ligne de commande vérifiaient bien les anomalies bloquantes ; la
+fonction qui FIGE l'exercice, non. Un appel métier ordinaire figeait donc
+800 € non identifiés sans rien demander. Une garantie qui repose sur la
+discipline de ses appelants tombe au premier appelant nouveau : elle vit
+maintenant dans l'API, avec sa dérogation explicite.
+
+**Le compte d'attente et ce qu'apurer veut dire.** Le compte était désigné
+par égalité avec 472000 — un cabinet numérote en 4720000. Et le contrôle
+sommait algébriquement : deux flux opposés encore « à identifier » donnent
+un solde nul, que le contrôle prenait pour un apurement. Le signal n'est
+pourtant pas le mouvement du compte — un compte régulièrement apuré porte
+justement l'écriture d'origine et sa reclassification, et le dossier de
+référence en compte 287 847,78 € — mais les OPÉRATIONS qui n'ont pas reçu
+de décision.
+
+**L'audit de cycle approuvait des régressions qu'il annonçait vérifier.**
+Un de ses contrôles passait `True` en dur ; un autre cherchait un code
+d'anomalie sans exiger son niveau ; et il effaçait ses propres injections
+avant de tenter la clôture, si bien qu'il n'éprouvait jamais le refus qu'il
+annonçait. Il l'éprouve, et le compte d'attente a désormais son témoin.
+
+**Des erreurs déterminées passées de l'avertissement au blocage.** Clôturer
+sans à-nouveaux, ou avec des amortissements antérieurs non repris, fige un
+bilan dont on SAIT qu'il est faux — actif net de −1 200 € au lieu de
+9 600 € dans un cas reproduit. Avec la nuance demandée : un exercice
+antérieur dont tous les soldes sont nuls ne laisse rien à reprendre et ne
+bloque rien.
+
+**Enfin, des alertes qui criaient sur du travail correct.** Une opération
+annulée continuait d'être signalée ; deux studios loués au même prix
+passaient pour un doublon ; un exercice ouvert en novembre réclamait dix
+loyers antérieurs à son ouverture ; un gabarit de loyer créé par
+l'utilisateur sortait des contrôles sans que rien ne l'annonce ; et un
+seuil enregistré à l'infini rendait deux contrôles définitivement muets.
+
+### Les règles versionnées (passe N, 8 constats)
+
+Le logiciel applique les règles « telles qu'elles sont enregistrées ».
+C'est un choix juste, mais il déplace la question : que vaut une règle
+enregistrée ?
+
+**Une règle a un domaine.** Une durée de report saisie à ZÉRO faisait
+expirer un déficit l'année même de sa naissance : 1 200 € purgés, et un
+bénéfice de 1 200 € laissé sans son imputation. Chaque règle livrée a
+désormais ses bornes.
+
+**Une règle a une période.** Saisir une valeur rétroactive laissait deux
+périodes ouvertes en même temps ; le tri par date sauvait le calcul, mais
+un historique contradictoire ne justifie rien devant un vérificateur.
+
+**Une règle a une histoire.** Le logiciel ressème ses règles dès qu'une clé
+manque — bon comportement à la première ouverture, mauvais après une
+perte : un seuil abaissé à 300 € revenait à 500 € et l'avertissement
+disparaissait avec lui. Une marque durable distingue maintenant les deux
+situations, et un contrôle le dit.
+
+**Deux lecteurs d'une même règle doivent répondre la même chose.** Le
+pense-bête comparait à une constante 23 000 et restait muet sur 20 000 € de
+recettes face à un seuil configuré à 15 000 €, là où le contrôle métier
+signalait le franchissement.
+
+**Un garde-fou qui ne peut pas travailler ne laisse pas passer.** Un seuil
+d'immobilisation devenu illisible faisait proposer en charge un achat de
+400 € que la règle disponible excluait. La ligne part désormais en attente,
+qui demande une décision — un repli silencieux vers la valeur la plus
+permissive est la pire réponse à l'indisponibilité d'un garde-fou.
+
+S'y ajoutent une création de gabarit qui validait la transaction de son
+appelant — 800 € survivaient au rollback —, une date de veille future
+acceptée qui éteignait le rappel pour des décennies, une consultation de
+veille en panne indiscernable d'une veille à jour, et la règle ALUR absente
+de la revue guidée alors qu'elle modifie le résultat fiscal.
+
+### Les sauvegardes et la pérennité (passe O, 10 constats)
+
+Le risque tient en une phrase : **confondre une copie créée avec une
+sauvegarde utilisable.**
+
+L'API SQLite garantit une copie FIDÈLE, pas la validité de ce qu'elle
+copie : une base au schéma corrompu donnait une copie tout aussi
+corrompue, retournée comme un succès — défaut découvert le jour où l'on a
+besoin de la copie, c'est-à-dire trop tard. Chaque copie est maintenant
+relue avant d'être annoncée. Un fichier de zéro octet portant le nom du
+jour suffisait par ailleurs à dire « déjà fait aujourd'hui », et aucune
+sauvegarde exploitable n'était plus créée de la journée.
+
+**La rotation pouvait supprimer la source d'une restauration en cours.** La
+copie de sûreté prise juste avant déclenche une rotation : elle emportait
+parfois le fichier que l'on s'apprêtait justement à lire, et la base active
+était remplacée par du vide, avec un retour annoncé réussi.
+
+**Le répertoire ne prouve pas l'appartenance.** Tous les dossiers nomment
+leur base « compta.db » : déposer la copie d'un autre dossier dans le bon
+répertoire suffisait à la faire accepter, et une comptabilité en remplaçait
+une autre. L'identité se lit maintenant DANS la base — exploitant, SIREN,
+biens — et seule une contradiction constatée fait refuser.
+
+**Une preuve qui ne prouve plus rien ne doit pas être remise comme si elle
+prouvait encore.** Le contrôle d'intégrité des archives existait, mais le
+téléchargement ne l'appelait pas : une archive modifiée était servie comme
+n'importe quelle autre. Le manifeste, lui, perdait ses lignes tronquées en
+silence, et son absence rendait une liste vide plutôt qu'une alerte.
+
+**Une restauration coupe l'histoire comptable en deux.** Après elle, deux
+FEC du même exercice coexistent, tous deux intègres au sens de leur
+empreinte, sans que rien ne dise lequel fait foi : la coupure est
+désormais inscrite dans le manifeste, à sa date. Une sauvegarde produite
+par une version PLUS RÉCENTE du logiciel était par ailleurs installée avant
+que le garde de version ne bloque le dossier — restauration annoncée
+réussie, comptabilité inaccessible dans la foulée. Et un registre de
+dossiers tronqué passait pour un registre vide, faisant disparaître les
+dossiers secondaires de l'interface sans que rien ne dise où ils étaient
+passés.
+
+### Au passage
+
+Le garde-fou anti-monolithe d'`app.py` s'est déclenché deux fois pendant
+ces passes. Chaque fois que la règle pouvait vivre ailleurs, elle y a été
+déplacée — la durée d'amortissement dans `amortissement`, l'intégrité
+d'une archive dans `perennite`. Son seuil passe de 2 200 à 2 250 lignes,
+relevé plutôt que supprimé, avec sa raison écrite.
+
+Un constat de la passe M (M-09, recettes du seuil LMP) était déjà corrigé
+par la passe J : il est vérifié et figé, non recorrigé.
+
+- 95 tests ajoutés (1081 au total).
+
 ## 8.47.0 — 2026-09-16 (Passe L : la cession d'un bien)
 Quatre constats, trois majeurs et un mineur. La neutralisation fiscale de la
 plus-value, la ligne 352 et le traitement d'une cession à titre gratuit

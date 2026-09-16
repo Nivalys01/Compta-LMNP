@@ -132,7 +132,7 @@ def test_k01_cloturer_un_exercice_anterieur_a_un_exercice_clos_est_refuse(
     try:
         immobilisation(conn, 2025)
         loyer(conn, 2025, 600)
-        r25 = fiscal.cloturer(conn, 2025, generer_dotation=False)
+        r25 = fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         assert r25["revenu_imposable"] == 600.0
         reprise.ouvrir_exercice(conn, 2024, avec_reprise=False)
         maintenance(conn, 2024, 1000)
@@ -152,7 +152,7 @@ def test_k01_le_message_dit_quoi_faire(tmp_path):
     conn = _dossier(tmp_path, "k01b.db", 2025)
     try:
         loyer(conn, 2025, 600)
-        fiscal.cloturer(conn, 2025, generer_dotation=False)
+        fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         reprise.ouvrir_exercice(conn, 2024, avec_reprise=False)
         maintenance(conn, 2024, 1000)
         with pytest.raises(ValueError) as exc:
@@ -169,11 +169,11 @@ def test_k01_l_ordre_chronologique_reste_praticable(tmp_path):
     conn = _dossier(tmp_path, "k01c.db", 2024)
     try:
         maintenance(conn, 2024, 1000)
-        fiscal.cloturer(conn, 2024, generer_dotation=False)
+        fiscal.cloturer(conn, 2024, generer_dotation=False, forcer=True)
         reprise.ouvrir_exercice(conn, 2025)
         immobilisation(conn, 2025)
         loyer(conn, 2025, 600)
-        r = fiscal.cloturer(conn, 2025, generer_dotation=False)
+        r = fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         assert r["deficits"]["impute_sur_benefice"] == 600.0
         assert r["revenu_imposable"] == 0.0
         assert deficit_restant(conn) == 400.0
@@ -202,7 +202,7 @@ def test_k01_un_exercice_posterieur_ouvert_ne_bloque_rien(tmp_path):
     try:
         loyer(conn, 2025, 600)
         reprise.ouvrir_exercice(conn, 2026, avec_reprise=False)
-        fiscal.cloturer(conn, 2025, generer_dotation=False)
+        fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         assert conn.execute("SELECT statut FROM exercice WHERE annee=2025"
                             ).fetchone()[0] == "clos"
     finally:
@@ -215,7 +215,7 @@ def _dossier_avec_reprise_2026(tmp_path, nom):
     conn = _dossier(tmp_path, nom, 2025)
     immobilisation(conn, 2025)
     loyer(conn, 2025, 600)
-    fiscal.cloturer(conn, 2025, generer_dotation=False)
+    fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
     reprise.ouvrir_exercice(conn, 2026)
     return conn
 
@@ -294,7 +294,7 @@ def test_k02_une_reprise_ordinaire_passe_toujours(tmp_path):
     try:
         immobilisation(conn, 2025)
         loyer(conn, 2025, 600)
-        fiscal.cloturer(conn, 2025, generer_dotation=False)
+        fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         assert reprise.reprise_deja_presente(conn, 2026) == ""
         reprise.ouvrir_exercice(conn, 2026)
         # 108000 porte −11 400 € repris (12 000 € d'apport moins 600 € de
@@ -317,9 +317,9 @@ def test_k02_la_chaine_se_poursuit_sur_un_troisieme_exercice(tmp_path):
     try:
         immobilisation(conn, 2025)
         loyer(conn, 2025, 600)
-        fiscal.cloturer(conn, 2025, generer_dotation=False)
+        fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         reprise.ouvrir_exercice(conn, 2026)
-        fiscal.cloturer(conn, 2026, generer_dotation=False)
+        fiscal.cloturer(conn, 2026, generer_dotation=False, forcer=True)
         reprise.ouvrir_exercice(conn, 2027)          # ne doit pas lever
         assert solde(conn, "120000", 2027) == 0.0
     finally:
@@ -382,7 +382,7 @@ def test_un_cycle_de_trois_exercices_traverse_les_nouvelles_gardes(tmp_path):
                 reprise.ouvrir_exercice(conn, annee)
             loyer(conn, annee, recettes)
             maintenance(conn, annee, charges)
-            fiscal.cloturer(conn, annee, generer_dotation=False)
+            fiscal.cloturer(conn, annee, generer_dotation=False, forcer=True)
             assert conn.execute(
                 "SELECT statut FROM exercice WHERE annee=?",
                 (annee,)).fetchone()[0] == "clos"
@@ -397,7 +397,7 @@ def test_une_cloture_deja_faite_reste_refusee(tmp_path):
     conn = _dossier(tmp_path, "idem.db", 2025)
     try:
         loyer(conn, 2025, 600)
-        fiscal.cloturer(conn, 2025, generer_dotation=False)
+        fiscal.cloturer(conn, 2025, generer_dotation=False, forcer=True)
         with pytest.raises(ValueError, match="déjà clos"):
             fiscal.cloturer(conn, 2025, generer_dotation=False)
     finally:

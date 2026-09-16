@@ -455,9 +455,21 @@ def rappels(conn: sqlite3.Connection, aujourd_hui: date | None = None,
         if statut != "ouvert" or annee > N:
             continue
         ca = _ca(conn, annee)
-        if ca > 23000:
+        # Le seuil est une RÈGLE VERSIONNÉE, comme pour le contrôle métier :
+        # la constante écrite ici ignorait la valeur enregistrée, et le
+        # rappel restait muet sur 20 000 € de recettes face à un seuil
+        # configuré à 15 000 €. Les deux consommateurs de la même règle
+        # doivent répondre la même chose.
+        try:
+            import parametres as _param
+            seuil_lmp = float(_param.valeur(conn, "seuil_lmp_recettes",
+                                            annee, defaut=23000.0))
+        except Exception:                            # noqa: BLE001
+            seuil_lmp = 23000.0
+        if ca > seuil_lmp:
             add("important", f"CA {annee} : {ca:,.0f} € — seuil LMP franchi ?",
-                "Au-delà de 23 000 € de recettes, le statut LMP s'applique "
+                f"Au-delà de {seuil_lmp:,.0f} € de recettes, le statut LMP "
+                "s'applique "
                 "si elles excèdent AUSSI les autres revenus d'activité du "
                 "foyer — avec affiliation sociale (SSI) possible dès "
                 "23 000 € selon le mode de location. Vérifiez votre "
@@ -494,8 +506,15 @@ def rappels(conn: sqlite3.Connection, aujourd_hui: date | None = None,
                 "cession — ce logiciel applique les règles telles qu'elles y "
                 "sont enregistrées. Le menu « Veille fiscale » fournit le "
                 "corpus des textes et une question type à poser à une IA.")
-    except Exception:                      # noqa: BLE001 — rappel non vital
-        pass
+    except Exception as exc:               # noqa: BLE001
+        # Le rappel était simplement abandonné : une consultation de veille
+        # en panne produisait donc la même sortie qu'une veille à jour. Ne
+        # pas pouvoir vérifier n'est pas avoir vérifié — on le dit.
+        add("a_prevoir", "Veille fiscale : état inconnu",
+            f"La date de dernière veille n'a pas pu être lue ({exc}). Le "
+            "logiciel ne peut donc pas dire si les règles enregistrées ont "
+            "été revues récemment — vérifiez-le depuis le menu « Veille "
+            "fiscale ».")
 
     # ── Sauvegardes ──────────────────────────────────────────────────────
     if db_path:

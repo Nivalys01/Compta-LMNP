@@ -101,6 +101,15 @@ CORPUS = [
      "Durée de conservation des justificatifs, du FEC et des archives "
      "produites par le logiciel.", None),
 
+    ("BOI-BIC-CHG-40-20",
+     "Fonds de travaux ALUR : charge non déductible",
+     "La contribution au fonds de travaux est CAPITALISÉE : elle est "
+     "réintégrée au résultat fiscal à la clôture. Le logiciel le fait "
+     "automatiquement, et cette réintégration majore aussi le plafond "
+     "d'amortissement déductible de l'article 39 C — une règle qui change "
+     "donc réellement le résultat, et qui doit être revue comme les "
+     "autres.", "retraitement_alur_auto"),
+
     # ── Fiscalité annexe ────────────────────────────────────────────────
     ("Art. 261 D, 4° du CGI",
      "Exonération de TVA de la location meublée",
@@ -149,6 +158,19 @@ def enregistrer_veille(conn: sqlite3.Connection,
     """Mémorise qu'une veille vient d'être faite."""
     _table_meta(conn)
     jour = jour or datetime.date.today().isoformat()
+    # Une veille se constate, elle ne se planifie pas : une date FUTURE
+    # enregistrée par erreur — 2099 dans le cas reproduit — éteignait le
+    # rappel pour des décennies, sans que rien ne signale l'incohérence.
+    try:
+        saisie = datetime.date.fromisoformat(jour)
+    except ValueError:
+        raise ValueError(f"Date de veille illisible : {jour!r} "
+                         "(format attendu AAAA-MM-JJ).") from None
+    if saisie > datetime.date.today():
+        raise ValueError(
+            f"Date de veille dans le futur : {jour}. Une veille s'enregistre "
+            "le jour où elle est faite — une date future éteindrait le "
+            "rappel jusque-là.")
     conn.execute("INSERT INTO meta (cle, valeur) VALUES ('derniere_veille', ?) "
                  "ON CONFLICT(cle) DO UPDATE SET valeur=excluded.valeur",
                  (jour,))
@@ -167,6 +189,11 @@ def veille_a_refaire(conn: sqlite3.Connection,
     try:
         d = datetime.date.fromisoformat(derniere)
     except ValueError:
+        return True
+    # Une date postérieure à aujourd'hui ne prouve aucune veille faite :
+    # l'écart en jours est alors négatif, et le test « plus de 334 jours »
+    # concluait tranquillement que tout allait bien.
+    if d > auj:
         return True
     return (auj - d).days > 334
 

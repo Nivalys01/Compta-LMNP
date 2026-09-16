@@ -41,7 +41,7 @@ def conn(tmp_path):
 # === Faille n°1 : exercice clos scellé =====================================
 
 def test_saisie_refusee_dans_exercice_clos(conn):
-    fiscal.cloturer(conn, 2026)
+    fiscal.cloturer(conn, 2026, forcer=True)
     with pytest.raises(ValueError, match="clos"):
         operations.saisir(conn, type="loyer", montant=795,
                           date_operation="2026-11-01", exercice=2026, bien_id=1)
@@ -67,7 +67,7 @@ def test_cloture_refusee_dans_le_desordre(conn):
     with pytest.raises(ValueError, match="2026"):
         fiscal.cloturer(conn, 2027)
     fiscal.cloturer(conn, 2026)          # puis l'ordre légitime passe
-    fiscal.cloturer(conn, 2027)
+    fiscal.cloturer(conn, 2027, forcer=True)
 
 
 # === Faille n°3 : pas d'en-tête orphelin après un échec ====================
@@ -121,7 +121,7 @@ def test_marathon_5_exercices_hostiles(conn, tmp_path):
                               annee=annee, libelle="piège",
                               lignes=[(CONTREPARTIE, 500, 0),
                                       (LOYERS, 0, 499.99)])
-        fiscal.cloturer(conn, annee)
+        fiscal.cloturer(conn, annee, forcer=True)
         d, c = reprise.controle_equilibre(conn, annee)
         assert abs(d - c) <= 0.005       # bilan équilibré chaque année
         if annee < 2030:
@@ -150,7 +150,7 @@ def test_volume_300_operations_equilibre_exact(conn, tmp_path):
             operations.saisir(conn, type=random.choice(types_charges),
                               montant=round(random.uniform(5, 400), 2),
                               date_operation=jour, bien_id=1)
-    fiscal.cloturer(conn, 2026)
+    fiscal.cloturer(conn, 2026, forcer=True)
     d, c = reprise.controle_equilibre(conn, 2026)
     assert abs(d - c) < 0.005            # pas un centime perdu en route
     fec = str(tmp_path / "FEC.txt")

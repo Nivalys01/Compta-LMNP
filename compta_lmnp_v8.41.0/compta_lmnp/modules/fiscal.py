@@ -759,7 +759,7 @@ def retraitement_automatique(conn: sqlite3.Connection, annee: int) -> float:
 
 
 def cloturer(conn: sqlite3.Connection, annee: int, *, autres_retraitements: float = 0.0,
-             generer_dotation: bool = True) -> dict:
+             generer_dotation: bool = True, forcer: bool = False) -> dict:
     """
     Clôture fiscale d'un exercice :
       1) génère la dotation aux amortissements (J4) si demandé ;
@@ -825,6 +825,31 @@ def cloturer(conn: sqlite3.Connection, annee: int, *, autres_retraitements: floa
             "scellement interdit. Restaurez une sauvegarde antérieure à la "
             f"clôture de {posterieur[0]}, puis reprenez les clôtures dans "
             "l'ordre chronologique.")
+
+    # ANOMALIES BLOQUANTES. Le refus de clôturer sur un contrôle bloquant
+    # était mis en œuvre par chaque interface — la route web et la CLI le
+    # vérifiaient bien avant d'appeler ici — mais pas par la fonction qui
+    # réalise la mutation IRRÉVERSIBLE. Un appel métier ordinaire figeait
+    # donc 800 € de compte d'attente non identifiés sans rien demander. Une
+    # garantie qui repose sur la discipline de ses appelants n'est pas une
+    # garantie : elle vaut pour ceux qu'on connaît, et tombe au premier
+    # nouvel appelant.
+    #
+    # `forcer=True` reste la dérogation EXPLICITE que les deux interfaces
+    # proposent déjà par une case à cocher, et que les injections
+    # volontaires des tests d'audit utilisent.
+    if not forcer:
+        import controles as _controles
+        bloquantes = _controles.bloquants(_controles.controler(conn, annee))
+        if bloquantes:
+            details = " | ".join(f"{a.code} : {a.message}"
+                                 for a in bloquantes[:3])
+            raise ValueError(
+                f"Clôture de {annee} refusée : {len(bloquantes)} anomalie(s) "
+                f"bloquante(s). {details}"
+                + (" …" if len(bloquantes) > 3 else "")
+                + " Corrigez-les, ou clôturez en connaissance de cause "
+                  "(option « Forcer »).")
 
     if generer_dotation:
         import amortissement

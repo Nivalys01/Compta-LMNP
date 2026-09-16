@@ -101,14 +101,27 @@ def c_numerotation_fec(conn, annee) -> list[Anomalie]:
 
 def c_doublons(conn, annee) -> list[Anomalie]:
     """AVERTISSEMENT — opérations de même type, même période, même montant."""
+    # Le groupement ignorait le BIEN et le TIERS : deux logements loués au
+    # même prix — deux studios identiques, le cas le plus banal d'un
+    # investisseur — étaient signalés comme un doublon chaque mois. Deux
+    # opérations ne sont soupçonnables que si elles portent sur le même
+    # bien et le même tiers.
     rows = conn.execute(
-        "SELECT type, periode, ROUND(montant,2), COUNT(*) "
+        "SELECT type, periode, ROUND(montant,2), COUNT(*), "
+        "       COALESCE(bien_id,0), COALESCE(tiers,'') "
         "FROM operation WHERE COALESCE(annulee,0)=0 AND exercice_annee=? "
-        "GROUP BY type, periode, ROUND(montant,2) HAVING COUNT(*) > 1", (annee,)
+        "GROUP BY type, periode, ROUND(montant,2), COALESCE(bien_id,0), "
+        "         COALESCE(tiers,'') HAVING COUNT(*) > 1", (annee,)
     ).fetchall()
-    return [Anomalie(AVERTISSEMENT, "DOUBLON",
-                     f"Doublon potentiel : {n}× '{t}' pour {per} à {m:.2f} €.")
-            for t, per, m, n in rows]
+    libelles = dict(conn.execute("SELECT id, libelle FROM bien"))
+    out = []
+    for t, per, m, n, bien_id, tiers in rows:
+        ou = f" sur « {libelles[bien_id]} »" if bien_id in libelles else ""
+        qui = f", tiers « {tiers} »" if tiers else ""
+        out.append(Anomalie(AVERTISSEMENT, "DOUBLON",
+                   f"Doublon potentiel : {n}× '{t}' pour {per} à "
+                   f"{m:.2f} €{ou}{qui}."))
+    return out
 
 
 def c_autres_a_requalifier(conn, annee) -> list[Anomalie]:
@@ -139,9 +152,16 @@ def c_depense_immobilisable(conn, annee) -> list[Anomalie]:
         if "seuil_immo" not in g:
             continue
         seuil = seuil_regle
+        # `COALESCE(annulee,0)=0` : une opération contre-passée n'existe
+        # plus comptablement, et l'alerte qui continue de la viser apprend
+        # à l'utilisateur à ignorer les suivantes. Trois contrôles
+        # l'oubliaient encore — celui-ci, le doublon annuel, et la seconde
+        # requête des loyers atypiques, dont la première excluait pourtant
+        # bien les annulations.
         rows = conn.execute(
             "SELECT id, periode, montant FROM operation "
-            "WHERE exercice_annee=? AND type=? AND montant > ?", (annee, t, seuil)
+            "WHERE exercice_annee=? AND type=? AND montant > ? "
+            "AND COALESCE(annulee,0)=0", (annee, t, seuil)
         ).fetchall()
         out += [Anomalie(AVERTISSEMENT, "IMMOBILISABLE",
                          f"Dépense potentiellement immobilisable (op. {oid}, {per}) : "
@@ -150,13 +170,58 @@ def c_depense_immobilisable(conn, annee) -> list[Anomalie]:
     return out
 
 
+def types_de_loyer(conn) -> list[str]:
+    """Les gabarits qui portent un LOYER, quel que soit leur nom.
+
+    Les contrôles de complétude et d'écart cherchaient le type écrit en
+    dur, `'loyer'`. Un gabarit personnalisé créé par l'utilisateur — même
+    compte, même nature, même périodicité — sortait donc de leur couverture
+    sans que rien ne l'annonce : une erreur de saisie de 720 € sur un loyer
+    n'était plus signalée, alors que les recettes étaient bien
+    comptabilisées.
+
+    La périodicité seule ne suffit pas à reconnaître un loyer : une
+    provision pour charges est mensuelle elle aussi. On retient donc les
+    gabarits de PRODUIT, mensuels, dont le compte est celui des loyers —
+    et le type standard, qui fait foi.
+    """
+    types = {"loyer"}
+    compte_loyer = (_g.tous(conn).get("loyer") or {}).get("compte")
+    for cle, g in _g.tous(conn).items():
+        if (g.get("nature") == "produit" and g.get("periodicite") == "mensuel"
+                and compte_loyer and g.get("compte") == compte_loyer):
+            types.add(cle)
+    return sorted(types)
+
+
+def _mois_de_l_exercice(conn, annee) -> list[str]:
+    """Les mois réellement couverts par l'exercice.
+
+    Douze mois étaient attendus quelle que soit sa durée. Un bien acquis en
+    novembre donnait donc dix « loyers manquants » pour des mois antérieurs
+    à l'ouverture de l'exercice — des mois où l'activité n'existait pas.
+    """
+    row = conn.execute("SELECT date_debut, date_fin FROM exercice WHERE annee=?",
+                       (annee,)).fetchone()
+    premier, dernier = 1, 12
+    if row and row[0] and row[1]:
+        try:
+            premier = max(1, int(str(row[0])[5:7]))
+            dernier = min(12, int(str(row[1])[5:7]))
+        except ValueError:
+            premier, dernier = 1, 12
+    return [f"{annee}-{m:02d}" for m in range(premier, dernier + 1)]
+
+
 def c_completude_loyers(conn, annee) -> list[Anomalie]:
-    """AVERTISSEMENT — 12 loyers mensuels attendus ; signale les mois manquants."""
+    """AVERTISSEMENT — un loyer mensuel attendu par mois de l'exercice ;
+    signale les mois manquants."""
+    types = types_de_loyer(conn)
+    ph = ",".join("?" * len(types))
     present = {r[0] for r in conn.execute(
-        "SELECT periode FROM operation WHERE COALESCE(annulee,0)=0 AND exercice_annee=? AND type='loyer'", (annee,)
-    ) if r[0]}
-    attendus = {f"{annee}-{m:02d}" for m in range(1, 13)}
-    manquants = sorted(attendus - present)
+        f"SELECT periode FROM operation WHERE COALESCE(annulee,0)=0 "
+        f"AND exercice_annee=? AND type IN ({ph})", (annee, *types)) if r[0]}
+    manquants = sorted(set(_mois_de_l_exercice(conn, annee)) - present)
     if not present:
         return []   # aucune saisie de loyer encore : on ne signale rien
     if manquants:
@@ -202,17 +267,57 @@ def c_dates_hors_exercice(conn, annee) -> list[Anomalie]:
 
 
 def c_compte_attente(conn, annee) -> list[Anomalie]:
-    """BLOQUANT — solde non nul sur 472000 (à-nouveaux en attente) : à apurer
-    avant clôture, sinon le bilan est faux."""
-    s = conn.execute(
+    """BLOQUANT — un compte d'attente encore mouvementé : à apurer avant
+    clôture, sinon le bilan est faux.
+
+    Deux corrections de la passe M, et la seconde est la plus instructive.
+
+    1. Le compte était désigné par égalité avec `472000`. Un cabinet
+       numérote en 4720000, et la reprise d'un FEC crée ce compte tel quel :
+       800 € non classés pouvaient alors être figés sans aucun signal. Toute
+       la racine 47 est un compte d'attente, subdivisions comprises.
+
+    2. Le solde était sommé algébriquement, et deux flux opposés ENCORE EN
+       ATTENTE — un encaissement et un décaissement de 800 € qu'on n'a pas
+       eu le temps d'identifier — donnent un solde nul. Le contrôle
+       concluait « apuré », et 800 € de recette potentielle étaient figés
+       sans décision.
+
+       Mais le mouvement du compte ne peut pas servir de signal : un compte
+       d'attente correctement APURÉ porte justement, par construction,
+       l'écriture d'origine et sa reclassification — soit un aller-retour
+       de montants égaux pour un solde nul. Le dossier de référence en
+       compte 287 847,78 €, tous régulièrement reclassés. C'est donc du
+       côté des OPÉRATIONS qu'il faut regarder : celles dont le gabarit dit
+       encore « à identifier » n'ont pas reçu de décision, quel que soit
+       l'état du compte.
+    """
+    solde = conn.execute(
         "SELECT ROUND(SUM(l.debit - l.credit),2) FROM ligne l "
         "JOIN ecriture e ON e.id=l.ecriture_id "
-        "WHERE e.exercice_annee=? AND l.compte_num='472000'", (annee,)
-    ).fetchone()[0]
-    if s and abs(s) > 0.005:
+        "WHERE e.exercice_annee=? AND l.compte_num LIKE '47%'", (annee,)
+    ).fetchone()[0] or 0.0
+    if abs(solde) > 0.005:
         return [Anomalie(BLOQUANT, "COMPTE_ATTENTE",
-                         f"Compte d'attente 472000 non soldé : {s:.2f} € — "
+                         f"Compte d'attente (47) non soldé : {solde:.2f} € — "
                          "reclasser avant la clôture.")]
+    attente = [t for t, g in _g.tous(conn).items()
+               if str(g.get("compte", "")).startswith("47")]
+    if not attente:
+        return []
+    ph = ",".join("?" * len(attente))
+    rows = conn.execute(
+        f"SELECT COUNT(*), ROUND(COALESCE(SUM(montant),0),2) FROM operation "
+        f"WHERE exercice_annee=? AND COALESCE(annulee,0)=0 "
+        f"AND type IN ({ph})", (annee, *attente)).fetchone()
+    if rows and rows[0]:
+        return [Anomalie(BLOQUANT, "COMPTE_ATTENTE",
+                f"{rows[0]} opération(s) encore « à identifier » "
+                f"({rows[1]:.2f} €) : leur compte d'attente est soldé, mais "
+                "un solde nul n'est pas un apurement — deux flux opposés "
+                "jamais reclassés se compensent tout aussi bien. Donnez à "
+                "chacune sa vraie nature avant de clôturer : tant qu'elles "
+                "sont en attente, leur effet sur le résultat reste inconnu.")]
     return []
 
 
@@ -364,6 +469,31 @@ def c_retraitement_manuel_majore_le_plafond(conn, annee, *,
             "charge de structure (honoraires comptables, CFE). Vérifiez ce "
             "point : dans le second cas, vous déduiriez plus "
             "d'amortissement que la loi ne l'autorise.")]
+
+
+def c_regles_retablies(conn, annee) -> list[Anomalie]:
+    """AVERTISSEMENT — des règles fiscales ont été recréées à leur valeur
+    livrée après avoir disparu de la configuration.
+
+    Le logiciel ressème ses cinq règles dès qu'une clé manque. C'est le
+    bon comportement à la première ouverture ; c'en est un mauvais après
+    une perte, car la valeur rétablie n'est pas nécessairement celle qui
+    s'appliquait — un seuil d'immobilisation abaissé à 300 € revenait à
+    500 €, et l'avertissement sur une dépense de 400 € disparaissait avec
+    lui. La valeur perdue n'est pas récupérable ; le seul service honnête
+    est de dire qu'elle l'a été.
+    """
+    del annee
+    retablies = parametres.regles_retablies(conn)
+    if not retablies:
+        return []
+    noms = ", ".join(parametres.LIBELLES.get(c, c) for c in retablies)
+    return [Anomalie(AVERTISSEMENT, "REGLE_RETABLIE",
+            f"Règle(s) fiscale(s) recréée(s) à leur valeur livrée : {noms}. "
+            "Elles avaient disparu de la configuration, et le logiciel les a "
+            "réinsérées avec leur valeur d'origine — qui n'est pas forcément "
+            "celle que vous aviez enregistrée. Vérifiez-les dans le menu "
+            "« Réglementation » avant de clôturer.")]
 
 
 def c_ventilation_39c_incomplete(conn, annee) -> list[Anomalie]:
@@ -584,16 +714,22 @@ def c_plausibilite_n1(conn, annee) -> list[Anomalie]:
 def c_loyer_atypique(conn, annee) -> list[Anomalie]:
     """AVERTISSEMENT — loyer mensuel s'écartant de plus de 15 % de la médiane
     annuelle (erreur de saisie ou changement de loyer à documenter)."""
+    types = types_de_loyer(conn)
+    ph = ",".join("?" * len(types))
     rows = [r[0] for r in conn.execute(
-        "SELECT montant FROM operation WHERE COALESCE(annulee,0)=0 AND exercice_annee=? AND type='loyer' "
-        "ORDER BY montant", (annee,)).fetchall()]
+        f"SELECT montant FROM operation WHERE COALESCE(annulee,0)=0 "
+        f"AND exercice_annee=? AND type IN ({ph}) ORDER BY montant",
+        (annee, *types)).fetchall()]
     if len(rows) < 3:
         return []
     mediane = rows[len(rows) // 2]
     out = []
+    # La première requête excluait bien les annulations ; celle-ci les
+    # réintroduisait, et un loyer corrigé restait signalé indéfiniment.
     for per, m in conn.execute(
-        "SELECT periode, montant FROM operation "
-        "WHERE exercice_annee=? AND type='loyer'", (annee,)).fetchall():
+        f"SELECT periode, montant FROM operation "
+        f"WHERE exercice_annee=? AND type IN ({ph}) "
+        f"AND COALESCE(annulee,0)=0", (annee, *types)).fetchall():
         if mediane > 0 and abs(m - mediane) / mediane > 0.15 and abs(m - mediane) > 20:
             out.append(Anomalie(AVERTISSEMENT, "LOYER_ATYPIQUE",
                 f"Loyer {per} : {m:.2f} € vs médiane annuelle {mediane:.2f} € — "
@@ -613,6 +749,7 @@ def c_annuel_multiple(conn, annee) -> list[Anomalie]:
     rows = conn.execute(
         f"SELECT type, COUNT(*) FROM operation "
         f"WHERE exercice_annee=? AND type IN ({ph}) "
+        f"AND COALESCE(annulee,0)=0 "
         f"GROUP BY type HAVING COUNT(*) > 1", (annee, *annuels)).fetchall()
     return [Anomalie(AVERTISSEMENT, "ANNUEL_MULTIPLE",
                      f"'{t}' (périodicité annuelle) saisi {n} fois — doublon "
@@ -640,11 +777,33 @@ def c_an_absents(conn, annee) -> list[Anomalie]:
         return []
     an = conn.execute("SELECT COUNT(*) FROM ecriture WHERE exercice_annee=? "
                       "AND journal_code='AN'", (annee,)).fetchone()[0]
-    if an == 0:
-        return [Anomalie(AVERTISSEMENT, "AN_ABSENTS",
-                f"L'exercice {annee-1} est clos mais {annee} n'a pas d'à-nouveaux : "
-                "reprenez le bilan (Nouvel exercice → reprise) sinon le 2033-A sera faux.")]
-    return []
+    if an:
+        return []
+    # BLOQUANT, et non plus avertissement, DÈS LORS qu'il y a quelque chose
+    # à reprendre. Clôturer sans à-nouveaux fige un bilan dont on sait déjà
+    # qu'il est faux : dans un cas reproduit, un actif net de −1 200 € au
+    # lieu de 9 600 €. L'erreur est déterminée, pas soupçonnée — et la
+    # liasse la signale ensuite, mais après une clôture autorisée, quand
+    # l'exercice ne peut plus être corrigé.
+    #
+    # Un exercice précédent dont tous les soldes de bilan sont nuls ne
+    # laisse rien à reprendre : le signaler bloquerait pour rien.
+    import reprise as _reprise
+    try:
+        bal = _reprise.lire_balance_interne(conn, annee - 1)
+        a_reprendre = round(sum(abs(v) for n, v in bal.items()
+                                if n[:1] in "12345"), 2)
+    except sqlite3.Error:
+        a_reprendre = 0.0
+    if a_reprendre <= 0.005:
+        return []
+    return [Anomalie(BLOQUANT, "AN_ABSENTS",
+            f"L'exercice {annee-1} est clos et laisse {a_reprendre:.2f} € de "
+            f"soldes de bilan à reprendre, mais {annee} n'a aucun à-nouveau. "
+            "Clôturer maintenant figerait un bilan faux — actif, "
+            "amortissements et compte de l'exploitant partiraient de zéro. "
+            "Reprenez le bilan (Nouvel exercice → reprise) avant de "
+            "clôturer.")]
 
 
 def c_dotation_vs_plan(conn, annee) -> list[Anomalie]:
@@ -883,14 +1042,17 @@ def c_amortissements_anterieurs(conn, annee) -> list[Anomalie]:
     plus-value en cas de revente.
     """
     import operations as _ops
-    try:
-        m = _ops.amortissements_anterieurs_manquants(conn, annee)
-    except Exception:
-        return []
+    # Pas de `except` qui rende une liste vide : « je n'ai pas pu vérifier »
+    # n'est pas « rien à signaler ». L'échec remonte à `controler`, qui
+    # l'isole et le NOMME (anomalie CONTROLE_IMPOSSIBLE).
+    m = _ops.amortissements_anterieurs_manquants(conn, annee)
     if not m["par_compte"]:
         return []
     noms = ", ".join(d["composant"] for d in m["detail"][:3])
-    return [Anomalie(AVERTISSEMENT, "AMORT_ANTERIEURS",
+    # BLOQUANT : l'écart est CALCULÉ, pas soupçonné, et il ne se résorbe
+    # jamais de lui-même — il fausse la valeur nette comptable, donc la
+    # plus-value à la revente. Le geste de correction tient en un clic.
+    return [Anomalie(BLOQUANT, "AMORT_ANTERIEURS",
             f"{m['total']:.2f} € d'amortissements déjà courus avant "
             f"{annee} ne sont pas comptabilisés ({noms}). Le bilan "
             "présente le bien comme neuf alors que le tableau 2033-C "
@@ -899,6 +1061,18 @@ def c_amortissements_anterieurs(conn, annee) -> list[Anomalie]:
             "la page Immobilisations (« Reprendre les amortissements "
             "antérieurs ») — le résultat de l'exercice n'en est pas "
             "affecté, seul le bilan est remis à l'endroit.")]
+
+
+def _immobilisations_comptabilisees(conn, annee) -> float:
+    """Valeur brute des immobilisations effectivement écrites dans les
+    comptes de l'exercice (classe 2, hors amortissements 28/29)."""
+    r = conn.execute(
+        "SELECT ROUND(COALESCE(SUM(l.debit - l.credit),0),2) FROM ligne l "
+        "JOIN ecriture e ON e.id = l.ecriture_id "
+        "WHERE e.exercice_annee=? AND l.compte_num LIKE '2%' "
+        "AND l.compte_num NOT LIKE '28%' AND l.compte_num NOT LIKE '29%'",
+        (annee,)).fetchone()
+    return float(r[0] or 0.0)
 
 
 def c_ventilation_incoherente(conn, annee) -> list[Anomalie]:
@@ -917,7 +1091,6 @@ def c_ventilation_incoherente(conn, annee) -> list[Anomalie]:
     où il se produit (à la ventilation initiale et à l'ajout d'un
     composant), pas à chaque contrôle.
     """
-    del annee
     out = []
     for bien_id, lib, prix in conn.execute(
             "SELECT id, libelle, prix_total FROM bien"):
@@ -933,6 +1106,15 @@ def c_ventilation_incoherente(conn, annee) -> list[Anomalie]:
             # à l'amortissement, le tableau des immobilisations est vide, et
             # rien ne le dit avant la liasse. L'absence de donnée n'est pas
             # une preuve de conformité.
+            #
+            # Mais ce qui fait le préjudice, c'est un actif INSCRIT AUX
+            # COMPTES que nul composant n'explique — pas un `prix_total`
+            # renseigné. Ce champ est une information de dossier : tant que
+            # l'acquisition n'est pas comptabilisée, il n'y a rien au bilan,
+            # donc rien qui manque au 2033-C, et bloquer la clôture
+            # reviendrait à exiger une ventilation avant même l'achat.
+            if _immobilisations_comptabilisees(conn, annee) <= 0.005:
+                continue
             out.append(Anomalie(BLOQUANT, "VENTILATION_ABSENTE",
                        f"Bien « {lib} » : {prix:.2f} € d'acquisition et "
                        "AUCUN composant. Rien ne peut donc être amorti, et "
@@ -1096,6 +1278,7 @@ CONTROLES = [
     c_postes_habituels_absents,
     c_deficit_menace_par_le_39c,
     c_ventilation_39c_incomplete,
+    c_regles_retablies,
     c_retraitement_manuel_majore_le_plafond,
     c_duree_allongee,
     c_loyer_atypique,
@@ -1115,12 +1298,44 @@ CONTROLES = [
 
 
 def controler(conn: sqlite3.Connection, annee: int) -> list[Anomalie]:
-    """Exécute tous les contrôles et renvoie la liste agrégée des anomalies."""
+    """Exécute tous les contrôles et renvoie la liste agrégée des anomalies.
+
+    Chaque contrôle est ISOLÉ. Un contrôle qui échoue — lecture impossible,
+    donnée incohérente en base, plan d'amortissement inexploitable — ne doit
+    produire ni l'un ni l'autre des deux comportements observés :
+
+      - être avalé par un `except` local et rendre une liste vide, ce qui
+        transforme « je n'ai pas pu vérifier » en « rien à signaler ». Le
+        déclarant recevait alors une assurance positive sur un cumul
+        d'amortissement de 12 000 € qui n'avait pas été contrôlé ;
+      - remonter jusqu'ici et faire échouer TOUS les autres contrôles avec
+        lui, ce qui prive l'utilisateur des vingt-six verdicts valides.
+
+    Un contrôle en échec devient une anomalie BLOQUANTE qui le nomme : c'est
+    la seule réponse honnête, et elle empêche de clôturer sur une
+    vérification qui n'a pas eu lieu.
+    """
     import operations as _ops
     _ops.assurer_colonne_annulee(conn)
     anomalies: list[Anomalie] = []
+    # Un exercice qui n'existe pas ne peut pas être contrôlé. Le rapport
+    # concluait « aucune anomalie ✓ » pour une année absente de la base :
+    # il prétendait avoir vérifié ce qu'il n'avait pas pu lire.
+    if conn.execute("SELECT COUNT(*) FROM exercice WHERE annee=?",
+                    (annee,)).fetchone()[0] == 0:
+        return [Anomalie(BLOQUANT, "EXERCICE_INEXISTANT",
+                         f"L'exercice {annee} n'existe pas dans ce dossier : "
+                         "aucun contrôle n'a pu être exécuté. Vérifiez "
+                         "l'année demandée, ou ouvrez cet exercice.")]
     for ctl in CONTROLES:
-        anomalies += ctl(conn, annee)
+        try:
+            anomalies += ctl(conn, annee)
+        except Exception as exc:                     # noqa: BLE001
+            anomalies.append(Anomalie(
+                BLOQUANT, "CONTROLE_IMPOSSIBLE",
+                f"Le contrôle « {ctl.__name__} » n'a pas pu être exécuté "
+                f"({type(exc).__name__} : {exc}). Ce qu'il vérifie n'est donc "
+                "PAS vérifié — ne clôturez pas sans avoir compris pourquoi."))
     ordre = {BLOQUANT: 0, AVERTISSEMENT: 1, INFO: 2}
     return sorted(anomalies, key=lambda a: ordre[a.niveau])
 
