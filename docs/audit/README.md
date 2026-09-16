@@ -5,6 +5,25 @@ Un fichier par passe, à copier tel quel dans une IA. **Toujours joindre
 format imposé, les six règles apprises en se trompant, et la consigne de
 sécurité sur les données réelles.
 
+## Assembler un dossier complet
+
+```bash
+python docs/audit/assembler.py R      # → docs/audit/paquets/passe-R-complet.md
+```
+
+Produit un document **autoportant** — invariants, prompt, puis le contenu
+intégral de chaque pièce à joindre — à téléverser tel quel dans l'IA. Un seul
+fichier, rien à rassembler à la main, donc rien à oublier.
+
+La liste des pièces est **lue dans le tableau du prompt**, jamais recopiée
+dans le script : une seconde liste aurait divergé dès la première pièce
+ajoutée, et c'est le prompt que l'auditeur lit. L'assemblage **échoue** si une
+pièce manque, et le document est relu contre les empreintes du dossier privé
+avant d'exister — le destinataire étant une IA tierce, le script refuse de
+produire quoi que ce soit s'il ne peut pas charger ces empreintes. Il ne
+tourne donc que sur le poste qui détient les données, comme
+`construire_distribution.py`.
+
 ## Les passes
 
 | Fichier | Domaine | Pièces principales |
