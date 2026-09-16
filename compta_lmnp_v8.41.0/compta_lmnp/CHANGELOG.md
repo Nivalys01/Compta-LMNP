@@ -1,5 +1,37 @@
 # Journal des versions — Compta LMNP
 
+## 8.50.1 — 2026-09-16 (Le contrôle de publication sait lire un PDF)
+
+**Un contrôle qui échoue toujours finit par ne plus être lu.** Les preuves
+d'audit versionnées dans `docs/preuves_*` sont des PDF ; le contrôle avant
+publication rangeait le PDF parmi les formats opaques — archives, images,
+bureautique — et rendait un avertissement pour chacun. Quatorze
+avertissements perpétuels, un test de publication rouge en permanence, et
+l'habitude de passer outre qui s'installe.
+
+**La facilité aurait rouvert le trou que ce contrôle documente.** Exempter
+`docs/preuves_*` par son chemin aurait rendu le test vert en aveuglant le
+contrôle à l'endroit exact où l'on dépose des sorties fraîchement produites
+— alors que le cas qui a motivé cet avertissement est justement un bilan
+comptable RÉEL déposé en PDF, que le contrôle traversait sans rien y voir.
+Un chemin exempté ne dit pas « ce fichier est propre », il dit « je ne
+regarde plus par ici ».
+
+**Le PDF est donc lu pour de bon.** Son texte est extrait par `pdftotext`,
+dont la suite de tests dépend déjà, et les empreintes du dossier réel y sont
+cherchées comme dans n'importe quel fichier. Ce qui ne peut pas être lu est
+DIT, jamais traversé : poppler absent de la machine, extraction en échec sur
+un fichier chiffré ou abîmé, document scanné dont l'extraction ne rend aucun
+caractère — chacun de ces cas redevient un avertissement nommé, qui dit ce
+qui manque. Et l'ordre des deux verdicts compte : le peu de texte d'une page
+scannée passe d'abord au tamis des empreintes, parce qu'un nom tient en
+moins de vingt signes et qu'une fuite lisible ne doit pas être classée « à
+vérifier à la main ».
+
+Le contrôle du dépôt conclut désormais sur les 209 fichiers qui seraient
+publiés, PDF compris.
+
+
 ## 8.50.0 — 2026-09-16 (Passe Q : le bon contrôle, au mauvais moment)
 
 Douze constats, quatre critiques, sept majeurs et un mineur. Cette passe ne

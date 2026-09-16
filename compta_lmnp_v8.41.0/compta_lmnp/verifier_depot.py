@@ -56,6 +56,9 @@ CHEMINS_INTERDITS = [
 ]
 
 # Formats dont le texte est compressé ou encodé : les lire ne prouve rien.
+# Le .pdf y reste pour le REPLI seulement : il est lu par extraction (voir
+# texte_du_pdf), et ne retombe dans cette liste que lorsque l'extraction
+# n'a pas pu avoir lieu.
 OPAQUES = (".pdf", ".zip", ".gz", ".tar", ".7z", ".rar", ".docx", ".xlsx",
            ".pptx", ".odt", ".ods", ".png", ".jpg", ".jpeg", ".webp", ".db",
            ".sqlite", ".sqlite3")
@@ -113,6 +116,60 @@ def normaliser(texte: str) -> str:
     texte = unicodedata.normalize("NFD", (texte or "").lower())
     texte = "".join(c for c in texte if not unicodedata.combining(c))
     return " ".join(texte.split())
+
+
+# Quantité de texte extrait en deçà de laquelle un PDF n'est PAS réputé
+# inspecté. Un PDF scanné, ou fait d'images, rend zéro caractère ou trois
+# parasites : l'extraction « réussit » sans rien montrer. Conclure au vert
+# là-dessus reviendrait à dire « rien à voir » pour « rien vu » — l'erreur
+# même que l'avertissement des formats opaques était censé empêcher.
+TEXTE_PDF_MINIMUM = 40
+
+
+def texte_du_pdf(chemin: str) -> tuple[str | None, str]:
+    """(texte, réserve) — la réserve est vide quand la lecture fait foi.
+
+    `texte` vaut None lorsque l'extraction n'a pas pu avoir lieu du tout :
+    le motif dit alors pourquoi. Lorsqu'elle a eu lieu mais n'a presque rien
+    rendu, le texte est renvoyé QUAND MÊME, avec une réserve : une empreinte
+    trouvée dans ces quelques caractères reste une fuite, et un nom seul
+    tient en moins de vingt signes. La réserve ne sert qu'à défaut — voir
+    verifier().
+
+    Le PDF était rangé parmi les formats opaques, au même titre qu'une
+    archive ou une image. Il ne l'est pas : son texte s'extrait, et les
+    preuves versionnées dans docs/ sont justement des PDF de texte. La
+    solution de facilité — exempter docs/preuves_* par son chemin —
+    rouvrait exactement le trou décrit dans verifier() : un PDF réel
+    déposé là serait passé sans être vu, et c'est le dossier où l'on
+    dépose des sorties fraîchement produites.
+
+    L'extraction passe par pdftotext (poppler), dont la suite de tests
+    dépend déjà. Absent, en échec ou muet, le PDF redevient un
+    AVERTISSEMENT : le contrôle ne dit « inspecté » que lorsqu'il a
+    effectivement lu quelque chose.
+    """
+    try:
+        r = subprocess.run(["pdftotext", "-layout", "-enc", "UTF-8",
+                            chemin, "-"], capture_output=True, timeout=60)
+    except FileNotFoundError:
+        return None, ("PDF non inspecté — pdftotext (poppler) absent de "
+                      "cette machine : vérifiez à la main qu'il ne porte "
+                      "aucune donnée personnelle")
+    except (subprocess.TimeoutExpired, OSError):
+        return None, ("PDF non inspecté — extraction interrompue : "
+                      "vérifiez à la main qu'il ne porte aucune donnée "
+                      "personnelle")
+    if r.returncode != 0:
+        return None, ("PDF non inspecté — extraction en échec (fichier "
+                      "chiffré ou abîmé ?) : vérifiez à la main qu'il ne "
+                      "porte aucune donnée personnelle")
+    texte = (r.stdout or b"").decode("utf-8", "replace")
+    if len("".join(texte.split())) < TEXTE_PDF_MINIMUM:
+        return texte, ("PDF sans texte extractible (image ou document "
+                       "scanné) — vérifiez à la main qu'il ne porte aucune "
+                       "donnée personnelle")
+    return texte, ""
 
 
 def empreintes() -> list[tuple[str, str]]:
@@ -217,35 +274,58 @@ def verifier(racine: str | None = None) -> dict:
                                      "— non examiné"})
             continue
         # Formats dont le contenu N'EST PAS inspectable : le texte y est
-        # compressé (PDF, archives, bureautique) et la recherche
+        # compressé (archives, bureautique, images) et la recherche
         # d'empreintes n'y trouverait rien — sans échouer pour autant. Le
         # cas s'est produit : un bilan comptable RÉEL, déposé en PDF à la
         # racine, n'était ni suivi ni ignoré ; le contrôle le lisait comme
         # du cp1252, n'y voyait aucune empreinte, et concluait au vert.
         # Un format qu'on ne sait pas lire doit être DIT, pas traversé.
-        if f.lower().endswith(OPAQUES):
+        #
+        # Le PDF fait exception depuis : son texte s'extrait vraiment, donc
+        # il est lu comme les autres fichiers, et les empreintes y sont
+        # cherchées. Ce n'est qu'à défaut d'extraction qu'il redevient un
+        # avertissement — jamais un chemin exempté.
+        reserve = ""
+        if f.lower().endswith(".pdf"):
+            contenu, reserve = texte_du_pdf(chemin)
+            if contenu is None:
+                alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                                "motif": reserve})
+                continue
+        elif f.lower().endswith(OPAQUES):
             alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
                             "motif": "format dont le contenu n'est pas "
                                      "inspectable — vérifiez à la main qu'il "
                                      "ne porte aucune donnée personnelle"})
             continue
-        contenu = None
-        for enc in ("utf-8", "cp1252"):
-            try:
-                contenu = brut.decode(enc)
-                break
-            except UnicodeDecodeError:
+        else:
+            contenu = None
+            for enc in ("utf-8", "cp1252"):
+                try:
+                    contenu = brut.decode(enc)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            if contenu is None:
+                alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                                "motif": "binaire non décodable — contenu "
+                                         "non examiné"})
                 continue
-        if contenu is None:
-            alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
-                            "motif": "binaire non décodable — contenu non "
-                                     "examiné"})
-            continue
         normalise = normaliser(contenu)
+        vu = False
         for quoi, valeur in cherchees:
             if valeur and valeur in normalise:
+                vu = True
                 alertes.append({"gravite": "BLOQUANT", "fichier": f,
                                 "motif": f"contient une donnée réelle ({quoi})"})
+        # La réserve d'un PDF presque muet ne se prononce qu'ici : ce qui a
+        # été lu passe d'abord au tamis des empreintes, et l'avertissement
+        # ne vient que si ce tamis n'a rien retenu. Dans l'autre ordre, une
+        # page scannée portant le nom en clair dans son maigre texte aurait
+        # été classée « à vérifier à la main » au lieu de BLOQUANTE.
+        if reserve and not vu:
+            alertes.append({"gravite": "AVERTISSEMENT", "fichier": f,
+                            "motif": reserve})
 
     return {"fichiers_publies": len(fichiers), "empreintes_cherchees":
             len(liste), "alertes": alertes, "racine": racine}

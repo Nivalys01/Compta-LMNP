@@ -350,6 +350,153 @@ def test_controle_de_publication_disponible_et_strict():
     assert not r["alertes"], r["alertes"]
 
 
+# --- Un PDF n'est pas un fichier illisible --------------------------------
+# Les preuves d'audit versionnées dans docs/ sont des PDF de texte. Le
+# contrôle les rangeait parmi les formats opaques et rendait un
+# AVERTISSEMENT pour chacun — le test ci-dessus échouait donc en
+# permanence, et un contrôle qui échoue toujours finit par ne plus être lu.
+# La solution de facilité, exempter docs/preuves_* par son chemin, aurait
+# rouvert le trou que ce même contrôle documente : un PDF RÉEL déposé là
+# serait passé sans être vu. Le PDF est donc LU.
+
+def _pdf_de_test(chemin, texte=None, corps=True):
+    """Petit PDF réel : avec du texte, ou muet (un simple rectangle) pour
+    imiter un document scanné. `corps=False` ne pose que la ligne demandée,
+    pour le cas du document presque vide."""
+    from reportlab.pdfgen import canvas
+    c = canvas.Canvas(str(chemin))
+    if texte is None:
+        c.rect(100, 100, 200, 200, fill=1)
+    else:
+        c.drawString(72, 720, texte)
+        if corps:
+            for i, ligne in enumerate([
+                    "Recettes de l'exercice (CA HT) : 12 000,00 EUR",
+                    "Amortissements de l'exercice : 4 200,00 EUR",
+                    "Resultat fiscal LMNP : 1 850,00 EUR",
+                    "Document de travail — report champ a champ."]):
+                c.drawString(72, 700 - 14 * i, ligne)
+    c.save()
+    return str(chemin)
+
+
+def _depot_jetable(tmp_path, monkeypatch, empreinte="MARTIN"):
+    """Dépôt git minimal + empreinte factice : un test n'a pas à manipuler
+    la vraie identité de l'exploitant."""
+    import subprocess
+    import verifier_depot
+    repo = tmp_path / "depot"
+    (repo / "docs").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    monkeypatch.setattr(verifier_depot, "_empreintes",
+                        lambda: [("nom de l'exploitant", empreinte)])
+    return repo
+
+
+def test_un_pdf_de_texte_est_reellement_inspecte(tmp_path, monkeypatch):
+    """Le cas qui motive tout : une liasse réelle déposée en PDF dans
+    docs/. Le contrôle doit y trouver le nom, pas se contenter d'un
+    « vérifiez à la main » que personne ne fait."""
+    import verifier_depot
+    repo = _depot_jetable(tmp_path, monkeypatch)
+    _pdf_de_test(repo / "docs" / "bilan.pdf",
+                 "Bilan 2026 — MARTIN Camille — exercice clos")
+
+    r = verifier_depot.verifier(str(repo))
+
+    fautifs = {a["fichier"]: a for a in r["alertes"]}
+    assert "docs/bilan.pdf" in fautifs, r["alertes"]
+    assert fautifs["docs/bilan.pdf"]["gravite"] == "BLOQUANT"
+    assert "donnée réelle" in fautifs["docs/bilan.pdf"]["motif"]
+
+
+def test_un_pdf_de_texte_propre_ne_laisse_aucune_alerte(tmp_path, monkeypatch):
+    """Contrepartie, et raison d'être du correctif : les preuves de docs/
+    ne doivent plus produire d'avertissement perpétuel."""
+    import verifier_depot
+    repo = _depot_jetable(tmp_path, monkeypatch)
+    _pdf_de_test(repo / "docs" / "preuve.pdf",
+                 "Exploitant fictif — liasse de démonstration")
+
+    assert verifier_depot.verifier(str(repo))["alertes"] == []
+
+
+def test_un_pdf_sans_texte_reste_un_avertissement(tmp_path, monkeypatch):
+    """« L'extraction n'a rien rendu » ne vaut pas « il n'y a rien dedans ».
+    Un bilan photographié ou scanné ne donne aucun caractère : conclure au
+    vert là-dessus serait le piège d'origine, déplacé d'un cran."""
+    import verifier_depot
+    repo = _depot_jetable(tmp_path, monkeypatch)
+    _pdf_de_test(repo / "docs" / "scan.pdf")          # aucune chaîne de texte
+
+    alertes = verifier_depot.verifier(str(repo))["alertes"]
+
+    assert [a["fichier"] for a in alertes] == ["docs/scan.pdf"], alertes
+    assert alertes[0]["gravite"] == "AVERTISSEMENT"
+    assert "sans texte extractible" in alertes[0]["motif"]
+
+
+def test_un_pdf_presque_muet_qui_porte_le_nom_reste_bloquant(tmp_path,
+                                                            monkeypatch):
+    """L'ordre des deux verdicts compte. Une page scannée dont l'extraction
+    ne rend qu'une ligne — mais le nom en clair dedans — serait classée
+    « à vérifier à la main » si la réserve se prononçait avant le tamis des
+    empreintes. Un nom tient en moins de vingt signes."""
+    import verifier_depot
+    repo = _depot_jetable(tmp_path, monkeypatch)
+    _pdf_de_test(repo / "docs" / "entete.pdf", "MARTIN Camille", corps=False)
+
+    alertes = verifier_depot.verifier(str(repo))["alertes"]
+
+    assert [a["gravite"] for a in alertes] == ["BLOQUANT"], alertes
+    assert alertes[0]["fichier"] == "docs/entete.pdf"
+
+
+def test_pdftotext_absent_ne_vaut_pas_pdf_propre(tmp_path, monkeypatch):
+    """Sur une machine sans poppler — une CI, un autre poste — le contrôle
+    doit DIRE qu'il n'a pas lu, et nommer ce qui lui manque."""
+    import verifier_depot
+    pdf = _pdf_de_test(tmp_path / "liasse.pdf", "MARTIN Camille")
+    monkeypatch.setenv("PATH", str(tmp_path))         # plus de pdftotext
+
+    texte, motif = verifier_depot.texte_du_pdf(pdf)
+
+    assert texte is None
+    assert "pdftotext" in motif and "poppler" in motif
+
+
+def test_un_pdf_illisible_redevient_un_avertissement(tmp_path, monkeypatch):
+    """Et cet échec d'extraction, quelle qu'en soit la cause, remonte bien
+    jusqu'au verdict : il n'est pas avalé par la branche qui le lit."""
+    import verifier_depot
+    repo = _depot_jetable(tmp_path, monkeypatch)
+    (repo / "docs" / "chiffre.pdf").write_bytes(b"%PDF-1.4 abime")
+
+    alertes = verifier_depot.verifier(str(repo))["alertes"]
+
+    assert [a["gravite"] for a in alertes] == ["AVERTISSEMENT"], alertes
+    assert alertes[0]["fichier"] == "docs/chiffre.pdf"
+    assert "non inspecté" in alertes[0]["motif"]
+
+
+def test_les_preuves_pdf_de_ce_depot_sont_lisibles():
+    """Garde-fou sur le dépôt réel : si l'extraction cessait de fonctionner,
+    le contrôle redeviendrait vert-par-avertissement sans que rien ne le
+    signale, et ce dossier est précisément celui où l'on dépose des sorties
+    fraîchement produites."""
+    import glob
+    import verifier_depot
+    racine = verifier_depot.racine_depot()
+    preuves = sorted(glob.glob(os.path.join(racine, "docs", "preuves_*",
+                                            "*.pdf")))
+    if not preuves:
+        import pytest as _p
+        _p.skip("aucune preuve PDF dans ce dépôt")
+    muets = [os.path.basename(f) for f in preuves
+             if verifier_depot.texte_du_pdf(f)[0] is None]
+    assert not muets, f"PDF non inspectables : {muets}"
+
+
 def test_aucun_tiers_nomme_dans_le_depot():
     """Nommer un prestataire tiers dans un dépôt public n'apporte rien et
     l'expose autant que nous. Les termes à proscrire sont listés dans le
