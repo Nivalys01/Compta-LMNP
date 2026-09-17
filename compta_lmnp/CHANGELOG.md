@@ -1,5 +1,53 @@
 # Journal des versions — Compta LMNP
 
+## 8.54.0 — 2026-09-17 (Une installation mélangée se dénonce elle-même)
+
+**La cause du défaut de la veille est trouvée, et elle n'était dans aucun
+fichier.** L'onglet Liasse tombait entièrement ; ni le gabarit ni le module de
+calcul n'étaient fautifs. Le gabarit demandait un champ que le module installé
+**à côté** ne produisait pas encore : un paquet décompressé par-dessus un
+autre sans tout remplacer, deux versions cohabitant dans la même installation.
+Confirmé par l'utilisateur — après réinstallation complète, plus aucun
+`⚠ champ absent` nulle part.
+
+**Rien ne le signalait.** Le logiciel démarrait, servait ses pages, et cassait
+à l'écran le plus éloigné de sa cause. C'est le pire profil de défaut : celui
+qui fait chercher au mauvais endroit.
+
+**Le paquet porte désormais son manifeste.** `MANIFESTE.json` liste les 51
+fichiers livrés avec leur empreinte SHA-256, calculée sur les octets
+**réellement livrés** — les documents Markdown voient leurs liens réécrits à
+la construction, et un manifeste calculé sur la source annoncerait une
+différence dès le premier démarrage.
+
+**Trois situations, trois réponses, et elles ne sont pas interchangeables.**
+
+- **Un fichier manque** : aucune ambiguïté possible, on refuse de servir en le
+  nommant. Tenir une comptabilité avec un programme dont on sait qu'il est
+  amputé ne se justifie jamais.
+- **Un fichier diffère** : impossible de distinguer une installation périmée
+  d'une modification volontaire — et l'AGPL donne explicitement le droit de
+  modifier ce code. Refuser transformerait une liberté accordée par la licence
+  en panne. On avertit donc, par un bandeau sur **chaque** page, en nommant les
+  fichiers.
+- **Le manifeste est absent** : normal dans l'arborescence de développement,
+  où il n'a jamais existé et où `tests/` permet de le reconnaître ; signalé
+  partout ailleurs, parce qu'un manifeste perdu est un contrôle perdu.
+
+**Le moment importait plus que le contrôle.** Une première version branchait
+la garde sur la requête. Elle n'avait jamais la parole : un module manquant
+fait échouer l'**import** d'`app.py`, et le lanceur n'affiche alors qu'un
+`ModuleNotFoundError` nu — qui nomme le module sans dire ni pourquoi il
+manque, ni quoi faire. Reproduit en retirant `modules/liasse.py` d'une
+installation décompressée. La vérification a donc lieu **avant les imports
+métier**, sur la console que le lanceur garde ouverte pour ça.
+
+Non-régression : `tests/test_integrite_installation.py` (12 tests), dont deux
+en processus séparé — seule façon d'observer ce qui se passe à l'import et le
+code de sortie. Éprouvé aussi hors tests, sur le paquet réellement décompressé,
+dans ses trois états.
+
+
 ## 8.53.1 — 2026-09-17 (Un champ manquant ne coûte plus la liasse entière)
 
 **Défaut remonté en usage réel.** L'onglet Liasse répondait « unsupported

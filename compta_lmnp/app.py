@@ -36,6 +36,12 @@ _MODULES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modules")
 if _MODULES not in sys.path:
     sys.path.insert(0, _MODULES)
 
+# AVANT les imports métier : un module manquant les fait échouer, et le
+# lanceur n'affiche alors qu'un ModuleNotFoundError nu. La garde ne peut
+# pas attendre la première requête pour parler — elle n'y arriverait pas.
+import integrite  # noqa: E402
+integrite.exiger_installation_complete()
+
 import controles
 import fiscal
 import init_db
@@ -212,6 +218,9 @@ def _migrer_si_besoin() -> None:
 # routage. Un hôte hostile atteindrait sinon la migration et la garde de
 # version avant d'être rejeté.
 gardes_http.enregistrer(app)
+# Juste après : une installation incomplète doit être refusée avant
+# que quoi que ce soit ne touche à la base (constat de terrain 8.53.0).
+integrite.enregistrer(app, journal=app.logger.warning)
 
 
 @app.before_request
@@ -555,6 +564,7 @@ def _base(content: str, *, active: str, annee: int, annees: list[int],
         f' class="{"active" if k == active else ""}">{label}</a>'
         for k, label in nav_items
     )
+    bandeau_integrite = integrite.banniere()
     bandeau_sandbox = ""
     if _en_bac_a_sable():
         bandeau_sandbox = (
@@ -593,7 +603,7 @@ def _base(content: str, *, active: str, annee: int, annees: list[int],
   <style>{CSS}</style>
 </head>
 <body>
-{bandeau_sandbox}
+{bandeau_integrite}{bandeau_sandbox}
 <header>
   <div class="brand">Compta LMNP</div>
   <nav>{nav_html}</nav>

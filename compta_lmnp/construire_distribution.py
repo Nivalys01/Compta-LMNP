@@ -22,6 +22,15 @@ import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
+# modules/ dans le chemin d'import : ce script est aussi lancé par
+# build_client.py via runpy, qui n'ajoute pas le dossier du script aux
+# chemins d'import.
+for _d in (HERE, os.path.join(HERE, "modules")):
+    if _d not in sys.path:
+        sys.path.insert(0, _d)
+
+import integrite  # noqa: E402
+
 # Points d'entrée et outils : à la RACINE du paquet, comme les lanceurs et
 # les documents. Les lanceurs appellent app.py par son nom.
 ENTREES = ["app.py", "cli.py", "verifier_depot.py"]
@@ -164,6 +173,7 @@ def construire() -> str:
                 "ligne Unix. cmd.exe ne peut pas interpreter ce fichier : "
                 "reecrivez-le en ASCII pur avec des fins de ligne CRLF.")
 
+    livres: dict[str, bytes] = {}
     with zipfile.ZipFile(cible, "w", zipfile.ZIP_DEFLATED) as z:
         for dans_paquet, sur_disque in fichiers:
             chemin = os.path.join(HERE, sur_disque)
@@ -171,9 +181,26 @@ def construire() -> str:
                 texte = open(chemin, encoding="utf-8").read()
                 for avant, apres in REECRITURES.items():
                     texte = texte.replace(f"]({avant})", f"]({apres})")
+                livres[dans_paquet] = texte.encode("utf-8")
                 z.writestr(f"compta_lmnp/{dans_paquet}", texte)
             else:
+                # `z.write` et non `writestr` : il conserve le mode du
+                # fichier, et le lanceur .sh doit rester exécutable.
+                livres[dans_paquet] = open(chemin, "rb").read()
                 z.write(chemin, arcname=f"compta_lmnp/{dans_paquet}")
+
+        # ── Manifeste d'installation ────────────────────────────────────
+        #    Calculé sur les octets RÉELLEMENT livrés, pas sur ceux du
+        #    disque : les documents Markdown voient leurs liens réécrits
+        #    ci-dessus, et un manifeste calculé sur la source annoncerait
+        #    une différence dès le premier démarrage.
+        #
+        #    Il existe parce qu'une installation où des fichiers de deux
+        #    versions cohabitent ne se signale nulle part : elle démarre,
+        #    sert ses pages, et casse à l'écran le plus éloigné de sa cause
+        #    (l'onglet Liasse, en v8.53.0).
+        z.writestr(f"compta_lmnp/{integrite.MANIFESTE}",
+                   integrite.construire_manifeste(version, livres))
 
     # ── Garde anti-fuite n°1 : aucun NOM interdit ───────────────────────
     with zipfile.ZipFile(cible) as z:
