@@ -1,5 +1,50 @@
 # Journal des versions — Compta LMNP
 
+## 8.53.1 — 2026-09-17 (Un champ manquant ne coûte plus la liasse entière)
+
+**Défaut remonté en usage réel.** L'onglet Liasse répondait « unsupported
+format string passed to Undefined.\_\_format\_\_ » et ne s'affichait plus du
+tout, en saisie comme après clôture.
+
+**Le mécanisme.** Un gabarit qui demande un champ absent du modèle ne reçoit
+pas `None` mais un `Undefined` de Jinja. `_eur` le passait à un f-string avec
+spécification — `{x:,.2f}` — Python levait, l'exception remontait, et la page
+entière tombait en 500. **Un seul champ manquant, et plus de liasse**, sans
+que rien ne nomme le champ en cause : l'utilisateur reçoit un message
+technique, et il n'y a rien à diagnostiquer.
+
+**Les deux réponses évidentes sont mauvaises, pour la même raison.** Planter
+prive le déclarant de tous ses autres chiffres à cause d'un seul — c'est ce
+qui se passait. Mais rendre « — » serait pire encore : sur un document
+fiscal, un montant ABSENT passerait pour un montant NUL, et rien ne
+distinguerait les deux. Le défaut deviendrait invisible, ce qui est
+exactement la faute que ce projet traque ailleurs.
+
+**La liasse rend donc le reste, et porte le manque là où il se produit**, en
+le nommant : la cellule affiche « ⚠ champ absent : <nom> », et le journal
+persistant en garde la trace — un utilisateur décrit « une erreur », pas un
+nom de champ. Toute valeur non formatable, et pas seulement un `Undefined`,
+reçoit le même traitement.
+
+**Ceci est un correctif de ROBUSTESSE, pas de cause.** Le champ qui manque
+chez l'utilisateur n'est pas identifié : aucun des scénarios reconstitués —
+saisie simple, sans composant, avec cession, déficitaire, avec déficits
+reportés sur exercice suivant — ne le reproduit, et les 66 chemins `L.*` du
+gabarit se résolvent tous sur ces jeux. C'est précisément pour cela que le
+correctif **nomme** le champ : la prochaine ouverture de l'onglet dira lequel,
+et la cause pourra alors être traitée.
+
+Le formateur quitte `app.py` pour `modules/formats.py`. Deux gardes s'y sont
+opposées tour à tour, et elles avaient raison toutes les deux : le point
+d'entrée était déjà au plafond de sa garde anti-monolithe, et `pages.py` doit
+rester INERTE — des chaînes de gabarits, sans un import ni une fonction. Un
+formateur est du code : il lui fallait son propre module.
+
+Non-régression : `tests/test_liasse_robuste.py` (6 tests), dont cinq échouent
+sans le correctif. L'un d'eux vérifie qu'un champ absent n'est jamais rendu
+comme un zéro — rendre « — » aurait suffi à faire passer les autres.
+
+
 ## 8.53.0 — 2026-09-16 (Passe T : ce que chaque garde tient, leur composition le lâche)
 
 Neuf constats, quatre élevés, aucun critique — une passe agnostique, menée

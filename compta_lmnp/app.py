@@ -54,6 +54,7 @@ import veille_fiscale
 from pages import (ASSISTANT, PAGE_DOSSIER_ABSENT, PAGE_VERSION_TROP_RECENTE, PAGE_DEMARRAGE, PAGE_DON_SECTION, PAGE_QUITTANCES, PAGE_QUITTANCE_IMPRIMABLE, PAGE_IMPORT_SECTION, CSS, PAGE_ARCHIVES, PAGE_CLOTURE, PAGE_DOSSIERS, PAGE_EX_NOUVEAU, PAGE_IMMO, PAGE_LIASSE, PAGE_PENSE_BETE, PAGE_REGLEMENTATION, PAGE_SAISIE, PAGE_SANDBOX, PAGE_SAUVEGARDES_SECTION, PAGE_VEILLE)
 import audit_cycle
 import gardes_http
+import formats
 import gabarits as gabarits_mod
 import liasse as liasse_mod
 import perennite
@@ -287,6 +288,10 @@ def _assurer_journal() -> None:
     lanceur. Or ce sont précisément ces incidents-là qu'on veut pouvoir
     relire à froid.
     """
+    # La présentation n'importe pas l'application — elle reçoit de quoi
+    # écrire. Sans cette ligne, un champ manquant de la liasse resterait
+    # visible à l'écran mais ne laisserait aucune trace à relire à froid.
+    formats.JOURNAL = app.logger.warning
     if any(getattr(x, "_journal_compta", False) for x in app.logger.handlers):
         return
     try:
@@ -1452,12 +1457,6 @@ def exercice_ouvrir():
 
 
 
-def _eur(x) -> str:
-    if x is None:
-        return "—"
-    return f"{x:,.2f} €".replace(",", " ").replace(".", ",")
-
-
 @app.route("/liasse")
 def liasse_page():
     conn   = _conn()
@@ -1466,7 +1465,7 @@ def liasse_page():
     try:
         L = liasse_mod.generer(conn, annee)
         conn.close()
-        body = render_template_string(PAGE_LIASSE, L=L, eur=_eur)
+        body = render_template_string(PAGE_LIASSE, L=L, eur=formats.eur)
         return _base(body, active="liasse", annee=annee, annees=annees,
                      flash_ok=request.args.get("ok",""),
                      flash_err=request.args.get("err",""))

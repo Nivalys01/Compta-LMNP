@@ -1,5 +1,6 @@
 # Compta LMNP — Copyright © 2026 Sylvain FAURE et les contributeurs.
 # SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Gabarits HTML de l'interface web — la PRÉSENTATION, rien qu'elle.
 
@@ -18,6 +19,7 @@ oblige : pas de dossier static/).
 L'échappement des données utilisateur est assuré par Jinja (autoescape) au
 rendu, dans app.py — ces chaînes n'insèrent jamais rien elles-mêmes.
 """
+
 
 CSS = """
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
