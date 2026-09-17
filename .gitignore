@@ -78,3 +78,11 @@ htmlcov/
 .idea/
 .DS_Store
 *.swp
+
+# --- Outillage local ----------------------------------------------------------
+#     Réglages personnels de l'assistant de développement : permissions
+#     accordées sur CETTE machine, avec ses chemins absolus — donc le nom
+#     d'utilisateur. Rien de secret, mais rien qui regarde un dépôt public,
+#     et la convention veut que `settings.local.json` reste local (un
+#     éventuel `settings.json` partagé, lui, serait versionné).
+.claude/settings.local.json
