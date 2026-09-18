@@ -91,22 +91,6 @@ L'article 13 de l'AGPL vous donne droit au code source correspondant à la
 version que vous utilisez, y compris lorsque vous y accédez par le réseau. Le
 pied de page de l'application porte le lien du dépôt.
 
-> ⚠️ **Tant que ce dépôt n'est pas public, ce lien répond 404 à qui n'y a pas
-> accès** (constat R-01). Le paquet client contient toutefois l'intégralité des
-> sources de production : il n'existe aucune distribution binaire de ce
-> logiciel. L'ouverture du dépôt est un prérequis de la publication, pas une
-> conséquence — voir la liste de contrôle ci-dessous.
-
-> **Pourquoi l'AGPL, et pas une licence maison « gratuit mais non revendable ».**
-> Ce logiciel a d'abord été diffusé sous une licence maison qui interdisait la
-> vente et les versions dérivées. Une telle licence n'est pas un logiciel
-> libre — le premier critère de l'open source est justement la liberté de
-> redistribution, vente comprise — et elle entrait en contradiction avec
-> l'hébergement du code sur une plateforme publique, dont les conditions
-> d'utilisation accordent à chacun le droit de forker. L'AGPL dit la même
-> intention de fond, mais avec un texte éprouvé, opposable, et compris
-> partout : la contrepartie de la liberté n'est pas l'interdiction de vendre,
-> c'est l'obligation de rendre.
 
 ## Données personnelles (RGPD)
 
@@ -164,18 +148,6 @@ Les signalements de défauts et les correctifs sont bienvenus — voir
 [`CONTRIBUTING.md`](CONTRIBUTING.md). Deux exigences non négociables : **aucune
 donnée réelle** dans une contribution, et **un test de non-régression** par
 correctif.
-
-## Liste de contrôle avant ouverture du dépôt
-
-Trois gestes, dans cet ordre, et le premier conditionne les deux autres :
-
-1. **Rendre le dépôt public.** Tant qu'il ne l'est pas, l'offre de source de
-   l'article 13 n'est pas tenue (constat R-01).
-2. **Poser le tag de version**, pour rattacher la source publiée à la version
-   qui tourne chez l'utilisateur.
-3. **Vérifier le lien du pied de page anonymement** — déconnecté, ou en
-   navigation privée. Un test automatique ne peut pas le faire à votre place :
-   il constate la présence du lien, jamais son accessibilité.
 
 ## État du projet et limites connues
 
