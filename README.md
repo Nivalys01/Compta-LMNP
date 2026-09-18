@@ -1,13 +1,13 @@
 # Compta LMNP
 
-//Message de l'Auteur\\
+//Message de l'Auteur//
 J'ai souhaité développer ce logiciel pour faire face aux augmentations de tarifs de la solution payante que j'utilisais jusqu'à récemment, sans que ces augmentations me paraissent justifiées avec l'apparition de solutions IA et de leurs coûts associés. 
 Mon objectif est de développer une solution robuste et fiable, je ne suis pas ingénieur informaticien, mais j'ai un cursus comptable. 
 Aussi je me suis appuyé sur plusieurs modèles d'IA pour le développement (dont Claude Opus 5, Fable 5.1, GPT 6-ASTRA). 
-Il subsiste des erreurs dans le texte qui sont sans importances sur le fonctionnement comptable et je n'effectue pas de correction si la substance l'emporte sur la forme.
+Il subsiste des imprécisions dans le texte qui sont sans importances sur le fonctionnement comptable ou la compréhension générale et je n'effectue pas de correction si la substance l'emporte sur la forme.
 L'investissement en temps passé m'a donné envie de rendre cela disponible gratuitement. Il n'y a pas de raison de dépenser de l'argent, du temps et des ressources naturelles pour juste le garder pour soit.
 Ce n'est peut être pas la solution la plus facile d'accès (installation de python pour l'OS windows), mais c'est gratuit. Le code étant open-source, vous êtes libre de vérifier l'absence de malveillance.
-Allez, maintenant au boulot !" 
+Je vous souhaite une bonne appropriation de l'outil ! 
 
 
 
