@@ -736,10 +736,19 @@ majPeriode(document.getElementById('type').value);
 PAGE_IMMO = """
 {% if not exploitant %}
 <div class="card">
-  <div class="card-header amber">Exploitant — configuration initiale</div>
+  <div class="card-header amber">Exploitant — configuration initiale
+    <span class="aide" data-aide="Vous reprenez une comptabilite existante ? L'ordre compte : 1) cette identite ; 2) TOUTES les immobilisations, dans l'ordre d'acquisition, sur cette meme page ; 3) seulement ensuite, l'import des FEC anterieurs, onglet Nouvel exercice, du plus ancien au plus recent.">?</span></div>
   <div class="card-body">
     <p style="margin-bottom:16px;color:#555;font-size:13px">
       Aucun exploitant enregistré. Renseignez vos informations pour pouvoir créer un bien.
+    </p>
+    <p style="margin-bottom:16px;background:#f0f6fb;border-left:4px solid #1a73e8;padding:10px 14px;font-size:13px">
+      <b>Vous importez une comptabilité existante ?</b> Dans cet ordre :
+      cette identité → vos immobilisations, ci-dessous, dans l'ordre
+      d'acquisition → puis seulement l'import des FEC, onglet
+      <a href="/exercice/nouveau">Nouvel exercice</a>, du plus ancien au
+      plus récent. L'import fait avant les immobilisations laisse un bilan
+      que le tableau 2033-C contredit.
     </p>
     <form method="post" action="/immobilisations/exploitant">
       <input type="hidden" name="annee" value="{{ annee }}">
@@ -793,6 +802,7 @@ PAGE_IMMO = """
           <th style="text-align:right">Valeur brute</th>
           <th>Durée</th><th>Mise en service</th>
           <th>Compte</th><th>Amort.</th><th style="text-align:center">Durée</th>
+          <th style="text-align:center">Corriger</th>
         </tr>
       </thead>
       <tbody>
@@ -816,9 +826,17 @@ PAGE_IMMO = """
               <button type="submit" class="btn-secondaire">Corriger</button>
             </form>
           </td>
+          <td style="text-align:center">
+            <form method="post"
+                  action="/immobilisations/composant/{{ c['id'] }}/supprimer"
+                  style="margin:0">
+              <button type="submit" class="btn-secondaire"
+                      data-confirmer="Supprimer ce composant ? Son écriture d'acquisition sera contre-passée, et la ligne disparaîtra du plan d'amortissement. Vous pourrez la resaisir avec les bonnes valeurs.">Supprimer</button>
+            </form>
+          </td>
         </tr>
         {% else %}
-        <tr><td colspan="9" class="empty">Aucun composant pour ce bien.</td></tr>
+        <tr><td colspan="10" class="empty">Aucun composant pour ce bien.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -870,13 +888,19 @@ PAGE_IMMO = """
       <form method="post" action="/immobilisations/ventiler"
             id="form-vent-{{ bien['id'] }}">
         <input type="hidden" name="bien_id" value="{{ bien['id'] }}">
-        <table>
+        <table id="tab-vent-{{ bien['id'] }}">
           <thead><tr><th>Poste</th><th style="text-align:right">Montant</th>
             <th style="text-align:right">Durée</th><th>À quoi ça correspond</th></tr></thead>
           <tbody>
           {% for l in ventilations[bien['id']] %}
-            <tr>
-              <td>{{ l.libelle }}</td>
+            <tr data-cle="{{ l.cle }}">
+              <td>{{ l.libelle }}
+                {% if l.cle in dedoublables %}
+                <button type="button" class="btn-secondaire ajout-poste"
+                        data-cle="{{ l.cle }}" data-libelle="{{ l.libelle }}"
+                        title="Ajouter une seconde ligne de ce poste, avec sa propre durée"
+                        style="margin-left:6px;padding:0 7px">+</button>
+                {% endif %}</td>
               <td style="text-align:right">
                 <input type="number" step="0.01" min="0" style="width:120px"
                        class="vent-{{ bien['id'] }}"
@@ -889,6 +913,12 @@ PAGE_IMMO = """
           {% endfor %}
           </tbody>
         </table>
+        <p class="muted" style="font-size:.9em">Le « + » d'un poste ajoute
+        une ligne à ce poste. Un meublé n'a pas UNE durée de mobilier :
+        l'électroménager se renouvelle en 5 ans, les lits en 10, une cuisine
+        intégrée en 15. Séparez-les — c'est exactement ce que la
+        décomposition apporte, et une ligne unique vous oblige sinon à une
+        durée moyenne.</p>
         <p style="margin:10px 0">Total ventilé :
           <b id="tot-{{ bien['id'] }}">—</b>
           <span class="muted">/ prix d'acquisition
@@ -923,8 +953,44 @@ PAGE_IMMO = """
               + " \u20ac (" + pct.toFixed(1) + " %)";
           e.style.color = pct > 5 ? "#c5221f" : (pct < 0.01 ? "#188038" : "#e8710a");
         }
-        document.querySelectorAll(".vent-" + id).forEach(function(i){
-          i.addEventListener("input", maj); });
+        var form = document.getElementById("form-vent-" + id);
+        form.addEventListener("input", function(e){
+          if (e.target.classList.contains("vent-" + id)) maj(); });
+
+        // Une ligne SUPPLÉMENTAIRE sur un poste dédoublable. Les champs
+        // partent en listes parallèles (sup_cle / sup_libelle / sup_montant
+        // / sup_duree) : c'est la forme que lit amortissement.postes_ventilation.
+        function ajouter(cle, libelle){
+          var corps = document.querySelector("#tab-vent-" + id + " tbody");
+          var lignes = corps.querySelectorAll("tr[data-cle='" + cle + "']");
+          var tr = document.createElement("tr");
+          tr.setAttribute("data-cle", cle);
+          var champ = function(n, v, attrs){
+            return "<input name='" + n + "' value='" + v + "' " + attrs + ">"; };
+          tr.innerHTML =
+            "<td><input type='hidden' name='sup_cle' value='" + cle + "'>"
+            + champ("sup_libelle", libelle + " (2)", "style='width:150px'")
+            + "</td><td style='text-align:right'>"
+            + champ("sup_montant", "", "type='number' step='0.01' min='0' "
+                    + "style='width:120px' class='vent-" + id + "'")
+            + "</td><td style='text-align:right'>"
+            + champ("sup_duree", "", "type='number' min='0' max='100' "
+                    + "style='width:70px'")
+            + "</td><td class='muted' style='font-size:.9em'>"
+            + "Ligne ajoutee : donnez-lui son libelle et sa propre duree. "
+            + "<button type='button' class='btn-secondaire retirer-poste'>"
+            + "Retirer</button></td>";
+          lignes[lignes.length - 1].insertAdjacentElement("afterend", tr);
+          maj();
+        }
+        form.addEventListener("click", function(e){
+          if (e.target.classList.contains("ajout-poste")) {
+            ajouter(e.target.dataset.cle, e.target.dataset.libelle);
+          } else if (e.target.classList.contains("retirer-poste")) {
+            e.target.closest("tr").remove();
+            maj();
+          }
+        });
         maj();
       })();
       </script>
@@ -936,16 +1002,30 @@ PAGE_IMMO = """
   <div class="card" style="border-left:4px solid #e8710a;background:#fff8f0">
     <div class="card-body">
       <h2 style="margin-top:0">Amortissements antérieurs non repris</h2>
+      {% if amort_anterieurs > 0 %}
       <p>Vos composants sont amortis depuis leur mise en service, mais
       <b>{{ '%.2f'|format(amort_anterieurs) }} €</b> d'amortissements déjà
       courus avant cet exercice ne figurent pas dans les comptes. C'est le
       cas habituel d'un bien acquis il y a plusieurs années et saisi ici
       pour la première fois : l'écriture d'entrée porte la valeur brute,
       sans le cumul déjà pratiqué.</p>
-      <p class="muted">Tant que ce cumul n'est pas repris, le bilan présente
-      le bien comme neuf alors que le tableau 2033-C déroule son plan depuis
-      l'origine — l'écart réapparaîtra à chaque liasse, et la valeur nette
-      comptable servant au calcul d'une future plus-value sera fausse.</p>
+      {% else %}
+      <p>Les comptes d'amortissement portent
+      <b>{{ '%.2f'|format(-amort_anterieurs) }} €</b> de PLUS que le plan
+      d'amortissement n'en calcule à l'ouverture de cet exercice. Cela
+      arrive quand les à-nouveaux viennent d'un cabinet qui appliquait
+      d'autres durées que celles saisies ici, ou après avoir corrigé une
+      durée, une valeur ou un composant.</p>
+      <p class="muted"><b>Avant de reprendre, vérifiez la saisie.</b> Si le
+      cabinet amortissait votre mobilier en 5 ans et que vous avez indiqué
+      8 ans, c'est la durée qu'il faut aligner — pas le cumul qu'il faut
+      réduire. La reprise ci-dessous met les comptes au niveau du plan :
+      elle n'a de sens qu'une fois le plan juste.</p>
+      {% endif %}
+      <p class="muted">Tant que cet écart subsiste, le bilan et le tableau
+      2033-C se contredisent — il réapparaîtra à chaque liasse, et la valeur
+      nette comptable servant au calcul d'une future plus-value sera
+      fausse.</p>
       <form method="post" action="/immobilisations/reprendre-amortissements"
             data-confirmer="Passer l'écriture de reprise ? Le résultat de l'exercice n'est pas modifié : seul le bilan est corrigé.">
         <input type="hidden" name="annee" value="{{ annee }}">
@@ -2149,7 +2229,8 @@ Fait le {{ q.date_emission }}.</p>
 PAGE_DEMARRAGE = """
 <div class="card" style="border-left:5px solid #ffd54f;background:#fffdf3">
   <div class="card-body">
-    <h2 style="margin-top:0">Bienvenue — configurons votre dossier</h2>
+    <h2 style="margin-top:0">Bienvenue — configurons votre dossier
+      <span class="aide" data-aide="Vous reprenez une comptabilite existante ? L'ordre compte : 1) enregistrez l'identite ci-dessous ; 2) saisissez TOUTES les immobilisations, dans l'ordre d'acquisition, page Immobilisations ; 3) seulement ensuite, importez vos FEC anterieurs depuis l'onglet Nouvel exercice, du plus ancien au plus recent. Un FEC importe avant les immobilisations laisse un bilan que le tableau 2033-C contredit.">?</span></h2>
     <p>Ce dossier est vierge. Une seule chose est nécessaire pour commencer :
     l'identité sous laquelle vous déclarez.</p>
 
@@ -2188,13 +2269,35 @@ PAGE_DEMARRAGE = """
 </div>
 
 <div class="card">
-  <div class="card-header">Reprendre un historique existant</div>
+  <div class="card-header amber">Reprendre une comptabilité existante —
+    l'ordre des trois étapes</div>
   <div class="card-body">
-    <p class="muted">Vous venez d'un autre logiciel ou d'un prestataire ?
-    Vous pouvez rejouer un ou plusieurs exercices depuis leurs fichiers
-    FEC — écriture par écriture, à numérotation identique — depuis
-    l'onglet <a href="/exercice/nouveau">Nouvel exercice</a>. Commencez par
-    le plus ancien.</p>
+    <p>Vous venez d'un autre logiciel ou d'un prestataire, et vous voulez
+    importer vos FEC ? <b>Ne commencez pas par l'import.</b> Rien ne
+    l'interdit, mais l'import seul reconstitue les ÉCRITURES sans le plan
+    d'amortissement qui les explique : le bilan porterait des immobilisations
+    que le tableau 2033-C ne saurait pas dérouler, et l'écart ne se résorbe
+    pas tout seul.</p>
+    <ol style="line-height:1.8;padding-left:20px">
+      <li><b>Votre identité</b> — nom, SIREN, adresse, dans le cadre
+        ci-dessus. C'est fait en une minute.</li>
+      <li><b>Vos immobilisations</b>, page
+        <a href="/immobilisations">Immobilisations</a> :
+        créez chaque bien, puis ventilez son prix d'acquisition en
+        composants (terrain, gros œuvre, agencements, mobilier…).
+        <b>Dans l'ordre d'acquisition</b>, du plus ancien au plus récent.
+        Une valeur ou une durée mal saisie se corrige ou se supprime tant
+        que l'exercice n'est pas clôturé — ne restez pas bloqué dessus.</li>
+      <li><b>Vos FEC antérieurs</b>, onglet
+        <a href="/exercice/nouveau">Nouvel exercice</a> — l'import s'y
+        trouve, et nulle part ailleurs. Rejouez-les
+        <b>du plus ancien au plus récent</b>, un exercice à la fois.</li>
+    </ol>
+    <p class="muted">Ensuite seulement, page Immobilisations, le bouton
+    « Reprendre les amortissements antérieurs » aligne les comptes 28 sur
+    le plan : c'est l'étape qui réconcilie le bilan et le 2033-C, et elle
+    suppose que le plan soit juste — donc que les deux étapes précédentes
+    soient faites.</p>
   </div>
 </div>
 

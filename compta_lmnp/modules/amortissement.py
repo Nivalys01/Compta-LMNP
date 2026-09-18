@@ -464,6 +464,89 @@ VENTILATION_INDICATIVE = [
 ]
 
 
+# Les postes qui se DÉDOUBLENT. Un logement meublé n'a pas « un » mobilier
+# amorti sur une durée unique : un lave-linge se renouvelle en 5 ans, un lit
+# en 10, une cuisine intégrée en 15. Tant que la ventilation n'offrait
+# qu'une ligne par poste, il fallait choisir une durée moyenne pour
+# l'ensemble — c'est-à-dire renoncer à ce que la décomposition apporte.
+# L'utilisateur ajoute donc autant de lignes « Mobilier » ou « Agencements »
+# qu'il a de durées distinctes à déclarer.
+POSTES_DEDOUBLABLES = ("agencements", "mobilier")
+
+
+def montant_ventilation(brut: str, poste: str) -> float:
+    """Lit un montant du formulaire de ventilation, ou dit pourquoi il ne
+    l'est pas. Une case vide vaut zéro : le poste est simplement ignoré."""
+    brut = (brut or "").strip()
+    if not brut:
+        return 0.0
+    try:
+        montant = float(brut.replace(",", ".").replace(" ", ""))
+    except ValueError:
+        raise ValueError(
+            f"« {poste} » : « {brut} » n'est pas un montant. Attendu un "
+            "nombre en euros (ex. 52000 ou 52000,50), ou une case vide pour "
+            "ignorer ce poste.") from None
+    if montant > 1e12:
+        raise ValueError(
+            f"« {poste} » : montant hors de proportion "
+            f"({montant:,.0f} €). Vérifiez la saisie.".replace(",", " "))
+    return montant
+
+
+def postes_ventilation(form) -> list[dict]:
+    """
+    Les composants à créer, lus dans le formulaire de ventilation initiale.
+
+    Deux familles de champs, et une seule liste en sortie :
+      - `montant_<clé>` / `duree_<clé>` — les six postes indicatifs, un par
+        clé de VENTILATION_INDICATIVE ;
+      - `sup_cle` / `sup_libelle` / `sup_montant` / `sup_duree` — les lignes
+        AJOUTÉES par l'utilisateur sur un poste dédoublable, en listes
+        parallèles (plusieurs champs de même nom dans le formulaire).
+
+    Chaque poste retourné porte {'libelle', 'categorie', 'compte_immo',
+    'montant', 'duree'} — `duree` à None pour ce qui ne s'amortit pas.
+    """
+    modeles = {x["cle"]: x for x in VENTILATION_INDICATIVE}
+
+    def duree_de(brut):
+        brut = (brut or "").strip()
+        return int(brut) if brut and brut != "0" else None
+
+    postes = []
+    for ligne in VENTILATION_INDICATIVE:
+        montant = montant_ventilation(form.get(f"montant_{ligne['cle']}", ""),
+                                      ligne["libelle"])
+        if montant <= 0:
+            continue                  # poste laissé vide : simplement ignoré
+        postes.append({"libelle": ligne["libelle"],
+                       "categorie": ligne["categorie"],
+                       "compte_immo": ligne["compte_immo"],
+                       "montant": montant,
+                       "duree": duree_de(form.get(f"duree_{ligne['cle']}", ""))})
+
+    listes = getattr(form, "getlist", lambda _nom: [])
+    cles, libelles = listes("sup_cle"), listes("sup_libelle")
+    montants, durees = listes("sup_montant"), listes("sup_duree")
+    for rang, cle in enumerate(cles):
+        modele = modeles.get(cle)
+        if modele is None or cle not in POSTES_DEDOUBLABLES:
+            raise ValueError(f"Poste supplémentaire inconnu : « {cle} ».")
+        def rang_ou_vide(liste, rang=rang):
+            return liste[rang] if rang < len(liste) else ""
+        libelle = (rang_ou_vide(libelles).strip() or modele["libelle"])
+        montant = montant_ventilation(rang_ou_vide(montants), libelle)
+        if montant <= 0:
+            continue
+        postes.append({"libelle": libelle,
+                       "categorie": modele["categorie"],
+                       "compte_immo": modele["compte_immo"],
+                       "montant": montant,
+                       "duree": duree_de(rang_ou_vide(durees))})
+    return postes
+
+
 def normaliser_quote_part(valeur, prix_total: float | None = None):
     """
     Interprète une quote-part de terrain saisie librement.

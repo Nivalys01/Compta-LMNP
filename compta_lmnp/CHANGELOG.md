@@ -1,5 +1,66 @@
 # Journal des versions — Compta LMNP
 
+## 8.55.0 — 2026-09-18 (Reprendre une compta existante sans repartir de zéro)
+
+**Trois blocages du même parcours**, remontés en usage réel par quelqu'un qui
+reprenait une comptabilité tenue ailleurs. Aucun n'était une erreur de calcul :
+tous trois enfermaient l'utilisateur dans une saisie qu'il ne pouvait plus
+défaire, et la seule issue connue était d'ouvrir un dossier neuf à zéro.
+
+**Le parcours n'était écrit nulle part.** Pour importer un FEC, il fallait
+deviner l'onglet *Nouvel exercice* — et surtout deviner que les
+immobilisations devaient être saisies **avant**. Un FEC importé d'abord
+reconstitue les écritures sans le plan d'amortissement qui les explique : le
+bilan porte des immobilisations que le 2033-C ne sait pas dérouler, et l'écart
+ne se résorbe pas tout seul. La page d'accueil d'un dossier vierge donne
+désormais les trois étapes dans l'ordre — identité, immobilisations **dans
+l'ordre d'acquisition**, puis import des FEC du plus ancien au plus récent —
+et l'infobulle du titre porte la même consigne pour qui ne lit pas.
+
+**Un poste de ventilation se dédouble.** Un meublé n'a pas *une* durée de
+mobilier : l'électroménager se renouvelle en 5 ans, les lits en 10, une cuisine
+intégrée en 15. La ventilation initiale n'offrait qu'une ligne par poste, donc
+une durée moyenne — c'est-à-dire renoncer à ce que la décomposition apporte, et
+c'est tout l'intérêt du réel. Le « + » des postes *Mobilier* et *Agencements*
+ajoute autant de lignes que l'on a de durées distinctes à déclarer. La lecture
+du formulaire est partie dans `amortissement.postes_ventilation`, avec la table
+qu'elle sert ; `app.py` y a regagné les lignes que la suppression lui coûtait.
+
+**Un composant se défait.** Seule la durée se corrigeait ; une valeur brute, un
+compte ou une date de mise en service erronés étaient définitifs. Le composant
+est une donnée de RÉFÉRENTIEL : il se supprime. Son écriture d'acquisition est
+une donnée COMPTABLE : elle ne disparaît pas, elle se **contre-passe** — même
+geste qu'`annuler`, pour que le FEC garde sa numérotation dense et sa piste
+d'audit complète. Deux garde-fous : un bien cédé ne se remanie plus, et un
+composant déjà pris dans une clôture non plus — sa dotation est dans un
+résultat figé et une liasse déjà établie, et la sortie de secours reste la
+restauration d'une sauvegarde d'avant clôture.
+
+**« Reprendre les amortissements antérieurs » ne passait qu'une fois.** Au
+deuxième appel, la base répondait `CHECK constraint failed: debit >= 0 AND
+credit >= 0` — un message de moteur, sur une opération parfaitement légitime.
+L'écart entre le plan et les comptes 28 était supposé toujours positif ; il
+devient négatif dès que les comptes portent **plus** d'amortissement que le
+plan n'en calcule, et cela arrive de deux façons banales : des à-nouveaux repris
+d'un cabinet qui appliquait d'autres durées, ou une durée corrigée après une
+première reprise. Un excédent d'amortissement se corrige au **débit** du compte
+28, c'est tout ce qui manquait. Une écriture peut désormais porter les deux
+sens, et quand ils s'annulent exactement, elle s'équilibre entre comptes 28
+sans ligne de contrepartie à 0,00 € que le FEC afficherait sans rien dire.
+
+**Un double comptage silencieux découvert en chemin.** La reprise se prenait
+elle-même pour un à-nouveau de bilan au passage suivant : sur un dossier tenu
+ici depuis l'origine (exercices antérieurs en base, pas d'à-nouveaux), elle
+complétait le cumul puis redemandait la différence. Le compte 28 finissait à
+10 438 € pour un plan de 8 438 € — faux, et sans qu'aucun équilibre ne le
+trahisse. Elle se reconnaît maintenant à sa référence de pièce.
+
+Non-régression : `tests/test_import_externe.py` (20 tests), un groupe par
+constat. Le test de borne de la ventilation, qui vérifiait la présence d'une
+chaîne dans `app.py`, éprouve désormais la garde **à l'œuvre** : un test de
+source ne dit pas qu'elle tient encore.
+
+
 ## 8.54.0 — 2026-09-17 (Une installation mélangée se dénonce elle-même)
 
 **La cause du défaut de la veille est trouvée, et elle n'était dans aucun

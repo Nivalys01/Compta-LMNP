@@ -771,8 +771,14 @@ def test_ventilation_est_atomique(tmp_path, monkeypatch):
 
 
 def test_ventilation_refuse_un_montant_hors_de_proportion():
-    src = open(conftest.source("app.py"), encoding="utf-8").read()
-    assert "montant hors de proportion" in src
+    """La borne a suivi la lecture du formulaire de ventilation dans
+    `amortissement` (les postes dédoublables l'y ont amenée) : on la vérifie
+    désormais À L'ŒUVRE, et non par la présence d'une chaîne dans app.py —
+    un test de source ne dit pas que la garde tient encore."""
+    import amortissement
+    with pytest.raises(ValueError, match="hors de proportion"):
+        amortissement.montant_ventilation("9" * 20, "Mobilier")
+    assert amortissement.montant_ventilation("52000,50", "Mobilier") == 52000.50
 
 
 def test_assistante_est_une_creation_originale():

@@ -161,6 +161,12 @@ def dupliquer(conn: sqlite3.Connection, operation_id: int,
 SEUIL_MATERIALITE_EUROS = 5.00
 SEUIL_MATERIALITE_RATIO = 0.01
 
+# Référence de pièce de l'écriture de reprise des amortissements antérieurs.
+# Elle sert à la RECONNAÎTRE : c'est le seul à-nouveau que ce module passe
+# lui-même, et il ne doit pas être pris pour un à-nouveau de reprise de
+# bilan (cf. amortissements_anterieurs_manquants).
+PIECE_REPRISE_AMORT = "AN-AMORT"
+
 
 def ecart_materiel(ecart: float, reference: float) -> bool:
     """L'écart mérite-t-il d'être signalé, ou n'est-ce que de l'arrondi ?"""
@@ -215,16 +221,30 @@ def amortissements_anterieurs_manquants(conn: sqlite3.Connection,
         #
         # Sans à-nouveaux, on retombe sur le cumul des exercices
         # antérieurs — cas d'un dossier tenu ici depuis l'origine.
+        #
+        # Les à-nouveaux que NOUS avons passés (PIECE_REPRISE_AMORT) ne
+        # comptent pas comme des à-nouveaux « porteurs de la situation
+        # d'ouverture » : ils la COMPLÈTENT. Les confondre inversait la
+        # portée au deuxième appel — un dossier tenu ici depuis l'origine,
+        # sans à-nouveaux, passait après la première reprise du cumul des
+        # exercices antérieurs au seul montant repris, et redemandait donc
+        # la différence : le cumul du 28 finissait à 10 438 € pour un plan
+        # de 8 438 €, sans qu'aucun équilibre ne le trahisse.
         a_des_an = conn.execute(
             "SELECT 1 FROM ecriture WHERE exercice_annee=? "
-            "AND journal_code='AN' LIMIT 1", (annee,)).fetchone() is not None
+            "AND journal_code='AN' AND piece_ref <> ? LIMIT 1",
+            (annee, PIECE_REPRISE_AMORT)).fetchone() is not None
         portee = ("e.exercice_annee = ? AND e.journal_code = 'AN'"
-                  if a_des_an else "e.exercice_annee < ?")
+                  if a_des_an else
+                  "e.exercice_annee < ? OR (e.exercice_annee = ? AND "
+                  "e.journal_code = 'AN' AND e.piece_ref = ?)")
+        args = ((cpt, annee) if a_des_an
+                else (cpt, annee, annee, PIECE_REPRISE_AMORT))
         comptabilise = conn.execute(
             "SELECT COALESCE(ROUND(SUM(l.credit - l.debit), 2), 0) FROM ligne l "
             "JOIN ecriture e ON e.id = l.ecriture_id "
             f"WHERE l.compte_num = ? AND ({portee})",
-            (cpt, annee)).fetchone()[0]
+            args).fetchone()[0]
         ecart = round(montant - comptabilise, 2)
         if ecart_materiel(ecart, montant):
             par_compte[cpt] = ecart
@@ -244,6 +264,20 @@ def reprendre_amortissements_anterieurs(conn: sqlite3.Connection, annee: int,
     dotation de l'année, c'est la reconstitution d'une situation
     antérieure. Seul le bilan change — il cesse de présenter comme neuf
     un bien amorti depuis des années.
+
+    L'écart se reprend DANS LES DEUX SENS. Le cas courant le crédite : les
+    comptes 28 portent moins que le plan. Mais l'inverse existe, et il
+    n'était pas prévu — les comptes portent PLUS que le plan :
+      - les à-nouveaux repris d'un cabinet appliquaient d'autres durées
+        que celles saisies ici (un mobilier amorti en 5 ans chez lui,
+        déclaré sur 8 ans ici) ;
+      - une durée corrigée après une première reprise, ou un composant
+        supprimé et resaisi, réduit le cumul attendu.
+    L'écart devenait alors négatif et partait tel quel au crédit : la base
+    le rejetait par « CHECK constraint failed: debit >= 0 AND credit >= 0 »
+    — un message de moteur, sur une opération légitime, et la reprise
+    restait impossible à rejouer. Un excédent d'amortissement se corrige
+    au DÉBIT du compte 28, c'est tout ce qui manquait.
     """
     manquants = amortissements_anterieurs_manquants(conn, annee)
     if not manquants["par_compte"]:
@@ -257,14 +291,24 @@ def reprendre_amortissements_anterieurs(conn: sqlite3.Connection, annee: int,
         raise ValueError(f"L'exercice {annee} est clos : la reprise doit "
                          "être passée sur un exercice ouvert.")
     lignes = [(cpt, 0.0, montant, "Amortissements antérieurs - reprise")
+              if montant >= 0 else
+              (cpt, -montant, 0.0, "Amortissements antérieurs - excédent repris")
               for cpt, montant in sorted(manquants["par_compte"].items())]
-    lignes.append(("108000", manquants["total"], 0.0,
-                   "Amortissements antérieurs - contrepartie exploitant"))
+    total = manquants["total"]
+    # Contrepartie exploitant du SOLDE. Un total nul avec des écarts de
+    # sens opposés s'équilibre entre comptes 28 : pas de ligne à 0,00 €,
+    # que le FEC afficherait sans rien dire.
+    if total > 0:
+        lignes.append(("108000", total, 0.0,
+                       "Amortissements antérieurs - contrepartie exploitant"))
+    elif total < 0:
+        lignes.append(("108000", 0.0, -total,
+                       "Amortissements antérieurs - contrepartie exploitant"))
     res = ecritures.inserer(
         conn, journal="AN", annee=annee, date=f"{annee}-01-01",
         libelle="Reprise des amortissements antérieurs à l'entrée en gestion",
-        piece_ref="AN-AMORT", lignes=lignes, commit=commit)
-    return {"total": manquants["total"], "par_compte": manquants["par_compte"],
+        piece_ref=PIECE_REPRISE_AMORT, lignes=lignes, commit=commit)
+    return {"total": total, "par_compte": manquants["par_compte"],
             "ecriture_num": res["ecriture_num"]}
 
 
@@ -422,3 +466,150 @@ def annuler(conn: sqlite3.Connection, operation_id: int,
         conn.commit()
     return {"operation": operation_id, "ecriture_annulation": res["ecriture_num"],
             "type": op["type"], "montant": op["montant"]}
+
+
+def supprimer_composant(conn: sqlite3.Connection, composant_id: int,
+                        commit: bool = True) -> dict:
+    """
+    Retire un composant du plan d'immobilisation et CONTRE-PASSE son
+    écriture d'acquisition.
+
+    Les composants étaient créables et jamais défaisables : seule la durée
+    se corrigeait (route `/immobilisations/composant/<id>/duree`). Une
+    valeur brute erronée, un mauvais compte, une date de mise en service
+    fausse — tout cela s'écrivait une fois pour toutes, et la seule issue
+    était d'ouvrir un dossier neuf. La ventilation d'un prix d'acquisition
+    étant précisément l'endroit où l'on tâtonne, l'interdiction ne tenait
+    pas.
+
+    Le composant est une donnée de RÉFÉRENTIEL : il se supprime. Son
+    écriture d'acquisition est une donnée COMPTABLE : elle ne disparaît
+    pas, elle se contre-passe — même geste que `annuler`, pour que le FEC
+    garde sa numérotation dense et sa piste d'audit complète.
+
+    Deux garde-fous :
+      - un bien cédé ne se remanie plus (ses composants sont sortis du
+        bilan par la cession) ;
+      - un composant déjà pris dans une clôture ne se supprime pas : sa
+        dotation est dans un résultat figé et dans une liasse déjà
+        déposée. La sortie de secours reste la restauration d'une
+        sauvegarde d'avant clôture (page Dossiers).
+
+    Renvoie {'libelle', 'valeur_brute', 'ecriture_annulation' | None}.
+    """
+    import cession
+    # `bien.date_cession` est une colonne créée à la volée : sur une base
+    # antérieure à la cession, elle n'existe pas encore et la lecture
+    # échouerait sur « no such column ». Avant la transaction : c'est du DDL.
+    cession.assurer_schema(conn)
+    if not conn.in_transaction:
+        conn.execute("BEGIN IMMEDIATE")
+    cur = conn.cursor()
+    cur.row_factory = sqlite3.Row          # isolé : ne modifie pas la connexion
+    c = cur.execute(
+        "SELECT c.id, c.libelle, c.valeur_brute, c.compte_immo, "
+        "c.date_mise_service, b.libelle AS bien, b.date_cession "
+        "FROM composant c JOIN bien b ON b.id = c.bien_id "
+        "WHERE c.id = ?", (composant_id,)).fetchone()
+    if c is None:
+        raise ValueError("Composant introuvable — il a peut-être déjà été "
+                         "supprimé.")
+    if c["date_cession"]:
+        raise ValueError(
+            f"Le bien « {c['bien']} » a été cédé le {c['date_cession']} : "
+            "ses composants sont sortis du bilan et ne se remanient plus.")
+
+    # L'écriture d'acquisition, si elle existe : la création la rend
+    # facultative (case « ne pas générer l'écriture d'acquisition », pour un
+    # historique déjà porté par les à-nouveaux). On ne contre-passe que ce
+    # qui a été réellement passé, et jamais deux fois — la contre-passation
+    # porte l'identifiant de l'écriture d'origine dans sa référence de pièce,
+    # ce qui rend le deuxième passage impossible sans marqueur en base.
+    acq = cur.execute(
+        "SELECT e.id, e.exercice_annee FROM ecriture e "
+        "JOIN ligne l ON l.ecriture_id = e.id "
+        "WHERE e.piece_ref = 'ACQ' AND e.libelle = ? AND l.compte_num = ? "
+        "AND ABS(l.debit - ?) < 0.005 "
+        "AND NOT EXISTS (SELECT 1 FROM ecriture a "
+        "                WHERE a.piece_ref = 'ANNUL-ACQ-' || e.id) "
+        "ORDER BY e.id LIMIT 1",
+        (f"Acquisition - {c['libelle']}", c["compte_immo"],
+         round(float(c["valeur_brute"]), 2))).fetchone()
+
+    # Un composant entré dans une clôture a produit une dotation dans un
+    # résultat scellé : le supprimer rendrait la liasse déposée
+    # irreproductible. L'année de référence est celle de sa mise en service,
+    # à défaut celle de son acquisition.
+    reference = None
+    if c["date_mise_service"]:
+        reference = int(c["date_mise_service"][:4])
+    elif acq is not None:
+        reference = acq["exercice_annee"]
+    if reference is not None:
+        clos = conn.execute(
+            "SELECT annee FROM exercice WHERE statut = 'clos' AND annee >= ? "
+            "ORDER BY annee LIMIT 1", (reference,)).fetchone()
+        if clos is not None:
+            raise ValueError(
+                f"L'exercice {clos[0]} est clos et a déjà amorti « "
+                f"{c['libelle']} » : le supprimer fausserait un résultat "
+                "figé et une liasse déjà établie. Restaurez une sauvegarde "
+                "d'avant clôture (page Dossiers) pour reprendre la saisie.")
+
+    ecriture_annulation = None
+    if acq is not None:
+        lignes_orig = conn.execute(
+            "SELECT compte_num, debit, credit, libelle FROM ligne "
+            "WHERE ecriture_id = ?", (acq["id"],)).fetchall()
+        res = ecritures.inserer(
+            conn, journal="OD", annee=acq["exercice_annee"],
+            date=conn.execute("SELECT ecriture_date FROM ecriture WHERE id=?",
+                              (acq["id"],)).fetchone()[0],
+            libelle=f"Annulation : Acquisition - {c['libelle']}",
+            piece_ref=f"ANNUL-ACQ-{acq['id']}", commit=False,
+            lignes=[(r[0], round(r[2], 2), round(r[1], 2),
+                     f"Annulation - {r[3] or ''}".strip(" -"))
+                    for r in lignes_orig])
+        ecriture_annulation = res["ecriture_num"]
+
+    conn.execute("DELETE FROM composant WHERE id = ?", (composant_id,))
+    if commit:
+        conn.commit()
+    return {"libelle": c["libelle"],
+            "valeur_brute": round(float(c["valeur_brute"]), 2),
+            "ecriture_annulation": ecriture_annulation}
+
+
+# ── Messages rendus à l'utilisateur ───────────────────────────────────────
+#
+# Le routeur affiche, il ne rédige pas : ces deux phrases expliquent une
+# RÈGLE (le sens d'un écart d'amortissement, le sort d'une écriture
+# d'acquisition contre-passée) et vivent donc avec elle.
+
+def message_reprise(r: dict) -> str:
+    """Compte rendu de `reprendre_amortissements_anterieurs`."""
+    comptes = ", ".join(f"{c} : {m:+.2f} €" for c, m in sorted(r["par_compte"].items()))
+    # Un écart négatif n'est pas une erreur, mais il ne se lit pas tout
+    # seul : les comptes portaient PLUS d'amortissement que le plan n'en
+    # calcule, et c'est alors la SAISIE (durée, valeur, date de mise en
+    # service) qu'il faut regarder avant de se fier au montant repris.
+    sens = ("" if r["total"] >= 0 else
+            " Le montant est négatif : les comptes portaient plus "
+            "d'amortissement que le plan n'en calcule — vérifiez les durées "
+            "et les valeurs de vos composants, qui doivent refléter ce qui a "
+            "réellement été pratiqué.")
+    return (f"Amortissements antérieurs repris pour {r['total']:.2f} € "
+            f"({comptes}) — écriture OD n°{r['ecriture_num']} au 1er janvier. "
+            f"Le résultat de l'exercice est inchangé.{sens}")
+
+
+def message_suppression(r: dict) -> str:
+    """Compte rendu de `supprimer_composant`."""
+    suite = (f" Son écriture d'acquisition a été contre-passée (OD "
+             f"n°{r['ecriture_annulation']}) : le bilan est à jour, et la "
+             "piste d'audit conserve les deux écritures."
+             if r["ecriture_annulation"] else
+             " Aucune écriture d'acquisition n'y était rattachée : rien à "
+             "contre-passer.")
+    return (f"Composant « {r['libelle']} » supprimé "
+            f"({r['valeur_brute']:.2f} €).{suite}")

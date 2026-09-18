@@ -751,12 +751,8 @@ def immo_reprendre_amortissements():
     annee = _annee_param(conn)
     try:
         r = operations.reprendre_amortissements_anterieurs(conn, annee)
-        comptes = ", ".join(f"{c} : {m:.2f} €"
-                            for c, m in sorted(r["par_compte"].items()))
         return redirect(url_for("immobilisations", annee=annee,
-            ok=f"Amortissements antérieurs repris pour {r['total']:.2f} € "
-               f"({comptes}) — écriture OD n°{r['ecriture_num']} au "
-               f"1er janvier. Le résultat de l'exercice est inchangé."))
+                                ok=operations.message_reprise(r)))
     except Exception as exc:
         return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
     finally:
@@ -854,6 +850,7 @@ def immobilisations():
             if not any(c["bien_id"] == b["id"] for c in compos)},
         annee=annee, exploitant=exp, biens=biens, composants=compos,
         comptes_immo=COMPTES_IMMO,
+        dedoublables=amortissement.POSTES_DEDOUBLABLES,
         amort=amort_map,
     )
     return _base(body, active="immobilisations", annee=annee, annees=annees,
@@ -1031,53 +1028,39 @@ def immo_ventiler():
             raise ValueError(
                 "Ce bien a déjà des composants : la ventilation initiale ne "
                 "s'utilise qu'une fois. Ajoutez les composants manquants "
-                "un par un ci-dessous.")
+                "un par un ci-dessous, ou supprimez les lignes existantes "
+                "pour la refaire entièrement.")
         dms = request.form.get("date_mise_service") or bien["date_acquisition"]
+        postes = amortissement.postes_ventilation(request.form)
+        if not postes:
+            raise ValueError("Aucun montant saisi : renseignez au moins un "
+                             "poste.")
         cree, total = 0, 0.0
-        for ligne in amortissement.VENTILATION_INDICATIVE:
-            brut = request.form.get(f"montant_{ligne['cle']}", "").strip()
-            try:
-                montant = float(brut.replace(",", ".").replace(" ", "")) if brut else 0.0
-            except ValueError:
-                raise ValueError(
-                    f"« {ligne['libelle']} » : « {brut} » n'est pas un "
-                    "montant. Attendu un nombre en euros (ex. 52000 ou "
-                    "52000,50), ou une case vide pour ignorer ce poste."
-                ) from None
-            if montant > 1e12:
-                raise ValueError(
-                    f"« {ligne['libelle']} » : montant hors de proportion "
-                    f"({montant:,.0f} €). Vérifiez la saisie.".replace(",", " "))
-            if montant <= 0:
-                continue          # poste laissé vide : simplement ignoré
-            duree_s = request.form.get(f"duree_{ligne['cle']}", "").strip()
-            duree = int(duree_s) if duree_s and duree_s != "0" else None
-            amort_map = {num: am for num, _, am in COMPTES_IMMO}
-            cpt_amort = amort_map.get(ligne["compte_immo"]) if duree else None
+        for poste in postes:
+            duree = poste["duree"]
+            cpt_amort = (plan_immo.compte_amortissement(poste["compte_immo"])
+                         if duree else None)
             if duree and not cpt_amort:
-                raise ValueError(f"« {ligne['libelle']} » ne s'amortit pas : "
+                raise ValueError(f"« {poste['libelle']} » ne s'amortit pas : "
                                  "laissez sa durée à 0.")
             conn.execute(
                 "INSERT INTO composant (bien_id, libelle, categorie, "
                 "valeur_brute, duree_annees, date_mise_service, compte_immo, "
                 "compte_amort, amortissable) VALUES (?,?,?,?,?,?,?,?,?)",
-                (bien_id, ligne["libelle"], ligne["categorie"], montant,
-                 duree, dms, ligne["compte_immo"], cpt_amort,
-                 1 if duree else 0))
+                (bien_id, poste["libelle"], poste["categorie"],
+                 poste["montant"], duree, dms, poste["compte_immo"],
+                 cpt_amort, 1 if duree else 0))
             ouverts = _annees_ouvertes(conn)
             if request.form.get("sans_ecriture") != "1" and ouverts:
                 cible = min(ouverts)
                 date_op = (dms if dms and int(dms[:4]) == cible
                            else f"{cible}-01-01")
                 operations.saisir_acquisition(
-                    conn, compte_immo=ligne["compte_immo"], montant=montant,
-                    date_operation=date_op, libelle=ligne["libelle"],
-                    exercice=cible, commit=False)
+                    conn, compte_immo=poste["compte_immo"],
+                    montant=poste["montant"], date_operation=date_op,
+                    libelle=poste["libelle"], exercice=cible, commit=False)
             cree += 1
-            total = round(total + montant, 2)
-        if not cree:
-            raise ValueError("Aucun montant saisi : renseignez au moins un "
-                             "poste.")
+            total = round(total + poste["montant"], 2)
         conn.commit()
         prix = bien["prix_total"] or 0.0
         alerte = ""
@@ -1131,6 +1114,24 @@ def composant_duree(composant_id):
                "plus amorti.")
         return redirect(url_for("immobilisations", annee=annee, ok=msg))
     except Exception as exc:
+        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
+    finally:
+        conn.close()
+
+
+@app.route("/immobilisations/composant/<int:composant_id>/supprimer",
+           methods=["POST"])
+def composant_supprimer(composant_id):
+    """Supprime un composant mal saisi et contre-passe son acquisition
+    (règle et garde-fous dans `operations.supprimer_composant`)."""
+    conn = _conn()
+    annee = _annee_param(conn)
+    try:
+        r = operations.supprimer_composant(conn, composant_id)
+        return redirect(url_for("immobilisations", annee=annee,
+                                ok=operations.message_suppression(r)))
+    except Exception as exc:
+        conn.rollback()
         return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
     finally:
         conn.close()
