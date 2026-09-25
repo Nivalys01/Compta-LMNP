@@ -86,3 +86,4 @@ htmlcov/
 #     et la convention veut que `settings.local.json` reste local (un
 #     éventuel `settings.json` partagé, lui, serait versionné).
 .claude/settings.local.json
+logiciel_concurrent/
