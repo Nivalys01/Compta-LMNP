@@ -109,6 +109,7 @@ def test_app_reste_de_la_logique_pure():
     # les routes, pas un gabarit de page : il dépend de l'état de session
     # (onglet actif, exercice courant, messages) et n'a pas de contenu
     # propre. Tout le RESTE du HTML appartient à pages.py.
+    import glob
     import re as _re
     for bloc in _re.findall(r'"""(.*?)"""', src, _re.S):
         if "<!DOCTYPE" in bloc:
@@ -116,6 +117,17 @@ def test_app_reste_de_la_logique_pure():
         assert "<div" not in bloc and "<table" not in bloc, \
             "du HTML est réapparu dans app.py : il appartient à pages.py"
     assert 'PAGE_SAISIE = """' not in src        # aucun gabarit réintroduit
+    # Les modules de routes (`*_web.py`) sont des morceaux du routeur : même
+    # règle. Sans elle, l'extraction deviendrait une porte de sortie pour
+    # le HTML que ce test chasse d'app.py.
+    modules = glob.glob(os.path.join(os.path.dirname(conftest.source(
+        "routes.py")), "*_web.py"))
+    assert modules, "aucun module de routes trouvé : le test ne vérifie rien"
+    for chemin in modules:
+        texte = open(chemin, encoding="utf-8").read()
+        for bloc in _re.findall(r'"""(.*?)"""', texte, _re.S):
+            assert "<div" not in bloc and "<table" not in bloc, \
+                f"du HTML dans {os.path.basename(chemin)} : il appartient à pages.py"
     # Seuil relevé de 2000 à 2200 en v8.40.0, puis à 2300 au fil des passes
     # G à Q. Ce garde-fou vise l'accumulation de HTML et de logique métier
     # dans le routeur ; les deux vérifications ci-dessus s'en chargent et
@@ -134,7 +146,15 @@ def test_app_reste_de_la_logique_pure():
     # dans `perennite`, l'enregistrement d'un import dans
     # `import_bancaire`, le rendu de la page 409 factorisé. C'est bien son
     # office : signaler la dérive, pas l'interdire.
-    assert src.count("\n") < 2300, "app.py devient un monolithe"
+    #
+    # Abaissé à 1800 en v8.58.0. Relever le seuil ne rendait aucune marge :
+    # à 2299 lignes pour 2300, la fonction suivante n'aurait pu ajouter
+    # même son appel. Les routes des onglets Immobilisations et Nouvel
+    # exercice sont parties dans leurs modules (`*_web.py`, enregistrés
+    # par `routes.enregistrer_tous` sans que `app.py` les nomme) ; le seuil
+    # descend avec elles pour que la marge rendue ne se reperde pas en
+    # silence.
+    assert src.count("\n") < 1800, "app.py devient un monolithe"
 
 
 def test_toutes_les_pages_rendent_encore(tmp_path, monkeypatch):

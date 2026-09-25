@@ -7,7 +7,6 @@ Lancer : python app.py   puis ouvrir http://localhost:5000
 """
 from __future__ import annotations
 import io
-import math
 import os
 import sqlite3
 import threading
@@ -43,23 +42,18 @@ import integrite  # noqa: E402
 integrite.exiger_installation_complete()
 
 import controles
-import depots_web
-import recurrentes_web
+import routes
+from formulaires import form_float as _form_float, form_int as _form_int
 import fiscal
 import init_db
 import migrations
 import operations
 import pense_bete
-import plan_immo
-import cession
-import amortissement
 import import_bancaire
-import migration_fec
 import re
-import rejeu_fec
 import uuid
 import veille_fiscale
-from pages import (ASSISTANT, PAGE_DOSSIER_ABSENT, PAGE_VERSION_TROP_RECENTE, PAGE_DEMARRAGE, PAGE_DON_SECTION, PAGE_QUITTANCES, PAGE_QUITTANCE_IMPRIMABLE, PAGE_IMPORT_SECTION, CSS, PAGE_ARCHIVES, PAGE_CLOTURE, PAGE_DOSSIERS, PAGE_EX_NOUVEAU, PAGE_IMMO, PAGE_LIASSE, PAGE_PENSE_BETE, PAGE_REGLEMENTATION, PAGE_SAISIE, PAGE_SANDBOX, PAGE_SAUVEGARDES_SECTION, PAGE_VEILLE)
+from pages import (ASSISTANT, PAGE_DOSSIER_ABSENT, PAGE_VERSION_TROP_RECENTE, PAGE_DEMARRAGE, PAGE_DON_SECTION, PAGE_QUITTANCES, PAGE_QUITTANCE_IMPRIMABLE, PAGE_IMPORT_SECTION, CSS, PAGE_ARCHIVES, PAGE_CLOTURE, PAGE_DOSSIERS, PAGE_LIASSE, PAGE_PENSE_BETE, PAGE_REGLEMENTATION, PAGE_SAISIE, PAGE_SANDBOX, PAGE_SAUVEGARDES_SECTION, PAGE_VEILLE)
 import audit_cycle
 import gardes_http
 import formats
@@ -80,7 +74,6 @@ def _lire_version() -> str:
 VERSION = _lire_version()
 
 import parametres
-import reprise
 
 # COMPTA_DB / COMPTA_DB_BAC_A_SABLE : surcharge des chemins (tests hermétiques
 # — sans elle, les tests du lanceur démarraient le serveur sur la base RÉELLE).
@@ -93,34 +86,6 @@ app = Flask(__name__)
 # Plafond anti-abus : refuse un corps de requête > 2 Mo (413) avant même de
 # le charger en mémoire. Une saisie comptable légitime pèse quelques Ko.
 app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024
-
-
-def _form_int(nom: str, defaut=None):
-    """Lit un entier de formulaire SANS jamais lever : renvoie `defaut` si le
-    champ est absent, vide ou non entier. Évite les erreurs 500 sur saisie
-    malformée — la couche métier renverra un message clair si `defaut` est
-    invalide en aval."""
-    brut = (request.form.get(nom) or "").strip()
-    try:
-        return int(brut)
-    except (TypeError, ValueError):
-        return defaut
-
-
-def _form_float(nom: str, defaut=None):
-    """Idem pour un décimal. Accepte la virgule française (« 795,50 »).
-
-    `float()` accepte aussi « nan », « inf » et « 1e400 » : trois mots que
-    n'importe qui peut taper dans un champ de montant, et qui traversaient
-    ensuite toutes les comparaisons de la couche métier sans jamais les
-    faire échouer. Ce ne sont pas des montants — ils sont traités comme une
-    saisie invalide, au même titre qu'un mot quelconque."""
-    brut = (request.form.get(nom) or "").strip().replace(",", ".")
-    try:
-        valeur = float(brut)
-    except (TypeError, ValueError):
-        return defaut
-    return valeur if math.isfinite(valeur) else defaut
 
 
 # Verrou : le test d'appartenance et l'ajout sont DEUX opérations, et le
@@ -450,12 +415,6 @@ def _catalogue(conn):
             {k: v["libelle"] for k, v in g.items()},
             {k: v["periodicite"] for k, v in g.items()})
 
-# Comptes immobilisation disponibles (compte_immo → compte_amort ou None).
-# La table vivait ICI, en dur, dans la couche web — une connaissance
-# comptable logée dans la présentation, et dupliquée avec celle de liasse.py
-# sans que l'une référence l'autre. Source unique désormais :
-# modules/plan_immo.py (constat D2-05).
-COMPTES_IMMO = plan_immo.pour_la_saisie()
 
 # ── Helpers DB ───────────────────────────────────────────────────────────────
 
@@ -501,13 +460,6 @@ def _dossier_configure() -> bool:
         return n > 0
     except sqlite3.Error:
         return True          # en cas de doute, ne pas perturber la navigation
-
-
-def _annees_ouvertes(conn: sqlite3.Connection) -> list[int]:
-    rows = conn.execute(
-        "SELECT annee FROM exercice WHERE statut='ouvert' ORDER BY annee DESC"
-    ).fetchall()
-    return [r[0] for r in rows]
 
 
 def _annee_courante(conn: sqlite3.Connection) -> int:
@@ -678,7 +630,6 @@ document.addEventListener("submit", function (ev) {{
 # ── Page Saisie ──────────────────────────────────────────────────────────────
 
 
-
 @app.route("/")
 def root():
     # PREMIER DÉMARRAGE : on ouvre sur « Démarrer », pas sur la saisie.
@@ -742,23 +693,6 @@ def operation_dupliquer(operation_id: int):
     except Exception as exc:
         conn.close()
         return redirect(url_for("saisie", annee=annee, err=str(exc)))
-
-
-@app.route("/immobilisations/reprendre-amortissements", methods=["POST"])
-def immo_reprendre_amortissements():
-    """Passe le « à-nouveau » d'amortissement d'un bien déjà amorti à son
-    entrée dans le logiciel. Constaté en usage réel : sans lui, le bilan et
-    le tableau 2033-C divergent définitivement."""
-    conn = _conn()
-    annee = _annee_param(conn)
-    try:
-        r = operations.reprendre_amortissements_anterieurs(conn, annee)
-        return redirect(url_for("immobilisations", annee=annee,
-                                ok=operations.message_reprise(r)))
-    except Exception as exc:
-        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
-    finally:
-        conn.close()
 
 
 @app.route("/saisir-appel", methods=["POST"])
@@ -827,316 +761,6 @@ def saisir_op():
 
 
 # ── Page Immobilisations ─────────────────────────────────────────────────────
-
-
-
-@app.route("/immobilisations")
-def immobilisations():
-    conn   = _conn()
-    cession.assurer_schema(conn)          # colonnes/comptes de cession à la volée
-    conn.commit()
-    annee  = _annee_param(conn)
-    annees = _annees(conn)
-    exp    = conn.execute("SELECT * FROM exploitant LIMIT 1").fetchone()
-    biens  = conn.execute("SELECT * FROM bien ORDER BY id").fetchall()
-    compos = conn.execute("SELECT * FROM composant ORDER BY bien_id, id").fetchall()
-    manque_amort = operations.amortissements_anterieurs_manquants(conn, annee)["total"]
-    conn.close()
-
-    amort_map = {num: amort for num, _, amort in COMPTES_IMMO}
-    body = render_template_string(PAGE_IMMO,
-        amort_anterieurs=manque_amort,
-        ventilations={b["id"]: amortissement.ventilation_proposee(
-            b["prix_total"] or 0.0, b["quote_part_terrain"])
-            for b in biens
-            if not any(c["bien_id"] == b["id"] for c in compos)},
-        annee=annee, exploitant=exp, biens=biens, composants=compos,
-        comptes_immo=COMPTES_IMMO,
-        dedoublables=amortissement.POSTES_DEDOUBLABLES,
-        amort=amort_map,
-    )
-    return _base(body, active="immobilisations", annee=annee, annees=annees,
-                 flash_ok=request.args.get("ok",""),
-                 flash_err=request.args.get("err",""),
-                 flash_warn=request.args.get("warn",""))
-
-
-@app.route("/immobilisations/exploitant", methods=["POST"])
-def creer_exploitant():
-    """Enregistre l'exploitant.
-
-    Accessible depuis la page Immobilisations ET depuis la configuration
-    initiale d'un dossier neuf : c'est là qu'un débutant la cherche, et
-    l'y trouver évite de commencer par une page d'immobilisations vide
-    (retour d'usage). Le paramètre `retour` dit où revenir.
-    """
-    conn  = _conn()
-    annee = _annee_param(conn)
-    retour = request.form.get("retour") or "immobilisations"
-    try:
-        conn.execute(
-            "INSERT INTO exploitant (nom, siren, adresse) VALUES (?,?,?)",
-            (request.form["nom"], request.form["siren"], request.form.get("adresse",""))
-        )
-        conn.commit()
-        ouverts = _annees_ouvertes(conn)
-        ok = (f"Dossier configuré au nom de « {request.form['nom']} ». "
-              f"L'exercice {ouverts[0]} est déjà OUVERT : vous pouvez "
-              "saisir immédiatement." if ouverts else
-              f"Exploitant « {request.form['nom']} » enregistré.")
-    except Exception as exc:
-        conn.close()
-        return redirect(url_for(retour, annee=annee, err=str(exc)))
-    conn.close()
-    cible = "saisie" if retour == "saisie" else retour
-    return redirect(url_for(cible, annee=annee, ok=ok))
-
-
-@app.route("/immobilisations/bien", methods=["POST"])
-def creer_bien():
-    conn  = _conn()
-    annee = _annee_param(conn)
-    try:
-        exp = conn.execute("SELECT id FROM exploitant LIMIT 1").fetchone()
-        if not exp:
-            raise ValueError("Créez d'abord un exploitant.")
-        prix  = request.form.get("prix_total") or None
-        qpt   = request.form.get("quote_part_terrain") or None
-        dacq  = request.form.get("date_acquisition") or None
-        conn.execute(
-            "INSERT INTO bien (exploitant_id, libelle, adresse, date_acquisition, "
-            "prix_total, quote_part_terrain) VALUES (?,?,?,?,?,?)",
-            (exp[0], request.form["libelle"], request.form.get("adresse",""),
-             dacq, float(prix) if prix else None, float(qpt) if qpt else None)
-        )
-        conn.commit()
-        ok = f"Bien « {request.form['libelle']} » créé."
-    except Exception as exc:
-        conn.close()
-        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
-    conn.close()
-    return redirect(url_for("immobilisations", annee=annee, ok=ok))
-
-
-@app.route("/immobilisations/composant", methods=["POST"])
-def creer_composant():
-    conn  = _conn()
-    annee = _annee_param(conn)
-    try:
-        bien_id  = _form_int("bien_id")
-        if bien_id is None:
-            raise ValueError("Bien non sélectionné.")
-        duree    = amortissement.duree_valide(request.form.get("duree_annees", ""))
-        amortissable = 1 if duree else 0
-
-        cpt_immo = request.form["compte_immo"]
-        # Résolution automatique du compte d'amortissement depuis le compte
-        # d'immobilisation — par le plan, qui reconnaît aussi les
-        # subdivisions à sept chiffres d'un cabinet.
-        cpt_amort = plan_immo.compte_amortissement(cpt_immo) if amortissable else None
-        # Un compte SANS contrepartie d'amortissement (le terrain) ne peut
-        # pas porter de durée : le composant était accepté, puis la clôture
-        # échouait sur « NOT NULL constraint failed: ligne.compte_num » —
-        # message incompréhensible, et blocage total (constat d'usage).
-        if amortissable and not cpt_amort:
-            libelle_cpt = next((lib for num, lib, _ in COMPTES_IMMO
-                                if num == cpt_immo), cpt_immo)
-            raise ValueError(
-                f"« {libelle_cpt} » n'est pas amortissable : laissez la "
-                "durée à 0. Le terrain ne se déprécie pas — c'est d'ailleurs "
-                "pour cela qu'il faut isoler sa quote-part du reste du prix. "
-                "Si vous vouliez amortir du bâti, choisissez « Bâtiment ».")
-
-        dms = request.form.get("date_mise_service") or None
-        conn.execute(
-            "INSERT INTO composant (bien_id, code_immo, libelle, categorie, valeur_brute, "
-            "duree_annees, date_mise_service, compte_immo, compte_amort, amortissable) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (bien_id, request.form.get("code_immo") or None, request.form["libelle"],
-             request.form.get("categorie",""), float(request.form["valeur_brute"]),
-             duree, dms, cpt_immo, cpt_amort, amortissable)
-        )
-        # Pas de commit ici : il vient après l'écriture d'acquisition, pour
-        # que les deux tiennent ou tombent ensemble (constat Q-07).
-        ok = f"Composant « {request.form['libelle']} » ajouté."
-        # Alerte de cohérence AU MOMENT DE L'AJOUT : c'est là qu'elle sert,
-        # pendant que l'utilisateur a le montant en tête.
-        b = conn.execute("SELECT libelle, prix_total FROM bien WHERE id=?",
-                         (bien_id,)).fetchone()
-        if b and b["prix_total"]:
-            total = conn.execute(
-                "SELECT COALESCE(SUM(valeur_brute),0) FROM composant "
-                "WHERE bien_id=?", (bien_id,)).fetchone()[0]
-            depassement = round(total - b["prix_total"], 2)
-            if depassement > 0.05 * b["prix_total"]:
-                ok += (f" ⚠ La somme des composants ({total:.2f} €) dépasse "
-                       f"désormais de {depassement:.2f} € "
-                       f"({depassement / b['prix_total'] * 100:.1f} %) le "
-                       f"prix d'acquisition ({b['prix_total']:.2f} €). "
-                       "Normal si vous immobilisez des travaux postérieurs ; "
-                       "à vérifier s'il s'agit de la ventilation initiale.")
-
-        # Écriture d'acquisition (débit 2xx / crédit 108000) sur l'exercice
-        # ouvert — sinon le composant n'existe qu'en référentiel et le bilan
-        # (2033-A) comme le FEC seraient faux. Désactivable pour une reprise
-        # d'historique déjà portée par les à-nouveaux.
-        if request.form.get("sans_ecriture") != "1":
-            ouverts = _annees_ouvertes(conn)
-            if not ouverts:
-                raise ValueError("Aucun exercice ouvert pour comptabiliser "
-                                 "l'écriture d'acquisition.")
-            cible = min(ouverts)
-            date_op = dms if dms and int(dms[:4]) == cible else f"{cible}-01-01"
-            res = operations.saisir_acquisition(
-                conn, compte_immo=cpt_immo,
-                montant=float(request.form["valeur_brute"]),
-                date_operation=date_op, libelle=request.form["libelle"],
-                exercice=cible)
-            ok += (f" Écriture d'acquisition n°{res['ecriture_num']} "
-                   f"générée sur {cible}.")
-    except Exception as exc:
-        # Le composant était committé AVANT l'écriture d'acquisition : une
-        # date invalide laissait 12 000 € au référentiel sans écriture, et
-        # l'erreur ne disait pas qu'une partie était enregistrée (Q-07).
-        conn.rollback()
-        conn.close()
-        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("immobilisations", annee=annee, ok=ok))
-
-
-@app.route("/immobilisations/ventiler", methods=["POST"])
-def immo_ventiler():
-    """
-    Ventile le prix d'acquisition d'un bien en composants, en une fois.
-
-    Ajouté après un constat d'usage : on pouvait empiler des composants
-    sans qu'aucun lien ne soit fait avec le prix payé. Or c'est la
-    ventilation qui donne au réel tout son intérêt — un bien saisi en bloc
-    s'amortit sur la durée du gros œuvre, et le mobilier, qui devrait
-    s'amortir en quelques années, s'étale sur des décennies.
-    """
-    conn = _conn()
-    annee = _annee_param(conn)
-    try:
-        bien_id = _form_int("bien_id")
-        bien = conn.execute("SELECT * FROM bien WHERE id=?",
-                            (bien_id,)).fetchone()
-        if bien is None:
-            raise ValueError("Bien introuvable.")
-        if conn.execute("SELECT COUNT(*) FROM composant WHERE bien_id=?",
-                        (bien_id,)).fetchone()[0]:
-            raise ValueError(
-                "Ce bien a déjà des composants : la ventilation initiale ne "
-                "s'utilise qu'une fois. Ajoutez les composants manquants "
-                "un par un ci-dessous, ou supprimez les lignes existantes "
-                "pour la refaire entièrement.")
-        dms = request.form.get("date_mise_service") or bien["date_acquisition"]
-        postes = amortissement.postes_ventilation(request.form)
-        if not postes:
-            raise ValueError("Aucun montant saisi : renseignez au moins un "
-                             "poste.")
-        cree, total = 0, 0.0
-        for poste in postes:
-            duree = poste["duree"]
-            cpt_amort = (plan_immo.compte_amortissement(poste["compte_immo"])
-                         if duree else None)
-            if duree and not cpt_amort:
-                raise ValueError(f"« {poste['libelle']} » ne s'amortit pas : "
-                                 "laissez sa durée à 0.")
-            conn.execute(
-                "INSERT INTO composant (bien_id, libelle, categorie, "
-                "valeur_brute, duree_annees, date_mise_service, compte_immo, "
-                "compte_amort, amortissable) VALUES (?,?,?,?,?,?,?,?,?)",
-                (bien_id, poste["libelle"], poste["categorie"],
-                 poste["montant"], duree, dms, poste["compte_immo"],
-                 cpt_amort, 1 if duree else 0))
-            ouverts = _annees_ouvertes(conn)
-            if request.form.get("sans_ecriture") != "1" and ouverts:
-                cible = min(ouverts)
-                date_op = (dms if dms and int(dms[:4]) == cible
-                           else f"{cible}-01-01")
-                operations.saisir_acquisition(
-                    conn, compte_immo=poste["compte_immo"],
-                    montant=poste["montant"], date_operation=date_op,
-                    libelle=poste["libelle"], exercice=cible, commit=False)
-            cree += 1
-            total = round(total + poste["montant"], 2)
-        conn.commit()
-        prix = bien["prix_total"] or 0.0
-        alerte = ""
-        if prix and abs(total - prix) > 0.05 * prix:
-            alerte = (f" Attention : le total ventilé ({total:.2f} €) "
-                      f"s'écarte de plus de 5 % du prix d'acquisition "
-                      f"({prix:.2f} €) — vérifiez la répartition.")
-        return redirect(url_for("immobilisations", annee=annee,
-            ok=f"{cree} composant(s) créé(s) pour {total:.2f} €.{alerte}"))
-    except Exception as exc:
-        conn.rollback()
-        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
-    finally:
-        conn.close()
-
-
-@app.route("/immobilisations/composant/<int:composant_id>/duree",
-           methods=["POST"])
-def composant_duree(composant_id):
-    """
-    Corrige la durée d'amortissement d'un composant.
-
-    Ajouté après un blocage réel : un composant créé avec une durée sur un
-    compte non amortissable (terrain) faisait échouer toute clôture, et
-    RIEN dans l'interface ne permettait de le corriger — les composants
-    étaient créables, jamais modifiables. Un logiciel qui laisse commettre
-    une erreur doit laisser la défaire.
-    """
-    conn = _conn()
-    annee = _annee_param(conn)
-    try:
-        c = conn.execute("SELECT libelle, compte_immo FROM composant "
-                         "WHERE id=?", (composant_id,)).fetchone()
-        if c is None:
-            raise ValueError("Composant introuvable.")
-        duree = amortissement.duree_valide(request.form.get("duree_annees", ""))
-        amortissable = 1 if duree else 0
-        cpt_amort = (plan_immo.compte_amortissement(c["compte_immo"])
-                     if amortissable else None)
-        if amortissable and not cpt_amort:
-            raise ValueError(
-                f"Le compte {c['compte_immo']} ne s'amortit pas : seule la "
-                "durée 0 est acceptée pour ce composant.")
-        conn.execute("UPDATE composant SET duree_annees=?, amortissable=?, "
-                     "compte_amort=? WHERE id=?",
-                     (duree, amortissable, cpt_amort, composant_id))
-        conn.commit()
-        msg = (f"Composant « {c['libelle']} » : durée portée à "
-               f"{duree} ans." if duree else
-               f"Composant « {c['libelle']} » : durée retirée, il n'est "
-               "plus amorti.")
-        return redirect(url_for("immobilisations", annee=annee, ok=msg))
-    except Exception as exc:
-        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
-    finally:
-        conn.close()
-
-
-@app.route("/immobilisations/composant/<int:composant_id>/supprimer",
-           methods=["POST"])
-def composant_supprimer(composant_id):
-    """Supprime un composant mal saisi et contre-passe son acquisition
-    (règle et garde-fous dans `operations.supprimer_composant`)."""
-    conn = _conn()
-    annee = _annee_param(conn)
-    try:
-        r = operations.supprimer_composant(conn, composant_id)
-        return redirect(url_for("immobilisations", annee=annee,
-                                ok=operations.message_suppression(r)))
-    except Exception as exc:
-        conn.rollback()
-        return redirect(url_for("immobilisations", annee=annee, err=str(exc)))
-    finally:
-        conn.close()
 
 
 @app.route("/pense-bete/notes", methods=["POST"])
@@ -1275,7 +899,6 @@ def quittance_imprimable(quittance_id):
 # ── Page Clôture ─────────────────────────────────────────────────────────────
 
 
-
 @app.route("/cloture")
 def cloture():
     conn   = _conn()
@@ -1383,91 +1006,7 @@ def cloturer():
 # ── Page Nouvel exercice ─────────────────────────────────────────────────────
 
 
-
-@app.route("/exercice/nouveau")
-def exercice_nouveau():
-    return _page_exercice_nouveau(None)
-
-
-def _page_exercice_nouveau(conn_ouverte, analyse=None):
-    """Rend la page. `analyse` porte le résultat d'une analyse
-    multi-FEC, qui doit s'afficher SANS redirection — sinon le
-    résultat serait perdu."""
-    del conn_ouverte
-    conn   = _conn()
-    annee  = _annee_param(conn)
-    annees = _annees(conn)
-    exercices = conn.execute(
-        "SELECT * FROM exercice ORDER BY annee DESC"
-    ).fetchall()
-    annee_suggere = (max(e["annee"] for e in exercices) + 1) if exercices else date.today().year
-    prev_ouvert   = next(
-        (e["annee"] for e in exercices if e["statut"] == "ouvert"), None
-    )
-    reprise_possible = any(
-        e["annee"] == annee_suggere - 1 and e["statut"] == "clos" for e in exercices
-    )
-    conn.close()
-
-    conn2 = _conn()
-    veille_due = veille_fiscale.veille_a_refaire(conn2)
-    derniere = veille_fiscale.derniere_veille(conn2)
-    conn2.close()
-    body = render_template_string(PAGE_EX_NOUVEAU,
-        annee=annee, exercices=exercices,
-        annee_suggere=annee_suggere, prev_ouvert=prev_ouvert,
-        reprise_possible=reprise_possible, analyse=analyse,
-        veille_due=veille_due, derniere_veille=derniere)
-    return _base(body, active="exercice_nouveau", annee=annee, annees=annees,
-                 flash_ok=request.args.get("ok",""),
-                 flash_err=request.args.get("err",""))
-
-
-@app.route("/exercice/ouvrir", methods=["POST"])
-def exercice_ouvrir():
-    conn = _conn()
-    try:
-        a    = _form_int("annee")
-        if a is None:
-            raise ValueError("Année d'exercice invalide.")
-        deb  = request.form.get("date_debut", "")
-        fin  = request.form.get("date_fin", "")
-        exis = conn.execute("SELECT annee FROM exercice WHERE annee=?", (a,)).fetchone()
-        if exis:
-            raise ValueError(f"L'exercice {a} existe déjà.")
-        # UN SEUL GESTE. L'exercice était créé et committé AVANT que la
-        # reprise ne soit tentée : un refus laissait un exercice vide, alors
-        # que le message invitait à recommencer après clôture. Ouvrir avec
-        # reprise aboutit, ou ne laisse rien (constat Q-11).
-        reprise_demandee = request.form.get("reprise") == "1"
-        conn.execute("BEGIN IMMEDIATE")
-        conn.execute(
-            "INSERT INTO exercice (annee, date_debut, date_fin, statut) VALUES (?,?,?,'ouvert')",
-            (a, deb, fin)
-        )
-        msg = f"Exercice {a} ouvert ({deb} → {fin})."
-        if reprise_demandee:
-            info = reprise.construire_an_interne(conn, a, commit=False)
-            d, c_ = reprise.controle_equilibre(conn, a)
-            if abs(d - c_) > 0.005:
-                raise ValueError("À-nouveaux déséquilibrés — reprise annulée.")
-            msg += (f" À-nouveaux repris depuis {info['annee_source']} : "
-                    f"{info['nb_comptes']} comptes, résultat reporté "
-                    f"{info['resultat_reporte']:.2f} € (affecté au compte exploitant).")
-        conn.commit()
-        if veille_fiscale.veille_a_refaire(conn):
-            msg += (" Pensez à votre veille fiscale avant de saisir : "
-                    "voir le menu « Veille fiscale ».")
-        conn.close()
-        return redirect(url_for("exercice_nouveau", annee=a, ok=msg))
-    except Exception as exc:
-        conn.rollback()
-        conn.close()
-        return redirect(url_for("exercice_nouveau", err=str(exc)))
-
-
 # ── Page Liasse fiscale ──────────────────────────────────────────────────────
-
 
 
 @app.route("/liasse")
@@ -1519,7 +1058,6 @@ def liasse_pdf_route():
 
 
 # ── Page Réglementation (règles versionnées + gabarits personnalisés) ────────
-
 
 
 @app.route("/reglementation")
@@ -1608,11 +1146,7 @@ def reglementation_compte():
 # ── Page Bac à sable ─────────────────────────────────────────────────────────
 
 
-
 # ── Page Dossiers (J8 : plusieurs comptabilités indépendantes) ──────────────
-
-
-
 
 
 @app.route("/archives")
@@ -1839,9 +1373,6 @@ CERT_FILE = os.path.join(CERT_DIR, "cert.pem")
 KEY_FILE  = os.path.join(CERT_DIR, "key.pem")
 
 
-
-
-
 @app.route("/pense-bete")
 def pense_bete_page():
     conn = _conn()
@@ -1858,45 +1389,6 @@ def pense_bete_page():
                      annees=_annees(conn))
     finally:
         conn.close()
-
-
-
-
-@app.route("/immobilisations/bien/<int:bien_id>/ceder", methods=["POST"])
-def bien_ceder(bien_id):
-    conn = _conn()
-    try:
-        annee = _annee_param(conn)
-        # Sentinelle None plutôt que -1 : un champ vide, un mot, « nan » ou
-        # « inf » sont TOUS des saisies invalides, et les annoncer comme un
-        # « prix négatif » envoyait l'utilisateur corriger un signe qu'il
-        # n'avait pas tapé.
-        prix = _form_float("prix_cession")
-        if prix is None:
-            raise ValueError("indiquez un prix de cession en euros "
-                             "(0 si la sortie se fait sans contrepartie).")
-        r = cession.ceder_bien(
-            conn, bien_id,
-            date_cession=(request.form.get("date_cession") or "").strip(),
-            prix_cession=prix)
-        ok = (f"Cession de {r['bien']} enregistrée : dotation complémentaire "
-              f"{r['dotation_complementaire']:.2f} €, VNC sortie "
-              f"{r['vnc_sortie']:.2f} €, prix {r['prix_cession']:.2f} € "
-              f"({'plus' if r['pv_comptable'] >= 0 else 'moins'}-value comptable "
-              f"{abs(r['pv_comptable']):.2f} €, neutralisée fiscalement — "
-              "voir le Pense-bête pour les démarches).")
-        return redirect(url_for("immobilisations", annee=annee, ok=ok))
-    except Exception as exc:
-        return redirect(url_for("immobilisations",
-                                annee=request.form.get("annee", type=int)
-                                or date.today().year,
-                                err=f"Cession refusée — {exc}"))
-    finally:
-        conn.close()
-
-
-
-
 
 
 @app.route("/veille")
@@ -2057,172 +1549,18 @@ def import_valider():
         conn.close()
 
 
-@app.route("/exercice/analyser-fec", methods=["POST"])
-def exercice_analyser_fec():
-    """Analyse PLUSIEURS FEC sans rien écrire.
-
-    Deux temps volontairement séparés : une migration est irréversible en
-    pratique (on ne défait pas trois exercices d'un clic), et l'utilisateur
-    doit voir ce que le logiciel a compris — l'ordre déduit, les jonctions,
-    les dotations — AVANT de s'engager.
-    """
-    fichiers = [f for f in request.files.getlist("fecs") if f and f.filename]
-    if not fichiers:
-        return redirect(url_for("exercice_nouveau",
-                                err="Sélectionnez au moins un fichier FEC."))
-    conn = _conn()
-    try:
-        jeton = uuid.uuid4().hex
-        dossier = os.path.join(_dossier_imports(), jeton)
-        os.makedirs(dossier, exist_ok=True)
-        chemins = []
-        for n, f in enumerate(fichiers):
-            c = os.path.join(dossier, f"{n:02d}.txt")
-            f.save(c)
-            chemins.append(c)
-        ordre = migration_fec.ordonner(chemins)
-        for x, f in zip(ordre, [None] * len(ordre)):
-            del f
-        noms = {c: f.filename for c, f in zip(chemins, fichiers)}
-        for x in ordre:
-            x["nom"] = noms.get(x["chemin"], "")
-            x["dotations"] = migration_fec.dotations_du_fec(x["chemin"])
-        deja = {r[0] for r in conn.execute("SELECT annee FROM exercice")}
-        for x in ordre:
-            if x["annee"] and x["annee"] in deja:
-                x["erreurs"].append(
-                    f"l'exercice {x['annee']} existe déjà dans ce dossier : "
-                    "il ne sera pas repris.")
-        obs = (migration_fec.controler_jonctions(ordre)
-               + migration_fec.controler_amortissements(conn, ordre))
-        reprenables = sum(1 for x in ordre if x["annee"] and not x["erreurs"])
-        analyse = {"fichiers": ordre, "observations": obs,
-                   "jeton": jeton, "reprenables": reprenables}
-        return _page_exercice_nouveau(None, analyse=analyse)
-    except Exception as exc:
-        return redirect(url_for("exercice_nouveau", err=str(exc)))
-    finally:
-        conn.close()
+def _tardif(nom: str):
+    """Fonction du routeur résolue À L'APPEL, pas à l'enregistrement : la
+    remplacer ici (un test le fait) la remplace aussi pour les modules."""
+    return lambda *a, **k: globals()[nom](*a, **k)
 
 
-@app.route("/exercice/reprendre-fec-multi", methods=["POST"])
-def exercice_reprendre_fec_multi():
-    """Rejoue les exercices analysés, DU PLUS ANCIEN AU PLUS RÉCENT.
-
-    L'ordre est imposé par les données : rejouer 2025 avant 2023
-    produirait des à-nouveaux absurdes, et l'utilisateur n'a aucune raison
-    de connaître cette contrainte.
-    """
-    jeton = request.form.get("jeton", "")
-    if not re.fullmatch(r"[0-9a-f]{32}", jeton):
-        return redirect(url_for("exercice_nouveau",
-                                err="Session d'analyse expirée — recommencez."))
-    dossier = os.path.join(_dossier_imports(), jeton)
-    if not os.path.isdir(dossier):
-        return redirect(url_for("exercice_nouveau",
-                                err="Session d'analyse expirée — recommencez."))
-    conn = _conn()
-    echoue = False
-    try:
-        chemins = [os.path.join(dossier, n) for n in sorted(os.listdir(dossier))]
-        ordre = migration_fec.ordonner(chemins)
-        deja = {r[0] for r in conn.execute("SELECT annee FROM exercice")}
-        faits, ignores = [], []
-        for x in ordre:
-            a = x["annee"]
-            if not a or a in deja:
-                ignores.append(str(a or "?"))
-                continue
-            conn.execute("INSERT INTO exercice (annee, date_debut, date_fin, "
-                         "statut) VALUES (?,?,?,'ouvert')",
-                         (a, f"{a}-01-01", f"{a}-12-31"))
-            res = rejeu_fec.rejouer(conn, x["chemin"], a, commit=False)
-            faits.append(f"{a} ({res['ecritures']} écritures)")
-            deja.add(a)
-        conn.commit()
-        if not faits:
-            raise ValueError("Aucun exercice repris : tous étaient déjà "
-                             "présents ou illisibles.")
-        msg = ("Exercices repris du plus ancien au plus récent : "
-               + ", ".join(faits) + ".")
-        if ignores:
-            msg += f" Ignorés : {', '.join(ignores)}."
-        msg += (" Vérifiez la balance de chaque exercice, puis clôturez-les "
-                "dans l'ordre.")
-        return redirect(url_for("exercice_nouveau", ok=msg))
-    except Exception as exc:
-        # TOUT OU RIEN, et la PRÉPARATION EST CONSERVÉE. Chaque rejeu
-        # committait le sien : une reprise de deux fichiers qui échouait sur
-        # le second laissait durablement le premier exercice, tandis que le
-        # `finally` effaçait le dossier des fichiers téléversés. L'action
-        # globale se terminait en erreur, l'état était partiel, et de quoi
-        # recommencer avait disparu (constat Q-09).
-        conn.rollback()
-        echoue = True
-        return redirect(url_for("exercice_nouveau", err=(
-            f"Reprise interrompue : {exc}\n\nAucun exercice n'a été repris "
-            "— la base est dans l'état où elle était. Vos fichiers restent "
-            "chargés : corrigez celui qui est en cause, puis relancez "
-            "l'analyse.")))
-    finally:
-        conn.close()
-        if not echoue:
-            import shutil
-            shutil.rmtree(dossier, ignore_errors=True)
-
-
-@app.route("/exercice/reprendre-fec", methods=["POST"])
-def exercice_reprendre_fec():
-    """Reprise d'un exercice complet depuis son FEC (migration depuis un
-    prestataire de comptabilité LMNP) :
-    exercice créé puis fichier rejoué écriture par écriture."""
-    f = request.files.get("fec")
-    a = _form_int("annee")
-    if f is None or not f.filename or a is None:
-        return redirect(url_for("exercice_nouveau",
-                                err="Année et fichier FEC requis."))
-    conn = _conn()
-    chemin = os.path.join(_dossier_imports(), uuid.uuid4().hex + ".txt")
-    try:
-        f.save(chemin)
-        if conn.execute("SELECT 1 FROM exercice WHERE annee=?", (a,)).fetchone():
-            raise ValueError(f"L'exercice {a} existe déjà : la reprise crée "
-                             "l'exercice, elle ne complète pas un exercice "
-                             "existant.")
-        conn.execute("INSERT INTO exercice (annee, date_debut, date_fin, "
-                     "statut) VALUES (?,?,?,'ouvert')",
-                     (a, f"{a}-01-01", f"{a}-12-31"))
-        res = rejeu_fec.rejouer(conn, chemin, a)
-        conn.commit()
-        # Toute TRANSFORMATION du fichier source est annoncée. Une reprise
-        # qui se dit réussie sans dire ce qu'elle a changé laisse croire que
-        # le ré-export reproduira le fichier remis.
-        ok = (f"Exercice {a} repris depuis le FEC : {res['ecritures']} "
-              f"écritures rejouées, {len(res['comptes_crees'])} compte(s) "
-              f"créé(s) depuis le fichier"
-              + (f", {res['normalisees']} ligne(s) à montant négatif "
-                 f"normalisée(s) par équivalence comptable" if res.get("normalisees") else "")
-              + (". Les écritures ont été RENUMÉROTÉES de 1 à "
-                 f"{res['ecritures']} (les numéros du fichier source se "
-                 "répétaient d'un journal à l'autre, ou n'étaient pas "
-                 "numériques) : conservez le FEC d'origine"
-                 if res.get("renumerotees") else "")
-              + (". Libellé(s) de journal conservé(s) depuis le plan du "
-                 f"logiciel — {'; '.join(res['journaux_renommes'])}"
-                 if res.get("journaux_renommes") else "")
-              + ". Vérifiez la balance puis clôturez normalement.")
-        return redirect(url_for("exercice_nouveau", annee=a, ok=ok))
-    except Exception as exc:
-        conn.rollback()
-        return redirect(url_for("exercice_nouveau", err=f"Reprise refusée : {exc}"))
-    finally:
-        conn.close()
-        if os.path.exists(chemin):
-            os.remove(chemin)
-
-
-depots_web.enregistrer_routes(app, conn=_conn, annee_param=_annee_param)
-recurrentes_web.enregistrer_routes(app, conn=_conn, annee_param=_annee_param, base=_base, annees=_annees)
+# Tous les modules de routes `modules/*_web.py`, trouvés par lecture du
+# répertoire : une fonction nouvelle n'ajoute rien ici (voir `routes`).
+routes.enregistrer_tous(app, routes.ContexteWeb(
+    conn=_tardif("_conn"), annee_param=_tardif("_annee_param"),
+    annees=_tardif("_annees"), base=_tardif("_base"),
+    db_path=_tardif("_db_path"), dossier_imports=_tardif("_dossier_imports")))
 
 if __name__ == "__main__":
     if not os.path.exists(DB):
@@ -2261,23 +1599,9 @@ if __name__ == "__main__":
           "mode debug est désactivé. L'avertissement « development server » "
           "de Flask, qui vise les sites publics sur internet, ne s'applique "
           "pas à cet usage.")
-    # HTTP par défaut sur la boucle locale — décision assumée, revue en
-    # v8.15.0 après retour d'usage. Un certificat AUTO-SIGNÉ ne peut pas
-    # être validé par le navigateur : il affiche un avertissement plein
-    # écran au premier accès, puis un cadenas barré à chaque lancement,
-    # définitivement. Ce n'est pas un défaut de configuration, c'est la
-    # nature d'un certificat que personne n'a signé.
-    #
-    # Or il ne protège rien ici : l'application n'écoute que sur 127.0.0.1,
-    # les données ne quittent jamais la machine et ne traversent aucun
-    # réseau. Le seul effet réel du HTTPS local est donc d'habituer
-    # l'utilisateur à passer outre les avertissements de sécurité de son
-    # navigateur — exactement le réflexe qu'il ne faut pas installer.
-    #
-    # Les navigateurs traitent d'ailleurs http://localhost comme un
-    # CONTEXTE SÉCURISÉ, au même titre que HTTPS : aucune fonctionnalité
-    # web n'est perdue. HTTPS reste disponible sur demande explicite
-    # (COMPTA_HTTPS=1), pour qui expose l'application autrement.
+    # HTTP par défaut sur la boucle locale, HTTPS sur demande
+    # (COMPTA_HTTPS=1) : décision assumée, motivée dans ARCHITECTURE.md,
+    # section « Choix assumés ».
     ssl_ctx = None
     if os.environ.get("COMPTA_HTTPS") == "1":
         if os.path.exists(CERT_FILE) and os.path.exists(KEY_FILE):

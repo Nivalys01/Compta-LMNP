@@ -1,5 +1,55 @@
 # Journal des versions — Compta LMNP
 
+## 8.58.0 — 2026-09-25 (Le routeur rend de la place)
+
+**Aucun changement de comportement.** Cette version réorganise le code des
+pages ; ce que voit l'utilisateur est identique, à la route près : les 61
+routes de l'application — chemin, méthodes, nom — sont les mêmes avant et
+après, relevé à l'appui.
+
+**`app.py` était plein.** Le garde-fou anti-monolithe le plafonnait à 2 300
+lignes ; il en comptait 2 299. Le seuil avait déjà été relevé deux fois
+(2 000, 2 200, 2 300), et le relever encore n'aurait rendu aucune marge : la
+fonction suivante — les emprunts — n'aurait pu y ajouter même son appel.
+
+Le modèle existait déjà : les charges récurrentes et le suivi des dépôts
+avaient leurs routes dans leur propre module (`*_web.py`). Il est appliqué à
+deux groupes de routes existants et cohérents, chacun un onglet :
+**Immobilisations** (`immobilisations_web.py` : exploitant, biens,
+composants, ventilation, durées, suppression, reprise des amortissements,
+cession) et **Nouvel exercice** (`exercices_web.py` : ouverture et reprise
+depuis un ou plusieurs FEC). Le code est déplacé À L'IDENTIQUE — seule
+l'indentation change, vérifié bloc par bloc — et la lecture des champs de
+formulaire, partagée, part dans `formulaires.py`. `app.py` passe de 2 299 à
+1 623 lignes, et le seuil **descend à 1 800** pour que la marge rendue ne se
+reperde pas en silence.
+
+**Un seul point d'enregistrement.** `routes.enregistrer_tous` trouve les
+modules `modules/*_web.py` en lisant le répertoire et les branche ; `app.py`
+n'en nomme aucun, et un test y veille. Une fonction nouvelle ajoute son
+module, jamais une ligne au routeur. Pas de liste à tenir, donc pas d'oubli
+possible — et pas de silence non plus : un module qui ne se charge pas, ou
+qui n'expose pas `enregistrer_routes`, fait échouer le démarrage en se
+nommant. Les fonctions du routeur transmises aux modules sont résolues à
+l'appel : remplacer l'une d'elles la remplace aussi pour eux.
+
+**Des garde-fous qui suivent les routes où qu'elles vivent.** Chaque route
+POST de l'application — 35 aujourd'hui, toutes celles à venir — est
+éprouvée contre une requête d'origine étrangère, qui doit être refusée.
+L'interdiction du HTML dans le routeur s'étend aux modules de routes.
+
+Quatre tests atteignaient des routes déplacées par le module `app` ou
+lisaient leur code dans `app.py` ; ils les atteignent désormais par
+l'application ou lisent la couche web entière, sans rien changer à ce
+qu'ils vérifient. La justification du HTTP par défaut sur la boucle locale,
+qui occupait vingt lignes de commentaire au démarrage, est passée dans
+`ARCHITECTURE.md` (« Choix assumés »), qui décrit aussi les modules de
+routes.
+
+Non-régression : `tests/test_routes_web.py` (9 tests). Paquet client 8.58.0
+éprouvé décompressé : intégrité au vert, 61 routes, toutes les pages
+servies.
+
 ## 8.57.0 — 2026-09-25 (Les charges qui reviennent se déclarent une fois)
 
 **Douze fois la même assurance.** Une charge mensuelle identique se

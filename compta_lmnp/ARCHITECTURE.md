@@ -59,7 +59,7 @@ métier (français, termes du PCG et de la DGFiP).
 | Échéances | `echeancier.py` | Moteur GÉNÉRIQUE de génération en lot : aperçu (statuts, doublons probables), génération atomique par le guichet, idempotence par la base (`echeance_generee`, unique par source × date). Une source lui remet des `Echeance` à une ou plusieurs opérations. |
 | Charges récurrentes | `recurrentes.py`, `recurrentes_web.py` | Première source du moteur : modèles de charges (liste blanche), calendrier ancré sur le jour choisi. Complète `operations.dupliquer`, sans la remplacer. |
 | Dépôts | `depots.py`, `depots_web.py` | Suivi DÉCLARATIF des dépôts (liasse, 2042-C-PRO) : aucune écriture, aucun effet sur FEC ni liasse. Instantané des chiffres lu dans `liasse`, confronté à chaque lecture. Contrôles tenus HORS de `controles.CONTROLES` (la liasse embarque ceux du moteur). Les dépôts traversent une restauration (`perennite.restaurer`). Routes branchées par `enregistrer_routes(app)`, comme `gardes_http`. |
-| Interfaces | `app.py` (routes web), `pages.py` (gabarits HTML), `cli.py` | Flask local (127.0.0.1, HTTPS auto-signé), multi-dossiers (`dossiers.py`), bac à sable. |
+| Interfaces | `app.py` (routeur), `modules/*_web.py` (routes par onglet ou par fonction), `routes.py` (leur enregistrement), `pages.py` (gabarits HTML), `formulaires.py` (lecture des champs), `cli.py` | Flask local (127.0.0.1, HTTP par défaut), multi-dossiers (`dossiers.py`), bac à sable. |
 
 ## Les invariants à ne jamais casser
 
@@ -92,6 +92,20 @@ métier (français, termes du PCG et de la DGFiP).
   versionnées au jalon J9 (packaging/mise à jour).
 - Templates HTML inline dans `app.py` : assumé pour la distribution
   mono-fichier, mais voir Dette ci-dessous.
+- **HTTP par défaut sur la boucle locale** (décision revue en v8.15.0 après
+  retour d'usage). Un certificat AUTO-SIGNÉ ne peut pas être validé par le
+  navigateur : il affiche un avertissement plein écran au premier accès,
+  puis un cadenas barré à chaque lancement, définitivement. Ce n'est pas un
+  défaut de configuration, c'est la nature d'un certificat que personne n'a
+  signé. Or il ne protège rien ici : l'application n'écoute que sur
+  127.0.0.1, les données ne quittent jamais la machine et ne traversent
+  aucun réseau. Le seul effet réel du HTTPS local serait d'habituer
+  l'utilisateur à passer outre les avertissements de sécurité de son
+  navigateur — exactement le réflexe qu'il ne faut pas installer. Les
+  navigateurs traitent d'ailleurs `http://localhost` comme un CONTEXTE
+  SÉCURISÉ, au même titre que HTTPS : aucune fonctionnalité web n'est
+  perdue. HTTPS reste disponible sur demande explicite (`COMPTA_HTTPS=1`),
+  pour qui expose l'application autrement.
 
 ## Dette technique — état
 
@@ -125,6 +139,24 @@ métier (français, termes du PCG et de la DGFiP).
    `create_app(config)` et un contexte de dossier injecté lèveraient la
    contrainte. Même remarque : chantier, pas correctif.
 
+## Modules de routes (`*_web.py`)
+
+`app.py` garde ce qui est l'état du routeur : dossier actif et bac à sable,
+migration à l'ouverture, gardes, connexion fermée en fin de requête, mise en
+page commune (`_base`). Les routes d'un onglet ou d'une fonction vivent dans
+leur module `modules/<nom>_web.py` (Immobilisations, Nouvel exercice,
+charges récurrentes, dépôts…), qui expose `enregistrer_routes(app, ctx)` ;
+`ctx` (`routes.ContexteWeb`) leur transmet les fonctions du routeur.
+
+`routes.enregistrer_tous` trouve ces modules en lisant le répertoire — pas
+de liste à tenir, donc pas d'oubli possible — et refuse de démarrer si l'un
+d'eux ne se charge pas. Les routes sont posées sur l'application, pas dans
+un blueprint : leurs noms `url_for` sont ceux de leur fonction. **Une
+fonction nouvelle ajoute son module, jamais de ligne à `app.py`.** Le
+garde-fou anti-monolithe (`tests/test_refonte.py`) plafonne `app.py` à
+1 800 lignes depuis l'extraction de 8.58.0, et interdit le HTML dans les
+modules de routes comme dans le routeur.
+
 ## Par où commencer une modification
 
 - Une règle fiscale change → `parametres.py` (règle datée) + `fiscal.py`,
@@ -136,6 +168,8 @@ métier (français, termes du PCG et de la DGFiP).
   retournant des `Anomalie`), + injection de test dans `audit_cycle.py`.
 - Toute écriture nouvelle → passer par `ecritures.inserer`, jamais
   d'INSERT direct dans `ecriture`/`ligne`.
+- Une page ou des routes nouvelles → un module `modules/<nom>_web.py`
+  exposant `enregistrer_routes(app, ctx)` ; rien à ajouter dans `app.py`.
 
 ## Suite de tests
 

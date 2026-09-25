@@ -197,7 +197,9 @@ def test_g02_vue_web_annonce_le_refus(tmp_path, monkeypatch):
     with web.app.test_request_context(
             "/", method="POST",
             data={"annee": "2025", "fec": (io.BytesIO(octets), "fictif.txt")}):
-        reponse = web.exercice_reprendre_fec()
+        # La route vit dans `exercices_web` depuis 8.58.0 : on l'atteint
+        # par l'application, sous son nom inchangé.
+        reponse = web.app.view_functions["exercice_reprendre_fec"]()
     query = parse_qs(urlparse(reponse.location).query)
     assert "ok" not in query
     assert "colonnes annoncées" in query["err"][0]

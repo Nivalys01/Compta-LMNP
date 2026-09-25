@@ -3,8 +3,8 @@
 """
 Routes web des charges récurrentes.
 
-Branchées par `enregistrer_routes(app, …)`, comme `depots_web` : le routeur
-principal ne reçoit que l'appel. La règle vit dans `recurrentes` et
+Branchées par `enregistrer_routes(app, ctx)`, appelée par
+`routes.enregistrer_tous` : le routeur principal ne nomme pas ce module. La règle vit dans `recurrentes` et
 `echeancier` ; ici, on lit le formulaire, on appelle, on redirige avec le
 message de réussite ou de refus. Les gardes d'origine (`gardes_http`) sont
 globales et couvrent ces routes.
@@ -43,9 +43,11 @@ def _ligne_vue(ligne: echeancier.Ligne) -> dict:
             "alertes": e.alertes, "cochee": ligne.cochee_par_defaut}
 
 
-def enregistrer_routes(app, *, conn, annee_param, base, annees) -> None:
-    """`conn`, `annee_param`, `base` et `annees` sont les fonctions du
-    routeur : même dossier actif (bac à sable compris), même mise en page."""
+def enregistrer_routes(app, ctx) -> None:
+    """Les fonctions du routeur arrivent par `ctx` : même dossier actif
+    (bac à sable compris), même mise en page."""
+    conn, annee_param, base, annees = (ctx.conn, ctx.annee_param, ctx.base,
+                                       ctx.annees)
 
     def _retour(annee, ancre="apercu", **params):
         return redirect(url_for("recurrentes_page", annee=annee,

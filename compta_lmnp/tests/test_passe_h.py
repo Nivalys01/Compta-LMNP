@@ -410,7 +410,9 @@ def test_h07_la_route_web_refuse_la_duree_negative(tmp_path, monkeypatch):
             "valeur_brute": "12000", "duree_annees": "-1",
             "compte_immo": "218400", "date_mise_service": "2026-01-01",
             "annee": "2026"}):
-        reponse = web.creer_composant()
+        # La route vit dans `immobilisations_web` depuis 8.58.0 : on
+        # l'atteint par l'application, sous son nom inchangé.
+        reponse = web.app.view_functions["creer_composant"]()
     query = parse_qs(urlparse(reponse.location).query)
     assert "ok" not in query
     assert "négative" in query["err"][0]

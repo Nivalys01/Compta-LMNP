@@ -3,9 +3,9 @@
 """
 Routes web du suivi des dépôts.
 
-Branchées sur l'application par `enregistrer_routes(app, …)`, comme les
-gardes HTTP le sont par `gardes_http.enregistrer(app)` : le routeur
-principal ne reçoit que l'appel. La règle vit dans `depots` ; ici, on ne
+Branchées sur l'application par `enregistrer_routes(app, ctx)`, appelée
+par `routes.enregistrer_tous` : le routeur principal ne nomme pas ce
+module. La règle vit dans `depots` ; ici, on ne
 fait que lire le formulaire, appeler, et rediriger vers la page Liasse avec
 le message de réussite ou de refus.
 
@@ -19,10 +19,11 @@ from flask import redirect, request, url_for
 import depots
 
 
-def enregistrer_routes(app, *, conn, annee_param) -> None:
-    """`conn` ouvre la base du dossier actif ; `annee_param` lit l'année
-    demandée — ce sont les fonctions du routeur, pour viser le même dossier
-    que toutes les autres pages (bac à sable compris)."""
+def enregistrer_routes(app, ctx) -> None:
+    """`ctx.conn` ouvre la base du dossier actif ; `ctx.annee_param` lit
+    l'année demandée — ce sont les fonctions du routeur, pour viser le même
+    dossier que toutes les autres pages (bac à sable compris)."""
+    conn, annee_param = ctx.conn, ctx.annee_param
 
     def _retour(annee, **msg):
         return redirect(url_for("liasse_page", annee=annee, _anchor="depots",

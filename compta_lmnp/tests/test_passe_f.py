@@ -561,7 +561,9 @@ def test_d204_la_validation_dimport_est_tout_ou_rien():
     assert "conn.commit()" in bloc
     src_app = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
     bloc_app = src_app[src_app.index("def import_valider"):]
-    bloc_app = bloc_app[:bloc_app.index("\n@app.route")]
+    # Jusqu'à la route suivante, ou à la fin du fichier : depuis 8.58.0 la
+    # route qui la suivait vit dans son module (`exercices_web`).
+    bloc_app = bloc_app.split("\n@app.route")[0]
     assert "ANNULÉ" in src or "ANNULÉ" in bloc_app, \
         "le message ne dit pas que RIEN n'a été écrit"
 
@@ -606,7 +608,12 @@ def test_d205_le_plan_des_immobilisations_a_une_source_unique():
     import plan_immo
     assert liasse.RUBRIQUES_2033C == plan_immo.pour_le_2033c()
     assert liasse.ORDRE_RUBRIQUES == plan_immo.ordre_rubriques()
-    web = open(os.path.join(HERE, "app.py"), encoding="utf-8").read()
+    # La couche web : le routeur et ses modules de routes (la page
+    # Immobilisations vit dans `immobilisations_web` depuis 8.58.0).
+    import glob
+    web = "".join(open(f, encoding="utf-8").read() for f in
+                  [os.path.join(HERE, "app.py")]
+                  + glob.glob(os.path.join(HERE, "modules", "*_web.py")))
     assert "plan_immo.pour_la_saisie()" in web
     assert '"281315"' not in web, "un compte d'amortissement est encore en dur"
 
