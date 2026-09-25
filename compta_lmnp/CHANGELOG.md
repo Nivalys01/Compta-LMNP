@@ -66,12 +66,14 @@ reprendre de la dernière déclaration », jamais à zéro. La garde de
 `liasse.suivi_reports` reste stricte pour tout autre appel : seule
 l'édition de la liasse tolère le manque, et elle le montre.
 
-**Deux corrections au passage.** La grille à trois champs (`grid3`) du
-formulaire des quittances était utilisée sans être définie dans la feuille
-de style : elle l'est, avec un repli sur une colonne pour les écrans
-étroits. Et la liste de contrôle avant ouverture du dépôt, retirée du
-`README.md` par une modification récente, y est remise : un test la
-vérifie (constat R-01).
+**Au passage.** La grille à trois champs (`grid3`) du formulaire des
+quittances était utilisée sans être définie dans la feuille de style : elle
+l'est, avec un repli sur une colonne pour les écrans étroits.
+
+**Le dépôt est public.** La liste de contrôle avant ouverture, retirée du
+`README.md`, n'avait plus d'objet ; le test qui en exigeait la présence
+(constat R-01) est retiré avec elle. Celui qui vérifie la forme du lien
+« code source » du pied de page reste.
 
 Schéma en version 9 (table `depot_declaration`, palier de migration 9 : la
 table naît vide, aucune donnée existante n'est touchée). Les routes web

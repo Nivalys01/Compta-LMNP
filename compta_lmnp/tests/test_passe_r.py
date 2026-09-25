@@ -69,8 +69,11 @@ def test_r01_le_pied_de_page_offre_une_url_de_source_bien_formee():
 
     **Ce test ne prouve toujours PAS que l'URL répond.** Un test hors ligne
     ne le peut pas, et le prétendre serait le défaut même que la passe R
-    relève. Il vérifie la forme ; l'accessibilité anonyme est un geste de la
-    liste de contrôle avant publication (voir `test_r01_…_liste_de_controle`).
+    relève. Il vérifie la forme ; l'accessibilité anonyme se vérifie à la
+    main, déconnecté du compte ou en navigation privée. Le dépôt étant
+    désormais public, la liste de contrôle qui conditionnait sa publication,
+    et le test qui en exigeait la présence dans le README, ont été retirés
+    (8.56.0).
     """
     src = _lire("compta_lmnp/app.py")
     liens = re.findall(r'href="([^"]+)"[^>]*>\s*code source\s*</a>', src)
@@ -81,17 +84,6 @@ def test_r01_le_pied_de_page_offre_une_url_de_source_bien_formee():
             f"{url} ne désigne pas un dépôt précis")
     assert "AGPL" in src, "le pied de page doit nommer la licence"
 
-
-def test_r01_la_liste_de_controle_avant_publication_est_ecrite():
-    """Ce qu'un test ne peut pas vérifier doit être confié à un humain, par
-    écrit. Sans cette liste, le 404 anonyme du lien resterait une découverte
-    d'utilisateur."""
-    readme = _lire("README.md")
-    assert "Liste de contrôle avant ouverture du dépôt" in readme
-    for geste in ("public", "tag", "anonymement"):
-        assert geste in readme, geste
-    # et la limite actuelle est dite, pas tue
-    assert "404" in readme
 
 
 # ═══ R-02 — pas de négation absolue sur les licences tierces ═══════════
