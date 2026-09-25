@@ -390,14 +390,26 @@ def rappels(conn: sqlite3.Connection, aujourd_hui: date | None = None,
                 "quittances, factures) et saisissez le fonds travaux ALUR "
                 "de l'année le cas échéant, avant de clôturer.")
     if exercices.get(prec) == "clos" and 2 <= auj.month <= 6:
-        add("important", f"Déclarer les résultats {prec}",
-            "La clôture ne déclare RIEN : télétransmettez la liasse "
-            f"(2031 + 2033) au titre de {prec} — via votre "
-            "expert-comptable/EDI ou votre espace impots.gouv.fr — "
-            "généralement pour mi-mai, puis reportez le résultat sur la "
-            "2042C-PRO de votre déclaration de revenus (aide dédiée dans "
-            "l'onglet Liasse). Vérifiez les dates exactes de l'année sur "
-            "impots.gouv.fr.")
+        # Les dépôts notés dans la page Liasse cochent l'étape : un rappel
+        # « important » qui persiste après le dépôt apprend à l'ignorer.
+        import depots
+        faits = depots.initiales(conn, prec)
+        if len(faits) == len(depots.TYPES):
+            add("fait", f"Résultats {prec} déclarés ✓",
+                f"Liasse déposée le {faits['liasse_2031']}, 2042-C-PRO "
+                f"déposée le {faits['2042_c_pro']}. Conservez les accusés "
+                "de réception avec les pièces de l'exercice.")
+        else:
+            add("important", f"Déclarer les résultats {prec}",
+                "La clôture ne déclare RIEN : télétransmettez la liasse "
+                f"(2031 + 2033) au titre de {prec} — via votre "
+                "expert-comptable/EDI ou votre espace impots.gouv.fr — "
+                "généralement pour mi-mai, puis reportez le résultat sur la "
+                "2042C-PRO de votre déclaration de revenus (aide dédiée dans "
+                "l'onglet Liasse). Vérifiez les dates exactes de l'année sur "
+                "impots.gouv.fr."
+                + "".join(f" Déjà fait : {depots.TYPES[t]}, déposée le {d}."
+                          for t, d in sorted(faits.items())))
 
     # ── Échéances calendaires ────────────────────────────────────────────
     if auj.month in (10, 11):
@@ -565,6 +577,6 @@ def rappels(conn: sqlite3.Connection, aujourd_hui: date | None = None,
                 "enregistré : soit il a été passé en charge (à vérifier), "
                 "soit il reste à saisir dans la page Immobilisations.")
 
-    ordre = {"important": 0, "a_prevoir": 1, "info": 2}
+    ordre = {"important": 0, "a_prevoir": 1, "info": 2, "fait": 3}
     out.sort(key=lambda r: ordre[r["niveau"]])
     return out

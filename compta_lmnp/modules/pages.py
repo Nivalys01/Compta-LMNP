@@ -117,6 +117,7 @@ label.field .opt { font-weight: 400; color: #999; }
 .rappel-important { border-left-color: #c0392b; background: #fdf3f2; }
 .rappel-a_prevoir { border-left-color: #d68910; background: #fdf9f0; }
 .rappel-info      { border-left-color: #2471a3; background: #f2f7fb; }
+.rappel-fait      { border-left-color: #1a6b3a; background: #f4faf4; }
 .rappel-titre  { font-weight: 600; margin-bottom: 4px; }
 .rappel-detail { font-size: 13.5px; color: #444; line-height: 1.5; }
 
@@ -1197,6 +1198,8 @@ PAGE_CLOTURE = """
       </div>
     </div>
     <p style="color:#555;font-size:13px">Cet exercice est clôturé et ne peut plus être modifié.</p>
+    <p style="color:#555;font-size:13px">Dépôts — {{ depots_resume(ex['annee']) }}
+      (<a href="/liasse?annee={{ ex['annee'] }}#depots">noter un dépôt</a>)</p>
     {% endif %}
 
   </div>
@@ -1652,6 +1655,66 @@ PAGE_LIASSE = """
     {% endfor %}
   </table>
   <p class="muted" style="padding:10px 12px">{{ L.aide_2042c.note }}</p></div>
+</div>
+
+{# Suivi des dépôts : purement déclaratif, hors de l'impression. #}
+{% set D = depots_etat(L.annee) %}
+<div class="card no-print" id="depots">
+  <div class="card-header">Dépôt des déclarations — exercice {{ D.annee }}</div>
+  <div class="card-body">
+    <p class="muted">Notez ici le dépôt de chaque déclaration, avec la
+    référence de l'accusé de réception. Rien n'est transmis : c'est un
+    aide-mémoire. Les chiffres calculés au moment de l'enregistrement sont
+    conservés, pour vous signaler s'ils changent ensuite.</p>
+    {% for a in D.anomalies %}
+    <div class="{{ 'flash flash-warn' if a.niveau == 'AVERTISSEMENT' else 'rappel rappel-info' }}">{{ a.message }}</div>
+    {% endfor %}
+    {% for t in D.types %}
+    <h4 style="margin:14px 0 6px">{{ t.libelle }}</h4>
+    {% if t.depots %}
+    <table>
+      <tr><th>Nature</th><th>Date de dépôt</th><th>Référence de l'accusé</th><th>Note</th><th></th></tr>
+      {% for d in t.depots %}
+      <tr><td>{{ d.nature }}</td><td>{{ d.date_depot }}</td>
+          <td>{{ d.reference or '—' }}</td><td>{{ d.note or '' }}</td>
+          <td style="text-align:center">
+            <form method="post" action="/depots/{{ d.id }}/supprimer" style="margin:0">
+              <input type="hidden" name="annee" value="{{ D.annee }}">
+              <button type="submit" class="btn-secondaire"
+                      data-confirmer="Supprimer ce dépôt ? La ligne sera effacée. Pour corriger une date ou une référence, supprimez puis ressaisissez.">Supprimer</button>
+            </form></td></tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted">Aucun dépôt enregistré.</p>
+    {% endif %}
+    {% endfor %}
+    {% if D.clos %}
+    <form method="post" action="/depots/enregistrer" style="margin-top:16px">
+      <input type="hidden" name="annee" value="{{ D.annee }}">
+      <div class="form-grid">
+        <div><label class="field">Déclaration</label>
+          <select name="type" required>
+            {% for t in D.types %}<option value="{{ t.code }}">{{ t.libelle }}</option>{% endfor %}
+          </select></div>
+        <div><label class="field">Nature</label>
+          <select name="nature" required>
+            <option value="initiale">Initiale</option>
+            <option value="rectificative">Rectificative</option>
+          </select></div>
+        <div><label class="field">Date de dépôt</label>
+          <input type="date" name="date_depot" max="{{ D.aujourd_hui }}" required></div>
+        <div><label class="field">Référence de l'accusé <span class="opt">(facultatif)</span></label>
+          <input type="text" name="reference" maxlength="64"></div>
+        <div><label class="field">Note <span class="opt">(facultatif)</span></label>
+          <input type="text" name="note" maxlength="200"></div>
+      </div>
+      <p><button type="submit">Enregistrer le dépôt</button></p>
+    </form>
+    {% else %}
+    <p class="muted">Un dépôt s'enregistre une fois l'exercice clôturé.</p>
+    {% endif %}
+  </div>
 </div>
 
 <div class="card no-print">

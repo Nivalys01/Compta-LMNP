@@ -43,6 +43,7 @@ import integrite  # noqa: E402
 integrite.exiger_installation_complete()
 
 import controles
+import depots_web
 import fiscal
 import init_db
 import migrations
@@ -1851,7 +1852,7 @@ def pense_bete_page():
             oublis=pense_bete.oublis_frequents(),
             actualites=pense_bete.actualites(),
             notes=pense_bete.lire_notes(conn),
-            badge={"important": "🔴", "a_prevoir": "🟠", "info": "🔵"})
+            badge={"important": "🔴", "a_prevoir": "🟠", "info": "🔵", "fait": "✅"})
         return _base(body, active="pense_bete", annee=annee,
                      annees=_annees(conn))
     finally:
@@ -2218,6 +2219,8 @@ def exercice_reprendre_fec():
         if os.path.exists(chemin):
             os.remove(chemin)
 
+
+depots_web.enregistrer_routes(app, conn=_conn, annee_param=_annee_param)
 
 if __name__ == "__main__":
     if not os.path.exists(DB):

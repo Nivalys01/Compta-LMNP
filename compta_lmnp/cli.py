@@ -12,6 +12,9 @@ Exemples :
     python cli.py controler --annee 2026
     python cli.py exporter --annee 2026 --out FEC2026.txt
     python cli.py gabarits
+    python cli.py depot ajouter --annee 2026 --type liasse --nature initiale --date 2027-05-12 --reference ABC123
+    python cli.py depot lister --annee 2026
+    python cli.py depot supprimer --id 3
 """
 from __future__ import annotations
 import argparse
@@ -32,6 +35,7 @@ if _MODULES not in sys.path:
 import init_db
 import operations
 import controles
+import depots
 import export_fec
 import import_bancaire
 import fiscal
@@ -125,7 +129,55 @@ def cmd_importer(a):
 def cmd_controler(a):
     conn = _conn()
     print(controles.rapport(conn, a.annee))
+    # Hors du moteur (voir depots) : affichés à la suite, pas dans le bilan.
+    for ano in depots.controler(conn, a.annee):
+        print(f"  [{ano.niveau:<13}] {ano.code:<13} {ano.message}")
     conn.close()
+
+
+def cmd_depot_ajouter(a):
+    conn = _conn()
+    try:
+        n = depots.enregistrer(conn, annee=a.annee, type=a.type,
+                               nature=a.nature, date_depot=a.date,
+                               reference=a.reference, note=a.note)
+    except ValueError as exc:
+        raise SystemExit(f"Dépôt refusé : {exc}") from None
+    finally:
+        conn.close()
+    print(f"Dépôt n° {n} enregistré.")
+
+
+def cmd_depot_lister(a):
+    conn = _conn()
+    try:
+        for t, liste in depots.lister(conn, a.annee).items():
+            print(f"{depots.TYPES[t]} — exercice {a.annee}")
+            if not liste:
+                print("  aucun dépôt enregistré")
+            for d in liste:
+                print(f"  n° {d['id']:<4} {d['nature']:<13} {d['date_depot']}  "
+                      f"{d['reference'] or '—'}  {d['note'] or ''}".rstrip())
+        for ano in depots.controler(conn, a.annee):
+            print(f"[{ano.niveau}] {ano.code} {ano.message}")
+    finally:
+        conn.close()
+
+
+def cmd_depot_supprimer(a):
+    if not a.oui:
+        rep = input(f"Supprimer le dépôt n° {a.id} ? La ligne sera effacée. "
+                    "[o/N] ")
+        if rep.strip().lower() not in ("o", "oui"):
+            print("Abandon : rien n'a été supprimé.")
+            return
+    conn = _conn()
+    try:
+        print(depots.message_suppression(depots.supprimer(conn, a.id)))
+    except ValueError as exc:
+        raise SystemExit(f"Suppression refusée : {exc}") from None
+    finally:
+        conn.close()
 
 
 def cmd_cloturer(a):
@@ -239,6 +291,25 @@ def main():
                         "et les deux montants s'additionneraient.")
     s.add_argument("--forcer", action="store_true", help="clôturer malgré les anomalies bloquantes")
     s.set_defaults(f=cmd_cloturer)
+
+    s = sub.add_parser("depot", help="suivi des dépôts de déclaration")
+    ds = s.add_subparsers(required=True)
+    d = ds.add_parser("ajouter")
+    d.add_argument("--annee", type=int, required=True)
+    d.add_argument("--type", required=True,
+                   help="liasse (2031/2033) ou 2042 (2042-C-PRO)")
+    d.add_argument("--nature", choices=list(depots.NATURES), required=True)
+    d.add_argument("--date", required=True, help="date de dépôt AAAA-MM-JJ")
+    d.add_argument("--reference", help="référence de l'accusé de réception")
+    d.add_argument("--note")
+    d.set_defaults(f=cmd_depot_ajouter)
+    d = ds.add_parser("lister")
+    d.add_argument("--annee", type=int, required=True)
+    d.set_defaults(f=cmd_depot_lister)
+    d = ds.add_parser("supprimer")
+    d.add_argument("--id", type=int, required=True)
+    d.add_argument("--oui", action="store_true", help="sans confirmation")
+    d.set_defaults(f=cmd_depot_supprimer)
 
     s = sub.add_parser("exporter")
     s.add_argument("--annee", type=int, default=2026)

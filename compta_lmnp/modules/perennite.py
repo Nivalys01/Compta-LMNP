@@ -293,7 +293,8 @@ def _identites_incompatibles(db_path: str, sauvegarde: str) -> str:
     return ""
 
 
-def restaurer(db_path: str, sauvegarde: str) -> str:
+def restaurer(db_path: str, sauvegarde: str, *,
+              perdre_depots: bool = False) -> str:
     """
     Restaure la base depuis une sauvegarde, avec deux garde-fous :
       1. la sauvegarde est vérifiée AVANT d'écraser quoi que ce soit
@@ -301,6 +302,9 @@ def restaurer(db_path: str, sauvegarde: str) -> str:
          par une sauvegarde encore plus abîmée ;
       2. l'état courant est d'abord copié en « avant-restauration », pour
          que la restauration soit elle-même réversible.
+    Les dépôts de déclaration de la base courante sont reportés dans la base
+    restaurée (voir plus bas) ; `perdre_depots=True` lève le refus opposé
+    quand l'un d'eux porte sur un exercice absent de la sauvegarde.
     Retourne le chemin de la copie de sûreté créée avant restauration
     (ou une chaîne vide si la base n'existait pas).
     """
@@ -371,6 +375,30 @@ def restaurer(db_path: str, sauvegarde: str) -> str:
             f"une version plus récente du logiciel (schéma {trop_recente[0]}, "
             f"celui-ci en connaît {trop_recente[1]}). La restaurer rendrait "
             "ce dossier inaccessible : mettez d'abord le logiciel à jour.")
+    # 1 bis. Un dépôt de déclaration est un fait du MONDE RÉEL : revenir à
+    #        une comptabilité d'avant clôture ne « dé-dépose » rien auprès de
+    #        l'administration. Les dépôts de la base courante sont donc
+    #        reportés dans la base restaurée — c'est ce qui permet, après
+    #        reclôture, de signaler que les chiffres ont changé depuis le
+    #        dépôt. Si l'exercice d'un dépôt n'existe pas dans la sauvegarde,
+    #        le report est impossible (clé étrangère) : on refuse plutôt que
+    #        de le perdre en silence, comme pour les quittances.
+    import depots as _depots
+    depots_courants = (_depots.lire_pour_report(db_path)
+                       if os.path.exists(db_path) else None)
+    if depots_courants:
+        perdus = _depots.orphelins(depots_courants, sauvegarde)
+        if perdus and not perdre_depots:
+            raise ValueError(
+                f"Cette restauration ferait disparaître {len(perdus)} dépôt(s) "
+                "de déclaration enregistré(s), faute d'exercice correspondant "
+                "dans la sauvegarde :\n  - " + "\n  - ".join(perdus) + "\n\n"
+                "Ces déclarations ont réellement été déposées : notez leurs "
+                "dates et références avant de choisir une sauvegarde plus "
+                "récente, qui contient ces exercices.")
+        if perdus:
+            annees = _depots.annees_de(sauvegarde)
+            depots_courants = [d for d in depots_courants if d[1] in annees]
     # 2. Copie de sûreté de l'état courant (peut échouer si la base actuelle
     #    est trop corrompue pour être lue : on la met alors de côté telle
     #    quelle, sans la perdre).
@@ -416,6 +444,8 @@ def restaurer(db_path: str, sauvegarde: str) -> str:
             dst.close()
     finally:
         src.close()
+    if depots_courants is not None:
+        _depots.reporter(db_path, depots_courants)
     return surete
 
 

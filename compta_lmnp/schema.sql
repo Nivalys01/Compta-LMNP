@@ -227,3 +227,26 @@ CREATE TABLE suivi_deficits (
     exercice_annee INTEGER PRIMARY KEY REFERENCES exercice(annee),
     details_json TEXT NOT NULL
 );
+
+-- --- Dépôts des déclarations -------------------------------------------------
+-- Fait survenu HORS du logiciel : « la liasse / la 2042-C-PRO de tel exercice
+-- a été déposée tel jour ». Aucun effet comptable. `chiffres_json` fige les
+-- montants tels que le logiciel les calculait à l'enregistrement, pour
+-- signaler un écart après réouverture. Créée à la volée par
+-- depots.assurer_schema pour une installation antérieure (palier 9).
+CREATE TABLE IF NOT EXISTS depot_declaration (
+    id             INTEGER PRIMARY KEY,
+    exercice_annee INTEGER NOT NULL REFERENCES exercice(annee),
+    type           TEXT NOT NULL
+                   CHECK (type IN ('liasse_2031','2042_c_pro')),
+    nature         TEXT NOT NULL
+                   CHECK (nature IN ('initiale','rectificative')),
+    date_depot     TEXT NOT NULL,              -- AAAA-MM-JJ
+    reference      TEXT,                       -- accusé de réception
+    note           TEXT,
+    chiffres_json  TEXT NOT NULL,
+    enregistre_le  TEXT NOT NULL
+);
+-- Une seule déclaration initiale par exercice et par type.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_depot_initiale
+    ON depot_declaration(exercice_annee, type) WHERE nature = 'initiale';

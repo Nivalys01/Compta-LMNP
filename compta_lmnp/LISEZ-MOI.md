@@ -254,6 +254,9 @@ python cli.py importer --csv releve.csv --valider  # saisit les propositions
 python cli.py controler --annee 2026       # rapport de cohérence pré-clôture
 python cli.py cloturer --annee 2026 --retraitements 61   # dotation + 39C + déficits
 python cli.py exporter --annee 2026 --out FEC2026.txt
+python cli.py depot ajouter --annee 2026 --type liasse --nature initiale --date 2027-05-12 --reference ABC123
+python cli.py depot lister --annee 2026    # dépôts notés et écarts éventuels
+python cli.py depot supprimer --id 3
 ```
 
 On ne saisit jamais un débit/crédit : on déclare un **fait** (un loyer, une
@@ -444,6 +447,17 @@ ligne 352 = 0, totaux 2033-C = bilan, résultat fiscal = clôture). Le dossier
 démo réconcilie au centime le bilan d'ouverture repris d'un prestataire. Sur exercice ouvert, la liasse s'affiche en mode
 « provisoire ». Télétransmission EDI-TDFC non incluse : la liasse sert de
 support de contrôle et de report manuel (ou de dépôt papier/expert).
+
+**Dépôt des déclarations.** Une fois l'exercice clôturé, la page Liasse
+permet de noter le dépôt de la liasse 2031/2033 (espace professionnel) et
+celui de la 2042-C-PRO (espace particulier) : date, nature (initiale puis
+rectificatives), référence de l'accusé de réception. C'est un aide-mémoire
+— rien n'est transmis, aucune écriture n'est créée. Les chiffres calculés au
+moment du dépôt sont conservés : si l'exercice est rouvert (restauration
+d'une sauvegarde d'avant clôture) puis reclôturé avec d'autres montants,
+l'écart est affiché, avec le rappel qu'une rectificative peut être
+nécessaire. Les dépôts suivent les sauvegardes, et une restauration les
+conserve.
 
 ## Bac à sable & audit du cycle complet
 

@@ -98,8 +98,17 @@ def _palier_8(conn: sqlite3.Connection) -> None:
     quittances.assurer_schema(conn)
 
 
+def _palier_9(conn: sqlite3.Connection) -> None:
+    """v9 — suivi des dépôts de déclaration (table depot_declaration).
+
+    Aucune donnée existante n'est touchée : la table naît vide.
+    """
+    import depots
+    depots.assurer_schema(conn)
+
+
 PALIERS = {2: _palier_2, 3: _palier_3, 4: _palier_4, 5: _palier_5,
-           6: _palier_6, 7: _palier_7, 8: _palier_8}
+           6: _palier_6, 7: _palier_7, 8: _palier_8, 9: _palier_9}
 
 # Garde-fou de développement. La boucle de `migrer` ignorait silencieusement
 # un palier absent, puis marquait la base au niveau du logiciel : une base

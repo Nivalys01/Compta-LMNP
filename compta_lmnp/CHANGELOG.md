@@ -1,5 +1,65 @@
 # Journal des versions — Compta LMNP
 
+## 8.56.0 — 2026-09-25 (Noter qu'une déclaration est partie)
+
+**Le logiciel savait préparer une déclaration, pas qu'elle avait été
+déposée.** Le pense-bête rappelait « Déclarer les résultats » tout le
+printemps, dépôt fait ou non : un rappel qui ne s'éteint jamais apprend à
+l'ignorer. Et rien ne gardait la référence de l'accusé de réception, que
+l'on cherche précisément le jour où l'administration pose une question.
+
+Une fois l'exercice clôturé, la page Liasse note désormais les deux dépôts,
+qui se font dans deux espaces distincts d'impots.gouv.fr : la liasse
+2031/2033 (espace professionnel) et la 2042-C-PRO (espace particulier). Pour
+chacun : une déclaration initiale, puis autant de rectificatives que
+nécessaire, avec la date, la référence de l'accusé et une note. La même chose
+se fait en ligne de commande (`cli.py depot ajouter | lister | supprimer`).
+Quand les deux initiales sont notées, le pense-bête coche l'étape.
+
+**Purement déclaratif.** Aucune écriture, aucun calcul modifié, rien de
+transmis. Un test vérifie que le FEC, la liasse et le rapport du moteur de
+contrôles restent identiques octet pour octet avant et après un
+enregistrement. C'est aussi pourquoi les contrôles propres aux dépôts vivent
+HORS du moteur : la liasse embarque les anomalies de celui-ci, et noter un
+dépôt aurait sinon modifié la liasse.
+
+**Les refus**, tous sans rien écrire : exercice non clôturé, date future ou
+antérieure ou égale à la fin de l'exercice, seconde initiale, rectificative
+sans initiale ou datée avant elle, référence ou note sur plusieurs lignes ou
+trop longues (64 et 200 caractères). La seconde initiale est aussi bloquée
+par un index unique en base, que deux enregistrements concurrents ne
+franchissent pas. On ne modifie pas un dépôt : on le supprime et on le
+ressaisit. Une initiale qui a des rectificatives ne se supprime pas avant
+elles.
+
+**Les chiffres déclarés sont conservés.** À l'enregistrement, le résultat
+fiscal et les cases de l'aide 2042-C-PRO sont figés, lus dans la liasse et
+non recalculés. À chaque lecture, ils sont confrontés à ce que le logiciel
+calcule alors : si l'exercice a été rouvert puis reclôturé avec d'autres
+montants, l'écart s'affiche case par case, avec le rappel qu'une
+rectificative peut être nécessaire. Si ces chiffres n'ont pas pu être lus,
+le logiciel le dit au lieu de conclure qu'il n'y a pas d'écart. Aucune
+date limite n'est codée : elles changent chaque année.
+
+**Une restauration ne défait pas un dépôt.** Rouvrir un exercice, c'est
+restaurer la sauvegarde prise avant sa clôture, qui précède donc le dépôt :
+sans précaution, la restauration aurait effacé le dépôt, et avec lui la
+possibilité même de signaler l'écart. `perennite.restaurer` reporte
+maintenant les dépôts de la base courante dans la base restaurée. Si l'un
+d'eux porte sur un exercice absent de la sauvegarde, la restauration est
+refusée par défaut, avant toute écriture, en listant les dépôts qui seraient
+perdus, comme pour les quittances.
+
+Schéma en version 9 (table `depot_declaration`, palier de migration 9 : la
+table naît vide, aucune donnée existante n'est touchée). Les routes web
+vivent dans `modules/depots_web.py`, branchées sur l'application comme les
+gardes HTTP : `app.py` ne reçoit que l'appel, sans relever le seuil du
+garde-fou anti-monolithe.
+
+Non-régression : `tests/test_suivi_depot.py` (51 tests), un par règle et par
+refus, plus la migration depuis le schéma 8, le bac à sable, le web et la
+ligne de commande.
+
 ## 8.55.0 — 2026-09-18 (Reprendre une compta existante sans repartir de zéro)
 
 **Trois blocages du même parcours**, remontés en usage réel par quelqu'un qui

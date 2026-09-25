@@ -56,6 +56,7 @@ métier (français, termes du PCG et de la DGFiP).
 | **FEC** | `export_fec.py`, `valider_fec.py`, `fec_io.py` (lecture commune) | Export A47 A-1 (CRLF, UTF-8 sans BOM, virgule décimale — conventions des FEC réellement acceptés) et validateur indépendant, plus strict que Test Compta Demat sur certains points. |
 | Pérennité | `perennite.py` | Sauvegardes quotidiennes + rotation, archivage FEC horodaté + manifeste SHA-256, restauration avec intégrité vérifiée AVANT écrasement. |
 | Rappels | `pense_bete.py` | Démarches manuelles (déclarer, payer, INPI) croisant calendrier × état du dossier. |
+| Dépôts | `depots.py`, `depots_web.py` | Suivi DÉCLARATIF des dépôts (liasse, 2042-C-PRO) : aucune écriture, aucun effet sur FEC ni liasse. Instantané des chiffres lu dans `liasse`, confronté à chaque lecture. Contrôles tenus HORS de `controles.CONTROLES` (la liasse embarque ceux du moteur). Les dépôts traversent une restauration (`perennite.restaurer`). Routes branchées par `enregistrer_routes(app)`, comme `gardes_http`. |
 | Interfaces | `app.py` (routes web), `pages.py` (gabarits HTML), `cli.py` | Flask local (127.0.0.1, HTTPS auto-signé), multi-dossiers (`dossiers.py`), bac à sable. |
 
 ## Les invariants à ne jamais casser
