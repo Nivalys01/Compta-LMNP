@@ -40,7 +40,7 @@ import rejeu_fec
 import valider_fec
 
 FEC_DEMO = os.path.join(HERE, "demo", "FEC_DEMO_2025.txt")
-FEC_REF_2025 = os.path.join(HERE, "reference", "FEC_REFERENCE_2025.txt")
+FEC_REF = os.path.join(HERE, "reference", "FEC_REFERENCE_2025.txt")
 MI_MAI = date(2026, 5, 15)
 ANNEE = (date(2026, 1, 1), date(2026, 12, 31))
 
@@ -1005,7 +1005,7 @@ def test_dossier_sans_emprunt_liasse_fec_controles_inchanges(tmp_path, source):
         else:
             init_db.init(chemin, "blanc", annee_cible=2025).close()
             c = sqlite3.connect(chemin)
-            rejeu_fec.rejouer(c, FEC_REF_2025, 2025)
+            rejeu_fec.rejouer(c, FEC_REF, 2025)
             c.close()
             annee = 2025
         if nom == "sans_tables":
