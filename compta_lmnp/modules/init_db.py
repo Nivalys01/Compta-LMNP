@@ -293,11 +293,12 @@ if __name__ == "__main__":
 # La garde évite l'irritant classique des logiciels comptables : ouvrir une
 # base créée par une version PLUS RÉCENTE du logiciel (données invisibles ou
 # comportements faux), sans message compréhensible.
-VERSION_SCHEMA = 10       # …5: annulation d'opération, 6: quittances,
+VERSION_SCHEMA = 11       # …5: annulation d'opération, 6: quittances,
                           # 7: comptes 164/165/401/411/758 (passe E, E-10),
                           # 8: identité figée du justificatif (passe P),
                           # 9: suivi des dépôts de déclaration,
-                          # 10: charges récurrentes (moteur d'échéances)
+                          # 10: charges récurrentes (moteur d'échéances),
+                          # 11: emprunts (tableau de remboursement)
 
 # Index de performance. Aucun n'existait : SQLite n'indexe pas les clés
 # étrangères automatiquement, et tous les calculs (agrégats, contrôles,

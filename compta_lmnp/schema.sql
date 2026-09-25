@@ -281,10 +281,50 @@ CREATE TABLE IF NOT EXISTS echeance_generee (
     date_echeance TEXT    NOT NULL,
     etat          TEXT    NOT NULL CHECK (etat IN ('generee','ecartee')),
     genere_le     TEXT    NOT NULL,
+    rang          INTEGER,                    -- n° d'échéance (emprunts)
     UNIQUE (source, source_id, date_echeance)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS ux_echeance_rang
+    ON echeance_generee(source, source_id, rang) WHERE rang IS NOT NULL;
 CREATE TABLE IF NOT EXISTS echeance_operation (
     echeance_id  INTEGER NOT NULL REFERENCES echeance_generee(id),
     operation_id INTEGER NOT NULL UNIQUE REFERENCES operation(id),
     PRIMARY KEY (echeance_id, operation_id)
+);
+
+-- Emprunts (schéma 11) : le tableau de remboursement, pour le suivi et la
+-- génération des échéances. Montants en CENTIMES entiers, taux en texte
+-- décimal : aucun flottant. Seules les charges (intérêts, assurance) sont
+-- comptabilisées ; capital et CRD restent ici, pour information.
+CREATE TABLE IF NOT EXISTS emprunt (
+    id                     INTEGER PRIMARY KEY,
+    bien_id                INTEGER NOT NULL REFERENCES bien(id),
+    preteur                TEXT    NOT NULL,
+    reference              TEXT,
+    capital_c              INTEGER NOT NULL CHECK (capital_c > 0),
+    taux_nominal           TEXT    NOT NULL,    -- '0.035' = 3,5 % nominal
+    nb_echeances           INTEGER NOT NULL
+                           CHECK (nb_echeances BETWEEN 1 AND 480),
+    periodicite            TEXT    NOT NULL CHECK (periodicite IN
+                           ('mensuelle','trimestrielle','annuelle')),
+    date_deblocage         TEXT    NOT NULL,
+    date_premiere_echeance TEXT    NOT NULL,
+    assurance_c            INTEGER NOT NULL DEFAULT 0
+                           CHECK (assurance_c >= 0),
+    rang_depart            INTEGER NOT NULL DEFAULT 1,
+    crd_depart_c           INTEGER NOT NULL CHECK (crd_depart_c > 0),
+    cree_le                TEXT    NOT NULL,
+    CHECK (date_premiere_echeance >= date_deblocage)
+);
+CREATE TABLE IF NOT EXISTS emprunt_ligne (
+    emprunt_id    INTEGER NOT NULL REFERENCES emprunt(id),
+    rang          INTEGER NOT NULL CHECK (rang >= 1),
+    date_echeance TEXT    NOT NULL,
+    capital_c     INTEGER NOT NULL CHECK (capital_c >= 0),
+    interets_c    INTEGER NOT NULL CHECK (interets_c >= 0),
+    assurance_c   INTEGER NOT NULL CHECK (assurance_c >= 0),
+    crd_c         INTEGER NOT NULL CHECK (crd_c >= 0),   -- après l'échéance
+    origine       TEXT    NOT NULL
+                  CHECK (origine IN ('calcul','saisie','import')),
+    PRIMARY KEY (emprunt_id, rang)
 );

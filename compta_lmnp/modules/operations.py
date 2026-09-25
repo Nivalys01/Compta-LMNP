@@ -96,6 +96,78 @@ def saisir(conn: sqlite3.Connection, *, type: str, montant: float, date_operatio
             "montant": montant}
 
 
+def saisir_ventilee(conn: sqlite3.Connection, *, parts: list[dict],
+                    date_operation: str, bien_id: int | None, libelle: str,
+                    exercice: int | None = None, piece_ref: str | None = None,
+                    source: str = "saisie") -> dict:
+    """UN paiement ventilé sur plusieurs charges : une seule écriture, une
+    ligne de débit par part et une seule contrepartie 108000, et une
+    opération par part, toutes rattachées à cette écriture.
+
+    C'est la forme d'une échéance d'emprunt : un prélèvement, deux charges
+    de nature fiscale différente (intérêts en 661100, ligne 294 du 2033-B ;
+    assurance emprunteur en 616110). Une opération par part garde visibles
+    les contrôles qui raisonnent par type (intérêts absents, intérêts mal
+    classés) ; une seule écriture garde la pièce entière.
+
+    Charges uniquement (nature « charge ») ; chaque montant strictement
+    positif, au centime. Ne committe jamais : l'appelant tient la
+    transaction (génération en lot, tout ou rien).
+    Renvoie {'operation_ids', 'ecriture_id', 'ecriture_num', 'total'}.
+    """
+    if not parts:
+        raise ValueError("Paiement ventilé sans aucune part.")
+    if bien_id is not None and not conn.execute(
+            "SELECT 1 FROM bien WHERE id=?", (bien_id,)).fetchone():
+        raise ValueError(f"Bien {bien_id} inconnu.")
+    try:
+        date_op = date.fromisoformat(date_operation)
+    except (TypeError, ValueError):
+        raise ValueError(f"Date d'opération invalide : {date_operation!r} "
+                         "(format attendu AAAA-MM-JJ).") from None
+    annee = exercice if exercice is not None else date_op.year
+    lignes, preparees = [], []
+    for part in parts:
+        g = gabarit(part["type"], conn)
+        if g["nature"] != "charge":
+            raise ValueError(f"« {g['libelle']} » n'est pas une charge : un "
+                             "paiement ventilé ne porte que des charges.")
+        montant = float(part["montant"])
+        if not math.isfinite(montant) or round(montant, 2) <= 0:
+            raise ValueError(f"Montant invalide pour « {g['libelle']} » : "
+                             f"{part['montant']!r}.")
+        montant = round(montant, 2)
+        lib = part.get("libelle") or g["libelle"]
+        lignes.append((g["compte"], montant, 0.0, lib))
+        preparees.append((part["type"], montant, lib, part.get("periode"),
+                          part.get("tiers") or ""))
+    total = round(sum(p[1] for p in preparees), 2)
+    lignes.append((COMPTE_CONTREPARTIE, 0.0, total, libelle))
+    r = ecritures.inserer(conn, journal="BQ", date=date_operation, annee=annee,
+                          libelle=libelle, lignes=lignes,
+                          piece_ref=piece_ref or "NA", commit=False)
+    ids = []
+    for type_, montant, lib, periode, tiers in preparees:
+        ids.append(conn.execute(
+            "INSERT INTO operation (exercice_annee, type, bien_id, tiers, "
+            "periode, date_operation, montant, libelle, ecriture_id, source) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (annee, type_, bien_id, tiers, periode, date_operation, montant,
+             lib, r["ecriture_id"], source)).lastrowid)
+    return {"operation_ids": ids, "ecriture_id": r["ecriture_id"],
+            "ecriture_num": r["ecriture_num"], "total": total}
+
+
+def operations_de_l_ecriture(conn: sqlite3.Connection,
+                             operation_id: int) -> list[int]:
+    """Toutes les opérations qui partagent l'écriture de celle-ci (elle
+    comprise). Une seule, sauf pour un paiement ventilé."""
+    return [r[0] for r in conn.execute(
+        "SELECT o2.id FROM operation o JOIN operation o2 "
+        "ON o2.ecriture_id = o.ecriture_id WHERE o.id=? ORDER BY o2.id",
+        (operation_id,))] or [operation_id]
+
+
 def dupliquer(conn: sqlite3.Connection, operation_id: int,
               decalage_mois: int = 1) -> dict:
     """
@@ -121,6 +193,14 @@ def dupliquer(conn: sqlite3.Connection, operation_id: int,
                       (operation_id,)).fetchone()
     if src is None:
         raise ValueError(f"Opération {operation_id} introuvable.")
+    if len(operations_de_l_ecriture(conn, operation_id)) > 1:
+        # Dupliquer une part recopierait les intérêts sans l'assurance, avec
+        # une date qui n'est plus celle du tableau : une échéance se
+        # régénère depuis sa source, elle ne se duplique pas.
+        raise ValueError("Cette opération fait partie d'un paiement ventilé "
+                         "(échéance d'emprunt) : elle ne se duplique pas. "
+                         "Générez l'échéance suivante depuis l'onglet "
+                         "Emprunts.")
 
     a, m, j = (int(x) for x in src["date_operation"].split("-"))
     m += decalage_mois
@@ -461,11 +541,19 @@ def annuler(conn: sqlite3.Connection, operation_id: int,
         libelle=f"Annulation : {op.get('libelle') or op['type']}",
         piece_ref=f"ANNUL-{operation_id}", commit=False,
         lignes=lignes_inverses)
-    conn.execute("UPDATE operation SET annulee=1 WHERE id=?", (operation_id,))
+    # Un paiement VENTILÉ (échéance d'emprunt) porte plusieurs opérations
+    # sur une écriture : la contre-passation ci-dessus les annule toutes
+    # en comptabilité, elles sont donc toutes marquées. N'en marquer qu'une
+    # laissait les autres « vivantes » pour les contrôles, alors que leurs
+    # montants venaient d'être contre-passés.
+    liees = operations_de_l_ecriture(conn, operation_id)
+    conn.execute(f"UPDATE operation SET annulee=1 WHERE id IN "
+                 f"({','.join('?' * len(liees))})", liees)
     if commit:
         conn.commit()
     return {"operation": operation_id, "ecriture_annulation": res["ecriture_num"],
-            "type": op["type"], "montant": op["montant"]}
+            "type": op["type"], "montant": op["montant"],
+            "operations_annulees": liees}
 
 
 def supprimer_composant(conn: sqlite3.Connection, composant_id: int,

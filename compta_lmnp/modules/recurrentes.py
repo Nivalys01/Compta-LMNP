@@ -17,7 +17,6 @@ fois encaissé, et les quittances lisent les écritures.
 """
 from __future__ import annotations
 
-import calendar
 import math
 import sqlite3
 from datetime import date, datetime
@@ -231,14 +230,21 @@ def depuis_operation(conn: sqlite3.Connection, operation_id: int, *,
     operations.assurer_colonne_annulee(conn)
     cur = conn.execute(
         "SELECT type, bien_id, montant, libelle, tiers, date_operation, "
-        "COALESCE(annulee,0) FROM operation WHERE id=?", (operation_id,))
+        "COALESCE(annulee,0), source FROM operation WHERE id=?",
+        (operation_id,))
     op = cur.fetchone()
     if op is None:
         raise ValueError(f"Opération {operation_id} introuvable.")
-    type_, bien_id, montant, libelle, tiers, jour, annulee = op
+    type_, bien_id, montant, libelle, tiers, jour, annulee, source = op
     if annulee:
         raise ValueError("Cette opération est annulée : elle ne peut pas "
                          "servir de modèle.")
+    if source == "emprunt":
+        # L'assurance d'une échéance d'emprunt est déjà générée avec
+        # l'échéance : un modèle récurrent la compterait deux fois.
+        raise ValueError("Cette opération vient d'une échéance d'emprunt : "
+                         "elle est générée depuis l'onglet Emprunts, pas "
+                         "par un modèle récurrent.")
     verifier_gabarit(type_)
     import gabarits
     if libelle == gabarits.GABARITS[type_]["libelle"]:
@@ -275,12 +281,9 @@ def lister(conn: sqlite3.Connection) -> list[dict]:
 def date_du_rang(m: dict, rang: int) -> date:
     """Date de la `rang`-ième échéance, calculée depuis l'ANCRE (mois de
     début) — jamais depuis l'échéance précédente, pour ne pas dériver."""
-    debut = date.fromisoformat(m["date_debut"])
-    mois = debut.month - 1 + rang * PERIODICITES[m["periodicite"]]
-    annee, mois = debut.year + mois // 12, mois % 12 + 1
-    dernier = calendar.monthrange(annee, mois)[1]
-    jour = dernier if m["jour"] == DERNIER_JOUR else min(m["jour"], dernier)
-    return date(annee, mois, jour)
+    return echeancier.date_ancree(date.fromisoformat(m["date_debut"]),
+                                  PERIODICITES[m["periodicite"]], rang,
+                                  jour=m["jour"])
 
 
 def grille(m: dict, du: date, au: date) -> list[tuple[date, str | None]]:

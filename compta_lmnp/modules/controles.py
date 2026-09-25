@@ -745,10 +745,13 @@ def c_annuel_multiple(conn, annee) -> list[Anomalie]:
     if not annuels:
         return []
     ph = ",".join("?" * len(annuels))
+    # Les intérêts générés depuis un tableau d'emprunt sont MENSUELS par
+    # construction (une écriture par échéance) : ils ne sont pas comptés.
+    # Le contrôle EMPRUNT_INTERETS confronte leur total au tableau.
     rows = conn.execute(
         f"SELECT type, COUNT(*) FROM operation "
         f"WHERE exercice_annee=? AND type IN ({ph}) "
-        f"AND COALESCE(annulee,0)=0 "
+        f"AND COALESCE(annulee,0)=0 AND COALESCE(source,'')<>'emprunt' "
         f"GROUP BY type HAVING COUNT(*) > 1", (annee, *annuels)).fetchall()
     return [Anomalie(AVERTISSEMENT, "ANNUEL_MULTIPLE",
                      f"'{t}' (périodicité annuelle) saisi {n} fois — doublon "
@@ -982,6 +985,63 @@ def c_interets_mal_classes(conn, annee) -> list[Anomalie]:
                      f"Opération {oid} ({t}, {m:.2f} €) : « {lib} » — des intérêts "
                      "d'emprunt ? Utiliser le gabarit dédié (compte 661100, "
                      "ligne 294 du 2033-B).") for oid, t, m, lib in rows]
+
+
+def c_emprunt_interets(conn, annee) -> list[Anomalie]:
+    """AVERTISSEMENT — intérêts des échéances échues selon les tableaux
+    d'emprunt ≠ intérêts comptabilisés en 661100. Muet sans emprunt décrit.
+
+    Trouve les échéances non générées, les intérêts rangés ailleurs (cas
+    réel : 628800, 627810) et les intérêts comptés deux fois (saisie
+    annuelle à la main PLUS génération)."""
+    import emprunts
+    r = emprunts.ecart_interets(conn, annee)
+    if r is None or not emprunts.materiel(r["ecart"]):
+        return []
+    f = emprunts.euros_fr
+    if r["ecart"] < 0:
+        cause = ("des échéances ne sont pas générées (onglet Emprunts), ou "
+                 "des intérêts sont rangés dans un autre compte (voir "
+                 "INTERETS_MAL_CLASSES)")
+    else:
+        cause = ("des intérêts sont comptés deux fois (saisie à la main et "
+                 "génération), ou viennent d'un emprunt non décrit")
+    return [Anomalie(AVERTISSEMENT, "EMPRUNT_INTERETS",
+            f"Intérêts d'emprunt {annee} : les tableaux de remboursement en "
+            f"prévoient {f(r['prevus'])} € (échéances du "
+            f"{r['du'].strftime('%d/%m/%Y')} au "
+            f"{r['au'].strftime('%d/%m/%Y')}), la comptabilité en porte "
+            f"{f(r['comptabilises'])} € en 661100 sur la même période — écart "
+            f"{f(r['ecart'])} € : {cause}.")]
+
+
+def c_emprunt_crd(conn, annee) -> list[Anomalie]:
+    """AVERTISSEMENT — capital restant dû des tableaux ≠ compte 164000, à
+    l'ouverture (à-nouveaux) et à la clôture. Muet si le dossier ne porte
+    pas de compte 164000 : le capital n'est pas comptabilisé par la
+    génération des échéances, il n'y a alors rien à rapprocher."""
+    import emprunts
+    r = emprunts.ecart_crd(conn, annee)
+    if r is None:
+        return []
+    f, out = emprunts.euros_fr, []
+    ecart = r["compte_ouverture"] - r["theorique_ouverture"]
+    if emprunts.materiel(ecart):
+        out.append(Anomalie(AVERTISSEMENT, "EMPRUNT_OUVERTURE",
+            f"Capital restant dû à l'ouverture de {annee} : "
+            f"{f(r['theorique_ouverture'])} € selon les tableaux, "
+            f"{f(r['compte_ouverture'])} € dans les à-nouveaux du compte "
+            f"164000 — écart {f(ecart)} €."))
+    ecart = r["compte_fin"] - r["theorique_fin"]
+    if emprunts.materiel(ecart):
+        out.append(Anomalie(AVERTISSEMENT, "EMPRUNT_CRD",
+            f"Capital restant dû au {r['fin'].strftime('%d/%m/%Y')} : "
+            f"{f(r['theorique_fin'])} € selon les tableaux, "
+            f"{f(r['compte_fin'])} € au compte 164000 — écart {f(ecart)} €. "
+            "La génération des échéances ne comptabilise pas le capital : "
+            "si ce dossier suit l'emprunt au bilan, passez le remboursement "
+            "(« Remboursement d'emprunt — CAPITAL »)."))
+    return out
 
 
 # --- Seconde salve : charges attendues (INFO) --------------------------------
@@ -1272,6 +1332,8 @@ CONTROLES = [
     c_annuel_multiple,
     c_periode_incoherente,
     c_interets_mal_classes,
+    c_emprunt_interets,
+    c_emprunt_crd,
     # plausibilité et cohérence fiscale
     c_plausibilite_n1,
     c_postes_habituels_absents,

@@ -1,5 +1,138 @@
 # Journal des versions — Compta LMNP
 
+## 8.59.0 — 2026-09-25 (Le tableau de la banque fait foi)
+
+**Un emprunt ne se saisissait qu'à la main.** Les intérêts d'une année
+tenaient en une ligne annuelle, calculée à part sur le tableau de la banque,
+et rangée selon les années en « Autres charges » ou en « Frais de tenue de
+compte » — le cas réel qui avait fait naître le contrôle
+`INTERETS_MAL_CLASSES`. Rien ne permettait de vérifier le chiffre.
+
+**Onglet « Emprunts ».** On décrit le prêt depuis l'offre : prêteur, bien
+financé, capital, taux NOMINAL (l'aide rappelle que le TAEG n'en est pas
+un), nombre d'échéances, périodicité, déblocage, date de la PREMIÈRE
+échéance — recopiée, jamais déduite —, assurance par échéance facultative.
+Le logiciel calcule le tableau à échéances constantes : taux périodique
+proportionnel, échéance C × i / (1 − (1 + i)^−n) au centime, intérêts sur le
+capital restant dû, dernière échéance ajustée pour solder exactement.
+`Decimal` de bout en bout, montants stockés en centimes entiers. Le jour de
+la première échéance est tenu (31 janvier, 28 ou 29 février, 31 mars, 30
+avril), jamais de débordement sur le mois suivant.
+
+**La banque fait foi.** Le calcul ne fait que proposer. Une ligne se
+remplace par celle de la banque ; si les suivantes sont calculées, elles
+sont recalculées sur la durée restante — c'est ce que fait la banque après
+un différé. Vérifié sur l'offre réelle d'un prêt à différé de douze mois :
+en remplaçant les douze premières lignes par celles de la banque, les 240
+échéances, la dernière ajustée et les totaux de capital et d'intérêts des
+21 années sont identiques au centime. Le tableau de la banque s'importe
+aussi en CSV, strictement et tout ou rien : un 31 février n'est jamais
+transformé en 3 mars, un séparateur décimal ambigu (« 1,234 »,
+« 1.234,56 ») est refusé plutôt que deviné, le signe est conservé, et la
+première ligne en erreur fait rejeter le fichier, avec son numéro. Les deux
+présentations rencontrées sur des tableaux réels (échéance avec ou sans
+l'assurance ; capital restant dû avant ou après l'échéance) sont reconnues
+sur le fichier entier. Un fichier peut commencer au milieu du prêt : un
+emprunt en cours se reprend à partir de l'échéance où commence le dossier.
+
+**Un tableau de la banque qui ne solde pas le prêt est accepté, et
+signalé.** Cas réel : le tableau actualisé d'un prêt à déblocages
+successifs n'amortit pas tout le capital débloqué, et laisse quelques
+centaines d'euros dus après sa dernière ligne. La banque fait foi, et le capital
+n'étant pas comptabilisé, le reliquat n'a aucun effet sur les comptes :
+l'import passe, l'alerte chiffrée s'affiche à l'import et sous le tableau,
+dans les deux onglets. Un tableau calculé ou corrigé à la main, lui, doit
+solder au centime.
+
+**Déblocages successifs.** Tant que les fonds se débloquent par tranches,
+les intérêts se saisissent à la main ; le tableau de la banque s'importe à
+partir de l'échéance où le prêt suit son cours normal, et seules ses
+échéances se génèrent. Les intérêts saisis avant le tableau ne déclenchent
+pas l'alerte de double comptabilisation, et le contrôle des intérêts ne
+compare que la période couverte par le tableau.
+
+**Des invariants, revérifiés sur ce qui est enregistré.** Somme des capitaux
+amortis = capital à rembourser au centime, capital restant dû final nul
+(sauf reliquat d'un tableau de la banque, ci-dessus),
+aucun montant négatif, capital restant dû qui ne remonte jamais (un report
+d'intérêts est refusé), dates croissantes. Remplacer un tableau se fait en
+une transaction, contrôlée sur le tableau RELU en base : une panne au
+milieu laisse l'ancien tableau intact — pas un tableau de douze lignes
+remplacé par deux. Des intérêts différents du calcul sont acceptés et
+marqués : première échéance brisée, arrondis propres à l'établissement.
+
+**Une échéance, une écriture — les charges seulement.** La génération
+réutilise le moteur des charges récurrentes (aperçu, échéances échues d'un
+exercice ouvert, confirmation, lot atomique, idempotence par la base).
+Chaque échéance passe UNE écriture de banque : intérêts en 661100 (ligne
+294 du 2033-B), assurance emprunteur en 616110, contrepartie 108000. Le
+CAPITAL n'est pas comptabilisé : ce n'est pas une charge, et le bilan du
+logiciel ne porte pas de dettes ; le tableau le garde pour le suivi. Le
+moteur a été généralisé pour cela, sans changer le comportement des charges
+récurrentes : une échéance peut porter plusieurs opérations en UNE écriture
+(`operations.saisir_ventilee`), l'idempotence vaut aussi par emprunt ×
+rang (colonne `rang`, index unique), et une mensualité déjà importée du
+relevé — rangée en attente pour son montant total — est reconnue comme
+doublon probable. Des intérêts déjà saisis à la main sur l'année laissent
+les échéances décochées, avec l'explication.
+
+**Verrou.** Une échéance passée en écriture fige sa ligne et les
+précédentes ; une échéance écartée (« déjà passée autrement ») aussi, et
+« Rétablir » la libère. Modifier le tableau ne réécrit jamais une écriture.
+Annuler une part d'une échéance annule l'échéance entière (une
+contre-passation, toutes les opérations marquées) ; une part ne se duplique
+pas et ne devient pas un modèle récurrent.
+
+**Contrôles de clôture.** `EMPRUNT_INTERETS` confronte les intérêts des
+échéances échues selon les tableaux au solde 661100 : il voit une échéance
+oubliée comme des intérêts comptés deux fois. `EMPRUNT_CRD` et
+`EMPRUNT_OUVERTURE` rapprochent le capital restant dû du compte 164000
+quand le dossier en porte un (comptabilité de cabinet reprise), à la
+clôture et dans les à-nouveaux. Seuil : 5 €, le capital restant dû se
+connaissant au centime. `ANNUEL_MULTIPLE` ne compte plus les intérêts
+générés mensuellement depuis un tableau.
+
+**Deux onglets, une seule lecture.** L'onglet Immobilisations montre, sous
+chaque bien financé, le « Tableau de remboursement de l'emprunt » en
+lecture seule, face au « Plan d'amortissement du bien » : la même vue que
+l'onglet Emprunts, aucune copie. Les emprunts d'un bien cédé restent
+consultables. Export CSV, relu à l'identique par l'import.
+
+**Sources au corpus de la Veille fiscale.** Trois entrées nouvelles :
+CGI, art. 39-1 et BOI-BIC-CHG-50, § 1 et § 10 (intérêts bancaires,
+charges financières déductibles ; le capital n'en est pas une) ; règlement
+ANC n° 2014-03, plan de comptes de l'article 1121-1 (932-1 jusqu'en 2024)
+pour les comptes 164, 275, 616 et 6611, intitulés vérifiés sur le plan
+2025 publié par l'ANC ; Code de la consommation, art. L313-25, 3°
+(échéancier capital / intérêts de l'offre à taux fixe) et L314-1 (le TAEG
+ajoute les frais aux intérêts : le tableau se calcule au taux nominal).
+En cas de conflit entre sources, le PCG et le CGI priment. Le prompt de
+veille les reprend.
+
+**Frais de garantie.** Le libellé du gabarit exclut désormais la part
+restituable d'une caution mutuelle — une créance, pas une charge —, comme
+l'annonçait la 8.34.0, qui ne l'avait écrit que dans le pense-bête.
+
+**Un dossier sans emprunt ne voit rien changer** : liasse, FEC et contrôles
+identiques, vérifié sur le dossier de démonstration et sur l'exercice réel
+2025 rejoué ; le test en or est inchangé.
+
+Schéma en version 11 (tables `emprunt`, `emprunt_ligne`, colonne `rang` de
+`echeance_generee` ; palier 11, aucune donnée existante touchée). Routes
+dans `modules/emprunts_web.py` ; `app.py` ne reçoit que l'onglet et le
+message d'annulation. En ligne de commande : `cli.py emprunt …`
+(`modules/emprunts_cli.py`).
+
+Non-régression : `tests/test_emprunts.py` (118 tests), un par règle et par
+refus — oracle indépendant en fractions (1 200 € à 12 % : 106,62 €), taux
+nul, 200 000 € sur 240 mois, trimestrielle par un 29 février, refus à la
+création, remplacement et différé, import (31 février, séparateurs ambigus,
+signe, présentation bancaire, reliquat accepté et signalé, reprise en
+cours), déblocages successifs,
+pannes au milieu d'un remplacement et d'une génération, verrou, annulation,
+FEC validé, contrôles, équivalence sans emprunt, sauvegarde, bac à sable,
+migration depuis le schéma 10, web et ligne de commande.
+
 ## 8.58.0 — 2026-09-25 (Le routeur rend de la place)
 
 **Aucun changement de comportement.** Cette version réorganise le code des

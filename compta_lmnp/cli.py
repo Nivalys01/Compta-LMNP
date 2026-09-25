@@ -18,6 +18,9 @@ Exemples :
     python cli.py recurrent ajouter --type assurance --bien 1 --montant 18.50 --periodicite mensuelle --jour 31 --debut 2026-01-31
     python cli.py recurrent apercu --du 2026-01-01 --au 2026-12-31
     python cli.py recurrent generer --du 2026-01-01 --au 2026-12-31
+    python cli.py emprunt creer --bien 1 --preteur "Banque" --capital 150000 --taux 3,5 --duree 240 --deblocage 2026-01-10 --premiere 2026-02-05
+    python cli.py emprunt importer --id 1 --csv tableau_banque.csv
+    python cli.py emprunt generer --du 2026-01-01 --au 2026-12-31
 """
 from __future__ import annotations
 import argparse
@@ -40,6 +43,7 @@ import operations
 import controles
 import depots
 import echeancier
+import emprunts_cli
 import export_fec
 import import_bancaire
 import fiscal
@@ -527,6 +531,8 @@ def main():
     d = rs.add_parser("retablir")
     d.add_argument("--cle", required=True)
     d.set_defaults(f=cmd_recurrent_retablir)
+
+    emprunts_cli.ajouter_commandes(sub, _conn)
 
     s = sub.add_parser("exporter")
     s.add_argument("--annee", type=int, default=2026)

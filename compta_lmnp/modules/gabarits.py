@@ -113,8 +113,14 @@ GABARITS = {
     # ── Emprunt & banque ────────────────────────────────────────────────────
     "interets_emprunt":      {"compte": "661100", "nature": "charge", "periodicite": "annuel",
                               "groupe": "Emprunt & banque", "libelle": "Intérêts d'emprunt"},
+    # Frais de GARANTIE : seule la commission acquise à l'organisme est une
+    # charge. La part versée au fonds mutuel de garantie d'une caution
+    # mutuelle est RESTITUABLE en fin de prêt — une créance, pas une
+    # dépense (CGI art. 39-1 ; PCG compte 275) : elle ne se saisit pas ici.
+    # Le libellé le dit, comme l'annonçait le journal de la 8.34.0.
     "frais_dossier_emprunt": {"compte": "627810", "nature": "charge", "periodicite": "variable",
-                              "groupe": "Emprunt & banque", "libelle": "Frais de dossier / garantie emprunt"},
+                              "groupe": "Emprunt & banque",
+                              "libelle": "Frais de dossier / garantie emprunt (hors part restituable de caution)"},
     "frais_bancaires":       {"compte": "627810", "nature": "charge", "periodicite": "variable",
                               "groupe": "Emprunt & banque", "libelle": "Frais de tenue de compte"},
 
