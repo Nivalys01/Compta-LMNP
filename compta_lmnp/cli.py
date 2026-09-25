@@ -15,6 +15,9 @@ Exemples :
     python cli.py depot ajouter --annee 2026 --type liasse --nature initiale --date 2027-05-12 --reference ABC123
     python cli.py depot lister --annee 2026
     python cli.py depot supprimer --id 3
+    python cli.py recurrent ajouter --type assurance --bien 1 --montant 18.50 --periodicite mensuelle --jour 31 --debut 2026-01-31
+    python cli.py recurrent apercu --du 2026-01-01 --au 2026-12-31
+    python cli.py recurrent generer --du 2026-01-01 --au 2026-12-31
 """
 from __future__ import annotations
 import argparse
@@ -36,6 +39,7 @@ import init_db
 import operations
 import controles
 import depots
+import echeancier
 import export_fec
 import import_bancaire
 import fiscal
@@ -180,6 +184,160 @@ def cmd_depot_supprimer(a):
         conn.close()
 
 
+def _recurrent(a, action):
+    """Exécute une action sur les modèles ; un refus sort en code 1."""
+    import recurrentes
+    conn = _conn()
+    try:
+        return action(conn, recurrentes)
+    except (ValueError, echeancier.LotAnnule) as exc:
+        raise SystemExit(f"Refusé : {exc}") from None
+    finally:
+        conn.close()
+
+
+def _champs_modele(a) -> dict:
+    noms = {"type": "type", "bien": "bien_id", "montant": "montant",
+            "periodicite": "periodicite", "jour": "jour",
+            "debut": "date_debut", "fin": "date_fin", "libelle": "libelle",
+            "tiers": "tiers"}
+    return {cle: getattr(a, arg) for arg, cle in noms.items()
+            if getattr(a, arg, None) is not None}
+
+
+def _aide_gabarit(recurrentes, type_):
+    if type_ in recurrentes.AIDES:
+        print(f"Note : {recurrentes.AIDES[type_]}")
+
+
+def cmd_recurrent_lister(a):
+    def f(conn, R):
+        modeles = R.lister(conn)
+        if not modeles:
+            print("Aucun modèle récurrent.")
+        for m in modeles:
+            print(f"n° {m['id']:<3} {'actif   ' if m['actif'] else 'suspendu'} "
+                  f"{m['libelle'] or m['gabarit_libelle']} — {m['bien_libelle']} "
+                  f"— {m['montant']:.2f} € {m['periodicite']}, "
+                  f"{m['jour_libelle']}, du {m['date_debut']}"
+                  + (f" au {m['date_fin']}" if m["date_fin"] else ""))
+    _recurrent(a, f)
+
+
+def cmd_recurrent_ajouter(a):
+    def f(conn, R):
+        n = R.creer(conn, **_champs_modele(a))
+        print(f"Modèle n° {n} créé.")
+        _aide_gabarit(R, a.type)
+    _recurrent(a, f)
+
+
+def cmd_recurrent_depuis_operation(a):
+    def f(conn, R):
+        n = R.depuis_operation(conn, a.id, periodicite=a.periodicite)
+        m = R.modele(conn, n)
+        print(f"Modèle n° {n} créé depuis l'opération {a.id} "
+              f"({a.periodicite}, le {m['jour']}, à partir du "
+              f"{m['date_debut']}). Vérifiez-le avec « recurrent lister ».")
+        _aide_gabarit(R, m["type"])
+    _recurrent(a, f)
+
+
+def cmd_recurrent_modifier(a):
+    def f(conn, R):
+        R.modifier(conn, a.id, **_champs_modele(a))
+        print(f"Modèle n° {a.id} modifié. Les opérations déjà générées ne "
+              "changent pas.")
+    _recurrent(a, f)
+
+
+def cmd_recurrent_etat(a):
+    def f(conn, R):
+        R.activer(conn, a.id, a.actif)
+        print(f"Modèle n° {a.id} {'repris' if a.actif else 'suspendu'}.")
+    _recurrent(a, f)
+
+
+def cmd_recurrent_supprimer(a):
+    if not a.oui:
+        rep = input(f"Supprimer le modèle n° {a.id} ? Les opérations déjà "
+                    "générées sont conservées ; un modèle recréé à l'identique "
+                    "reproposera les échéances passées. [o/N] ")
+        if rep.strip().lower() not in ("o", "oui"):
+            print("Abandon : rien n'a été supprimé.")
+            return
+
+    def f(conn, R):
+        r = R.supprimer(conn, a.id)
+        print(f"Modèle n° {a.id} supprimé ; {r['operations_conservees']} "
+              "opération(s) déjà générée(s) conservée(s).")
+    _recurrent(a, f)
+
+
+def _periode(conn, R, a):
+    import datetime as _dt
+    annee = echeancier._aujourd_hui().year
+    du, au = R.periode_par_defaut(conn, annee)
+    return (_dt.date.fromisoformat(a.du) if a.du else du,
+            _dt.date.fromisoformat(a.au) if a.au else au)
+
+
+def _afficher_apercu(lignes):
+    for x in lignes:
+        e = x.echeance
+        detail = x.motif or ", ".join(
+            f"opération n° {o['id']}" + (" (annulée)" if o["annulee"] else "")
+            for o in x.operations_liees)
+        print(f"  {x.cle:<32} {e.libelle[:30]:<30} "
+              f"{sum(op['montant'] for op in e.operations):>9.2f}  "
+              f"{echeancier.LIBELLES_STATUT[x.statut]:<13} {detail}")
+        for d in x.doublons:
+            print(f"      ⚠ doublon probable : {d['libelle'] or d['type']} du "
+                  f"{d['date']} (opération n° {d['id']}"
+                  + (", importée" if d["source"] == "import" else "") + ")")
+
+
+def cmd_recurrent_apercu(a):
+    def f(conn, R):
+        du, au = _periode(conn, R, a)
+        print(f"Échéances du {du} au {au} :")
+        _afficher_apercu(R.apercu(conn, du, au))
+    _recurrent(a, f)
+
+
+def cmd_recurrent_generer(a):
+    def f(conn, R):
+        du, au = _periode(conn, R, a)
+        lignes = R.apercu(conn, du, au)
+        exclues = set(a.exclure or ())
+        retenues = {x.cle for x in lignes
+                    if x.cochee_par_defaut and x.cle not in exclues}
+        retenues |= {c for c in (a.inclure or ())}
+        ecarter = set(a.ecarter or ())
+        print(f"Échéances du {du} au {au} :")
+        _afficher_apercu(lignes)
+        print(f"\n{len(retenues)} échéance(s) retenue(s)"
+              + (f", {len(ecarter)} à écarter" if ecarter else "")
+              + ". Les doublons probables ne sont retenus que par --inclure.")
+        if not retenues and not ecarter:
+            return
+        if not a.oui:
+            rep = input("Générer ces opérations ? [o/N] ")
+            if rep.strip().lower() not in ("o", "oui"):
+                print("Abandon : rien n'a été généré.")
+                return
+        print(R.message_generation(
+            R.generer(conn, du, au, retenues, ecarter=ecarter)))
+    _recurrent(a, f)
+
+
+def cmd_recurrent_retablir(a):
+    def f(conn, R):
+        echeancier.retablir(conn, a.cle)
+        print("Échéance rétablie.")
+    _recurrent(a, f)
+
+
 def cmd_cloturer(a):
     conn = _conn()
     # La clôture web prend une sauvegarde et archive le FEC ; la version en
@@ -310,6 +468,65 @@ def main():
     d.add_argument("--id", type=int, required=True)
     d.add_argument("--oui", action="store_true", help="sans confirmation")
     d.set_defaults(f=cmd_depot_supprimer)
+
+    s = sub.add_parser("recurrent", help="charges récurrentes")
+    rs = s.add_subparsers(required=True)
+
+    def _args_modele(d, requis):
+        d.add_argument("--type", required=requis, help="gabarit de charge admis")
+        d.add_argument("--bien", type=int, required=requis)
+        d.add_argument("--montant", type=float, required=requis)
+        d.add_argument("--periodicite", required=requis,
+                       choices=["mensuelle", "trimestrielle", "semestrielle",
+                                "annuelle"])
+        d.add_argument("--jour", required=requis,
+                       help="1 à 31, ou « dernier » (dernier jour du mois)")
+        d.add_argument("--debut", required=requis, help="AAAA-MM-JJ")
+        d.add_argument("--fin", help="AAAA-MM-JJ")
+        d.add_argument("--libelle")
+        d.add_argument("--tiers")
+
+    d = rs.add_parser("lister")
+    d.set_defaults(f=cmd_recurrent_lister)
+    d = rs.add_parser("ajouter")
+    _args_modele(d, True)
+    d.set_defaults(f=cmd_recurrent_ajouter)
+    d = rs.add_parser("depuis-operation")
+    d.add_argument("--id", type=int, required=True)
+    d.add_argument("--periodicite", default="mensuelle",
+                   choices=["mensuelle", "trimestrielle", "semestrielle",
+                            "annuelle"])
+    d.set_defaults(f=cmd_recurrent_depuis_operation)
+    d = rs.add_parser("modifier")
+    d.add_argument("--id", type=int, required=True)
+    _args_modele(d, False)
+    d.set_defaults(f=cmd_recurrent_modifier)
+    for nom, actif in (("suspendre", False), ("reprendre", True)):
+        d = rs.add_parser(nom)
+        d.add_argument("--id", type=int, required=True)
+        d.set_defaults(f=cmd_recurrent_etat, actif=actif)
+    d = rs.add_parser("supprimer")
+    d.add_argument("--id", type=int, required=True)
+    d.add_argument("--oui", action="store_true", help="sans confirmation")
+    d.set_defaults(f=cmd_recurrent_supprimer)
+    for nom, fn in (("apercu", cmd_recurrent_apercu),
+                    ("generer", cmd_recurrent_generer)):
+        d = rs.add_parser(nom)
+        d.add_argument("--du", help="AAAA-MM-JJ (défaut : exercice de l'année)")
+        d.add_argument("--au", help="AAAA-MM-JJ")
+        if nom == "generer":
+            d.add_argument("--exclure", action="append", metavar="CLE",
+                           help="échéance à ne pas générer cette fois")
+            d.add_argument("--inclure", action="append", metavar="CLE",
+                           help="retenir malgré un doublon probable")
+            d.add_argument("--ecarter", action="append", metavar="CLE",
+                           help="ne plus proposer cette échéance")
+            d.add_argument("--oui", action="store_true",
+                           help="sans confirmation")
+        d.set_defaults(f=fn)
+    d = rs.add_parser("retablir")
+    d.add_argument("--cle", required=True)
+    d.set_defaults(f=cmd_recurrent_retablir)
 
     s = sub.add_parser("exporter")
     s.add_argument("--annee", type=int, default=2026)

@@ -44,6 +44,7 @@ integrite.exiger_installation_complete()
 
 import controles
 import depots_web
+import recurrentes_web
 import fiscal
 import init_db
 import migrations
@@ -2221,6 +2222,7 @@ def exercice_reprendre_fec():
 
 
 depots_web.enregistrer_routes(app, conn=_conn, annee_param=_annee_param)
+recurrentes_web.enregistrer_routes(app, conn=_conn, annee_param=_annee_param, base=_base, annees=_annees)
 
 if __name__ == "__main__":
     if not os.path.exists(DB):

@@ -13,7 +13,7 @@ routes (52 % du fichier). Séparation stricte :
 Un gabarit se repère par sa page : PAGE_SAISIE, PAGE_IMMO, PAGE_CLOTURE,
 PAGE_EX_NOUVEAU, PAGE_LIASSE, PAGE_REGLEMENTATION, PAGE_SANDBOX,
 PAGE_ARCHIVES, PAGE_SAUVEGARDES_SECTION, PAGE_DOSSIERS, PAGE_PENSE_BETE,
-PAGE_VEILLE — plus CSS (style global inline, distribution mono-fichier
+PAGE_VEILLE, PAGE_RECURRENTES — plus CSS (style global inline, distribution mono-fichier
 oblige : pas de dossier static/).
 
 L'échappement des données utilisateur est assuré par Jinja (autoescape) au
@@ -665,6 +665,21 @@ PAGE_SAISIE = """
   </div>
 </div>
 
+{% set R = recurrentes_resume(annee) %}
+<div class="card">
+  <div class="card-header">Charges récurrentes</div>
+  <div class="card-body">
+    <p style="margin:0">{{ R.actifs }} modèle(s) actif(s) —
+      <strong>{{ R.a_generer }}</strong> échéance(s) échue(s) à générer sur {{ annee }}.
+      <a class="btn" href="/recurrentes?annee={{ annee }}#apercu"
+         style="text-decoration:none;margin-left:10px">Préparer la génération</a></p>
+    <p class="muted" style="margin:8px 0 0">Assurance, abonnement, charges de
+      copropriété… : une charge qui revient à l'identique se déclare une fois,
+      puis se génère en lot, après un aperçu. Seules les échéances passées
+      sont générées. Le bouton ↻ d'une opération en fait un modèle.</p>
+  </div>
+</div>
+
 <div class="card">
   <div class="card-header">Opérations {{ annee }}</div>
   <div class="card-body" style="padding:0">
@@ -702,6 +717,16 @@ PAGE_SAISIE = """
                       title="Dupliquer cette opération au mois suivant
 (même montant, même nature — date et période décalées d'un mois)">→ M+1</button>
             </form>
+            {% if op['type'] in recurrents_admis %}
+            <form method="post" action="/recurrentes/depuis-operation/{{ op['id'] }}"
+                  style="display:inline">
+              <input type="hidden" name="annee" value="{{ annee }}">
+              <button type="submit" class="btn"
+                      style="padding:2px 8px;font-size:12px"
+                      title="Faire de cette opération une charge récurrente
+(gabarit, bien, montant, libellé et tiers repris ; à vérifier ensuite)">↻</button>
+            </form>
+            {% endif %}
             {% endif %}
           </td>
           <td>
@@ -2614,4 +2639,168 @@ function copierPrompt() {
   } else { document.execCommand('copy'); ok(); }
 }
 </script>
+"""
+
+
+PAGE_RECURRENTES = """
+<p><a href="/saisie?annee={{ annee }}">← Retour à la saisie</a></p>
+
+<div class="card" id="modeles">
+  <div class="card-header">Charges récurrentes — modèles</div>
+  <div class="card-body" style="padding:0">
+    {% if modeles %}
+    <table>
+      <tr><th>N°</th><th>Charge</th><th>Bien</th><th class="right">Montant</th>
+          <th>Périodicité</th><th>Échéance</th><th>Du</th><th>Au</th>
+          <th>État</th><th></th></tr>
+      {% for m in modeles %}
+      <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.libelle or m.gabarit_libelle }}{% if m.tiers %} — {{ m.tiers }}{% endif %}</td>
+        <td>{{ m.bien_libelle }}</td>
+        <td class="right">{{ '%.2f'|format(m.montant)|replace('.', ',') }} €</td>
+        <td>{{ m.periodicite }}</td><td>{{ m.jour_libelle }}</td>
+        <td>{{ m.date_debut }}</td><td>{{ m.date_fin or '—' }}</td>
+        <td><span class="badge {{ 'badge-ok' if m.actif else 'badge-clos' }}">
+            {{ 'actif' if m.actif else 'suspendu' }}</span></td>
+        <td style="white-space:nowrap">
+          <a href="/recurrentes?annee={{ annee }}&modele={{ m.id }}#formulaire">Modifier</a>
+          <form method="post" action="/recurrentes/{{ m.id }}/etat" style="display:inline">
+            <input type="hidden" name="annee" value="{{ annee }}">
+            <input type="hidden" name="actif" value="{{ 0 if m.actif else 1 }}">
+            <button type="submit" class="btn" style="padding:2px 8px;font-size:12px">
+              {{ 'Suspendre' if m.actif else 'Reprendre' }}</button>
+          </form>
+          <form method="post" action="/recurrentes/{{ m.id }}/supprimer" style="display:inline">
+            <input type="hidden" name="annee" value="{{ annee }}">
+            <button type="submit" class="btn" style="padding:2px 8px;font-size:12px"
+                    data-confirmer="Supprimer ce modèle ? Les opérations déjà générées sont conservées. Attention : un modèle recréé à l'identique proposera de nouveau les échéances passées. Pour arrêter une charge, préférez une date de fin ou la suspension.">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted" style="padding:12px 16px">Aucun modèle. Créez-en un
+    ci-dessous, ou depuis une opération de la page Saisie (bouton ↻).</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card" id="formulaire">
+  <div class="card-header">{{ 'Modifier le modèle n° %d'|format(edition.id) if edition else 'Nouveau modèle' }}</div>
+  <div class="card-body">
+    <form method="post" action="/recurrentes/modele">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      {% if edition %}<input type="hidden" name="id" value="{{ edition.id }}">{% endif %}
+      <div class="grid3">
+        <div><label class="field">Charge</label>
+          <select name="type" required>
+            {% for k, lib in admis %}
+            <option value="{{ k }}" {{ 'selected' if edition and edition.type == k }}>{{ lib }}</option>
+            {% endfor %}
+          </select></div>
+        <div><label class="field">Bien</label>
+          <select name="bien_id" required>
+            {% for b in biens %}
+            <option value="{{ b[0] }}" {{ 'selected' if edition and edition.bien_id == b[0] }}>{{ b[1] }}</option>
+            {% endfor %}
+          </select></div>
+        <div><label class="field">Montant (€)</label>
+          <input type="number" step="0.01" min="0.01" name="montant" required
+                 value="{{ edition.montant if edition else '' }}"></div>
+        <div><label class="field">Périodicité</label>
+          <select name="periodicite">
+            {% for p in periodicites %}
+            <option value="{{ p }}" {{ 'selected' if edition and edition.periodicite == p }}>{{ p }}</option>
+            {% endfor %}
+          </select></div>
+        <div><label class="field">Jour d'échéance</label>
+          <select name="jour">
+            {% for j in range(1, 32) %}
+            <option value="{{ j }}" {{ 'selected' if edition and edition.jour == j }}>{{ j }}</option>
+            {% endfor %}
+            <option value="0" {{ 'selected' if edition and edition.jour == 0 }}>dernier jour du mois</option>
+          </select></div>
+        <div><label class="field">Tiers <span class="opt">(facultatif)</span></label>
+          <input type="text" name="tiers" maxlength="120" value="{{ edition.tiers or '' if edition else '' }}"></div>
+        <div><label class="field">Début</label>
+          <input type="date" name="date_debut" required value="{{ edition.date_debut if edition else '' }}"></div>
+        <div><label class="field">Fin <span class="opt">(facultatif)</span></label>
+          <input type="date" name="date_fin" value="{{ edition.date_fin or '' if edition else '' }}"></div>
+        <div><label class="field">Libellé <span class="opt">(facultatif)</span></label>
+          <input type="text" name="libelle" maxlength="120" value="{{ edition.libelle or '' if edition else '' }}"></div>
+      </div>
+      <p class="muted">Le jour est tenu d'une échéance à l'autre : au 31, une
+      mensualité tombe le 31 janvier, le 28 ou 29 février, le 31 mars, le 30
+      avril. Modifier un modèle ne change pas les opérations déjà générées.</p>
+      {% for lib, aide in aides.items() %}
+      <p class="muted"><strong>{{ lib }} :</strong> {{ aide }}</p>
+      {% endfor %}
+      <p><button type="submit">{{ 'Enregistrer les modifications' if edition else 'Créer le modèle' }}</button>
+        {% if edition %}<a href="/recurrentes?annee={{ annee }}#formulaire" style="margin-left:10px">Annuler</a>{% endif %}</p>
+    </form>
+  </div>
+</div>
+
+<div class="card" id="apercu">
+  <div class="card-header">Aperçu de la génération</div>
+  <div class="card-body">
+    <form method="get" action="/recurrentes#apercu" style="margin-bottom:12px">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      Du <input type="date" name="du" value="{{ du }}" style="width:auto">
+      au <input type="date" name="au" value="{{ au }}" style="width:auto">
+      <button type="submit" class="btn">Actualiser</button>
+    </form>
+    <p class="muted">Seules les échéances passées (au {{ aujourd_hui }}) se
+    génèrent : une opération enregistre un paiement effectué. Une ligne qui
+    ressemble à une opération déjà saisie (même compte, même montant, à
+    {{ fenetre }} jours près — une charge déjà importée du relevé, par
+    exemple) est signalée et laissée décochée.</p>
+    {% if lignes %}
+    <form method="post" action="/recurrentes/generer">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      <input type="hidden" name="du" value="{{ du }}">
+      <input type="hidden" name="au" value="{{ au }}">
+      <table>
+        <tr><th>Générer</th><th>Date</th><th>Charge</th><th class="right">Montant</th>
+            <th>Statut</th><th>Détail</th><th>Ne plus proposer</th></tr>
+        {% for l in lignes %}
+        <tr>
+          <td style="text-align:center">{% if l.statut == 'a_generer' %}
+            <input type="checkbox" name="retenir" value="{{ l.cle }}" style="width:auto"
+                   {{ 'checked' if l.cochee }}>{% endif %}</td>
+          <td>{{ l.date }}</td>
+          <td>{{ l.libelle }} <span class="muted">(n° {{ l.source_id }})</span></td>
+          <td class="right">{{ '%.2f'|format(l.montant)|replace('.', ',') }} €</td>
+          <td><span class="badge {{ {'a_generer':'badge-ok','deja_generee':'badge-clos','ecartee':'badge-clos','a_venir':'badge-warn','ignoree':'badge-err'}[l.statut] }}">{{ l.statut_libelle }}</span></td>
+          <td>
+            {% if l.motif %}{{ l.motif }}{% endif %}
+            {% for o in l.operations_liees %}opération n° {{ o.id }}{% if o.annulee %} (annulée){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+            {% for d in l.doublons %}
+            <div class="badge badge-warn" style="display:block;margin-top:3px">Doublon probable :
+              {{ d.libelle or d.type }} du {{ d.date }}{% if d.source == 'import' %} (importée){% endif %}</div>
+            {% endfor %}
+            {% for a in l.alertes %}<div class="badge badge-warn" style="display:block;margin-top:3px">{{ a }}</div>{% endfor %}
+            {% if l.statut == 'ecartee' %}
+            <button type="submit" class="btn" formaction="/recurrentes/retablir"
+                    name="cle" value="{{ l.cle }}" style="padding:2px 8px;font-size:12px">Rétablir</button>
+            {% endif %}
+          </td>
+          <td style="text-align:center">{% if l.statut == 'a_generer' %}
+            <input type="checkbox" name="ecarter" value="{{ l.cle }}" style="width:auto"
+                   title="Écarter définitivement cette échéance (réversible : bouton Rétablir)">{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p style="margin-top:12px">
+        <button type="submit" class="btn-primary"
+                data-confirmer="Générer les opérations des lignes cochées ? Chacune passe une écriture en journal de banque. Tout le lot est enregistré en une fois, ou rien ne l'est.">Générer les lignes cochées</button>
+        <span class="muted">{{ a_generer }} échéance(s) à générer sur la période.</span></p>
+    </form>
+    {% else %}
+    <p class="muted">Aucune échéance sur cette période.</p>
+    {% endif %}
+  </div>
+</div>
 """

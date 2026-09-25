@@ -250,3 +250,41 @@ CREATE TABLE IF NOT EXISTS depot_declaration (
 -- Une seule déclaration initiale par exercice et par type.
 CREATE UNIQUE INDEX IF NOT EXISTS ux_depot_initiale
     ON depot_declaration(exercice_annee, type) WHERE nature = 'initiale';
+
+-- --- Charges récurrentes et moteur d'échéances ---------------------------------
+-- Modèles de charges qui reviennent à l'identique, générés à la demande par
+-- le moteur `echeancier`. Créées à la volée par recurrentes.assurer_schema
+-- pour une installation antérieure (palier 10).
+CREATE TABLE IF NOT EXISTS modele_recurrent (
+    id          INTEGER PRIMARY KEY,
+    type        TEXT    NOT NULL,              -- gabarit de la liste blanche
+    bien_id     INTEGER NOT NULL REFERENCES bien(id),
+    montant     REAL    NOT NULL CHECK (montant > 0),
+    libelle     TEXT,
+    tiers       TEXT,
+    periodicite TEXT    NOT NULL CHECK (periodicite IN
+                ('mensuelle','trimestrielle','semestrielle','annuelle')),
+    jour        INTEGER NOT NULL CHECK (jour BETWEEN 0 AND 31), -- 0 = dernier jour
+    date_debut  TEXT    NOT NULL,
+    date_fin    TEXT,
+    actif       INTEGER NOT NULL DEFAULT 1 CHECK (actif IN (0,1)),
+    cree_le     TEXT    NOT NULL,
+    CHECK (date_fin IS NULL OR date_fin >= date_debut)
+);
+-- Lien générique échéance → opérations (sources : 'recurrent', plus tard les
+-- emprunts). L'unicité garantit qu'une échéance n'est générée qu'une fois ;
+-- pas de clé étrangère vers la source, pour survivre à sa suppression.
+CREATE TABLE IF NOT EXISTS echeance_generee (
+    id            INTEGER PRIMARY KEY,
+    source        TEXT    NOT NULL,
+    source_id     INTEGER NOT NULL,
+    date_echeance TEXT    NOT NULL,
+    etat          TEXT    NOT NULL CHECK (etat IN ('generee','ecartee')),
+    genere_le     TEXT    NOT NULL,
+    UNIQUE (source, source_id, date_echeance)
+);
+CREATE TABLE IF NOT EXISTS echeance_operation (
+    echeance_id  INTEGER NOT NULL REFERENCES echeance_generee(id),
+    operation_id INTEGER NOT NULL UNIQUE REFERENCES operation(id),
+    PRIMARY KEY (echeance_id, operation_id)
+);

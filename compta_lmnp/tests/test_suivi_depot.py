@@ -535,7 +535,7 @@ def test_cloisonnement_du_bac_a_sable(tmp_path, monkeypatch):
 def test_migration_base_neuve(tmp_path):
     c = init_db.init(str(tmp_path / "neuve.db"), "blanc", annee_cible=2026)
     try:
-        assert init_db.version_base(c) == init_db.VERSION_SCHEMA == 9
+        assert init_db.version_base(c) == init_db.VERSION_SCHEMA >= 9
         assert c.execute("SELECT COUNT(*) FROM depot_declaration"
                          ).fetchone()[0] == 0
     finally:
@@ -569,12 +569,12 @@ def test_migration_depuis_la_version_precedente_du_dossier_de_demo(tmp_path):
     avant = _contenu(chemin)
 
     r = migrations.migrer(chemin)
-    assert (r["avant"], r["apres"]) == (8, 9)
+    assert (r["avant"], r["apres"]) == (8, init_db.VERSION_SCHEMA)
     assert r["sauvegarde"] and os.path.exists(r["sauvegarde"])
     assert _contenu(chemin) == avant
     c = sqlite3.connect(chemin)
     try:
-        assert init_db.version_base(c) == 9
+        assert init_db.version_base(c) == init_db.VERSION_SCHEMA
         assert _nb(c) == 0
         assert c.execute("SELECT 1 FROM sqlite_master WHERE name="
                          "'ux_depot_initiale'").fetchone()

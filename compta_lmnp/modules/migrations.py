@@ -107,8 +107,18 @@ def _palier_9(conn: sqlite3.Connection) -> None:
     depots.assurer_schema(conn)
 
 
+def _palier_10(conn: sqlite3.Connection) -> None:
+    """v10 — charges récurrentes : modèles et tables du moteur d'échéances.
+
+    Aucune donnée existante n'est touchée : les tables naissent vides.
+    """
+    import recurrentes
+    recurrentes.assurer_schema(conn)
+
+
 PALIERS = {2: _palier_2, 3: _palier_3, 4: _palier_4, 5: _palier_5,
-           6: _palier_6, 7: _palier_7, 8: _palier_8, 9: _palier_9}
+           6: _palier_6, 7: _palier_7, 8: _palier_8, 9: _palier_9,
+           10: _palier_10}
 
 # Garde-fou de développement. La boucle de `migrer` ignorait silencieusement
 # un palier absent, puis marquait la base au niveau du logiciel : une base

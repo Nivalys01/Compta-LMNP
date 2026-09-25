@@ -257,6 +257,9 @@ python cli.py exporter --annee 2026 --out FEC2026.txt
 python cli.py depot ajouter --annee 2026 --type liasse --nature initiale --date 2027-05-12 --reference ABC123
 python cli.py depot lister --annee 2026    # dépôts notés et écarts éventuels
 python cli.py depot supprimer --id 3
+python cli.py recurrent ajouter --type assurance --bien 1 --montant 18.50 --periodicite mensuelle --jour 31 --debut 2026-01-31
+python cli.py recurrent apercu             # échéances de l'année et leur statut
+python cli.py recurrent generer            # aperçu, puis confirmation
 ```
 
 On ne saisit jamais un débit/crédit : on déclare un **fait** (un loyer, une
@@ -543,6 +546,38 @@ date et période décalées d'un mois (jour borné à la fin du mois : 31/01 →
 clics. Garde-fous : libellé personnalisé conservé, nouvelle pièce (pas de
 recopie de référence), refus explicite si l'exercice cible n'existe pas
 encore ou est clos, et la date décalée ne déclenche pas le contrôle DOUBLON.
+
+## Charges récurrentes
+
+Une charge qui revient à l'identique — assurance PNO, abonnement, charges de
+copropriété trimestrielles, taxe foncière mensualisée — se déclare une fois
+comme **modèle** : charge, bien, montant, périodicité (mensuelle,
+trimestrielle, semestrielle, annuelle), jour d'échéance (1 à 31 ou dernier
+jour du mois), début et fin facultative. Page « Charges récurrentes », depuis
+la Saisie ; le bouton **↻** d'une opération en fait un modèle.
+
+- **Le jour tient** : au 31, les échéances tombent le 31 janvier, le 28 ou
+  29 février, le 31 mars, le 30 avril — chaque date est calculée depuis le
+  début du modèle, jamais depuis la précédente (c'est la différence avec
+  « → M+1 », qui reste disponible).
+- **Aperçu, puis génération** : chaque échéance de la période a un statut —
+  à générer, déjà générée, à venir, ignorée (exercice clos ou absent, bien
+  cédé, modèle suspendu…). On décoche ce qu'on ne veut pas, on confirme.
+- **Seules les échéances passées se génèrent** : une opération enregistre un
+  paiement effectué (comptabilité de trésorerie en cours d'année).
+- **Une fois, pas deux** : rejouer ne recrée rien, et une opération annulée
+  n'est pas régénérée. Tout le lot est enregistré en une fois, ou rien.
+- **Doublons probables** : une ligne qui ressemble à une opération déjà
+  saisie (même compte, même montant, à 7 jours près — typiquement la même
+  charge importée du relevé) est signalée et laissée décochée. « Ne plus
+  proposer » l'écarte durablement (réversible).
+- Modifier ou supprimer un modèle ne touche jamais aux opérations déjà
+  générées.
+- **Charges seulement** : ni loyers (un loyer s'enregistre une fois encaissé),
+  ni achats, ni immobilisations, ni remboursements d'emprunt.
+- **Taxe foncière et CFE mensualisées** : les prélèvements sont des acomptes ;
+  la régularisation de fin d'année se saisit à la main, et le montant change
+  chaque année — mettez le modèle à jour à réception de l'avis.
 
 ## Pérennité pluri-annuelle (vérifiée)
 

@@ -1,5 +1,79 @@
 # Journal des versions — Compta LMNP
 
+## 8.57.0 — 2026-09-25 (Les charges qui reviennent se déclarent une fois)
+
+**Douze fois la même assurance.** Une charge mensuelle identique se
+saisissait douze fois, ou se dupliquait de mois en mois avec « → M+1 ». Or
+la duplication part de la date de l'opération dupliquée : une assurance
+prélevée le 31 passait au 28 en février et y restait — 28 mars, 28 avril —
+sans que rien ne le signale.
+
+Une charge qui revient à l'identique se déclare désormais une fois, comme
+**modèle** : charge, bien, montant, périodicité (mensuelle, trimestrielle,
+semestrielle, annuelle), jour d'échéance (1 à 31 ou dernier jour du mois),
+début, fin facultative, tiers. Chaque échéance est calculée depuis le début
+du modèle, jamais depuis la précédente : 31 janvier, 28 ou 29 février,
+31 mars, 30 avril. Le bouton ↻ d'une opération en fait un modèle. La
+duplication reste, pour les gestes ponctuels.
+
+**Un aperçu, puis la génération.** Rien ne se génère au démarrage ni en
+arrière-plan. L'aperçu donne à chaque échéance de la période un statut — à
+générer, déjà générée, à venir, ignorée avec son motif (exercice clôturé ou
+inexistant, date hors de l'exercice, bien cédé, modèle suspendu, date hors
+des bornes du modèle) — et l'on décoche ce qu'on ne veut pas. Seules les
+échéances **passées** se génèrent : le logiciel tient une comptabilité de
+trésorerie en cours d'année (CGI, art. 302 septies A ter A), une opération
+y est un paiement effectué, et générer d'avance inscrirait des charges non
+payées.
+
+**Une fois, pas deux, et tout ou rien.** Chaque échéance générée est inscrite
+dans la base, unique par modèle et par date : rejouer ne crée rien, et une
+opération annulée par contre-passation n'est pas régénérée, puisqu'elle
+existe toujours. Le lot passe en une transaction par le guichet unique ; une
+ligne en échec annule tout, et le message dit laquelle. L'aperçu est
+recalculé sous le verrou à la confirmation : deux onglets ouverts sur le
+même aperçu ne génèrent pas deux fois.
+
+**Les doublons probables sont montrés.** Le cas typique : la même charge déjà
+importée du relevé bancaire. Une échéance qui ressemble à une opération
+existante — même compte, même montant, à 7 jours près — est signalée et
+laissée décochée. Le bien n'est pas comparé pour une opération importée,
+l'import les rattachant toutes au premier bien. « Ne plus proposer » écarte
+une échéance durablement, et se rétablit.
+
+**Charges seulement, par liste blanche** : une liste noire laisserait passer
+tout gabarit ajouté plus tard sans que personne ait décidé qu'il pouvait
+être récurrent. Ni loyers (un loyer s'enregistre une fois encaissé, et les
+quittances lisent les écritures), ni achats, immobilisations, remboursements
+d'emprunt ou gabarits personnalisés. Pour la taxe foncière et la CFE
+mensualisées, l'aide rappelle que la régularisation de fin d'année se saisit
+à la main et que le montant change chaque année ; aucun calendrier fiscal
+n'est codé.
+
+**Un moteur réutilisable.** La génération vit dans `modules/echeancier.py`,
+qui ne connaît ni les modèles ni les emprunts : une source lui remet des
+échéances d'une ou plusieurs opérations. La fonction emprunts s'en servira
+pour les échéances de prêt ; un test l'éprouve déjà avec deux opérations par
+échéance.
+
+Modifier un modèle ne change jamais les opérations déjà générées ; le
+supprimer ne les supprime pas. Schéma en version 10 (tables
+`modele_recurrent`, `echeance_generee`, `echeance_operation` ; palier 10,
+aucune donnée existante touchée). Les routes vivent dans
+`modules/recurrentes_web.py` : `app.py` ne reçoit que l'appel. En ligne de
+commande : `cli.py recurrent …`.
+
+Le premier essai de la carte de la page Saisie relisait le catalogue des
+gabarits en base à chaque ligne d'aperçu : le test du constat T-09 l'a
+arrêté. Les gabarits admis sont tous dans le catalogue du code, lu sans
+requête.
+
+Non-régression : `tests/test_recurrentes.py` (78 tests), un par règle et par
+refus — calendrier (31, dernier jour, 2028 bissextile, trimestrielle, 29
+février), exercices courts aux deux bornes, rejeu, contre-passation, panne
+au milieu du lot, doublons, FEC validé, sauvegarde, bac à sable, migration
+depuis le schéma 9, web et ligne de commande.
+
 ## 8.56.0 — 2026-09-25 (Noter qu'une déclaration est partie)
 
 **Le logiciel savait préparer une déclaration, pas qu'elle avait été
