@@ -611,7 +611,9 @@ def test_survie_a_une_sauvegarde_puis_restauration(chemin, conn):
 def test_migration_base_neuve(tmp_path):
     c = init_db.init(str(tmp_path / "neuve.db"), "blanc", annee_cible=2026)
     try:
-        assert init_db.version_base(c) == init_db.VERSION_SCHEMA == 10
+        # Au moins le schéma 10 (les charges récurrentes) : les paliers
+        # suivants s'ajoutent sans retirer ces tables.
+        assert init_db.version_base(c) == init_db.VERSION_SCHEMA >= 10
         for t in ("modele_recurrent", "echeance_generee", "echeance_operation"):
             assert c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] == 0
     finally:
@@ -633,9 +635,12 @@ def _contenu(chemin, exclues):
 def test_migration_depuis_la_version_precedente_du_dossier_de_demo(tmp_path):
     chemin = str(tmp_path / "compta.db")
     init_db.init_demo(chemin, FEC_DEMO, 2026).close()
-    nouvelles = {"modele_recurrent", "echeance_generee", "echeance_operation"}
+    nouvelles = {"modele_recurrent", "echeance_generee", "echeance_operation",
+                 # paliers postérieurs au 10, appliqués par la même migration
+                 "emprunt", "emprunt_ligne"}
     c = sqlite3.connect(chemin)
-    for t in ("echeance_operation", "echeance_generee", "modele_recurrent"):
+    for t in ("echeance_operation", "echeance_generee", "modele_recurrent",
+              "emprunt_ligne", "emprunt"):
         c.execute(f"DROP TABLE {t}")
     c.execute("UPDATE meta SET valeur='9' WHERE cle='version_schema'")
     c.commit()
@@ -643,7 +648,7 @@ def test_migration_depuis_la_version_precedente_du_dossier_de_demo(tmp_path):
     avant = _contenu(chemin, nouvelles | {"meta"})
 
     r = migrations.migrer(chemin)
-    assert (r["avant"], r["apres"]) == (9, 10)
+    assert (r["avant"], r["apres"]) == (9, init_db.VERSION_SCHEMA)
     assert r["sauvegarde"] and os.path.exists(r["sauvegarde"])
     assert _contenu(chemin, nouvelles | {"meta"}) == avant
     c = sqlite3.connect(chemin)

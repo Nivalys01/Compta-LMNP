@@ -260,6 +260,9 @@ python cli.py depot supprimer --id 3
 python cli.py recurrent ajouter --type assurance --bien 1 --montant 18.50 --periodicite mensuelle --jour 31 --debut 2026-01-31
 python cli.py recurrent apercu             # échéances de l'année et leur statut
 python cli.py recurrent generer            # aperçu, puis confirmation
+python cli.py emprunt creer --bien 1 --preteur "Banque" --capital 150000 --taux 3,5 --duree 240 --deblocage 2026-01-10 --premiere 2026-02-05
+python cli.py emprunt importer --id 1 --csv tableau_banque.csv
+python cli.py emprunt generer              # échéances échues, puis confirmation
 ```
 
 On ne saisit jamais un débit/crédit : on déclare un **fait** (un loyer, une
@@ -578,6 +581,63 @@ la Saisie ; le bouton **↻** d'une opération en fait un modèle.
 - **Taxe foncière et CFE mensualisées** : les prélèvements sont des acomptes ;
   la régularisation de fin d'année se saisit à la main, et le montant change
   chaque année — mettez le modèle à jour à réception de l'avis.
+
+## Emprunts
+
+Onglet **« Emprunts »**, à côté d'« Immobilisations ». On décrit le prêt à
+partir de l'offre : prêteur, bien financé, capital, **taux nominal** (pas le
+TAEG, qui ajoute frais et assurance et ne sert qu'à comparer des offres),
+nombre d'échéances, périodicité (mensuelle, trimestrielle, annuelle), date de
+déblocage, date de la **première** échéance recopiée de l'offre, assurance
+par échéance facultative.
+
+- **La banque fait foi.** Le logiciel calcule un tableau à échéances
+  constantes (taux périodique proportionnel, arrondi au centime, dernière
+  échéance ajustée) ; on le compare à celui de la banque, on en remplace
+  des lignes ou on importe le tableau entier en CSV. Vérifié sur une offre
+  réelle : échéance, dernière ligne et totaux annuels identiques au centime.
+- **Différé, première échéance brisée, déblocages successifs** : on remplace
+  les lignes concernées par celles de la banque ; les échéances calculées
+  qui suivent sont recalculées sur la durée restante.
+- **Import CSV strict, tout ou rien** : date ; échéance ; capital ;
+  intérêts ; assurance ; capital restant dû. Une date inexistante (31/02),
+  un séparateur décimal ambigu, une ligne incohérente font rejeter le
+  fichier, avec le numéro de la ligne ; le tableau reste inchangé. Les deux
+  présentations bancaires (échéance avec ou sans assurance, capital restant
+  dû avant ou après l'échéance) sont reconnues.
+- **Contrôles du tableau** : somme des capitaux = capital emprunté au
+  centime, rien de négatif, capital restant dû qui ne remonte jamais. Des
+  intérêts différents du calcul sont acceptés et signalés. Un tableau de la
+  banque qui laisse un reliquat après sa dernière ligne est accepté, avec
+  une alerte chiffrée.
+- **Déblocages successifs** : tant que les fonds se débloquent par
+  tranches, saisissez les intérêts à la main ; importez ensuite le tableau
+  de la banque à partir de l'échéance où le prêt suit son cours normal —
+  seules ces échéances se génèrent.
+- **Sources** (onglet Veille fiscale) : CGI, art. 39-1 et BOI-BIC-CHG-50
+  (intérêts déductibles, capital non) ; PCG, plan de comptes de l'art.
+  1121-1 du règlement ANC n° 2014-03 (comptes 164, 275, 616, 6611) ; Code
+  de la consommation, art. L313-25, 3° et L314-1 (échéancier de l'offre,
+  TAEG). En cas de conflit, le PCG et le CGI priment.
+- **Génération des échéances** : seules les échéances échues d'un exercice
+  ouvert, avec aperçu et confirmation. Chaque échéance passe **une**
+  écriture de banque : intérêts en 661100, assurance emprunteur en 616110,
+  contrepartie 108000. **Le capital n'est pas comptabilisé** : ce n'est pas
+  une charge, et le bilan du logiciel ne porte pas de dettes ; le tableau le
+  suit pour information. Une mensualité déjà importée du relevé, ou des
+  intérêts déjà saisis à la main sur l'année, sont signalés et l'échéance
+  est laissée décochée.
+- **Verrou** : une échéance passée en écriture (ou écartée, « déjà passée
+  autrement ») fige sa ligne et les précédentes ; « Rétablir » une échéance
+  écartée la libère. Modifier le tableau ne réécrit jamais une écriture.
+- **Clôture** : le contrôle *EMPRUNT_INTERETS* compare les intérêts du
+  tableau à ceux comptabilisés en 661100 (écart au-delà de 5 €) — il voit
+  des échéances oubliées comme des intérêts comptés deux fois. Si le dossier
+  porte un compte 164000 (comptabilité de cabinet reprise), *EMPRUNT_CRD*
+  et *EMPRUNT_OUVERTURE* le rapprochent du capital restant dû.
+- Dans l'onglet **Immobilisations**, chaque bien financé montre le tableau
+  de remboursement de son emprunt, en lecture seule — à ne pas confondre
+  avec le plan d'amortissement du bien, juste au-dessus.
 
 ## Pérennité pluri-annuelle (vérifiée)
 

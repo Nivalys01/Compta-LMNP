@@ -487,6 +487,7 @@ def _base(content: str, *, active: str, annee: int, annees: list[int],
     nav_items = [
         ("saisie",          "Saisie"),
         ("immobilisations", "Immobilisations"),
+        ("emprunts",        "Emprunts"),
         ("cloture",         "Clôture"),
         ("liasse",          "Liasse"),
         ("quittances",      "Quittances"),
@@ -1429,6 +1430,10 @@ def operation_annuler(operation_id):
         ok = (f"Opération {operation_id} annulée par contre-passation "
               f"(écriture {r['ecriture_annulation']}). Les montants se "
               "neutralisent dans tous les calculs ; rien n'est supprimé.")
+        if len(r["operations_annulees"]) > 1:
+            ok += (" Elle faisait partie d'un paiement ventilé : les "
+                   f"opérations {', '.join(map(str, r['operations_annulees']))}"
+                   " sont annulées ensemble.")
         return redirect(url_for("saisie", ok=ok))
     except Exception as exc:
         return redirect(url_for("saisie", err=str(exc)))

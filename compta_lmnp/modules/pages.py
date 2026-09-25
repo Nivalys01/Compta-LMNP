@@ -13,7 +13,8 @@ routes (52 % du fichier). Séparation stricte :
 Un gabarit se repère par sa page : PAGE_SAISIE, PAGE_IMMO, PAGE_CLOTURE,
 PAGE_EX_NOUVEAU, PAGE_LIASSE, PAGE_REGLEMENTATION, PAGE_SANDBOX,
 PAGE_ARCHIVES, PAGE_SAUVEGARDES_SECTION, PAGE_DOSSIERS, PAGE_PENSE_BETE,
-PAGE_VEILLE, PAGE_RECURRENTES — plus CSS (style global inline, distribution mono-fichier
+PAGE_VEILLE, PAGE_RECURRENTES, PAGE_EMPRUNTS (et MACRO_EMPRUNT, partagée avec
+PAGE_IMMO) — plus CSS (style global inline, distribution mono-fichier
 oblige : pas de dossier static/).
 
 L'échappement des données utilisateur est assuré par Jinja (autoescape) au
@@ -763,7 +764,63 @@ majPeriode(document.getElementById('type').value);
 """
 
 
-PAGE_IMMO = """
+# Tableau de remboursement d'un emprunt : UNE macro, rendue par l'onglet
+# Emprunts (modifiable) et par l'onglet Immobilisations (lecture seule), à
+# partir de la même vue — aucune copie des données. Le titre dit
+# « remboursement » : l'onglet Immobilisations affiche aussi des
+# AMORTISSEMENTS, ceux des composants, qui n'ont rien à voir.
+MACRO_EMPRUNT = """
+{% macro tableau_emprunt(v, lecture_seule, annee) %}
+{% set e = v.emprunt %}
+<p class="muted" style="margin:8px 0">
+  {{ e.preteur }}{% if e.reference %} — prêt {{ e.reference }}{% endif %} :
+  {{ eur(e.capital) }} € à {{ e.taux_pourcent }} % nominal,
+  {{ e.nb_echeances }} échéances ({{ e.periodicite }}), première le
+  {{ e.premiere.strftime('%d/%m/%Y') }}, fonds débloqués le
+  {{ e.deblocage.strftime('%d/%m/%Y') }}.
+  {% if v.verrou %}Échéances 1 à {{ v.verrou }} verrouillées 🔒.{% endif %}
+  {% if v.nb_ecarts %}<span class="badge badge-warn">{{ v.nb_ecarts }} échéance(s) aux intérêts différents du calcul — la banque fait foi</span>{% endif %}
+</p>
+{% if v.reliquat %}<p class="badge badge-warn" style="display:block">{{ alerte_reliquat(v.reliquat) }}</p>{% endif %}
+<div style="max-height:480px;overflow:auto">
+<table>
+  <thead><tr><th>N°</th><th>Date</th>
+    <th class="right">Capital restant dû avant</th>
+    <th class="right">Capital amorti</th><th class="right">Intérêts</th>
+    <th class="right">Assurance</th>
+    <th class="right">Échéance (assurance comprise)</th>
+    <th class="right">Capital restant dû après</th>
+    <th>Origine</th><th>Comptabilité</th></tr></thead>
+  <tbody>
+  {% for l in v.lignes %}
+  <tr{% if l.verrouillee %} style="background:#f1f3f5"{% endif %}>
+    <td>{{ l.rang }}</td><td>{{ l.date.strftime('%d/%m/%Y') }}</td>
+    <td class="right">{{ eur(l.crd_avant) }}</td>
+    <td class="right">{{ eur(l.capital) }}</td>
+    <td class="right">{{ eur(l.interets) }}{% if l.interets_attendus is not none %}
+      <span class="badge badge-warn" title="Calcul : capital restant dû × taux = {{ eur(l.interets_attendus) }} €">≠ {{ eur(l.interets_attendus) }}</span>{% endif %}</td>
+    <td class="right">{{ eur(l.assurance) }}</td>
+    <td class="right">{{ eur(l.total) }}</td>
+    <td class="right">{{ eur(l.crd) }}</td>
+    <td class="muted">{{ {'calcul':'calcul','saisie':'saisie','import':'banque'}[l.origine] }}</td>
+    <td>{% if l.lien %}🔒 {% if l.lien.etat == 'generee' %}écriture n° {{ l.lien.ecriture }} ({{ l.lien.exercice }}){% if l.lien.annulee %} — annulée{% endif %}{% else %}écartée{% endif %}{% elif l.verrouillee %}🔒{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot><tr><th colspan="3">Totaux</th>
+    <th class="right">{{ eur(v.totaux.capital) }}</th>
+    <th class="right">{{ eur(v.totaux.interets) }}</th>
+    <th class="right">{{ eur(v.totaux.assurance) }}</th>
+    <th colspan="4"></th></tr></tfoot>
+</table>
+</div>
+{% if lecture_seule %}
+<p class="muted">Lecture seule. <a href="/emprunts?annee={{ annee }}&emprunt={{ e.id }}#tableau">Modifier dans l'onglet Emprunts</a></p>
+{% endif %}
+{% endmacro %}
+"""
+
+PAGE_IMMO = MACRO_EMPRUNT + """
 {% if not exploitant %}
 <div class="card">
   <div class="card-header amber">Exploitant — configuration initiale
@@ -825,6 +882,7 @@ PAGE_IMMO = """
     {% endif %}
   </div>
   <div class="card-body" style="padding:0">
+    <p class="muted" style="margin:8px 16px"><strong>Plan d'amortissement du bien</strong> — ses composants et leur durée d'amortissement comptable.</p>
     <table>
       <thead>
         <tr>
@@ -871,6 +929,16 @@ PAGE_IMMO = """
       </tbody>
     </table>
   </div>
+  {% set vues_emprunt = emprunts_du_bien(bien['id']) if emprunts_du_bien is defined else [] %}
+  {% for v in vues_emprunt %}
+  <div class="card-body" style="border-top:1px solid #e3e6ea">
+    <details>
+      <summary style="cursor:pointer;font-weight:600">Tableau de remboursement de l'emprunt — {{ v.emprunt.preteur }}
+        <span class="muted" style="font-weight:400">(capital restant dû à ce jour : {{ eur(v.emprunt.crd_aujourd_hui) }} €)</span></summary>
+      {{ tableau_emprunt(v, true, annee) }}
+    </details>
+  </div>
+  {% endfor %}
 </div>
 {% endfor %}
 {% endif %}
@@ -2800,6 +2868,220 @@ PAGE_RECURRENTES = """
     </form>
     {% else %}
     <p class="muted">Aucune échéance sur cette période.</p>
+    {% endif %}
+  </div>
+</div>
+"""
+
+PAGE_EMPRUNTS = MACRO_EMPRUNT + """
+<div class="card" id="liste">
+  <div class="card-header">Emprunts du dossier</div>
+  <div class="card-body" style="padding:0">
+    <p class="muted" style="margin:10px 16px">{{ rappel }} Le tableau de la
+    banque fait foi : le calcul ne fait que le proposer.</p>
+    {% if emprunts %}
+    <table>
+      <tr><th>N°</th><th>Prêteur</th><th>Bien financé</th>
+          <th class="right">Capital</th><th class="right">Taux nominal</th>
+          <th>Durée</th><th class="right">Capital restant dû à ce jour</th><th></th></tr>
+      {% for e in emprunts %}
+      <tr{% if e.id == choisi %} style="background:#eef4fb"{% endif %}>
+        <td>{{ e.id }}</td>
+        <td>{{ e.preteur }}{% if e.reference %} <span class="muted">({{ e.reference }})</span>{% endif %}</td>
+        <td>{{ e.bien_libelle }}{% if e.date_cession %} <span class="badge badge-clos">cédé le {{ e.date_cession }}</span>{% endif %}</td>
+        <td class="right">{{ eur(e.capital) }} €</td>
+        <td class="right">{{ e.taux_pourcent }} %</td>
+        <td>{{ e.nb_echeances }} échéances ({{ e.periodicite }})</td>
+        <td class="right">{{ eur(e.crd_aujourd_hui) }} €</td>
+        <td style="white-space:nowrap">
+          <a href="/emprunts?annee={{ annee }}&emprunt={{ e.id }}#tableau">Tableau</a>
+          · <a href="/emprunts/{{ e.id }}/export.csv">Export CSV</a>
+          {% if not e.verrou %}
+          <form method="post" action="/emprunts/{{ e.id }}/supprimer" style="display:inline">
+            <input type="hidden" name="annee" value="{{ annee }}">
+            <button type="submit" class="btn" style="padding:2px 8px;font-size:12px"
+                    data-confirmer="Supprimer cet emprunt et son tableau ? Aucune échéance n'est encore passée en écriture : rien d'autre n'est touché.">Supprimer</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="muted" style="padding:12px 16px">Aucun emprunt décrit. Un bien
+    acheté comptant n'en a pas besoin ; sinon, décrivez le prêt ci-dessous
+    à partir de l'offre de la banque.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if vue %}
+<div class="card" id="tableau">
+  <div class="card-header">Tableau de remboursement de l'emprunt n° {{ vue.emprunt.id }}</div>
+  <div class="card-body">
+    {{ tableau_emprunt(vue, false, annee) }}
+
+    <h3 style="margin-top:16px">Remplacer une échéance par celle de la banque</h3>
+    {% if vue.verrou %}<p class="muted">Les échéances 1 à {{ vue.verrou }} sont verrouillées : elles sont passées en écriture ou écartées. Rétablir une échéance écartée la rend de nouveau modifiable.</p>{% endif %}
+    <form method="post" action="/emprunts/{{ vue.emprunt.id }}/ligne">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      <div class="grid3">
+        <div><label class="field">Échéance n°</label>
+          <input type="number" name="rang" min="{{ vue.verrou + 1 }}" required></div>
+        <div><label class="field">Date</label>
+          <input type="date" name="date_echeance" required></div>
+        <div><label class="field">Capital amorti (€)</label>
+          <input type="text" name="capital" required inputmode="decimal"></div>
+        <div><label class="field">Intérêts (€)</label>
+          <input type="text" name="interets" required inputmode="decimal"></div>
+        <div><label class="field">Assurance (€) <span class="opt">(facultatif)</span></label>
+          <input type="text" name="assurance" inputmode="decimal"></div>
+      </div>
+      <p class="muted">Le capital restant dû se déduit de la ligne précédente.
+      Si les échéances suivantes sont toutes calculées, elles sont
+      recalculées : le capital restant est amorti à échéances constantes
+      sur la durée restante — c'est ce que fait la banque après un
+      différé. Des intérêts différents du calcul sont acceptés et signalés :
+      la banque fait foi.</p>
+      <p><button type="submit"
+         data-confirmer="Remplacer cette échéance ? Les échéances calculées qui suivent seront recalculées. Aucune écriture déjà passée n'est modifiée.">Remplacer l'échéance</button></p>
+    </form>
+
+    <h3 id="banque" style="margin-top:16px">Importer le tableau de la banque (CSV)</h3>
+    <form method="post" action="/emprunts/{{ vue.emprunt.id }}/importer" enctype="multipart/form-data">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      <input type="file" name="tableau" accept=".csv,.txt" required>
+      <button type="submit"
+              data-confirmer="Remplacer le tableau par celui du fichier, à partir de sa première date ? Un fichier contenant une seule ligne en erreur est refusé en entier, et le tableau reste alors inchangé.">Importer</button>
+    </form>
+    <p class="muted">Colonnes, dans cet ordre : {{ colonnes_csv }}
+    (séparateur « ; », tabulation ou « , » ; en-tête facultative). Dates
+    JJ/MM/AAAA ; montants à deux décimales au plus. L'échéance peut
+    inclure l'assurance ou non, et le capital restant dû être celui d'avant
+    ou d'après l'échéance : la présentation est reconnue sur le fichier
+    entier. Le fichier commence à la première échéance, ou à celle à partir
+    de laquelle vous reprenez le prêt. Refusés plutôt que devinés : date
+    inexistante (31/02), séparateur décimal ambigu (1,234 ou 1.234,56),
+    ligne incomplète.</p>
+  </div>
+</div>
+{% endif %}
+
+<div class="card" id="apercu">
+  <div class="card-header">Échéances à passer en écriture</div>
+  <div class="card-body">
+    <form method="get" action="/emprunts#apercu" style="margin-bottom:12px">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      {% if choisi %}<input type="hidden" name="emprunt" value="{{ choisi }}">{% endif %}
+      Du <input type="date" name="du" value="{{ du }}" style="width:auto">
+      au <input type="date" name="au" value="{{ au }}" style="width:auto">
+      <button type="submit" class="btn">Actualiser</button>
+    </form>
+    <p class="muted">Chaque échéance échue (au {{ aujourd_hui }}) d'un
+    exercice ouvert passe UNE écriture de banque : intérêts en 661100,
+    assurance emprunteur en 616110, contrepartie 108000. Le capital n'est
+    pas comptabilisé. Une échéance qui ressemble à une opération déjà
+    saisie (même montant, à {{ fenetre }} jours près — la mensualité
+    importée du relevé, par exemple) est signalée et laissée décochée.</p>
+    {% if lignes %}
+    <form method="post" action="/emprunts/generer">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      <input type="hidden" name="du" value="{{ du }}">
+      <input type="hidden" name="au" value="{{ au }}">
+      {% if choisi %}<input type="hidden" name="emprunt" value="{{ choisi }}">{% endif %}
+      <table>
+        <tr><th>Générer</th><th>Date</th><th>Échéance</th>
+            <th class="right">Charges (intérêts + assurance)</th>
+            <th class="right">Prélèvement</th>
+            <th>Statut</th><th>Détail</th><th>Écarter</th></tr>
+        {% for l in lignes %}
+        <tr>
+          <td style="text-align:center">{% if l.statut == 'a_generer' %}
+            <input type="checkbox" name="retenir" value="{{ l.cle }}" style="width:auto"
+                   {{ 'checked' if l.cochee }}>{% endif %}</td>
+          <td>{{ l.date }}</td>
+          <td>{{ l.libelle }}</td>
+          <td class="right">{{ '%.2f'|format(l.charges)|replace('.', ',') }} €</td>
+          <td class="right">{{ '%.2f'|format(l.total)|replace('.', ',') }} €</td>
+          <td><span class="badge {{ {'a_generer':'badge-ok','deja_generee':'badge-clos','ecartee':'badge-clos','a_venir':'badge-warn','ignoree':'badge-err'}[l.statut] }}">{{ l.statut_libelle }}</span></td>
+          <td>
+            {% if l.motif %}{{ l.motif }}{% endif %}
+            {% for o in l.operations_liees %}opération n° {{ o.id }}{% if o.annulee %} (annulée){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+            {% for d in l.doublons %}
+            <div class="badge badge-warn" style="display:block;margin-top:3px">Doublon probable :
+              {{ d.libelle or d.type }} du {{ d.date }} ({{ '%.2f'|format(d.montant)|replace('.', ',') }} €){% if d.source == 'import' %} (importée){% endif %}</div>
+            {% endfor %}
+            {% for a in l.alertes %}<div class="badge badge-warn" style="display:block;margin-top:3px">{{ a }}</div>{% endfor %}
+            {% if l.statut == 'ecartee' %}
+            <button type="submit" class="btn" formaction="/emprunts/retablir"
+                    name="cle" value="{{ l.cle }}" style="padding:2px 8px;font-size:12px">Rétablir</button>
+            {% endif %}
+          </td>
+          <td style="text-align:center">{% if l.statut == 'a_generer' %}
+            <input type="checkbox" name="ecarter" value="{{ l.cle }}" style="width:auto"
+                   title="Déjà passée autrement : ne plus proposer, et verrouiller sa ligne du tableau (réversible : bouton Rétablir)">{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p style="margin-top:12px">
+        <button type="submit" class="btn-primary"
+                data-confirmer="Passer en écriture les échéances cochées ? Une écriture de banque par échéance (intérêts et assurance) ; les lignes correspondantes du tableau seront verrouillées. Tout le lot est enregistré en une fois, ou rien ne l'est.">Générer les échéances cochées</button>
+        <span class="muted">{{ a_generer }} échéance(s) à générer sur la période.</span></p>
+    </form>
+    {% else %}
+    <p class="muted">Aucune échéance sur cette période.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card" id="creation">
+  <div class="card-header green">Décrire un emprunt</div>
+  <div class="card-body">
+    {% if biens %}
+    <form method="post" action="/emprunts/creer">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      <div class="grid3">
+        <div><label class="field">Bien financé</label>
+          <select name="bien_id" required>
+            {% for b in biens %}<option value="{{ b[0] }}">{{ b[1] }}</option>{% endfor %}
+          </select></div>
+        <div><label class="field">Prêteur (banque)</label>
+          <input type="text" name="preteur" maxlength="120" required></div>
+        <div><label class="field">Référence du prêt <span class="opt">(facultatif)</span></label>
+          <input type="text" name="reference" maxlength="120"></div>
+        <div><label class="field">Capital emprunté (€)</label>
+          <input type="text" name="capital" required inputmode="decimal"></div>
+        <div><label class="field">Taux nominal annuel (%)
+          <span class="aide" data-aide="{{ aide_taux }}">?</span></label>
+          <input type="text" name="taux" required inputmode="decimal" placeholder="3,5"></div>
+        <div><label class="field">Durée (nombre d'échéances)</label>
+          <input type="number" name="nb_echeances" min="1" max="480" step="1" required></div>
+        <div><label class="field">Périodicité</label>
+          <select name="periodicite">
+            {% for p in periodicites %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+          </select></div>
+        <div><label class="field">Date de déblocage des fonds</label>
+          <input type="date" name="date_deblocage" required></div>
+        <div><label class="field">Date de la PREMIÈRE échéance</label>
+          <input type="date" name="date_premiere_echeance" required></div>
+        <div><label class="field">Assurance par échéance (€) <span class="opt">(facultatif)</span></label>
+          <input type="text" name="assurance" inputmode="decimal"></div>
+      </div>
+      <p class="muted">{{ aide_taux }} La date de la première échéance se
+      recopie de l'offre, elle n'est jamais déduite ; le jour est ensuite
+      tenu d'une échéance à l'autre (31 janvier, 28 ou 29 février, 31 mars,
+      30 avril). Un emprunt en cours depuis avant votre premier exercice se
+      décrit de la même façon, depuis l'offre : ses échéances antérieures
+      ne sont pas proposées à la génération. Première échéance brisée,
+      différé, taux variable, déblocages successifs : décrivez le prêt,
+      puis remplacez les lignes concernées par celles de la banque ou
+      importez son tableau.</p>
+      <p class="muted">{{ aide_deblocages }}</p>
+      <p><button type="submit">Créer l'emprunt et calculer son tableau</button></p>
+    </form>
+    {% else %}
+    <p class="muted">Enregistrez d'abord le bien financé, page
+    <a href="/immobilisations?annee={{ annee }}">Immobilisations</a>.</p>
     {% endif %}
   </div>
 </div>

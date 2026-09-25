@@ -75,6 +75,34 @@ CORPUS = [
      "mobilier…), durées d'usage, terrain non amortissable.",
      "seuil_immobilisation"),
 
+    # ── Emprunts ────────────────────────────────────────────────────────
+    ("Art. 39-1 du CGI ; BOI-BIC-CHG-50, § 1 et § 10",
+     "Charges financières : intérêts des emprunts déductibles",
+     "Onglet Emprunts : chaque échéance passe en charges ses seuls intérêts "
+     "(661100, ligne 294 du 2033-B) et son assurance emprunteur (616110). "
+     "Le remboursement du capital éteint une dette, ce n'est pas une "
+     "charge : il n'est pas comptabilisé, le tableau de remboursement le "
+     "suit pour information.", None),
+    ("Règlement ANC n° 2014-03 (PCG), plan de comptes de l'art. 1121-1 "
+     "(art. 932-1 jusqu'en 2024)",
+     "Comptes 164, 275, 616 et 6611",
+     "164 « Emprunts auprès des établissements de crédit » : rapproché du "
+     "capital restant dû quand le dossier le porte ; 6611 « Intérêts des "
+     "emprunts et dettes » (661100 ici) ; 616 « Primes d'assurances » "
+     "(assurance emprunteur) ; 275 « Dépôts et cautionnements versés » : la "
+     "part restituable d'une caution mutuelle est une créance, pas une "
+     "charge (libellé du gabarit « Frais de dossier / garantie »).", None),
+
+    ("Art. L313-25, 3° et L314-1 du Code de la consommation",
+     "Offre de prêt immobilier : échéancier des amortissements ; taux "
+     "effectif global",
+     "L313-25, 3° : l'offre d'un prêt à taux fixe comprend un échéancier "
+     "détaillant, pour chaque échéance, la part de capital et d'intérêts — "
+     "le tableau qui fait foi dans l'onglet Emprunts. L314-1 : le TAEG "
+     "ajoute aux intérêts les frais, taxes et commissions ; c'est pourquoi "
+     "le tableau se calcule au taux NOMINAL, jamais au TAEG. En cas de "
+     "conflit, le PCG et le CGI priment.", None),
+
     # ── Sortie du bien ──────────────────────────────────────────────────
     ("Art. 150 U et suivants du CGI",
      "Plus-values immobilières des particuliers",

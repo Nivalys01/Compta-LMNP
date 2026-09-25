@@ -29,6 +29,7 @@ en tâche de fond.
 """
 from __future__ import annotations
 
+import calendar
 import sqlite3
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -55,6 +56,23 @@ def _aujourd_hui() -> date:
     return date.today()
 
 
+def date_ancree(ancre: date, pas_mois: int, rang: int,
+                jour: int | None = None) -> date:
+    """Date de la `rang`-ième échéance (rang 0 = l'ancre), tous les
+    `pas_mois` mois, calculée depuis l'ANCRE — jamais depuis l'échéance
+    précédente, pour ne pas dériver (31/01 → 28-29/02 → 31/03, pas 28/03).
+
+    `jour` : jour du mois tenu d'une échéance à l'autre (défaut : celui de
+    l'ancre), borné au dernier jour du mois ; 0 = dernier jour du mois.
+    Jamais de débordement sur le mois suivant (un 31 février ne devient pas
+    un 3 mars)."""
+    mois = ancre.month - 1 + rang * pas_mois
+    annee, mois = ancre.year + mois // 12, mois % 12 + 1
+    dernier = calendar.monthrange(annee, mois)[1]
+    j = ancre.day if jour is None else jour
+    return date(annee, mois, dernier if j == 0 else min(j, dernier))
+
+
 @dataclass
 class Echeance:
     """Ce qu'une source demande de générer à une date."""
@@ -69,6 +87,22 @@ class Echeance:
     motif_source: str | None = None
     # Mises en garde propres à la source, affichées sans bloquer.
     alertes: list[str] = field(default_factory=list)
+    # Toutes les opérations en UNE écriture (échéance d'emprunt : intérêts
+    # et assurance ensemble, une seule contrepartie). Défaut : une écriture
+    # par opération, comme une saisie.
+    ecriture_unique: bool = False
+    # Rang de l'échéance chez la source (emprunt : n° d'échéance du
+    # tableau). Inscrit en base, et unique par source : l'idempotence vaut
+    # alors par (source, identifiant, rang) en plus de la date.
+    rang: int | None = None
+    # Montant réellement débité à l'échéance, s'il diffère de la somme des
+    # opérations (mensualité dont le capital n'est pas comptabilisé) : une
+    # opération déjà saisie de ce montant — le relevé importé en attente —
+    # est un doublon probable.
+    montant_total: float | None = None
+    # Proposée décochée même sans doublon probable : la source sait qu'un
+    # risque de double comptabilisation existe (ses `alertes` disent lequel).
+    decochee: bool = False
 
     @property
     def cle(self) -> str:
@@ -105,7 +139,8 @@ class Ligne:
         # Un doublon probable n'est pas bloqué, mais il n'est pas proposé
         # d'office : c'est à l'utilisateur de le retenir en connaissance
         # de cause.
-        return self.statut == A_GENERER and not self.doublons
+        return (self.statut == A_GENERER and not self.doublons
+                and not self.echeance.decochee)
 
 
 class LotAnnule(Exception):
@@ -133,12 +168,26 @@ def assurer_schema(conn: sqlite3.Connection) -> None:
         " date_echeance TEXT    NOT NULL,"
         " etat          TEXT    NOT NULL CHECK (etat IN ('generee','ecartee')),"
         " genere_le     TEXT    NOT NULL,"
+        " rang          INTEGER,"
         " UNIQUE (source, source_id, date_echeance))")
     conn.execute(
         "CREATE TABLE IF NOT EXISTS echeance_operation ("
         " echeance_id  INTEGER NOT NULL REFERENCES echeance_generee(id),"
         " operation_id INTEGER NOT NULL UNIQUE REFERENCES operation(id),"
         " PRIMARY KEY (echeance_id, operation_id))")
+
+
+def assurer_rang(conn: sqlite3.Connection) -> None:
+    """Colonne `rang` et son unicité par source (palier 11). Idempotent,
+    sans commit. Une base au palier 10 a la table sans la colonne."""
+    assurer_schema(conn)
+    colonnes = {r[1] for r in conn.execute(
+        "PRAGMA table_info(echeance_generee)")}
+    if "rang" not in colonnes:
+        conn.execute("ALTER TABLE echeance_generee ADD COLUMN rang INTEGER")
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS ux_echeance_rang "
+                 "ON echeance_generee(source, source_id, rang) "
+                 "WHERE rang IS NOT NULL")
 
 
 # ── Aperçu ───────────────────────────────────────────────────────────────
@@ -183,29 +232,51 @@ def doublons_probables(conn, e: Echeance) -> list[dict]:
     l'import les rattache toutes au premier bien, et le doublon typique —
     la même charge déjà importée — serait sinon invisible sur tout autre
     bien.
+
+    La LIGNE doit porter le montant, pas seulement l'opération : une
+    écriture d'échéance d'emprunt porte plusieurs opérations, et l'assurance
+    de 8 € d'une échéance ne ressemble pas aux intérêts de 8 € d'une autre
+    parce qu'ils partagent une écriture.
+
+    `montant_total` (facultatif) : toute opération de ce montant, quel que
+    soit son compte — une mensualité importée du relevé, rangée en attente
+    faute de ventilation, en est le cas type.
     """
     import gabarits
     du = (e.date - timedelta(days=FENETRE_DOUBLON_JOURS)).isoformat()
     au = (e.date + timedelta(days=FENETRE_DOUBLON_JOURS)).isoformat()
     vus, out = set(), []
+
+    def _ajouter(rows):
+        for oid, d, t, m, lib, src in rows:
+            if oid not in vus:
+                vus.add(oid)
+                out.append({"id": oid, "date": d, "type": t, "montant": m,
+                            "libelle": lib, "source": src})
+
     for op in e.operations:
         # Catalogue du code d'abord : pas de relecture de la base à chaque
         # ligne d'aperçu (constat T-09) ; la base pour un gabarit personnalisé.
         g = gabarits.GABARITS.get(op["type"]) or gabarits.gabarit(op["type"], conn)
         compte = g["compte"]
-        for oid, d, t, m, lib, src in conn.execute(
-                "SELECT DISTINCT o.id, o.date_operation, o.type, o.montant, "
-                "o.libelle, o.source FROM operation o "
-                "JOIN ligne l ON l.ecriture_id = o.ecriture_id "
-                "WHERE COALESCE(o.annulee,0)=0 AND l.compte_num=? "
-                "AND ROUND(o.montant,2)=ROUND(?,2) "
-                "AND (o.bien_id IS ? OR o.source='import') "
-                "AND o.date_operation BETWEEN ? AND ? ORDER BY o.date_operation",
-                (compte, op["montant"], e.bien_id, du, au)):
-            if oid not in vus:
-                vus.add(oid)
-                out.append({"id": oid, "date": d, "type": t, "montant": m,
-                            "libelle": lib, "source": src})
+        _ajouter(conn.execute(
+            "SELECT DISTINCT o.id, o.date_operation, o.type, o.montant, "
+            "o.libelle, o.source FROM operation o "
+            "JOIN ligne l ON l.ecriture_id = o.ecriture_id "
+            "WHERE COALESCE(o.annulee,0)=0 AND l.compte_num=? "
+            "AND ROUND(o.montant,2)=ROUND(?,2) "
+            "AND ROUND(l.debit + l.credit,2)=ROUND(?,2) "
+            "AND (o.bien_id IS ? OR o.source='import') "
+            "AND o.date_operation BETWEEN ? AND ? ORDER BY o.date_operation",
+            (compte, op["montant"], op["montant"], e.bien_id, du, au)))
+    if e.montant_total:
+        _ajouter(conn.execute(
+            "SELECT o.id, o.date_operation, o.type, o.montant, o.libelle, "
+            "o.source FROM operation o WHERE COALESCE(o.annulee,0)=0 "
+            "AND ROUND(o.montant,2)=ROUND(?,2) "
+            "AND (o.bien_id IS ? OR o.source='import') "
+            "AND o.date_operation BETWEEN ? AND ? ORDER BY o.date_operation",
+            (e.montant_total, e.bien_id, du, au)))
     return out
 
 
@@ -276,10 +347,7 @@ def generer(conn: sqlite3.Connection, echeances: list[Echeance],
         for ligne in lignes:
             e = ligne.echeance
             if ligne.cle in ecarter and ligne.statut == A_GENERER:
-                conn.execute(
-                    "INSERT INTO echeance_generee (source, source_id, "
-                    "date_echeance, etat, genere_le) VALUES (?,?,?,'ecartee',?)",
-                    (e.source, e.source_id, e.date.isoformat(), maintenant))
+                _inscrire(conn, e, "ecartee", maintenant)
                 ecartees.append(ligne.cle)
                 continue
             if ligne.cle not in retenues:
@@ -288,24 +356,21 @@ def generer(conn: sqlite3.Connection, echeances: list[Echeance],
                 non_generees.append(ligne)
                 continue
             try:
-                eid = conn.execute(
-                    "INSERT INTO echeance_generee (source, source_id, "
-                    "date_echeance, etat, genere_le) VALUES (?,?,?,'generee',?)",
-                    (e.source, e.source_id, e.date.isoformat(),
-                     maintenant)).lastrowid
-                ops = []
-                for op in e.operations:
-                    r = operations.saisir(
-                        conn, type=op["type"], montant=op["montant"],
+                eid = _inscrire(conn, e, "generee", maintenant)
+                if e.ecriture_unique:
+                    ops = operations.saisir_ventilee(
+                        conn, parts=e.operations,
                         date_operation=e.date.isoformat(),
-                        periode=op.get("periode"), bien_id=e.bien_id,
-                        tiers=op.get("tiers") or "", libelle=op.get("libelle"),
-                        exercice=e.date.year, piece_ref=op.get("piece_ref"),
-                        source=e.source, commit=False)
+                        bien_id=e.bien_id, libelle=e.libelle,
+                        exercice=e.date.year,
+                        piece_ref=e.operations[0].get("piece_ref"),
+                        source=e.source)["operation_ids"]
+                else:
+                    ops = _saisir_une_a_une(conn, e)
+                for oid in ops:
                     conn.execute("INSERT INTO echeance_operation "
                                  "(echeance_id, operation_id) VALUES (?,?)",
-                                 (eid, r["operation_id"]))
-                    ops.append(r["operation_id"])
+                                 (eid, oid))
             except Exception as exc:                 # noqa: BLE001
                 raise LotAnnule(e, exc) from exc
             creees.append({"cle": ligne.cle, "operations": ops})
@@ -316,6 +381,35 @@ def generer(conn: sqlite3.Connection, echeances: list[Echeance],
     return {"creees": creees, "ecartees": ecartees,
             "non_generees": non_generees,
             "nb_operations": sum(len(c["operations"]) for c in creees)}
+
+
+def _inscrire(conn, e: Echeance, etat: str, maintenant: str) -> int:
+    if e.rang is None:
+        return conn.execute(
+            "INSERT INTO echeance_generee (source, source_id, date_echeance, "
+            "etat, genere_le) VALUES (?,?,?,?,?)",
+            (e.source, e.source_id, e.date.isoformat(), etat,
+             maintenant)).lastrowid
+    return conn.execute(
+        "INSERT INTO echeance_generee (source, source_id, date_echeance, "
+        "etat, genere_le, rang) VALUES (?,?,?,?,?,?)",
+        (e.source, e.source_id, e.date.isoformat(), etat, maintenant,
+         e.rang)).lastrowid
+
+
+def _saisir_une_a_une(conn, e: Echeance) -> list[int]:
+    import operations
+    ops = []
+    for op in e.operations:
+        r = operations.saisir(
+            conn, type=op["type"], montant=op["montant"],
+            date_operation=e.date.isoformat(),
+            periode=op.get("periode"), bien_id=e.bien_id,
+            tiers=op.get("tiers") or "", libelle=op.get("libelle"),
+            exercice=e.date.year, piece_ref=op.get("piece_ref"),
+            source=e.source, commit=False)
+        ops.append(r["operation_id"])
+    return ops
 
 
 def retablir(conn: sqlite3.Connection, valeur_cle: str) -> None:

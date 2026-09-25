@@ -116,9 +116,21 @@ def _palier_10(conn: sqlite3.Connection) -> None:
     recurrentes.assurer_schema(conn)
 
 
+def _palier_11(conn: sqlite3.Connection) -> None:
+    """v11 — emprunts : tableau de remboursement, rang des échéances du
+    moteur (idempotence par emprunt × rang).
+
+    Aucune donnée existante n'est touchée : les tables naissent vides, et
+    la colonne `rang` ajoutée vaut NULL pour les échéances déjà générées
+    (charges récurrentes, qui n'en ont pas).
+    """
+    import emprunts
+    emprunts.assurer_schema(conn)
+
+
 PALIERS = {2: _palier_2, 3: _palier_3, 4: _palier_4, 5: _palier_5,
            6: _palier_6, 7: _palier_7, 8: _palier_8, 9: _palier_9,
-           10: _palier_10}
+           10: _palier_10, 11: _palier_11}
 
 # Garde-fou de développement. La boucle de `migrer` ignorait silencieusement
 # un palier absent, puis marquait la base au niveau du logiciel : une base
