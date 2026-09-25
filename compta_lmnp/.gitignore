@@ -40,7 +40,12 @@ certs/
 .env
 
 # --- Artefacts de construction ----------------------------------------------
+#     dist/ reçoit les constructions de l'arbre de travail : il peut être
+#     écrasé (par la suite de tests d'un commit antérieur à 8.58.0, par
+#     exemple). Les paquets PUBLIÉS, vérifiés contre leur tag, sont archivés
+#     à part — voir docs/PUBLIER_UNE_VERSION.md.
 dist/
+paquets-publies/
 build/
 *.spec
 .raccourci_bureau

@@ -65,3 +65,15 @@ def test_la_garde_de_session_nomme_chaque_ecart():
     assert conftest.ecarts_dist(avant, apres) == [
         "supprimé : c.zip", "créé : d.zip", "modifié : b.zip"]
     assert conftest.ecarts_dist(avant, dict(avant)) == []
+
+
+def test_les_paquets_publies_vivent_hors_de_toute_sortie_de_construction():
+    """Un commit antérieur à 8.58.0 écrit encore dans dist/ ; les paquets
+    publiés n'y sont plus. Aucune sortie de construction — réelle ou
+    jetable — ne doit désigner leur dossier."""
+    publies = os.path.realpath(conftest._PAQUETS_PUBLIES)
+    assert publies != os.path.realpath(conftest._DIST_REEL)
+    assert not os.path.realpath(
+        construire_distribution.DOSSIER_SORTIE).startswith(publies)
+    assert not os.path.realpath(os.path.join(
+        construire_distribution.HERE, "dist")).startswith(publies)

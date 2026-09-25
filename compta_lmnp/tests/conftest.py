@@ -117,6 +117,9 @@ def pytest_collection_modifyitems(config, items):
 # à la fin, et fait ÉCHOUER la session en nommant ce qui a changé.
 
 _DIST_REEL = os.path.join(_RACINE, "dist")
+# Les paquets PUBLIÉS, archivés hors de dist/ (docs/PUBLIER_UNE_VERSION.md).
+# Aucun code ne doit y écrire ; la garde de session le vérifie aussi.
+_PAQUETS_PUBLIES = os.path.join(_RACINE, "paquets-publies")
 
 
 def etat_dist(dossier: str = _DIST_REEL) -> dict:
@@ -153,6 +156,7 @@ def _dist_jetable(request, tmp_path_factory, monkeypatch):
 
 def pytest_sessionstart(session):
     session.config._etat_dist_reel = etat_dist()
+    session.config._etat_paquets_publies = etat_dist(_PAQUETS_PUBLIES)
 
 
 def pytest_sessionfinish(session, exitstatus):
@@ -160,12 +164,15 @@ def pytest_sessionfinish(session, exitstatus):
     import shutil as _shutil
 
     avant = getattr(session.config, "_etat_dist_reel", None)
+    publies = getattr(session.config, "_etat_paquets_publies", None)
     if avant is not None:
-        ecarts = ecarts_dist(avant, etat_dist())
+        ecarts = ecarts_dist(avant, etat_dist()) + [
+            f"paquets-publies/ — {e}" for e in
+            ecarts_dist(publies or {}, etat_dist(_PAQUETS_PUBLIES))]
         if ecarts:
             rapport = session.config.pluginmanager.get_plugin("terminalreporter")
-            message = ("\nLA SUITE A MODIFIÉ LE VRAI dist/ — les paquets de "
-                       "version n'appartiennent pas aux tests :\n  "
+            message = ("\nLA SUITE A MODIFIÉ dist/ OU paquets-publies/ — les "
+                       "paquets de version n'appartiennent pas aux tests :\n  "
                        + "\n  ".join(ecarts)
                        + "\nReconstruisez les paquets concernés depuis leur "
                        "tag avant toute release.")
