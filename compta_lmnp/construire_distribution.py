@@ -139,10 +139,22 @@ INTERDITS = [
 ]
 
 
-def construire() -> str:
+# Dossier des paquets construits. Constante de module, lue À L'APPEL : la
+# suite de tests la redirige vers un dossier jetable (tests/conftest.py).
+# Elle construisait dans le VRAI dist/, sous le numéro de la version en
+# cours : chaque passage écrasait le paquet de cette version par le code
+# de l'arbre de travail — et le SUPPRIMAIT quand un test provoquait un
+# refus de construction, la garde effaçant « le zip fautif », homonyme du
+# paquet réel. Constaté le 2026-09-25 : les zips 8.56.0 et 8.57.0 de dist/
+# contenaient le code de la version suivante.
+DOSSIER_SORTIE = os.path.join(HERE, "dist")
+
+
+def construire(dossier_sortie: str | None = None) -> str:
     version = open(os.path.join(HERE, "VERSION"), encoding="utf-8").read().strip()
-    os.makedirs(os.path.join(HERE, "dist"), exist_ok=True)
-    cible = os.path.join(HERE, "dist", f"compta_lmnp_client_v{version}.zip")
+    dossier = dossier_sortie or DOSSIER_SORTIE
+    os.makedirs(dossier, exist_ok=True)
+    cible = os.path.join(dossier, f"compta_lmnp_client_v{version}.zip")
 
     # (chemin dans le paquet, chemin sur le disque)
     fichiers = ([(f"modules/{f}", f"modules/{f}") for f in MODULES_PROD]

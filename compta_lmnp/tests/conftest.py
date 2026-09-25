@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 import os
+import re
 import sys
+
+import pytest
 
 # Rend le paquet importable depuis tests/ : la racine pour les points
 # d'entrée et les outils (app, cli, verifier_depot…), et modules/ pour les
@@ -98,9 +101,80 @@ def pytest_collection_modifyitems(config, items):
 # Sur un clone public (pas de reference/), rien n'est touché : les données
 # y sont anonymisées, et l'inspection reste possible.
 
+# ── Le VRAI dist/ n'appartient pas à la suite ─────────────────────────────
+#
+# `construire_distribution.construire()` écrivait dans dist/, sous le numéro
+# de la version en cours : chaque passage de la suite remplaçait le paquet
+# de cette version par le code de l'arbre de travail, et le SUPPRIMAIT
+# quand un test provoquait un refus de construction (la garde efface « le
+# zip fautif », homonyme du paquet réel). Constaté le 2026-09-25 : les zips
+# 8.56.0 et 8.57.0 de dist/ contenaient la version suivante, et une release
+# a failli partir avec.
+#
+# Deux défenses. La fixture redirige toute construction vers un dossier
+# jetable, propre au test. La garde de session, elle, ne suppose rien sur
+# la façon dont un test construit : elle relève dist/ au début, le compare
+# à la fin, et fait ÉCHOUER la session en nommant ce qui a changé.
+
+_DIST_REEL = os.path.join(_RACINE, "dist")
+
+
+def etat_dist(dossier: str = _DIST_REEL) -> dict:
+    """{nom: (taille, date de modification)} des fichiers de `dossier`."""
+    if not os.path.isdir(dossier):
+        return {}
+    etat = {}
+    for nom in os.listdir(dossier):
+        st = os.stat(os.path.join(dossier, nom))
+        etat[nom] = (st.st_size, st.st_mtime_ns)
+    return etat
+
+
+def ecarts_dist(avant: dict, apres: dict) -> list[str]:
+    return ([f"supprimé : {n}" for n in sorted(set(avant) - set(apres))]
+            + [f"créé : {n}" for n in sorted(set(apres) - set(avant))]
+            + [f"modifié : {n}" for n in sorted(set(avant) & set(apres))
+               if avant[n] != apres[n]])
+
+
+@pytest.fixture(autouse=True)
+def _dist_jetable(request, tmp_path_factory, monkeypatch):
+    import hashlib
+
+    import construire_distribution
+    # Identifiant COMPLET du test : deux tests homonymes de fichiers
+    # différents ne partagent pas leur dossier.
+    ident = request.node.nodeid
+    nom = (re.sub(r"[^A-Za-z0-9_-]", "_", request.node.name)[:50] + "-"
+           + hashlib.sha256(ident.encode()).hexdigest()[:8])
+    monkeypatch.setattr(construire_distribution, "DOSSIER_SORTIE",
+                        str(tmp_path_factory.getbasetemp() / "dist" / nom))
+
+
+def pytest_sessionstart(session):
+    session.config._etat_dist_reel = etat_dist()
+
+
 def pytest_sessionfinish(session, exitstatus):
     import os as _os
     import shutil as _shutil
+
+    avant = getattr(session.config, "_etat_dist_reel", None)
+    if avant is not None:
+        ecarts = ecarts_dist(avant, etat_dist())
+        if ecarts:
+            rapport = session.config.pluginmanager.get_plugin("terminalreporter")
+            message = ("\nLA SUITE A MODIFIÉ LE VRAI dist/ — les paquets de "
+                       "version n'appartiennent pas aux tests :\n  "
+                       + "\n  ".join(ecarts)
+                       + "\nReconstruisez les paquets concernés depuis leur "
+                       "tag avant toute release.")
+            if rapport:
+                rapport.write_line(message, red=True, bold=True)
+            else:
+                print(message, file=sys.stderr)
+            session.exitstatus = pytest.ExitCode.TESTS_FAILED
+            exitstatus = session.exitstatus
 
     racine = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
     if not _os.path.isdir(_os.path.join(racine, "reference")):
