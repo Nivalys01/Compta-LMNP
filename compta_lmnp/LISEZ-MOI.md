@@ -459,6 +459,21 @@ l'écart est affiché, avec le rappel qu'une rectificative peut être
 nécessaire. Les dépôts suivent les sauvegardes, et une restauration les
 conserve.
 
+Si un dépôt porte sur un exercice que la sauvegarde choisie ne contient pas,
+la restauration est refusée et liste les dépôts qui seraient perdus. Pour
+revenir malgré tout à cette sauvegarde, notez-les, supprimez-les depuis la
+page Liasse, puis relancez la restauration. Il n'y a volontairement pas de
+bouton « restaurer quand même » : la référence d'un accusé de réception est
+la preuve d'un dépôt dans les délais, et un passage en force en un clic
+devient vite un réflexe. (Pour un script, `perennite.restaurer` accepte
+`perdre_depots=True`.)
+
+**Exercice repris sans historique des déficits.** Un exercice clôturé ailleurs
+puis importé n'a pas de suivi des déficits par millésime. Sa liasse s'affiche
+quand même, avec un avertissement : les déficits en report et les cases
+5GA à 5GJ de la 2042-C-PRO y sont marqués « non suivis », à reprendre de la
+dernière déclaration. Ils ne sont jamais affichés à zéro.
+
 ## Bac à sable & audit du cycle complet
 
 Le **bac à sable** est un dossier comptable jetable (`bac_a_sable.db`),

@@ -506,7 +506,21 @@ def immobilisations_2033c(conn: sqlite3.Connection, annee: int) -> dict:
 
 # ── Suivi des reports (39 C + déficits LMNP) ─────────────────────────────────
 
-def suivi_reports(conn: sqlite3.Connection, annee: int) -> dict:
+class HistoriqueDeficitsIndisponible(ValueError):
+    """Exercice clos sans suivi des déficits par millésime (reprise d'un
+    dossier tenu ailleurs, ou clôture antérieure à ce suivi)."""
+
+
+def suivi_reports(conn: sqlite3.Connection, annee: int, *,
+                  tolerer_sans_historique: bool = False) -> dict:
+    """Suivi des reports (39 C, déficits LMNP par millésime).
+
+    Sans historique des déficits pour un exercice clos, lève
+    `HistoriqueDeficitsIndisponible` — sauf `tolerer_sans_historique`, où
+    les déficits sont rendus NON SUIVIS : liste vide, totaux à None et
+    `deficits_indisponibles` porte le motif. Jamais de zéro à la place
+    d'un montant inconnu : un déficit absent passerait pour un déficit nul.
+    """
     s39 = _suivi_39c(conn, annee)
     # Stock 39 C PERDU à la cession d'un bien. La ventilation par bien
     # l'enregistre (colonne sortie_bien) et le PDF le montre, mais le suivi
@@ -526,6 +540,7 @@ def suivi_reports(conn: sqlite3.Connection, annee: int) -> dict:
         snapshot = conn.execute(
             "SELECT details_json FROM suivi_deficits WHERE exercice_annee=?",
             (annee,)).fetchone()
+    indisponible = None
     if snapshot is not None:
         deficits = json.loads(snapshot[0])
     else:
@@ -534,11 +549,13 @@ def suivi_reports(conn: sqlite3.Connection, annee: int) -> dict:
         clos = conn.execute("SELECT 1 FROM exercice WHERE annee>=? AND statut='clos'",
                             (annee,)).fetchone()
         if clos:
-            raise ValueError(
+            indisponible = (
                 f"Historique des déficits indisponible pour {annee} : "
                 "exercice clos sans suivi par millésime. Utilisez les archives "
                 "de déclaration ou une sauvegarde antérieure à la clôture.")
-        deficits = [dict(annee_origine=a, montant_initial=round(m, 2),
+            if not tolerer_sans_historique:
+                raise HistoriqueDeficitsIndisponible(indisponible)
+        deficits = [] if indisponible else [dict(annee_origine=a, montant_initial=round(m, 2),
                          solde=round(so, 2), annee_expiration=e,
                          solde_ouverture=round(so, 2), impute=0,
                          perte_peremption=0)
@@ -557,10 +574,12 @@ def suivi_reports(conn: sqlite3.Connection, annee: int) -> dict:
     import fiscal as _fiscal
     return {"suivi_39c": s39, "deficits": deficits,
             "suivi_39c_par_bien": _fiscal.suivi_39c_par_bien(conn, annee),
-            "total_deficits": total_deficits,
-            "total_deficits_perimes": total_perimes,
+            "deficits_indisponibles": indisponible,
+            "total_deficits": None if indisponible else total_deficits,
+            "total_deficits_perimes": None if indisponible else total_perimes,
             "sortie_39c": round(sortie_39c or 0.0, 2),
-            "total_restant": round(s39["stock_cloture"] + total_deficits, 2)}
+            "total_restant": None if indisponible else
+                round(s39["stock_cloture"] + total_deficits, 2)}
 
 
 # ── 2031 / 2031 bis / aide 2042C-PRO ─────────────────────────────────────────
@@ -573,10 +592,17 @@ def recap_2031(conn: sqlite3.Connection, annee: int) -> dict:
             "bic_non_pro_7b_deficit": round(-rf, 2) if rf < -TOL else None}
 
 
-def aide_2042c(conn: sqlite3.Connection, annee: int) -> dict:
-    """Cases pré-calculées pour la 2042C-PRO (régime réel, cas général)."""
+def aide_2042c(conn: sqlite3.Connection, annee: int, *,
+               rep: dict | None = None) -> dict:
+    """Cases pré-calculées pour la 2042C-PRO (régime réel, cas général).
+
+    `rep` : suivi des reports déjà lu (par `generer`). S'il porte des
+    déficits non suivis, les cases 5GA→5GJ sont déclarées non calculables
+    (`deficits_indisponibles`) plutôt que laissées vides, ce qui se lirait
+    « aucun déficit antérieur ».
+    """
     b = resultat_2033b(conn, annee)
-    rep = suivi_reports(conn, annee)
+    rep = rep if rep is not None else suivi_reports(conn, annee)
     rf = b["resultat_fiscal_lmnp"]
 
     # 5GA (année N-10) → 5GJ (année N-1) : déficits antérieurs non déduits.
@@ -604,6 +630,7 @@ def aide_2042c(conn: sqlite3.Connection, annee: int) -> dict:
     return {"case_5NA": euro(rf) if rf > TOL else None,
             "case_5NY": euro(-rf) if rf < -TOL else None,
             "cases_deficits_anterieurs": cases_deficits,
+            "deficits_indisponibles": rep.get("deficits_indisponibles"),
             "note": ("Montants indicatifs, arrondis à l'euro. À vérifier au "
                      "niveau du foyer fiscal, notamment en présence d'autres "
                      "activités de location meublée.")}
@@ -716,9 +743,13 @@ def generer(conn: sqlite3.Connection, annee: int) -> dict:
     b2033b = resultat_2033b(conn, annee)
     b2033a = bilan_2033a(conn, annee)
     b2033c = immobilisations_2033c(conn, annee)
-    reports = suivi_reports(conn, annee)
+    # Un exercice clos sans historique des déficits (dossier repris d'un
+    # autre outil) rendait la liasse ENTIÈRE indisponible, alors que seuls
+    # les déficits en report sont inconnus. On l'édite, déficits marqués
+    # « non suivis » et l'avertissement en tête.
+    reports = suivi_reports(conn, annee, tolerer_sans_historique=True)
     r2031 = recap_2031(conn, annee)
-    aide = aide_2042c(conn, annee)
+    aide = aide_2042c(conn, annee, rep=reports)
     cf = _cloture_fiscale(conn, annee)
 
     controles = [
@@ -757,6 +788,11 @@ def generer(conn: sqlite3.Connection, annee: int) -> dict:
         "cession_de_l_exercice": ag_cession,
         "statut_exercice": ex["statut"],
         "provisoire": ex["statut"] != "clos",
+        "avertissements": ([reports["deficits_indisponibles"]
+                            + " Les déficits en report et les cases 5GA à "
+                              "5GJ de la 2042-C-PRO ne sont pas calculés : "
+                              "reprenez-les de votre dernière déclaration."]
+                           if reports["deficits_indisponibles"] else []),
         "exploitant": dict(exploitant) if exploitant else None,
         "page_garde": {
             "ca_ht": b2033b["produits_218"],

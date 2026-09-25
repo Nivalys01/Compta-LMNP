@@ -493,6 +493,9 @@ def test_restauration_refusee_si_l_exercice_du_depot_manque(chemin):
         perennite.restaurer(chemin, sauvegarde)
     msg = str(exc.value)
     assert "1 dépôt(s)" in msg and "2027" in msg and "ACC-2027" in msg
+    # La voie de sortie est donnée, et l'absence de passage en force expliquée.
+    assert "supprimez ces dépôts depuis la page Liasse" in msg
+    assert "pas de bouton « restaurer quand même »" in msg
     # Base courante intacte, et rien n'a été entrepris.
     assert _empreinte(chemin) == avant
     assert set(os.listdir(perennite.dossier_sauvegardes(chemin))) == copies

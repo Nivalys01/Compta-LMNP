@@ -109,6 +109,10 @@ main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-grid .full { grid-column: 1 / -1; }
 .form-grid .w1   { grid-column: span 1; }
+/* Trois champs par ligne (quittances, dépôts). Utilisée sans être définie
+   jusqu'en 8.56.0 : les champs s'empilaient faute de grille. */
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 700px) { .grid3 { grid-template-columns: 1fr; } }
 label.field { display: block; font-size: 12px; font-weight: 600;
               color: #555; margin-bottom: 4px; }
 label.field .opt { font-weight: 400; color: #999; }
@@ -1415,6 +1419,9 @@ PAGE_LIASSE = """
 <strong>provisoires</strong> (la dotation aux amortissements et la mécanique
 39 C / déficits ne sont figées qu'à la clôture).</div>
 {% endif %}
+{% for a in L.avertissements %}
+<div class="flash flash-warn">{{ a }}</div>
+{% endfor %}
 
 <div class="card">
   <div class="card-header">Liasse fiscale — Année fiscale {{ L.annee }}
@@ -1440,8 +1447,12 @@ PAGE_LIASSE = """
       <tr><th colspan="3">Restant à imputer sur les exercices suivants</th></tr>
       <tr><th>Amort. reportés art. 39 C</th><th>Déficits LMNP</th><th>Total</th></tr>
       <tr><td class="num">{{ eur(L.page_garde.restant_39c) }}</td>
+          {% if L.reports.deficits_indisponibles %}
+          <td class="num">non suivi</td><td class="num"><strong>non calculable</strong></td></tr>
+          {% else %}
           <td class="num">{{ eur(L.page_garde.restant_deficits) }}</td>
           <td class="num"><strong>{{ eur(L.page_garde.restant_total) }}</strong></td></tr>
+          {% endif %}
     </table>
   </div>
 </div>
@@ -1631,10 +1642,10 @@ PAGE_LIASSE = """
         <td class="num">{{ eur(d.solde) }}</td>
         <td class="num">{{ d.annee_expiration }}{% if d.perime %} <b style="color:#c5221f">— périmé</b>{% endif %}</td></tr>
     {% else %}
-    <tr><td colspan="4" class="muted">Aucun déficit LMNP en report.</td></tr>
+    <tr><td colspan="4" class="muted">{{ 'Déficits non suivis pour cet exercice : voir l’avertissement en tête de page.' if L.reports.deficits_indisponibles else 'Aucun déficit LMNP en report.' }}</td></tr>
     {% endfor %}
     <tr class="tot"><td>Total déficits reportables</td><td></td>
-        <td class="num">{{ eur(L.reports.total_deficits) }}</td><td></td></tr>
+        <td class="num">{{ 'non suivi' if L.reports.deficits_indisponibles else eur(L.reports.total_deficits) }}</td><td></td></tr>
   </table></div>
 </div>
 
@@ -1653,6 +1664,10 @@ PAGE_LIASSE = """
         <td>Déficit antérieur non encore déduit — millésime {{ c.annee_origine }}</td>
         <td class="num">{{ c.montant }}</td></tr>
     {% endfor %}
+    {% if L.aide_2042c.deficits_indisponibles %}
+    <tr><td><strong>5GA→5GJ</strong></td>
+        <td>Déficits antérieurs — non calculables, historique non suivi</td>
+        <td class="num">à reprendre de la dernière déclaration</td></tr>{% endif %}
   </table>
   <p class="muted" style="padding:10px 12px">{{ L.aide_2042c.note }}</p></div>
 </div>
@@ -1692,7 +1707,7 @@ PAGE_LIASSE = """
     {% if D.clos %}
     <form method="post" action="/depots/enregistrer" style="margin-top:16px">
       <input type="hidden" name="annee" value="{{ D.annee }}">
-      <div class="form-grid">
+      <div class="grid3">
         <div><label class="field">Déclaration</label>
           <select name="type" required>
             {% for t in D.types %}<option value="{{ t.code }}">{{ t.libelle }}</option>{% endfor %}

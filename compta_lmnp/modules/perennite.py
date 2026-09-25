@@ -304,7 +304,10 @@ def restaurer(db_path: str, sauvegarde: str, *,
          que la restauration soit elle-même réversible.
     Les dépôts de déclaration de la base courante sont reportés dans la base
     restaurée (voir plus bas) ; `perdre_depots=True` lève le refus opposé
-    quand l'un d'eux porte sur un exercice absent de la sauvegarde.
+    quand l'un d'eux porte sur un exercice absent de la sauvegarde. Cette
+    option n'est exposée ni dans l'interface ni en ligne de commande, À
+    DESSEIN : elle sert aux scripts et aux tests. L'utilisateur passe par la
+    suppression des dépôts concernés, une par une (message de refus).
     Retourne le chemin de la copie de sûreté créée avant restauration
     (ou une chaîne vide si la base n'existait pas).
     """
@@ -393,9 +396,18 @@ def restaurer(db_path: str, sauvegarde: str, *,
                 f"Cette restauration ferait disparaître {len(perdus)} dépôt(s) "
                 "de déclaration enregistré(s), faute d'exercice correspondant "
                 "dans la sauvegarde :\n  - " + "\n  - ".join(perdus) + "\n\n"
-                "Ces déclarations ont réellement été déposées : notez leurs "
-                "dates et références avant de choisir une sauvegarde plus "
-                "récente, qui contient ces exercices.")
+                "Ces déclarations ont réellement été déposées. Choisissez de "
+                "préférence une sauvegarde plus récente, qui contient ces "
+                "exercices. Pour revenir malgré tout à celle-ci : notez les "
+                "dates et références ci-dessus, supprimez ces dépôts depuis "
+                "la page Liasse de leur exercice, puis relancez la "
+                "restauration.\n\n"
+                "Il n'y a volontairement pas de bouton « restaurer quand "
+                "même » : la référence d'un accusé de réception est la preuve "
+                "d'un dépôt dans les délais, et un passage en force en un clic "
+                "devient vite un réflexe. Les supprimer une à une, chacune "
+                "confirmée, oblige à les avoir sous les yeux avant qu'elles "
+                "disparaissent.")
         if perdus:
             annees = _depots.annees_de(sauvegarde)
             depots_courants = [d for d in depots_courants if d[1] in annees]

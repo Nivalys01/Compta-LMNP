@@ -159,3 +159,95 @@ def test_eur_ne_leve_sur_aucune_valeur_inattendue():
     for valeur in ("douze", [1, 2], {"a": 1}, object()):
         rendu = formats.eur(valeur)
         assert "valeur inattendue" in rendu, (valeur, rendu)
+
+
+# ── Exercice clos sans historique des déficits ───────────────────────────
+#
+# Un exercice clôturé ailleurs puis repris (ici le 2025 du jeu de
+# démonstration) n'a pas de suivi des déficits par millésime. La liasse
+# ENTIÈRE était refusée, alors que seuls les déficits en report sont
+# inconnus — et que la page Liasse porte aussi le suivi des dépôts.
+
+FEC_DEMO = os.path.join(HERE, "demo", "FEC_DEMO_2025.txt")
+
+
+@pytest.fixture()
+def demo(tmp_path):
+    c = init_db.init_demo(str(tmp_path / "demo.db"), FEC_DEMO, 2026)
+    yield c
+    c.close()
+
+
+def test_liasse_sans_historique_des_deficits_s_edite_avec_avertissement(demo):
+    import liasse
+    L = liasse.generer(demo, 2025)
+    assert len(L["avertissements"]) == 1
+    assert "Historique des déficits indisponible pour 2025" in L["avertissements"][0]
+    assert "5GA à 5GJ" in L["avertissements"][0]
+    # Inconnu n'est pas zéro : totaux à None, jamais 0.
+    assert L["reports"]["deficits"] == []
+    assert L["reports"]["total_deficits"] is None
+    assert L["reports"]["total_restant"] is None
+    assert L["page_garde"]["restant_deficits"] is None
+    assert L["aide_2042c"]["cases_deficits_anterieurs"] == []
+    assert L["aide_2042c"]["deficits_indisponibles"]
+    # Le reste est calculé normalement.
+    assert L["f2033b"]["produits_218"] > 0
+
+
+def test_la_garde_des_deficits_reste_stricte_hors_liasse(demo):
+    """Seule l'édition de la liasse tolère le manque : un appel direct lève
+    toujours, pour qu'aucun autre usage ne prenne un vide pour un zéro."""
+    import liasse
+    with pytest.raises(liasse.HistoriqueDeficitsIndisponible):
+        liasse.suivi_reports(demo, 2025)
+    with pytest.raises(ValueError, match="Historique des déficits indisponible"):
+        liasse.aide_2042c(demo, 2025)
+
+
+def test_page_liasse_sans_historique_affiche_le_manque(demo, tmp_path,
+                                                       monkeypatch):
+    demo.close()
+    monkeypatch.setenv("COMPTA_DB", str(tmp_path / "demo.db"))
+    monkeypatch.setenv("COMPTA_DB_BAC_A_SABLE", str(tmp_path / "bac.db"))
+    import app as app_mod
+    importlib.reload(app_mod)
+    monkeypatch.setattr(app_mod, "HERE", str(tmp_path))
+    try:
+        r = app_mod.app.test_client().get("/liasse?annee=2025")
+        page = r.get_data(as_text=True)
+        assert r.status_code == 200
+        assert "Liasse indisponible" not in page
+        assert "Historique des déficits indisponible pour 2025" in page
+        assert "non suivi" in page and "non calculable" in page
+        assert "Aucun déficit LMNP en report" not in page
+        assert 'id="depots"' in page          # le suivi des dépôts reste accessible
+    finally:
+        monkeypatch.delenv("COMPTA_DB")
+        importlib.reload(app_mod)
+
+
+def test_pdf_sans_historique_nomme_le_manque(demo):
+    import io
+    import liasse
+    pytest.importorskip("reportlab")
+    import liasse_pdf
+    L = liasse.generer(demo, 2025)
+    textes = []
+    original = liasse_pdf.Paragraph
+
+    def espion(texte, *a, **k):
+        textes.append(texte)
+        return original(texte, *a, **k)
+    import unittest.mock
+    with unittest.mock.patch.object(liasse_pdf, "Paragraph", espion):
+        liasse_pdf.generer_pdf(L, io.BytesIO())
+    tout = "\n".join(textes)
+    assert "ATTENTION : Historique des déficits indisponible" in tout
+    assert "Aucun déficit LMNP en stock." not in tout
+
+
+def test_grid3_est_definie():
+    """La grille à trois champs était utilisée sans être définie."""
+    from pages import CSS
+    assert ".grid3 {" in CSS

@@ -149,6 +149,19 @@ Les signalements de défauts et les correctifs sont bienvenus — voir
 donnée réelle** dans une contribution, et **un test de non-régression** par
 correctif.
 
+## Liste de contrôle avant ouverture du dépôt
+
+Trois gestes, dans cet ordre, et le premier conditionne les deux autres :
+
+1. **Rendre le dépôt public.** Tant qu'il ne l'est pas, le lien du pied de
+   page répond 404 à qui n'y a pas accès, et l'offre de source de
+   l'article 13 n'est pas tenue (constat R-01).
+2. **Poser le tag de version**, pour rattacher la source publiée à la version
+   qui tourne chez l'utilisateur.
+3. **Vérifier le lien du pied de page anonymement** — déconnecté, ou en
+   navigation privée. Un test automatique ne peut pas le faire à votre place :
+   il constate la présence du lien, jamais son accessibilité.
+
 ## État du projet et limites connues
 
 Le logiciel est utilisé en production par son auteur. Dix-huit passes d'audit

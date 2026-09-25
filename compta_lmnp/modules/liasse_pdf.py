@@ -197,7 +197,10 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
             st["note"]))
     E.append(Spacer(1, 6))
 
+    for avert in L.get("avertissements", []):
+        E.append(Paragraph("ATTENTION : " + _xml(avert), st["note"]))
     g = L["page_garde"]
+    sans_def = bool(L["reports"].get("deficits_indisponibles"))
     E.append(_table([
         ["Chiffres clés", "Montant"],
         ["Recettes de l'exercice (CA HT)", _eur(g["ca_ht"])],
@@ -205,8 +208,10 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
         ["Déficit LMNP généré", _eur(g["deficit_lmnp"])],
         ["Revenu imposable (2042C-PRO)", _eur(g["revenu_imposable"])],
         ["Amortissements en report (art. 39 C)", _eur(g["restant_39c"])],
-        ["Déficits LMNP en stock", _eur(g["restant_deficits"])],
-        ["Total des reports disponibles", _eur(g["restant_total"])],
+        ["Déficits LMNP en stock",
+         "non suivi" if sans_def else _eur(g["restant_deficits"])],
+        ["Total des reports disponibles",
+         "non calculable" if sans_def else _eur(g["restant_total"])],
     ], largeurs=[110 * mm, 60 * mm]))
 
     # ── Projection de clôture (exercice ouvert uniquement) ───────────────
@@ -438,6 +443,10 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
                    aligne_droite=(1, 2))
         _ligne_tot(t, len(lignes) - 1)
         E.append(t)
+    elif rep.get("deficits_indisponibles"):
+        E.append(Paragraph("Déficits non suivis pour cet exercice : voir "
+                           "l'avertissement en tête de document.",
+                           st["normal"]))
     else:
         E.append(Paragraph("Aucun déficit LMNP en stock.", st["normal"]))
 
@@ -465,6 +474,9 @@ def generer_pdf(L: dict, chemin_ou_buffer) -> None:
     for cd in aide["cases_deficits_anterieurs"]:
         lignes.append([f"{cd['case']} — déficit {cd['annee_origine']} "
                        "non encore déduit", _eur(cd["montant"])])
+    if aide.get("deficits_indisponibles"):
+        lignes.append(["5GA à 5GJ — déficits antérieurs non calculables "
+                       "(historique non suivi)", "à reprendre"])
     if len(lignes) == 1:
         lignes.append(["Aucune case à servir", "—"])
     E.append(_table(lignes, largeurs=[110 * mm, 60 * mm]))

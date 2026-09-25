@@ -48,7 +48,30 @@ possibilité même de signaler l'écart. `perennite.restaurer` reporte
 maintenant les dépôts de la base courante dans la base restaurée. Si l'un
 d'eux porte sur un exercice absent de la sauvegarde, la restauration est
 refusée par défaut, avant toute écriture, en listant les dépôts qui seraient
-perdus, comme pour les quittances.
+perdus, comme pour les quittances. Pour revenir malgré tout à cette
+sauvegarde, on supprime ces dépôts un par un depuis la page Liasse, puis on
+relance. Il n'y a volontairement pas de bouton « restaurer quand même » : la
+référence d'un accusé est la preuve d'un dépôt dans les délais, et un passage
+en force en un clic devient vite un réflexe. Le message de refus le dit.
+L'option `perdre_depots=True` de `perennite.restaurer` existe pour les
+scripts et les tests.
+
+**La liasse d'un exercice repris s'affiche.** Un exercice clôturé ailleurs
+puis importé n'a pas d'historique des déficits par millésime. La page Liasse
+refusait alors TOUTE la liasse (« Liasse indisponible »), et avec elle le
+suivi des dépôts, alors que seuls les déficits en report sont inconnus. Elle
+s'édite désormais, écran et PDF : un avertissement en tête, les déficits en
+report marqués « non suivis » et les cases 5GA à 5GJ « non calculables, à
+reprendre de la dernière déclaration », jamais à zéro. La garde de
+`liasse.suivi_reports` reste stricte pour tout autre appel : seule
+l'édition de la liasse tolère le manque, et elle le montre.
+
+**Deux corrections au passage.** La grille à trois champs (`grid3`) du
+formulaire des quittances était utilisée sans être définie dans la feuille
+de style : elle l'est, avec un repli sur une colonne pour les écrans
+étroits. Et la liste de contrôle avant ouverture du dépôt, retirée du
+`README.md` par une modification récente, y est remise : un test la
+vérifie (constat R-01).
 
 Schéma en version 9 (table `depot_declaration`, palier de migration 9 : la
 table naît vide, aucune donnée existante n'est touchée). Les routes web
@@ -58,7 +81,8 @@ garde-fou anti-monolithe.
 
 Non-régression : `tests/test_suivi_depot.py` (51 tests), un par règle et par
 refus, plus la migration depuis le schéma 8, le bac à sable, le web et la
-ligne de commande.
+ligne de commande ; `tests/test_liasse_robuste.py` (5 tests de plus) pour la
+liasse sans historique des déficits et la grille.
 
 ## 8.55.0 — 2026-09-18 (Reprendre une compta existante sans repartir de zéro)
 
